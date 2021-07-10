@@ -1,9 +1,10 @@
 import { h, Fragment } from 'preact';
 import { useState, useEffect, useRef } from 'preact/hooks';
 
-import { Platform } from '../analyzer/Types';
+import { Platform } from '../../analyzer/Types';
 
-import Worker, { WorkerResult } from "./Worker";
+import Worker, { WorkerResult } from "../Worker";
+import ReportPage from './ReportPage';
 
 const HomePage = () => {
     const [platform, setPlatform] = useState<Platform | undefined>(undefined);
@@ -35,9 +36,9 @@ const HomePage = () => {
                     ref={fileInput}
                     onChange={(e) => (e.target as any).files && selectFiles((e.target as any).files)}
                 />
-                <br/>
                 {result ? <>
-                    <a href={result.url} target="_blank">Ver reporte</a>
+                    <br/>
+                    <a href={result.url} target="_blank">Ver reportes</a>
                     <br/>
                     <a href={result.url} download="report.html">Descargar ({result.blob.size} bytes)</a>
                 </> : null}

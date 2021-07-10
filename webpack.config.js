@@ -12,8 +12,8 @@ console.log("Mode:", mode);
 
 const config = {
     entry: {
-        index: resolve("site/index.tsx"),
-        report: resolve("site/ReportPage.tsx")
+        index: resolve("site/Index.tsx"),
+        report: resolve("site/Report.tsx")
     },
     mode,
     output: {
@@ -63,6 +63,5 @@ const config = {
         compress: false
     }
 };
-
 
 module.exports = config;
