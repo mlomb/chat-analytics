@@ -1,21 +1,26 @@
-import "./assets/styles.less";
-import { h, Fragment, render } from 'preact';
-import { useState, useRef } from 'preact/hooks';
+import { h, Fragment } from 'preact';
+import { useState, useEffect, useRef } from 'preact/hooks';
 
 import { Platform } from '../analyzer/Types';
-import Service from "./worker/WorkerService";
+
+import Worker, { WorkerResult } from "./Worker";
 
 const HomePage = () => {
     const [platform, setPlatform] = useState<Platform | undefined>(undefined);
+    const [worker, setWorker] = useState<Worker | undefined>(undefined);
+    const [result, setResult] = useState<WorkerResult | undefined>(undefined);
     const fileInput = useRef<HTMLInputElement>(null);
 
-    const select = (platform: Platform | undefined) => {
-        setPlatform(platform);
-        Service.platform = platform;
-    };
+    useEffect(() => {
+        const worker: Worker = new Worker();
+        worker.onerror = ev => alert(`Error loading WebWorker:\n\n${ev.message}`);
+        worker.onmessage = (ev: MessageEvent<WorkerResult>) => setResult(ev.data);
+        setWorker(worker);
+        return () => { worker.terminate(); console.log("Terminating"); };
+    }, []);
 
     const selectFiles = (files: FileList) => {
-        Service.attachFiles(files);
+        worker!.postMessage({ type: "start", platform, files });
     };
 
     return <>
@@ -23,21 +28,25 @@ const HomePage = () => {
             <h1>Hello world</h1>
             {platform ? <>
                 <div>Selected: {platform}</div>
-                <button onClick={() => select(undefined)}>Cancel</button>
+                <button onClick={() => { setPlatform(undefined); setResult(undefined); }}>Cancel</button>
                 <input
                     type="file"
                     multiple={true}
                     ref={fileInput}
                     onChange={(e) => (e.target as any).files && selectFiles((e.target as any).files)}
                 />
+                <br/>
+                {result ? <>
+                    <a href={result.url} target="_blank">Ver reporte</a>
+                    <br/>
+                    <a href={result.url} download="report.html">Descargar ({result.blob.size} bytes)</a>
+                </> : null}
             </> : <>
-                <button onClick={() => select("whatsapp")}>Start WhatsApp</button><br/>
-                <button onClick={() => select("discord")}>Start Discord</button>
+                <button onClick={() => setPlatform("whatsapp")}>Start WhatsApp</button><br/>
+                <button onClick={() => setPlatform("discord")}>Start Discord</button>
             </>}
         </div>
     </>;
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    render(<HomePage/>, document.body);
-});
+export default HomePage;

@@ -1,11 +1,11 @@
 export default null as any;
 
-import { Platform } from "../../analyzer/Types";
-import { Parser } from "../../analyzer/Parser";
+import { Platform } from "../analyzer/Types";
+import { Parser } from "../analyzer/Parser";
 
-import { WhatsAppParser } from "../../analyzer/parsers/WhatsAppParser";
-import { DiscordParser } from "../../analyzer/parsers/DiscordParser";
-import { analyze } from "../../analyzer/Analyzer";
+import { WhatsAppParser } from "../analyzer/parsers/WhatsAppParser";
+import { DiscordParser } from "../analyzer/parsers/DiscordParser";
+import { analyze } from "../analyzer/Analyzer";
 
 let reportPage: string;
 
@@ -22,6 +22,11 @@ xhr.onload = () => {
 };
 xhr.open("GET", "report.html", true);
 xhr.send();
+
+export type WorkerResult = {
+    blob: Blob;
+    url: string;
+};
 
 export type StartMessage = {
     type: "start";
@@ -63,7 +68,10 @@ async function start(msg: StartMessage) {
     let blob = new Blob([page], {type : 'text/html'});
 
     // @ts-ignore
-    self.postMessage(blob);
+    self.postMessage(<WorkerResult>{
+        blob,
+        url: URL.createObjectURL(blob)
+    });
 }
 
 if (typeof window === "undefined" && typeof self !== "undefined") {

@@ -2,20 +2,20 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const HTMLInlineCSSWebpackPlugin = require("html-inline-css-webpack-plugin").default;
-
 const InlineChunkHtmlPlugin = require('react-dev-utils/InlineChunkHtmlPlugin');
 
-const prod = !(process.env.MODE === "development");
+const mode = process.env.MODE || 'development';
+const prod = !(mode === "development");
 const resolve = (file) => path.resolve(__dirname, file);
 
-console.log("Mode", process.env.MODE, prod);
+console.log("Mode:", mode);
 
 const config = {
     entry: {
-        index: resolve("site/HomePage.tsx"),
+        index: resolve("site/index.tsx"),
         report: resolve("site/ReportPage.tsx")
     },
-    mode: process.env.MODE || 'development',
+    mode,
     output: {
         path: resolve("public"),
         publicPath: ''
@@ -57,6 +57,7 @@ const config = {
 	optimization: {
         minimize: prod
     },
+    devtool: 'inline-source-map',
     devServer: {
         contentBase: resolve("public"),
         compress: false
