@@ -43,8 +43,8 @@ const HomePage = () => {
                     <a href={result.url} download="report.html">Descargar ({result.blob.size} bytes)</a>
                 </> : null}
             </> : <>
-                <button onClick={() => setPlatform("whatsapp")}>Start WhatsApp</button><br/>
-                <button onClick={() => setPlatform("discord")}>Start Discord</button>
+                <button onClick={() => setPlatform("whatsapp")}>Select WhatsApp</button><br/>
+                <button onClick={() => setPlatform("discord")}>Select Discord</button>
             </>}
         </div>
     </>;

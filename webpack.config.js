@@ -11,6 +11,7 @@ const resolve = (file) => path.resolve(__dirname, file);
 console.log("Mode:", mode);
 
 const config = {
+    target: "web",
     entry: {
         index: resolve("site/Index.tsx"),
         report: resolve("site/Report.tsx")
@@ -28,12 +29,17 @@ const config = {
                 MiniCssExtractPlugin.loader,
                 { loader: "css-loader" },
                 { loader: 'postcss-loader', options: { postcssOptions: { plugins: [require("autoprefixer"), require("cssnano")] } } },
-                { loader: "less-loader" }
+                { loader: "less-loader", options: { lessOptions: { javascriptEnabled: true } } }
             ] },
         ]
     },
     resolve: {
-        extensions: [".ts", ".tsx", ".js", ".jsx"]
+        extensions: [".ts", ".tsx", ".js", ".jsx"],
+        alias: { 
+            "react": "preact/compat",
+            "react-dom/test-utils": "preact/test-utils",
+            "react-dom": "preact/compat",
+        }
     },
 	plugins: [
 		new HtmlWebpackPlugin({
@@ -57,7 +63,7 @@ const config = {
 	optimization: {
         minimize: prod
     },
-    devtool: 'inline-source-map',
+    devtool: prod ? undefined : 'source-map',
     devServer: {
         contentBase: resolve("public"),
         compress: false
