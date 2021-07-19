@@ -44,7 +44,8 @@ const HomePage = () => {
                 </> : null}
             </> : <>
                 <button onClick={() => setPlatform("whatsapp")}>Select WhatsApp</button><br/>
-                <button onClick={() => setPlatform("discord")}>Select Discord</button>
+                <button onClick={() => setPlatform("discord")}>Select Discord</button><br/>
+                <button onClick={() => setPlatform("telegram")}>Select Telegram</button>
             </>}
         </div>
     </>;

@@ -5,6 +5,7 @@ import { Parser } from "../analyzer/Parser";
 
 import { WhatsAppParser } from "../analyzer/parsers/WhatsAppParser";
 import { DiscordParser } from "../analyzer/parsers/DiscordParser";
+import { TelegramParser } from "../analyzer/parsers/TelegramParser";
 import { analyze } from "../analyzer/Analyzer";
 
 let reportPage: string;
@@ -55,6 +56,7 @@ async function start(msg: StartMessage) {
     switch(msg.platform) {
         case 'discord': parser = new DiscordParser(); break;
         case 'whatsapp': parser = new WhatsAppParser(); break;
+        case 'telegram': parser = new TelegramParser(); break;
         default: return null;
     }
 

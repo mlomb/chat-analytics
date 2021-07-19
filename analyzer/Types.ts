@@ -1,10 +1,13 @@
-type ID = string | number;
+export type ID = string | number;
 
 export type Platform = 'discord' | 'telegram' | 'whatsapp';
 
 export type Author = {
     id: ID;
     name: string;
+    bot: boolean;
+    avatarUrl?: string;
+    color?: string;
 };
 
 // join chat, etc
@@ -13,10 +16,9 @@ export type Event = {
 }
 
 export type Message = {
-    id?: ID;
     type: "message";
     channel?: Channel;
-    from?: Author;
+    author?: ID;
     reply_to?: Message;
     date: Date;
     content: string;
@@ -32,6 +34,7 @@ export type Channel = {
 
 export type Database = {
     platform: Platform;
-    authors: Author[];
+    title: string;
+    authors: Map<ID, Author>;
     channels: Channel[];
 };
