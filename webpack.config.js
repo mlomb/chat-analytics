@@ -18,8 +18,9 @@ const config = {
     },
     mode,
     output: {
-        path: resolve("public"),
-        publicPath: ''
+        path: resolve("dist"),
+        publicPath: '',
+        clean: true
     },
     module: {
         rules: [
@@ -65,7 +66,7 @@ const config = {
     },
     devtool: prod ? undefined : 'source-map',
     devServer: {
-        contentBase: resolve("public"),
+        contentBase: resolve("dist"),
         compress: false
     }
 };

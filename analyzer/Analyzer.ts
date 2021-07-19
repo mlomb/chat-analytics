@@ -19,7 +19,7 @@ type Aggregation = {
     total_letters: number;
     words: { [word: string]: number };
     emojis: { [emoji: string]: number };
-    by_day: { [day: string]: Aggregation };
+//    by_day: { [day: string]: Aggregation };
 };
 
 type ReportData = {
@@ -151,6 +151,8 @@ const analyze = (db: Database): Report => {
     };
 
     console.log(report);
+    console.log(JSON.stringify(report));
+    
     return report;
 };
 

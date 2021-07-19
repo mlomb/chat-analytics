@@ -12,7 +12,7 @@ const ReportPage = ({ report }: Props) => {
     console.log("report", report);
     return <>
         <Header></Header>
-        <h1>Hola {JSON.stringify(report)}</h1>
+        <h1>Holaaaaasdasd</h1>
     </>;
 };
 
