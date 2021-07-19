@@ -14,12 +14,14 @@ export class WhatsAppParser extends Parser {
         for(let file_content of files) {
             let parsed = parseStringSync(file_content);
             for(let msg of parsed) {
-                authors.set(msg.author, {
-                    id: msg.author,
-                    name: msg.author,
-                    bot: false
-                });
                 if(msg.author !== "System") {
+                    if(!authors.has(msg.author)) {
+                        authors.set(msg.author, {
+                            id: msg.author,
+                            name: msg.author,
+                            bot: false
+                        });
+                    }
                     messages.push({
                         type: "message",
                         author: msg.author,

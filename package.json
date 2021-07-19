@@ -9,6 +9,7 @@
   "license": "MIT",
   "devDependencies": {
     "@types/webpack-env": "^1.16.2",
+    "@types/wink-tokenizer": "^4.0.3",
     "antd": "^4.16.6",
     "autoprefixer": "^10.2.6",
     "cross-env": "^7.0.3",
@@ -19,6 +20,7 @@
     "less": "^4.1.1",
     "less-loader": "^8.1.1",
     "mini-css-extract-plugin": "^2.1.0",
+    "multilang-sentiment": "^1.2.0",
     "postcss-loader": "^6.1.1",
     "preact": "^10.5.14",
     "react-dev-utils": "^11.0.4",
@@ -28,6 +30,7 @@
     "webpack-cli": "^4.7.2",
     "webpack-dev-server": "^3.11.2",
     "whatsapp-chat-parser": "^3.2.0",
+    "wink-tokenizer": "^5.2.3",
     "worker-loader": "^3.0.8"
   }
 }

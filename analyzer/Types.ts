@@ -1,4 +1,4 @@
-export type ID = string | number;
+export type ID = string;
 
 export type Platform = 'discord' | 'telegram' | 'whatsapp';
 
@@ -18,7 +18,7 @@ export type Event = {
 export type Message = {
     type: "message";
     channel?: Channel;
-    author?: ID;
+    author: ID;
     reply_to?: Message;
     date: Date;
     content: string;
