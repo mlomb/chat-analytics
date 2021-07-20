@@ -1,5 +1,4 @@
-import { h, Fragment } from 'preact';
-import { useState, useEffect, useRef } from 'preact/hooks';
+import { useState, useEffect, useRef } from 'react';
 
 import { Platform } from '../../analyzer/Types';
 

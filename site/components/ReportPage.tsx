@@ -1,6 +1,5 @@
 import { Report } from "../../analyzer/Analyzer";
 
-import { h, Fragment } from 'preact';
 import Header from "./Header";
 
 
@@ -12,7 +11,7 @@ const ReportPage = ({ report }: Props) => {
     console.log("report", report);
     return <>
         <Header></Header>
-        <h1>Holaaaaasdasd</h1>
+        <h1>Holaaaaasdeeeeeeeeeeeeasd</h1>
     </>;
 };
 

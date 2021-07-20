@@ -1,6 +1,6 @@
-import { h, Fragment } from 'preact';
+import { useState } from 'react';
+
 import Select from 'antd/lib/select';
-import { useState } from 'preact/hooks';
 
 interface ItemProps {
     label: string;

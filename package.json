@@ -2,12 +2,14 @@
   "name": "chats-analyzer",
   "version": "0.1.0",
   "scripts": {
-    "dev": "webpack serve --inline --hot --progress",
+    "dev": "webpack serve --progress",
     "build": "cross-env MODE=production webpack"
   },
   "author": "Martin Emiliano Lombardo <to@mlomb.me>",
   "license": "MIT",
   "devDependencies": {
+    "@types/react": "^17.0.14",
+    "@types/react-dom": "^17.0.9",
     "@types/webpack-env": "^1.16.2",
     "@types/wink-tokenizer": "^4.0.3",
     "antd": "^4.16.6",
@@ -22,8 +24,9 @@
     "mini-css-extract-plugin": "^2.1.0",
     "multilang-sentiment": "^1.2.0",
     "postcss-loader": "^6.1.1",
-    "preact": "^10.5.14",
+    "react": "^17.0.2",
     "react-dev-utils": "^11.0.4",
+    "react-dom": "^17.0.2",
     "ts-loader": "^8.3.0",
     "typescript": "^4.3.5",
     "webpack": "^5.44.0",

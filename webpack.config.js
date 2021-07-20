@@ -3,6 +3,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const HTMLInlineCSSWebpackPlugin = require("html-inline-css-webpack-plugin").default;
 const InlineChunkHtmlPlugin = require('react-dev-utils/InlineChunkHtmlPlugin');
+const webpack = require('webpack');
 
 const mode = process.env.MODE || 'development';
 const prod = !(mode === "development");
@@ -19,7 +20,7 @@ const config = {
     mode,
     output: {
         path: resolve("dist"),
-        publicPath: '',
+        publicPath: '/',
         clean: true
     },
     module: {
@@ -35,12 +36,7 @@ const config = {
         ]
     },
     resolve: {
-        extensions: [".ts", ".tsx", ".js", ".jsx"],
-        alias: { 
-            "react": "preact/compat",
-            "react-dom/test-utils": "preact/test-utils",
-            "react-dom": "preact/compat",
-        }
+        extensions: [".ts", ".tsx", ".js", ".jsx"]
     },
 	plugins: [
 		new HtmlWebpackPlugin({
@@ -58,16 +54,21 @@ const config = {
             } : { }
 		}),
         new MiniCssExtractPlugin(),
+	].concat(prod ? [
         new HTMLInlineCSSWebpackPlugin(),
-        new InlineChunkHtmlPlugin(HtmlWebpackPlugin, [/.*/]),
-	],
+        new InlineChunkHtmlPlugin(HtmlWebpackPlugin, [/.*/]),   
+    ] : [
+        new webpack.HotModuleReplacementPlugin()
+    ]),
 	optimization: {
         minimize: prod
     },
     devtool: prod ? undefined : 'source-map',
     devServer: {
-        contentBase: resolve("dist"),
-        compress: false
+        contentBase: resolve("public"),
+        compress: false,
+        inline: true,
+        hot: true
     }
 };
 
