@@ -1,5 +1,7 @@
 export default null as any;
 
+import { compress } from 'compress-json';
+
 import { Platform } from "../analyzer/Types";
 import { Parser } from "../analyzer/Parser";
 
@@ -66,7 +68,10 @@ async function start(msg: StartMessage) {
     // Analyze chats
     let report = analyze(db);
 
-    let page = reportPage.replace("undefined", JSON.stringify(report));
+    let report_data = JSON.stringify(compress(report));
+    console.log(report_data);
+
+    let page = reportPage.replace("undefined", report_data);
     let blob = new Blob([page], {type : 'text/html'});
 
     // @ts-ignore

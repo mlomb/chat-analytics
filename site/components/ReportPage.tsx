@@ -77,7 +77,11 @@ const ReportPage = ({ report }: Props) => {
         <FilterSelect options={report.authors} allText="All users" placeholder="Select users..." />
 
         <Selector/>
+
+        <h2>Messages</h2>
+        {/*<Messages />*/}
     </>;
 };
+
 
 export default ReportPage;
