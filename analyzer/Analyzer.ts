@@ -37,6 +37,7 @@ type Channels = {
 };
 
 export type Report = {
+    title: string;
     channels: Channels;
     authors: Authors;
     // events, stuff
@@ -111,6 +112,15 @@ const analyze = (db: Database): Report => {
     let authors: Authors = {};
     let channels: Channels = {};
 
+    let total = {
+        messages: 0,
+        total_words: 0,
+        total_emojis: 0,
+        total_letters: 0,
+        words: { },
+        emojis: { }
+    };
+
     for(let ch of db.channels) {
         channels[ch.id] = {
             name: ch.name,
@@ -125,6 +135,9 @@ const analyze = (db: Database): Report => {
         };
         let channel = channels[ch.id];
         for(let msg of ch.messages) {
+            if(db.authors.get(msg.author)?.bot === true)
+                continue;
+
             if(!(msg.author in authors)) {
                 // @ts-ignore
                 authors[msg.author] = {
@@ -141,17 +154,20 @@ const analyze = (db: Database): Report => {
             }
 
             let author = authors[msg.author];
-            processMessage(msg, [author.aggr, channel.aggr]);
+            processMessage(msg, [author.aggr, channel.aggr, total]);
         }
     }
 
     let report = {
+        title: db.title,
         channels,
         authors
     };
 
-    console.log(report);
-    console.log(JSON.stringify(report));
+    console.log(total);
+    
+    //console.log(report);
+    //console.log(JSON.stringify(report));
     
     return report;
 };

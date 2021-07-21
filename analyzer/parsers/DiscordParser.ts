@@ -42,6 +42,7 @@ export class DiscordParser extends Parser {
             }
             channels.push(channel);
         }
+
         return {
             platform: "discord",
             title: guild.name,

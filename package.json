@@ -8,8 +8,10 @@
   "author": "Martin Emiliano Lombardo <to@mlomb.me>",
   "license": "MIT",
   "devDependencies": {
+    "@amcharts/amcharts4": "^4.10.20",
     "@types/react": "^17.0.14",
     "@types/react-dom": "^17.0.9",
+    "@types/react-select": "^4.0.17",
     "@types/webpack-env": "^1.16.2",
     "@types/wink-tokenizer": "^4.0.3",
     "antd": "^4.16.6",
@@ -27,6 +29,7 @@
     "react": "^17.0.2",
     "react-dev-utils": "^11.0.4",
     "react-dom": "^17.0.2",
+    "react-select": "^4.3.1",
     "ts-loader": "^8.3.0",
     "typescript": "^4.3.5",
     "webpack": "^5.44.0",
