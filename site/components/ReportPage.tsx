@@ -1,13 +1,13 @@
-import { Report } from "../../analyzer/Analyzer";
-
-import Header from "./Header";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import Select from 'react-select';
 
 import * as am4core from "@amcharts/amcharts4/core";
 import * as am4charts from "@amcharts/amcharts4/charts";
 import am4themes_animated from "@amcharts/amcharts4/themes/animated";
 
-import { useLayoutEffect, useRef } from "react";
+import Header from "./Header";
 import FilterSelect from "./FilterSelect";
+import { NewAuthor, NewChannel, NewReport } from "../../analyzer/Analyzer";
 
 am4core.useTheme(am4themes_animated);
 
@@ -64,23 +64,40 @@ function Selector() {
 }
 
 interface Props {
-    report: Report
+    report: NewReport
 };
 
 const ReportPage = ({ report }: Props) => {
-    console.log("report", report);
-    return <>
-        <Header></Header>
-        <h1>{report.title} (reporte WIP)</h1>
+  const [selectedChannels, setSelectedChannels] = useState<NewChannel[]>([]);
+  const [selectedUsers, setSelectedUsers] = useState<NewAuthor[]>([]);
 
-        <FilterSelect options={report.channels} allText="All channels" placeholder="Select channels..." />
-        <FilterSelect options={report.authors} allText="All users" placeholder="Select users..." />
+  console.log("report", report);
+  console.log("selection", selectedUsers, selectedChannels);
 
-        <Selector/>
+  return <>
+      <Header></Header>
+      <h1>{report.title} (reporte WIP)</h1>
 
-        <h2>Messages</h2>
-        {/*<Messages />*/}
-    </>;
+      <FilterSelect
+        options={report.channels}
+        allText="All channels"
+        placeholder="Select channels..."
+        selected={selectedChannels}
+        onChange={setSelectedChannels}
+      />
+      <FilterSelect
+        options={report.authors}
+        allText="All users"
+        placeholder="Select users..."
+        selected={selectedUsers}
+        onChange={setSelectedUsers}
+      />
+
+      <Selector/>
+
+      <h2>Messages</h2>
+      {/*<Messages />*/}
+  </>;
 };
 
 

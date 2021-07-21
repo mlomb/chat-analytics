@@ -49,7 +49,13 @@ type DayAggregation = {
 
 type Event = MessageEvent;
 
-type NewAuthor = {
+export type NewChannel = {
+    id: string;
+    name: string;
+};
+
+export type NewAuthor = {
+    id: string;
     name: string;
     channels: {
         [id: string]: {
@@ -60,14 +66,8 @@ type NewAuthor = {
 
 export type NewReport = {
     title: string;
-    channels: {
-        [id: string]: {
-            name: string;
-        };
-    },
-    authors: {
-        [id: string]: NewAuthor;
-    };
+    channels: NewChannel[],
+    authors: NewAuthor[]
 };
 
 export type Report = {
@@ -103,22 +103,26 @@ const processMessage = (msg: Message, aggr: DayAggregation) => {
 const analyze = (db: Database): NewReport => {
     console.log("db", db);
 
-    let authors: { [id: string]: NewAuthor } = {};
-    let channels: { [id: string]: { name: string } } = {};
+    let authors = new Map<ID, NewAuthor>();
+    let channels: NewChannel[] = [];
 
     for(let [id, author] of db.authors) {
-        authors[id] = {
+        authors.set(id, {
+            id,
             name: author.name,
             channels: { }
-        };
+        });
     }
 
     for(let ch of db.channels) {
-        channels[ch.id] = { name: ch.name };
+        channels.push({
+            id: ch.id,
+            name: ch.name
+        });
 
         for(let msg of ch.messages) {
             let date = `${msg.date.getMonth()+1}-${msg.date.getDate()}-${msg.date.getFullYear()}`;
-            let author = authors[msg.author];
+            let author = authors.get(msg.author)!;
             if(!(ch.id in author.channels)) {
                 author.channels[ch.id] = { };
             }
@@ -134,10 +138,10 @@ const analyze = (db: Database): NewReport => {
         }
     }
 
-    let report = {
+    let report: NewReport = {
         title: db.title,
         channels,
-        authors,
+        authors: Array.from(authors.values())
     };
 
     console.log(report);

@@ -1,35 +1,31 @@
-import { useEffect, useState } from 'react';
+import Select from 'react-select';
 
-import Select, { Props as SelectProps } from 'react-select';
-
-interface Props {
-    allText: string;
-    placeholder: string;
-    options: {
-        [key: string]: {
-            name: string;
-        };
-    }
+interface Option {
+    id: string;
+    name: string;
 };
 
-const FilterSelect = (props: Props) => {
-    const [options, setOptions] = useState<any[]>([]);
+interface Props<T extends Option> {
+    allText: string;
+    placeholder: string;
+    options: T[];
+    selected: T[];
+    onChange: (selected: T[]) => void;
+};
 
-    useEffect(() => {
-        setOptions(Object.entries(props.options).map(entry => ({
-            value: entry[0],
-            label: entry[1].name
-        })));
-    }, [props.options]);
-
+const FilterSelect = <T extends Option>(props: Props<T>) => {
     return <Select
-        options={options}
+        options={props.options}
         placeholder={props.placeholder}
         isMulti={true}
         closeMenuOnSelect={false}
         hideSelectedOptions={false}
+        getOptionValue={option => option.id}
+        getOptionLabel={option => option.name}
+        defaultValue={props.selected}
+        // @ts-ignore
+        onChange={props.onChange}
     />;
-
 };
 
 export default FilterSelect;
