@@ -3,8 +3,12 @@ import ReactDOM from 'react-dom';
 
 import { Compressed, decompress } from "compress-json";
 
-import { Report } from "../analyzer/Analyzer";
 import ReportPage from "./components/ReportPage";
+
+// set amcharts theme
+import * as am4core from "@amcharts/amcharts4/core";
+import am4themes_animated from "@amcharts/amcharts4/themes/animated";
+am4core.useTheme(am4themes_animated);
 
 declare global {
     interface Window {
