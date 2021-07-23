@@ -67,7 +67,9 @@ export type NewAuthor = {
 export type NewReport = {
     title: string;
     channels: NewChannel[],
-    authors: NewAuthor[]
+    authors: NewAuthor[],
+    minDate: string;
+    maxDate: string;
 };
 
 export type Report = {
@@ -106,6 +108,11 @@ const analyze = (db: Database): NewReport => {
     let authors = new Map<ID, NewAuthor>();
     let channels: NewChannel[] = [];
 
+    let minDate: Date | null = null;
+    let maxDate: Date | null = null;
+
+    const dateToString = (date: Date): string => date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate();
+
     for(let [id, author] of db.authors) {
         authors.set(id, {
             id,
@@ -121,7 +128,10 @@ const analyze = (db: Database): NewReport => {
         });
 
         for(let msg of ch.messages) {
-            let date = `${msg.date.getMonth()+1}-${msg.date.getDate()}-${msg.date.getFullYear()}`;
+            if(minDate === null || msg.date < minDate) minDate = msg.date;
+            if(maxDate === null || msg.date > maxDate) maxDate = msg.date;
+
+            let date = dateToString(msg.date);
             let author = authors.get(msg.author)!;
             if(!(ch.id in author.channels)) {
                 author.channels[ch.id] = { };
@@ -141,7 +151,9 @@ const analyze = (db: Database): NewReport => {
     let report: NewReport = {
         title: db.title,
         channels,
-        authors: Array.from(authors.values())
+        authors: Array.from(authors.values()),
+        minDate: dateToString(minDate!),
+        maxDate: dateToString(maxDate!)
     };
 
     console.log(report);

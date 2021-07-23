@@ -4,11 +4,13 @@ import ReactDOM from 'react-dom';
 import { Compressed, decompress } from "compress-json";
 
 import ReportPage from "./components/ReportPage";
+import { initDataProvider } from "./DataProvider";
 
 // set amcharts theme
 import * as am4core from "@amcharts/amcharts4/core";
 import am4themes_animated from "@amcharts/amcharts4/themes/animated";
 am4core.useTheme(am4themes_animated);
+// am4core.options.queue = true; // TODO: are we sure?
 
 declare global {
     interface Window {
@@ -23,8 +25,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     if(window.__REPORT_DATA__ !== undefined) {
         const REPORT_DATA = decompress(window.__REPORT_DATA__);
+        initDataProvider(REPORT_DATA);
         ReactDOM.render(
-            <ReportPage report={REPORT_DATA} />,
+            <ReportPage/>,
             document.getElementById("app")
         );
     } else {

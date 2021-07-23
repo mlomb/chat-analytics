@@ -26,3 +26,20 @@ body {
     /*color: white;
     background-color: #333;*/
 }
+
+.tab {
+    display: inline-block;
+    margin: 10px;
+    border-bottom: 2px solid transparent;
+    font-size: 20px;
+    cursor: pointer;
+    user-select: none;
+    transition: 0.2s all;
+    
+    &:hover {
+        border-color: #c1b1ff;
+    }
+    &.active {
+        border-color: #5c33ff;
+    }
+}

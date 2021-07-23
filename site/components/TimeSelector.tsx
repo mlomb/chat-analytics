@@ -3,24 +3,23 @@ import { useLayoutEffect, useRef } from "react";
 import * as am4core from "@amcharts/amcharts4/core";
 import * as am4charts from "@amcharts/amcharts4/charts";
 
-interface Props {
-    onChange: (range: [Date, Date]) => void;
-};
+import { dataProvider } from "../DataProvider";
 
-const TimeSelector = (props: Props) => {
+const TimeSelector = () => {
     const chartDiv = useRef<HTMLDivElement>(null);
     const chart = useRef<am4charts.XYChart | null>(null);
 
     useLayoutEffect(() => {
         let x = am4core.create(chartDiv.current!, am4charts.XYChart);
 
-        x.xAxes.push(new am4charts.DateAxis());
-        x.yAxes.push(new am4charts.ValueAxis());
+        let dateAxis = x.xAxes.push(new am4charts.DateAxis());
+        let valueAxis = x.yAxes.push(new am4charts.ValueAxis());
+        valueAxis.min = 0;
 
         // preview series
         var series = x.series.push(new am4charts.LineSeries());
         series.dataFields.dateX = "date";
-        series.dataFields.valueY = "value";
+        series.dataFields.valueY = "messages";
 
         let sb = new am4charts.XYChartScrollbar();
         sb.series.push(series);
@@ -34,37 +33,29 @@ const TimeSelector = (props: Props) => {
         x.padding(0,0,0,0);
         x.margin(0,0,0,0);
 
-        chart.current = x;
-        return x.dispose;
-    }, []);
-
-    useLayoutEffect(() => {
-        let x = chart.current!;
         const dateAxisChanged = (ev: any) => {
             let start = new Date(ev.target.minZoomed);
             let end = new Date(ev.target.maxZoomed);
-            //props.onChange([start, end]);
-            // @ts-ignore
-            window.onzoom(start, end);
+            dataProvider.updateTimeRange(start, end);
         };
-        let dateAxis = x.xAxes.getIndex(0)!;
         dateAxis.events.on("startchanged", dateAxisChanged);
         dateAxis.events.on("endchanged", dateAxisChanged);
-    }, [props.onChange]);
 
-    useLayoutEffect(() => {
-        let x = chart.current!;
-        let data = [];
-        let visits = 10000;
-        for (let i = 1; i < 366; i++) {
-            visits += Math.round((Math.random() < 0.5 ? 1 : -1) * Math.random() * 10);
-            data.push({ date: new Date(2018, 0, i), name: "name" + i, value: visits });
-        }
+        x.data = dataProvider.getPerDayData();
 
-        x.data = data;
+        const onDataUpdated = () => {
+            x.invalidate();
+        };
+        dataProvider.on('updated-data', onDataUpdated);
+
+        chart.current = x;
+        return () => {
+            dataProvider.off('updated-data', onDataUpdated);
+            x.dispose();
+        };
     }, []);
 
-    return <div ref={chartDiv} style={{ width: "100%", height: "60px" }}></div>;
+    return <div ref={chartDiv} style={{ width: "100%", height: "85px" }}></div>;
 };
 
 export default TimeSelector;
