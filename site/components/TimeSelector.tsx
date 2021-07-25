@@ -14,9 +14,9 @@ const TimeSelector = () => {
 
         let dateAxis = x.xAxes.push(new am4charts.DateAxis());
         let valueAxis = x.yAxes.push(new am4charts.ValueAxis());
+        valueAxis.maxPrecision = 0;
         valueAxis.min = 0;
 
-        // preview series
         var series = x.series.push(new am4charts.LineSeries());
         series.dataFields.dateX = "date";
         series.dataFields.valueY = "messages";
@@ -41,13 +41,11 @@ const TimeSelector = () => {
         dateAxis.events.on("startchanged", dateAxisChanged);
         dateAxis.events.on("endchanged", dateAxisChanged);
 
-        x.data = dataProvider.getPerDayData();
-
-        const onDataUpdated = () => {
-            x.invalidate();
-        };
+        const onDataUpdated = () => sb.scrollbarChart.invalidateRawData();
         dataProvider.on('updated-data', onDataUpdated);
 
+        x.data = dataProvider.getPerDayData();
+        
         chart.current = x;
         return () => {
             dataProvider.off('updated-data', onDataUpdated);

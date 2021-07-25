@@ -78,7 +78,10 @@ const ReportPage = () => {
             <MessagesGraph/>
         </TabContainer>
         <TabContainer currentValue={tab} value="words">
-            <WordCloudGraph/>
+            <WordCloudGraph getData="getWordsData" />
+        </TabContainer>
+        <TabContainer currentValue={tab} value="emojis">
+            <WordCloudGraph getData="getEmojisData" />
         </TabContainer>
 
         {/*<MessagesHeatMap timeRange={selectedTimeRange} />*/}

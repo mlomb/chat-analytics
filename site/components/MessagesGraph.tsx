@@ -11,6 +11,7 @@ const MessagesGraph = () => {
     useLayoutEffect(() => {
         let x = am4core.create(chartDiv.current!, am4charts.XYChart);
 
+        x.data = dataProvider.getPerDayData();
         x.zoomOutButton.disabled = true;
 
         let dateAxis = x.xAxes.push(new am4charts.DateAxis());
@@ -18,7 +19,6 @@ const MessagesGraph = () => {
         valueAxis.maxPrecision = 0;
         valueAxis.min = 0;
 
-        // preview series
         var series = x.series.push(new am4charts.LineSeries());
         series.dataFields.dateX = "date";
         series.dataFields.valueY = "messages";
@@ -26,7 +26,6 @@ const MessagesGraph = () => {
         const onZoom = () => dateAxis.zoomToDates(dataProvider.getStart(), dataProvider.getEnd(), true, true);
         const onDataUpdated = x.invalidateRawData.bind(x);
 
-        x.data = dataProvider.getPerDayData();
         onZoom();
 
         dataProvider.on('updated-data', onDataUpdated);

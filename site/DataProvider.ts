@@ -7,8 +7,8 @@ export type DataPerDay = {
     messages: number;
 };
 
-export type WordData = {
-    word: string;
+export type FrequencyData = {
+    value: string;
     count: number;
 };
 
@@ -22,14 +22,15 @@ const dateToString = (date: Date): string => date.getFullYear() + "-" + (date.ge
 export class DataProvider extends EventEmitter {
 
     private perDay: DataPerDay[] = [];
-    private wordData: WordData[] = [];
+    private wordData: FrequencyData[] = [];
+    private emojiData: FrequencyData[] = [];
 
     private activeChannels: NewChannel[] = [];
     private activeAuthors: NewAuthor[] = [];
     private activeStartDate: Date = new Date();
     private activeEndDate: Date = new Date();
 
-    private readonly dates: [Date, string][] = [];
+    private readonly dates: string[] = [];
     private updateTimer?: NodeJS.Timeout;
 
     constructor(private readonly source: NewReport) {
@@ -39,7 +40,7 @@ export class DataProvider extends EventEmitter {
         const start = new Date(source.minDate);
         const end = new Date(source.maxDate);
         for (let day = start; day <= end; day.setDate(day.getDate() + 1)) {
-            this.dates.push([new Date(day), dateToString(day)]);
+            this.dates.push(dateToString(day));
             this.perDay.push({
                 date: new Date(day),
                 messages: 0
@@ -94,7 +95,9 @@ export class DataProvider extends EventEmitter {
     recomputeData() {
         let i = 0;
         let wordsAggr = new Map<string, number>();
-        for (let [date, dateStr] of this.dates) {
+        let emojisAggr = new Map<string, number>();
+
+        for (let dateStr of this.dates) {
             let messages = 0;
             
             for(const author of this.activeAuthors) {
@@ -105,9 +108,13 @@ export class DataProvider extends EventEmitter {
                             messages += from_user_in_channel[dateStr].messages;
 
                             const words = from_user_in_channel[dateStr].words;
-
                             for(const word in words) {
                                 wordsAggr.set(word, (wordsAggr.get(word) || 0) + words[word]);
+                            }
+                            
+                            const emojis = from_user_in_channel[dateStr].emojis;
+                            for(const emoji in emojis) {
+                                emojisAggr.set(emoji, (emojisAggr.get(emoji) || 0) + emojis[emoji]);
                             }
                         }
                     }
@@ -116,20 +123,29 @@ export class DataProvider extends EventEmitter {
             this.perDay[i++].messages = messages;
         }
 
-        this.wordData = [];
-        for(const [word, count] of wordsAggr) {
-            this.wordData.push({ word, count });
-        }
-        this.wordData.sort((a, b) => b.count - a.count);
-        this.wordData = this.wordData.slice(0, 100);
+        const deMap = (map: Map<string, number>): FrequencyData[] => {
+            let res = [];
+            for(const [value, count] of map) {
+                res.push({ value, count });
+            }
+            res.sort((a, b) => b.count - a.count);
+            return res.slice(0, 100);
+        };
+
+        this.wordData = deMap(wordsAggr);
+        this.emojiData = deMap(emojisAggr);
     }
 
     getPerDayData(): DataPerDay[] {
         return this.perDay;
     }
 
-    getWordsData(): WordData[] {
+    getWordsData(): FrequencyData[] {
         return this.wordData;
+    }
+
+    getEmojisData(): FrequencyData[] {
+        return this.emojiData;
     }
 
     getStart(): Date {
