@@ -53,22 +53,35 @@ const ReportPage = () => {
         <Header></Header>
         <h1>{report.title} (reporte WIP)</h1>
 
-        <FilterSelect
-        options={report.channels}
-        allText="All channels"
-        placeholder="Select channels..."
-        selected={selectedChannels}
-        onChange={setSelectedChannels}
-        />
-        <FilterSelect
-        options={report.authors}
-        allText="All users"
-        placeholder="Select users..."
-        selected={selectedUsers}
-        onChange={setSelectedUsers}
-        />
-
-        <TimeSelector/>
+        <div className="filters">
+            <div className="filter">
+                <label htmlFor="channels">Channels</label>
+                <FilterSelect
+                    name="channels"
+                    options={report.channels}
+                    allText="All channels"
+                    placeholder="Select channels..."
+                    selected={selectedChannels}
+                    onChange={setSelectedChannels}
+                />
+            </div>
+            <div className="sep"></div>
+            <div className="filter">
+                <label htmlFor="authors">Authors</label>
+                <FilterSelect
+                    name="authors"
+                    options={report.authors}
+                    allText="All users"
+                    placeholder="Select users..."
+                    selected={selectedUsers}
+                    onChange={setSelectedUsers}
+                />
+            </div>
+            <div className="filter" style={{ minWidth: "100%" }}>
+                <label htmlFor="authors">Time</label>
+                <TimeSelector/>
+            </div>
+        </div>
 
         <Tab currentValue={tab} onChange={setTab} value="messages">Messages</Tab>
         <Tab currentValue={tab} onChange={setTab} value="words">Words</Tab>

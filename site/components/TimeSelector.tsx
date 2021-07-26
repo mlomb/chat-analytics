@@ -66,7 +66,7 @@ const TimeSelector = () => {
 
         scrollbar.parent = x;
         scrollbar.margin(0, 0, 30, 0);
-        x.padding(0,10,0,10);
+        x.padding(0,0,0,0);
         x.margin(0,0,0,0);
 
         const dateAxisChanged = (ev: any) => {
@@ -89,7 +89,7 @@ const TimeSelector = () => {
         };
     }, []);
 
-    return <div ref={chartDiv} style={{ width: "100%", height: "100px" }}></div>;
+    return <div ref={chartDiv} style={{ width: "100%", height: "91px" }}></div>;
 };
 
 export default TimeSelector;
