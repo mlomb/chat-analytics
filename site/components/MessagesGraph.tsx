@@ -18,11 +18,28 @@ const MessagesGraph = () => {
         let valueAxis = x.yAxes.push(new am4charts.ValueAxis());
         valueAxis.maxPrecision = 0;
         valueAxis.min = 0;
+        valueAxis.title.text = "Messages sent";
+        valueAxis.cursorTooltipEnabled = false;
+
+        let title = x.titles.create();
+        title.text = "Messages sent per day";
+        title.fontSize = 20;
+        title.marginBottom = 10;
 
         var series = x.series.push(new am4charts.LineSeries());
         series.dataFields.dateX = "date";
         series.dataFields.valueY = "messages";
+        series.fillOpacity = 0.1;
+        series.fill = am4core.color("#479ADB");
+        series.stroke = am4core.color("#479ADB");
+        series.tensionX = 0.8;
+        series.tooltipText = "{dateX}: [bold]{valueY}[/]";
         
+        x.cursor = new am4charts.XYCursor();
+        x.cursor.behavior = "none";
+        x.cursor.lineX.disabled = true;
+        x.cursor.lineY.disabled = true;
+
         const onZoom = () => dateAxis.zoomToDates(dataProvider.getStart(), dataProvider.getEnd(), true, true);
         const onDataUpdated = x.invalidateRawData.bind(x);
 

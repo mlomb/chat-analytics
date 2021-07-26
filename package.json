@@ -14,7 +14,6 @@
     "@types/react-select": "^4.0.17",
     "@types/webpack-env": "^1.16.2",
     "@types/wink-tokenizer": "^4.0.3",
-    "antd": "^4.16.6",
     "autoprefixer": "^10.2.6",
     "compress-json": "^1.0.4",
     "cross-env": "^7.0.3",

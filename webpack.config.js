@@ -49,9 +49,7 @@ const config = {
             chunks: ["report"],
 			template: resolve("site/assets/report.html"),
             filename: "report.html",
-            minify: prod ? {
-                removeComments: false
-            } : { }
+            minify: prod
 		}),
         new MiniCssExtractPlugin(),
 	].concat(prod ? [
@@ -65,8 +63,9 @@ const config = {
     },
     devtool: prod ? undefined : 'source-map',
     devServer: {
+        host: '0.0.0.0',
         contentBase: resolve("public"),
-        compress: false,
+        compress: true,
         inline: true,
         hot: true
     }

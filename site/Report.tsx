@@ -7,10 +7,13 @@ import ReportPage from "./components/ReportPage";
 import { initDataProvider } from "./DataProvider";
 
 // set amcharts theme
-import * as am4core from "@amcharts/amcharts4/core";
+import { useTheme, options } from "@amcharts/amcharts4/core";
+import am4themes_dark from "@amcharts/amcharts4/themes/dark";
 import am4themes_animated from "@amcharts/amcharts4/themes/animated";
-am4core.useTheme(am4themes_animated);
-am4core.options.queue = true; // TODO: are we sure?
+useTheme(am4themes_dark);
+useTheme(am4themes_animated);
+options.queue = true;
+options.onlyShowOnViewport = true;
 
 declare global {
     interface Window {

@@ -73,6 +73,9 @@ const ReportPage = () => {
         <Tab currentValue={tab} onChange={setTab} value="messages">Messages</Tab>
         <Tab currentValue={tab} onChange={setTab} value="words">Words</Tab>
         <Tab currentValue={tab} onChange={setTab} value="emojis">Emojis</Tab>
+        <Tab currentValue={tab} onChange={setTab} value="interaction">Interaction</Tab>
+        <Tab currentValue={tab} onChange={setTab} value="sentiment">Sentiment</Tab>
+        <Tab currentValue={tab} onChange={setTab} value="external">External</Tab>
 
         <TabContainer currentValue={tab} value="messages">
             <MessagesGraph/>
