@@ -50,8 +50,7 @@ const ReportPage = () => {
     useLayoutEffect(() => dataProvider.updateChannels(selectedChannels), [selectedChannels]);
 
     return <>
-        <Header></Header>
-        <h1>{report.title} (reporte WIP)</h1>
+        <Header title={report.title}></Header>
 
         <div className="filters">
             <div className="filter">
@@ -89,6 +88,7 @@ const ReportPage = () => {
         <Tab currentValue={tab} onChange={setTab} value="interaction">Interaction</Tab>
         <Tab currentValue={tab} onChange={setTab} value="sentiment">Sentiment</Tab>
         <Tab currentValue={tab} onChange={setTab} value="external">External</Tab>
+        <Tab currentValue={tab} onChange={setTab} value="timeline">Timeline</Tab>
 
         <TabContainer currentValue={tab} value="messages">
             <MessagesGraph/>

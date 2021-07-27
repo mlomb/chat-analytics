@@ -2,7 +2,7 @@ import EventEmitter from "events";
 
 import { NewAuthor, NewChannel, NewReport } from "../analyzer/Analyzer";
 
-export type DataPerDay = {
+export type DataPerDate = {
     date: Date;
     messages: number;
 };
@@ -21,7 +21,8 @@ const dateToString = (date: Date): string => date.getFullYear() + "-" + (date.ge
 
 export class DataProvider extends EventEmitter {
 
-    private perDay: DataPerDay[] = [];
+    private perDay: DataPerDate[] = [];
+    private perMonth: DataPerDate[] = [];
     private wordData: FrequencyData[] = [];
     private emojiData: FrequencyData[] = [];
 
@@ -36,14 +37,19 @@ export class DataProvider extends EventEmitter {
     constructor(private readonly source: NewReport) {
         super();
 
-        this.perDay = [];
         const start = new Date(source.minDate);
         const end = new Date(source.maxDate);
-        for (let day = start; day <= end; day.setDate(day.getDate() + 1)) {
+        for (let day = new Date(start); day <= end; day.setDate(day.getDate() + 1)) {
             this.dates.push(dateToString(day));
             this.perDay.push({
                 date: new Date(day),
                 messages: 0
+            });
+        }
+        for (let month = new Date(start); month <= end; month.setMonth(month.getMonth() + 1)) {
+            this.perMonth.push({
+                date: new Date(month),
+                messages: Math.random() * 1000 + 10
             });
         }
         this.recomputeData();
@@ -136,8 +142,12 @@ export class DataProvider extends EventEmitter {
         this.emojiData = deMap(emojisAggr);
     }
 
-    getPerDayData(): DataPerDay[] {
+    getPerDayData(): DataPerDate[] {
         return this.perDay;
+    }
+
+    getPerMonthData(): DataPerDate[] {
+        return this.perMonth;
     }
 
     getWordsData(): FrequencyData[] {

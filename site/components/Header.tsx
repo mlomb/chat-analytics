@@ -1,8 +1,13 @@
-import { useState } from 'react';
+interface Props {
+    title: string;
+}
 
-const Header = () => {
+const Header = (props: Props) => {
     return (
-      <div></div>
+        <div className="header">
+            <h1>{props.title}</h1>
+            {/* cosas */}
+        </div>
     );
 };
 

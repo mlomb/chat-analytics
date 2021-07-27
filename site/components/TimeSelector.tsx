@@ -47,9 +47,13 @@ const TimeSelector = () => {
         let scrollbar = new am4charts.XYChartScrollbar();
         x.scrollbarX = scrollbar;
         
-        let series = new am4charts.LineSeries();
+        let series = new am4charts.StepLineSeries();
         series.dataFields.dateX = "date";
         series.dataFields.valueY = "messages";
+        series.noRisers = true;
+        series.strokeWidth = 2;
+        series.fillOpacity = 0.2;
+        series.sequencedInterpolation = true;
         
         x.series.push(series);
         scrollbar.series.push(series);
