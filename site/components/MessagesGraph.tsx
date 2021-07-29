@@ -20,16 +20,17 @@ const MessagesGraph = () => {
         chart.cursor.lineX.disabled = true;
         chart.cursor.lineY.disabled = true;*/
 
-        const createChart = (data: any) => {
+        const createChart = (data: any[], ) => {
             let chart = container.createChild(am4charts.XYChart);
             chart.zoomOutButton.disabled = true;
             
             let dateAxis = chart.xAxes.push(new am4charts.DateAxis());
+            dateAxis.dateFormats.setKey("day", "MMMM dt");
+            dateAxis.periodChangeDateFormats.setKey("month", "[bold]yyyy[/]"); 
 
             let valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
             valueAxis.maxPrecision = 0;
             valueAxis.min = 0;
-            //valueAxis.title.text = "Messages sent";
             valueAxis.cursorTooltipEnabled = false;
 
             valueAxis.marginTop = 10;
@@ -59,19 +60,18 @@ const MessagesGraph = () => {
             return chart;
         };
 
-
-        /*
-        let title = chart.titles.create();
-        title.text = "Messages sent per day";
+        let charts = [
+            createChart(dataProvider.getPerDayData()),
+            createChart(dataProvider.getPerMonthData())
+        ];
+        
+        let title = charts[0].titles.create();
+        title.text = "Messages sent per day & month";
         title.fontSize = 20;
         title.marginBottom = 10;
-
-        */
-       let charts = [
-           createChart(dataProvider.getPerDayData()),
-           createChart(dataProvider.getPerMonthData())
-       ];
-       charts[1].height = 100;
+        
+        charts[0].yAxes.getIndex(0)!.title.text = "Messages sent";
+        charts[1].height = 100;
 
         const onZoom = () => charts.forEach(c => (c.xAxes.getIndex(0) as am4charts.DateAxis).zoomToDates(dataProvider.getStart(), dataProvider.getEnd(), true, true));
         const onDataUpdated = () => {

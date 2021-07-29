@@ -12,6 +12,17 @@ export type FrequencyData = {
     count: number;
 };
 
+type AttachmentType = "image" | "video" | "voice" | "location" | "file";
+
+export type GeneralStats = {
+    totalMessages: number;
+    totalWords: number;
+    totalLetters: number;
+    totalAttachments: {
+        [type in AttachmentType]: number;
+    };
+};
+
 const monthToString = (date: Date): string => date.getFullYear() + "-" + (date.getMonth() + 1);
 const dateToString = (date: Date): string => monthToString(date) + "-" + date.getDate();
 
@@ -22,6 +33,7 @@ const dateToString = (date: Date): string => monthToString(date) + "-" + date.ge
 
 export class DataProvider extends EventEmitter {
 
+    private generalData: GeneralStats;
     private perDay: DataPerDate[] = [];
     private perMonth: DataPerDate[] = [];
     private wordData: FrequencyData[] = [];
