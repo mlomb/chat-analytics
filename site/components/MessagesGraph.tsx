@@ -25,7 +25,6 @@ const MessagesGraph = () => {
             chart.zoomOutButton.disabled = true;
             
             let dateAxis = chart.xAxes.push(new am4charts.DateAxis());
-            //dateAxis.periodChangeDateFormats.setKey("month", "[bold]yyyy[/]");
 
             let valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
             valueAxis.maxPrecision = 0;
@@ -50,6 +49,12 @@ const MessagesGraph = () => {
             series.strokeWidth = 2;
             series.fillOpacity = 0.2;
             series.sequencedInterpolation = true;
+            
+            /*
+            dateAxis.groupData = true;
+            dateAxis.groupCount = 600;
+            series.groupFields.valueY = "sum";
+            */
 
             return chart;
         };
@@ -66,11 +71,13 @@ const MessagesGraph = () => {
            createChart(dataProvider.getPerDayData()),
            createChart(dataProvider.getPerMonthData())
        ];
+       charts[1].height = 100;
 
         const onZoom = () => charts.forEach(c => (c.xAxes.getIndex(0) as am4charts.DateAxis).zoomToDates(dataProvider.getStart(), dataProvider.getEnd(), true, true));
-        const onDataUpdated = () => charts.forEach(c => c.invalidateRawData());
-
-        onZoom();
+        const onDataUpdated = () => {
+            charts.forEach(c => c.invalidateRawData());
+            onZoom();
+        };
 
         dataProvider.on('updated-data', onDataUpdated);
         dataProvider.on('updated-zoom', onZoom);

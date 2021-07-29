@@ -13,6 +13,7 @@ export class WhatsAppParser extends Parser {
         let authors = new Map<ID, Author>();
         for(let file_content of files) {
             let parsed = parseStringSync(file_content);
+            console.log(JSON.stringify(parsed, null, 4));
             for(let msg of parsed) {
                 if(msg.author !== "System") {
                     if(!authors.has(msg.author)) {
@@ -38,7 +39,7 @@ export class WhatsAppParser extends Parser {
             platform: "whatsapp",
             title: "WhatsApp chat", // TODO: chat or group
             channels: [{
-                id: "",
+                id: "default",
                 messages,
                 name: "Default"
             }],

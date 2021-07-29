@@ -12,7 +12,8 @@ export type FrequencyData = {
     count: number;
 };
 
-const dateToString = (date: Date): string => date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate();
+const monthToString = (date: Date): string => date.getFullYear() + "-" + (date.getMonth() + 1);
+const dateToString = (date: Date): string => monthToString(date) + "-" + date.getDate();
 
 // Events:
 // updated-zoom: instant (drag time slider)
@@ -31,27 +32,48 @@ export class DataProvider extends EventEmitter {
     private activeStartDate: Date = new Date();
     private activeEndDate: Date = new Date();
 
-    private readonly dates: string[] = [];
+    private readonly dates: {
+        date: Date;
+        dayKey: string;
+        monthKey: string;
+        dayData: DataPerDate;
+        monthData: DataPerDate;
+    }[] = [];
     private updateTimer?: NodeJS.Timeout;
 
     constructor(private readonly source: NewReport) {
         super();
 
+        const monthsData = new Map<string, DataPerDate>();
         const start = new Date(source.minDate);
         const end = new Date(source.maxDate);
         for (let day = new Date(start); day <= end; day.setDate(day.getDate() + 1)) {
-            this.dates.push(dateToString(day));
-            this.perDay.push({
+            const dayKey = dateToString(day);
+            const monthKey = monthToString(day);
+            let dayData = {
                 date: new Date(day),
                 messages: 0
+            };
+            let monthData = monthsData.get(monthKey);
+            if(monthData === undefined) {
+                monthData = {
+                    date: new Date(day.getFullYear(), day.getMonth(), 1),
+                    messages: 0
+                };
+                monthsData.set(monthKey, monthData);
+                this.perMonth.push(monthData);
+            }
+            this.dates.push({
+                date: new Date(day),
+                dayKey,
+                monthKey,
+                dayData,
+                monthData
             });
+            this.perDay.push(dayData);
         }
-        for (let month = new Date(start); month <= end; month.setMonth(month.getMonth() + 1)) {
-            this.perMonth.push({
-                date: new Date(month),
-                messages: Math.random() * 1000 + 10
-            });
-        }
+        this.activeStartDate = start;
+        this.activeEndDate = end;
         this.recomputeData();
     }
 
@@ -91,7 +113,7 @@ export class DataProvider extends EventEmitter {
         this.updateTimer = setTimeout(() => {
             this.updateTimer = undefined;
             this.update();
-        }, 200);
+        }, 2000);
     }
 
     // TODO: includeInData(author, channel, date), excludeFromData(author, channel, date)
@@ -99,26 +121,29 @@ export class DataProvider extends EventEmitter {
     // NOTE: this is expensive, it should be optimized knowing which kind of update it was
     //       (updateChannels, updateAuthors, updateTimeRange)
     recomputeData() {
-        let i = 0;
+        console.log("recomputing data");
         let wordsAggr = new Map<string, number>();
         let emojisAggr = new Map<string, number>();
 
-        for (let dateStr of this.dates) {
-            let messages = 0;
-            
+        for (let dayData of this.perDay) dayData.messages = 0;
+        for (let monthData of this.perMonth) monthData.messages = 0;
+
+        for (let { dayKey, dayData, monthData } of this.dates) {
             for(const author of this.activeAuthors) {
                 for(const channel of this.activeChannels) {
                     if(channel.id in author.channels) {
                         const from_user_in_channel = author.channels[channel.id];
-                        if(dateStr in from_user_in_channel) {
-                            messages += from_user_in_channel[dateStr].messages;
+                        if(dayKey in from_user_in_channel) {
+                            let messages = from_user_in_channel[dayKey].messages;
+                            dayData.messages += messages;
+                            monthData.messages += messages;
 
-                            const words = from_user_in_channel[dateStr].words;
+                            const words = from_user_in_channel[dayKey].words;
                             for(const word in words) {
                                 wordsAggr.set(word, (wordsAggr.get(word) || 0) + words[word]);
                             }
                             
-                            const emojis = from_user_in_channel[dateStr].emojis;
+                            const emojis = from_user_in_channel[dayKey].emojis;
                             for(const emoji in emojis) {
                                 emojisAggr.set(emoji, (emojisAggr.get(emoji) || 0) + emojis[emoji]);
                             }
@@ -126,7 +151,6 @@ export class DataProvider extends EventEmitter {
                     }
                 }
             }
-            this.perDay[i++].messages = messages;
         }
 
         const deMap = (map: Map<string, number>): FrequencyData[] => {

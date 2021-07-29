@@ -11,7 +11,7 @@ import { useTheme, options } from "@amcharts/amcharts4/core";
 import am4themes_dark from "@amcharts/amcharts4/themes/dark";
 import am4themes_animated from "@amcharts/amcharts4/themes/animated";
 useTheme(am4themes_dark);
-useTheme(am4themes_animated);
+//useTheme(am4themes_animated);
 options.queue = true;
 options.onlyShowOnViewport = true;
 

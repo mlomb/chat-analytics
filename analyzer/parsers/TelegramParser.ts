@@ -11,23 +11,25 @@ export class TelegramParser extends Parser {
             let data = JSON.parse(file_content);
             titles.push(data.name);
             console.log(data);
-
+            
             for(let msg of data.messages) {
+                const author_id = msg.from_id+'';
+                if(!msg.from) continue; // TODO: fix
                 if(msg.type === "message") {
                     messages.push({
                         type: "message",
-                        author: msg.from_id+'',
+                        author: author_id,
                         content: this.parseTextArray(msg.text),
                         date: new Date(msg.date),
                     });
                 }
-                if(!authors.has(msg.from_id)) {
+                if(!authors.has(author_id)) {
                     let author: Author = {
-                        id: msg.from_id,
+                        id: author_id,
                         name: msg.from,
                         bot: false
                     };
-                    authors.set(msg.from_id, author);
+                    authors.set(author_id, author);
                 }
             }
         }
@@ -37,7 +39,7 @@ export class TelegramParser extends Parser {
             title: titles.length === 1 ? titles[0] : `${titles.length} Telegram chats`,
             // TODO: fix
             channels: [{
-                id: "",
+                id: "default",
                 messages,
                 name: titles[0]
             }],
