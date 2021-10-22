@@ -2,6 +2,7 @@ import { useLayoutEffect, useRef } from "react";
 
 import * as am4core from "@amcharts/amcharts4/core";
 import * as am4charts from "@amcharts/amcharts4/charts";
+
 import { dataProvider } from "../DataProvider";
 
 const MessagesGraph = () => {
@@ -65,10 +66,10 @@ const MessagesGraph = () => {
             createChart(dataProvider.getPerMonthData())
         ];
         
-        let title = charts[0].titles.create();
+        /*let title = charts[0].titles.create();
         title.text = "Messages sent per day & month";
         title.fontSize = 20;
-        title.marginBottom = 10;
+        title.marginBottom = 10;*/
         
         charts[0].yAxes.getIndex(0)!.title.text = "Messages sent";
         charts[1].height = 100;

@@ -64,10 +64,10 @@ const config = {
     devtool: prod ? undefined : 'source-map',
     devServer: {
         host: '0.0.0.0',
-        contentBase: resolve("public"),
-        compress: true,
-        inline: true,
-        hot: true
+        static: {
+            publicPath: resolve("public"),
+        },
+        compress: true
     }
 };
 

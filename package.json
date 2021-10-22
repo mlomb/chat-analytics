@@ -34,9 +34,12 @@
     "typescript": "^4.3.5",
     "webpack": "^5.47.0",
     "webpack-cli": "^4.7.2",
-    "webpack-dev-server": "^3.11.2",
+    "webpack-dev-server": "^4.3.1",
     "whatsapp-chat-parser": "^3.2.1",
     "wink-tokenizer": "^5.2.3",
     "worker-loader": "^3.0.8"
+  },
+  "dependencies": {
+    "@amcharts/amcharts5": "^5.0.0-beta.35"
   }
 }

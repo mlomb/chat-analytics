@@ -3,25 +3,16 @@ import { useLayoutEffect, useMemo, useState } from "react";
 import { NewAuthor, NewChannel, NewReport } from "../../analyzer/Analyzer";
 import { dataProvider, DataProvider } from "../DataProvider";
 import Header from "./Header";
+import Card from "./Card";
 import FilterSelect from "./FilterSelect";
 import TimeSelector from "./TimeSelector";
 import MessagesGraph from "./MessagesGraph";
 import MessagesHeatMap from "./MessagesHeatMap";
 import WordCloudGraph from "./WordCloudGraph";
-
-const Tab = (props: {
-    currentValue: string;
-    value: string;
-    children: React.ReactNode;
-    onChange: (value: string) => void;
-}) => {
-    return <div
-        className={props.currentValue === props.value ? "active tab" : "tab"}
-        onClick={() => props.onChange(props.value)}
-    >
-        {props.children}
-    </div>;
-};
+import DonutChart from "./DonutChart";
+import PieChart from "./PieChart";
+import SimpleTable from "./SimpleTable";
+import HeatMapChart from "./HeatMapChart";
 
 const TabContainer = (props: {
     currentValue: string;
@@ -32,6 +23,8 @@ const TabContainer = (props: {
         {props.children}
     </div>;
 };
+
+const Title = ({ children }: any) => <div className="card-title">{children}</div>;
 
 const ReportPage = () => {
     const report = dataProvider.getSource();
@@ -50,54 +43,38 @@ const ReportPage = () => {
     useLayoutEffect(() => dataProvider.updateChannels(selectedChannels), [selectedChannels]);
 
     return <>
-        <Header title={report.title}></Header>
-
-        <div className="filters">
-            <div className="filter">
-                <label htmlFor="channels">Channels</label>
-                <FilterSelect
-                    name="channels"
-                    options={report.channels}
-                    allText="All channels"
-                    placeholder="Select channels..."
-                    selected={selectedChannels}
-                    onChange={setSelectedChannels}
-                />
-            </div>
-            <div className="sep"></div>
-            <div className="filter">
-                <label htmlFor="authors">Authors</label>
-                <FilterSelect
-                    name="authors"
-                    options={report.authors}
-                    allText="All users"
-                    placeholder="Select users..."
-                    selected={selectedUsers}
-                    onChange={setSelectedUsers}
-                />
-            </div>
-            <div className="filter" style={{ minWidth: "100%" }}>
-                <label htmlFor="authors">Time</label>
-                <TimeSelector/>
-            </div>
-        </div>
-
-        <Tab currentValue={tab} onChange={setTab} value="messages">Messages</Tab>
-        <Tab currentValue={tab} onChange={setTab} value="words">Words</Tab>
-        <Tab currentValue={tab} onChange={setTab} value="emojis">Emojis</Tab>
-        <Tab currentValue={tab} onChange={setTab} value="interaction">Interaction</Tab>
-        <Tab currentValue={tab} onChange={setTab} value="sentiment">Sentiment</Tab>
-        <Tab currentValue={tab} onChange={setTab} value="external">External</Tab>
-        <Tab currentValue={tab} onChange={setTab} value="timeline">Timeline</Tab>
+        <Header title={report.title} tab={tab} setTab={setTab} />
 
         <TabContainer currentValue={tab} value="messages">
-            <MessagesGraph/>
+            <Card>
+                <Title>Messages sent per day &amp; month</Title>
+                <MessagesGraph/>
+            </Card>
+            <Card>
+                <Title>Messages stats</Title>
+                <SimpleTable/>
+            </Card>
+            <Card>
+                <Title>Messages kind</Title>
+                <PieChart />
+            </Card>
+            <Card>
+                <Title>Messages heatmap</Title>
+                <HeatMapChart />
+            </Card>
         </TabContainer>
-        <TabContainer currentValue={tab} value="words">
-            <WordCloudGraph getData="getWordsData" />
+        <TabContainer currentValue={tab} value="language">
+            <Card>
+                <WordCloudGraph getData="getWordsData" />
+            </Card>
+            <Card>
+                <DonutChart />
+            </Card>
         </TabContainer>
         <TabContainer currentValue={tab} value="emojis">
-            <WordCloudGraph getData="getEmojisData" />
+            <Card>
+                <WordCloudGraph getData="getEmojisData" />
+            </Card>
         </TabContainer>
 
         {/*<MessagesHeatMap timeRange={selectedTimeRange} />*/}

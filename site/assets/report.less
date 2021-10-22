@@ -9,34 +9,147 @@ body {
     font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,Noto Sans,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji;
     font-size: 14px;
     color: white;
-    background: #121212;
+    background: #1C232B;
 }
 
 .header {
+    @tab-width: 90px;
+    @tab-padding: 10px;
+    @tab-stride: @tab-width + 2 * @tab-padding;
+    @line-size: 5px;
+
+    padding: 0 10px;
+    margin-bottom: 40px;
+    background-color: #22292F;
+    border-bottom: @line-size solid #282F35;
+
+    .menu {
+        display: flex;
+        position: relative;
+        
+        a {
+            display: block;
+            color: #535A65;
+            text-decoration: none;
+            text-transform: uppercase;
+            padding: @tab-padding;
+            font-size: 18px;
+            width: @tab-width;
+            text-align: center;
+            transition: color 0.1s;
+            cursor: pointer;
+            user-select: none;
+
+            &:hover {
+                color: #636b77;
+            }
+            
+            &.active {
+                color: white;
+            }
+
+            &:nth-child(1).active ~ .line { left: 0 * @tab-stride; }
+            &:nth-child(2).active ~ .line { left: 1 * @tab-stride; }
+            &:nth-child(3).active ~ .line { left: 2 * @tab-stride; }
+            &:nth-child(4).active ~ .line { left: 3 * @tab-stride; }
+            &:nth-child(5).active ~ .line { left: 4 * @tab-stride; }
+            &:nth-child(6).active ~ .line { left: 5 * @tab-stride; }
+            &:nth-child(7).active ~ .line { left: 6 * @tab-stride; }
+
+            &:nth-child(1):hover ~ .line { left: 0 * @tab-stride; }
+            &:nth-child(2):hover ~ .line { left: 1 * @tab-stride; }
+            &:nth-child(3):hover ~ .line { left: 2 * @tab-stride; }
+            &:nth-child(4):hover ~ .line { left: 3 * @tab-stride; }
+            &:nth-child(5):hover ~ .line { left: 4 * @tab-stride; }
+            &:nth-child(6):hover ~ .line { left: 5 * @tab-stride; }
+            &:nth-child(7):hover ~ .line { left: 6 * @tab-stride; }
+        }
+
+        .line {
+            position: absolute;
+            background: linear-gradient(to right, #6810ff, #bf00f7);
+            border-radius: 5px;
+            height: @line-size;
+            width: @tab-stride;
+            left: 0;
+            bottom: -@line-size;
+            transition: all 0.3s ease;
+        }
+    }
+
     h1 {
         font-size: 40px;
     }
 }
 
-#app {
-    margin: 15px 25px 0 25px;
+.card {
+    border-radius: 15px;
+    background: #22292f;
+    box-shadow: 0 1px 3px rgb(0 0 0 / 12%), 0 1px 2px rgb(0 0 0 / 24%);
+    margin: 20px;
 }
 
-.tab {
-    display: inline-block;
-    margin: 10px;
-    border-bottom: 2px solid transparent;
+.card-title {
     font-size: 20px;
-    cursor: pointer;
-    user-select: none;
-    transition: 0.2s all;
-    
-    &:hover {
-        border-color: #c1b1ff;
+    padding: 10px;
+    margin-bottom: 15px;
+    text-align: center;
+    border-bottom: 5px solid #282f35;
+}
+
+/* Simple Table */
+.simple-table {
+    padding: 15px;
+    padding-top: 0;
+
+    ul {
+        overflow-x: hidden;
+        list-style: none;
+
+        li:before {
+            float: left;
+            width: 0;
+            white-space: nowrap;
+            color: #636363;
+            content:
+            ". . . . . . . . . . . . . . . . . . . . "
+            ". . . . . . . . . . . . . . . . . . . . "
+            ". . . . . . . . . . . . . . . . . . . . "
+            ". . . . . . . . . . . . . . . . . . . . "
+            ". . . . . . . . . . . . . . . . . . . . "
+            ". . . . . . . . . . . . . . . . . . . . "
+            ". . . . . . . . . . . . . . . . . . . . "
+            ". . . . . . . . . . . . . . . . . . . . "
+            ". . . . . . . . . . . . . . . . . . . . "
+            ". . . . . . . . . . . . . . . . . . . . "
+            ". . . . . . . . . . . . . . . . . . . . "
+            ". . . . . . . . . . . . . . . . . . . . "
+            ". . . . . . . . . . . . . . . . . . . . "
+            ". . . . . . . . . . . . . . . . . . . . "
+            ". . . . . . . . . . . . . . . . . . . . "
+            ". . . . . . . . . . . . . . . . . . . . "
+            ". . . . . . . . . . . . . . . . . . . . "
+            ". . . . . . . . . . . . . . . . . . . . "
+            ". . . . . . . . . . . . . . . . . . . . ";
+        }
+        span:first-child {
+            padding-right: 0.33em;
+            background: #22292f;
+        }
+        span + span {
+            float: right;
+            padding-left: 0.33em;
+            background: #22292f;
+        }
     }
-    &.active {
-        border-color: #5c33ff;
-    }
+}
+
+
+
+
+
+#app {
+    //margin: 15px 25px 0 25px;
 }
 
 .filters {
