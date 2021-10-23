@@ -14,7 +14,7 @@ const PieChart = (props: Props) => {
     
     useLayoutEffect(() => {
         const root = am5.Root.new(chartDiv.current!);
-        root.setThemes(Themes(root));
+        root.setThemes(Themes(root, true));
 
         const chart = root.container.children.push(am5percent.PieChart.new(root, {
             layout: root.verticalLayout,
