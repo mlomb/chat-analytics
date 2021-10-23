@@ -1,99 +1,98 @@
 import { useLayoutEffect, useRef } from "react";
 
-import * as am4core from "@amcharts/amcharts4/core";
-import * as am4charts from "@amcharts/amcharts4/charts";
+import { Themes } from "./AmCharts5";
+import * as am5 from "@amcharts/amcharts5";
+import * as am5xy from "@amcharts/amcharts5/xy";
 
 import { dataProvider } from "../DataProvider";
 
-const styleScrollbar = (scrollbar: am4charts.XYChartScrollbar) => {
-    let series = scrollbar.series.getIndex(0)!;
-
-    const customizeGrip = (grip: am4core.ResizeButton) => {
-        grip.icon.disabled = true;
-        grip.background.disabled = true;
-
-        var img = grip.createChild(am4core.Rectangle);
-        img.width = 15;
-        img.height = 15;
-        img.fill = am4core.color("#479ADB");
-        img.rotation = 45;
-        img.align = "center";
-        img.valign = "middle";
-
-        var line = grip.createChild(am4core.Rectangle);
-        line.height = 60;
-        line.width = 3;
-        line.fill = am4core.color("#479ADB");
-        line.align = "center";
-        line.valign = "middle";
-    }
-    
-    customizeGrip(scrollbar.startGrip);
-    customizeGrip(scrollbar.endGrip);
-};
-
 const TimeSelector = () => {
     const chartDiv = useRef<HTMLDivElement>(null);
-    const chart = useRef<am4charts.XYChart | null>(null);
 
     useLayoutEffect(() => {
-        let x = am4core.create(chartDiv.current!, am4charts.XYChart);
+        const root = am5.Root.new(chartDiv.current!);
+        root.setThemes(Themes(root));
 
-        let dateAxis = x.xAxes.push(new am4charts.DateAxis());
-        let valueAxis = x.yAxes.push(new am4charts.ValueAxis());
-        valueAxis.maxPrecision = 0;
-        valueAxis.min = 0;
 
-        let scrollbar = new am4charts.XYChartScrollbar();
-        x.scrollbarX = scrollbar;
-        
-        let series = new am4charts.StepLineSeries();
-        series.dataFields.dateX = "date";
-        series.dataFields.valueY = "messages";
-        series.noRisers = true;
-        series.strokeWidth = 2;
-        series.fillOpacity = 0.2;
-        series.sequencedInterpolation = true;
-        
-        x.series.push(series);
-        scrollbar.series.push(series);
+        var chart = root.container.children.push(
+            am5xy.XYChart.new(root, {
+              layout: root.verticalLayout,
+              paddingBottom: 0,
+              paddingTop: 0,
+              paddingLeft: 0,
+              paddingRight: 0,
+              marginBottom: 0,
+              marginTop: 0,
+              marginLeft: 0,
+              marginRight: 0,
+            }),
+          );
+          
+          var scrollbarX = am5xy.XYChartScrollbar.new(root, {
+            orientation: "horizontal",
+            height: 50,
+            paddingBottom: 0,
+            paddingTop: 0,
+            paddingLeft: 0,
+            paddingRight: 0,
+            marginBottom: 0,
+            marginTop: 0,
+            marginLeft: 0,
+            marginRight: 0,
+          });
+          
+          chart.plotContainer.set("visible", false);
+          chart.rightAxesContainer.set("visible", false);
+          chart.leftAxesContainer.set("visible", false);
+          chart.bottomAxesContainer.set("visible", false);
+          
+          chart.set("scrollbarX", scrollbarX);
+          
+          var sbxAxis = scrollbarX.chart.xAxes.push(
+            am5xy.DateAxis.new(root, {
+              baseInterval: { timeUnit: "day", count: 1 },
+              renderer: am5xy.AxisRendererX.new(root, { })
+            })
+          );
+          
+          var sbyAxis = scrollbarX.chart.yAxes.push(
+            am5xy.ValueAxis.new(root, {
+              renderer: am5xy.AxisRendererY.new(root, {}),
+              min: 0,
+              maxPrecision: 0,
+            })
+          );
+          
+          var sbseries = scrollbarX.chart.series.push(
+            am5xy.StepLineSeries.new(root, {
+              xAxis: sbxAxis,
+              yAxis: sbyAxis,
+              valueYField: "messages",
+              valueXField: "date",
+              noRisers: true,
+              
+            })
+          );
+          sbseries.strokes.template.setAll({
+            strokeWidth: 2,
+            strokeOpacity: 0.5,
+          });
+          sbseries.fills.template.setAll({
+            fillOpacity: 0.2,
+            visible: true
+          });
 
-        // hide plot
-        x.plotContainer.visible = false;
-        x.leftAxesContainer.visible = false;
-        x.rightAxesContainer.visible = false;
-        x.bottomAxesContainer.visible = false;
-        x.chartContainer.visible = false;
-        x.chartAndLegendContainer.visible = false;
-        // style scrollbar
-        styleScrollbar(scrollbar);
+            const onDataUpdated = () => sbseries.data.setAll(dataProvider.getPerDayData());
+            dataProvider.on('updated-data', onDataUpdated);
 
-        scrollbar.parent = x;
-        scrollbar.margin(0, 0, 30, 0);
-        x.padding(0,0,0,0);
-        x.margin(0,0,0,0);
-
-        const dateAxisChanged = (ev: any) => {
-            let start = new Date(ev.target.minZoomed);
-            let end = new Date(ev.target.maxZoomed);
-            dataProvider.updateTimeRange(start, end);
-        };
-        dateAxis.events.on("startchanged", dateAxisChanged);
-        dateAxis.events.on("endchanged", dateAxisChanged);
-
-        const onDataUpdated = () => scrollbar.scrollbarChart.invalidateRawData();
-        dataProvider.on('updated-data', onDataUpdated);
-
-        x.data = dataProvider.getPerDayData();
-        
-        chart.current = x;
-        return () => {
-            dataProvider.off('updated-data', onDataUpdated);
-            x.dispose();
-        };
+            return () => {
+                dataProvider.off('updated-data', onDataUpdated);
+                root.dispose();
+            };
+          
     }, []);
 
-    return <div ref={chartDiv} style={{ width: "100%", height: "91px" }}></div>;
+    return <div ref={chartDiv} style={{ width: "100%", height: 91, imageRendering: "pixelated" }}></div>;
 };
 
 export default TimeSelector;

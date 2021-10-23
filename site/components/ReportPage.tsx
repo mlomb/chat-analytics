@@ -24,6 +24,15 @@ const TabContainer = (props: {
     </div>;
 };
 
+const CardContainer = (props: {
+    children: React.ReactNode;
+}) => {
+    return <div className="card-container">
+        {props.children}
+    </div>;
+};
+
+
 const Title = ({ children }: any) => <div className="card-title">{children}</div>;
 
 const ReportPage = () => {
@@ -46,33 +55,35 @@ const ReportPage = () => {
         <Header title={report.title} tab={tab} setTab={setTab} />
 
         <TabContainer currentValue={tab} value="messages">
-            <Card>
-                <Title>Messages sent per day &amp; month</Title>
-                <MessagesGraph/>
-            </Card>
-            <Card>
-                <Title>Messages stats</Title>
-                <SimpleTable/>
-            </Card>
-            <Card>
-                <Title>Messages kind</Title>
-                <PieChart />
-            </Card>
-            <Card>
-                <Title>Messages heatmap</Title>
-                <HeatMapChart />
-            </Card>
+            <CardContainer>
+                <Card num={2}>
+                    <Title>Messages sent per day &amp; month</Title>
+                    <MessagesGraph/>
+                </Card>
+                <Card num={1}>
+                    <Title>Messages stats</Title>
+                    <SimpleTable/>
+                </Card>
+                <Card num={1}>
+                    <Title>Messages kind</Title>
+                    <PieChart />
+                </Card>
+                <Card num={2}>
+                    <Title>Messages heatmap</Title>
+                    <HeatMapChart />
+                </Card>
+            </CardContainer>
         </TabContainer>
         <TabContainer currentValue={tab} value="language">
-            <Card>
+            <Card num={2}>
                 <WordCloudGraph getData="getWordsData" />
             </Card>
-            <Card>
+            <Card num={2}>
                 <DonutChart />
             </Card>
         </TabContainer>
         <TabContainer currentValue={tab} value="emojis">
-            <Card>
+            <Card num={2}>
                 <WordCloudGraph getData="getEmojisData" />
             </Card>
         </TabContainer>

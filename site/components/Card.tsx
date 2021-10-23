@@ -1,10 +1,11 @@
 interface Props {
-    children: React.ReactNode
+    children: React.ReactNode,
+    num: 1 | 2 | 3
 }
 
 const Card = (props: Props) => {
     return (
-        <div className="card">
+        <div className={"card card-" + props.num}>
             {props.children}
         </div>
     );

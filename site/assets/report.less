@@ -82,11 +82,20 @@ body {
     }
 }
 
+.card-container {
+    display: flex;
+    flex-wrap: wrap;
+}
+
 .card {
     border-radius: 15px;
     background: #22292f;
     box-shadow: 0 1px 3px rgb(0 0 0 / 12%), 0 1px 2px rgb(0 0 0 / 24%);
     margin: 20px;
+
+    &.card-1 { width: 33%; }
+    &.card-2 { width: 66%; }
+    &.card-3 { width: 100%; }
 }
 
 .card-title {

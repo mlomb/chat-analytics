@@ -3,7 +3,7 @@ import EventEmitter from "events";
 import { NewAuthor, NewChannel, NewReport } from "../analyzer/Analyzer";
 
 export type DataPerDate = {
-    date: Date;
+    date: number; // timestamp
     messages: number;
 };
 
@@ -63,13 +63,13 @@ export class DataProvider extends EventEmitter {
             const dayKey = dateToString(day);
             const monthKey = monthToString(day);
             let dayData = {
-                date: new Date(day),
+                date: day.getTime(),
                 messages: 0
             };
             let monthData = monthsData.get(monthKey);
             if(monthData === undefined) {
                 monthData = {
-                    date: new Date(day.getFullYear(), day.getMonth(), 1),
+                    date: new Date(day.getFullYear(), day.getMonth(), 1).getTime(),
                     messages: 0
                 };
                 monthsData.set(monthKey, monthData);
