@@ -67,6 +67,7 @@ const FilterSelect = <T extends Option>(props: Props<T>) => {
         placeholder={props.placeholder}
         isMulti={true}
         closeMenuOnSelect={false}
+        blurInputOnSelect={false}
         hideSelectedOptions={false}
         components={{ ValueContainer }}
         getOptionValue={option => option.id}

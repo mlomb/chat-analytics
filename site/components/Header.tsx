@@ -49,7 +49,6 @@ const Header = (props: Props) => {
                         onChange={setSelectedChannels}
                     />
                 </div>
-                <div className="sep"></div>
                 <div className="filter">
                     <label htmlFor="authors">Authors</label>
                     <FilterSelect
