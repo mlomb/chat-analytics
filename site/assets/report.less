@@ -18,7 +18,7 @@ body {
     @tab-stride: @tab-width + 2 * @tab-padding;
     @line-size: 5px;
 
-    padding: 0 10px;
+    padding: 15px 15px 0;
     margin-bottom: 40px;
     background-color: #22292F;
     border-bottom: @line-size solid #282F35;
@@ -79,6 +79,14 @@ body {
 
     h1 {
         font-size: 40px;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+    }
+    h2 {
+        color: #636b77;
+        font-size: 17px;
+        font-style: italic;
     }
 }
 
@@ -167,6 +175,7 @@ body {
     justify-content: center;
     flex-wrap: wrap;
     margin-bottom: 10px;
+    margin-top: 15px;
     
     .sep {
         width: 10px;
@@ -178,13 +187,15 @@ body {
 
         label {
             display: block;
-            margin: 4px 0 1px 0px;
+            margin: 6px 5px 5px;
+            font-size: 15px;
             font-weight: bold;
         }
     }
 }
 
 .time-selector {
+    border: 1px solid #3a3a3a;
     border-radius: 5px;
     overflow: hidden;
 

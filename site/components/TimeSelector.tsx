@@ -42,6 +42,10 @@ const TimeSelector = () => {
             marginRight: 0,
         });
 
+        scrollbarX.get("background")!.setAll({
+            fill: am5.Color.fromHex(0x000000),
+            fillOpacity: 0.01
+        });
         chart.plotContainer.set("visible", false);
         chart.rightAxesContainer.set("visible", false);
         chart.leftAxesContainer.set("visible", false);

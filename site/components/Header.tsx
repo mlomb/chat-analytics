@@ -36,6 +36,7 @@ const Header = (props: Props) => {
     return (
         <div className="header">
             <h1>{title}</h1>
+            <h2>chat analysis report</h2>
             <div className="filters">
                 <div className="filter">
                     <label htmlFor="channels">Channels</label>

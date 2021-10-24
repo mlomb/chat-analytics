@@ -67,6 +67,10 @@ const config = {
         static: {
             publicPath: resolve("public"),
         },
+        client: {
+            overlay: true,
+            progress: true
+        },
         compress: true
     }
 };
