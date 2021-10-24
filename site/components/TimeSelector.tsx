@@ -43,7 +43,7 @@ const TimeSelector = () => {
         });
 
         scrollbarX.get("background")!.setAll({
-            fill: am5.Color.fromHex(0x000000),
+            fill: am5.Color.fromHex(0x1e2529),
             fillOpacity: 0.01
         });
         chart.plotContainer.set("visible", false);
@@ -90,6 +90,7 @@ const TimeSelector = () => {
         const dateAxisChanged = (ev: { start: number, end: number }) => {
             let start = xAxis.positionToDate(ev.start);
             let end = xAxis.positionToDate(ev.end);
+            if(start > end) [start, end] = [end, start];
             dataProvider.updateTimeRange(start, end);
         };
         scrollbarX.events.on("rangechanged", dateAxisChanged);
@@ -109,7 +110,7 @@ const TimeSelector = () => {
         className="time-selector"
         style={{
             width: "100%",
-            height: SB_HEIGHT
+            height: SB_HEIGHT + 2
         }}
     ></div>;
 };

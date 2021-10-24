@@ -1,4 +1,4 @@
-import Select, { CommonProps, components, GroupTypeBase, OptionTypeBase, StylesConfig, Theme } from 'react-select';
+import Select, { CommonProps, components, GroupTypeBase, OptionProps, OptionTypeBase, StylesConfig, Theme } from 'react-select';
 
 interface Option {
     id: string;
@@ -9,6 +9,7 @@ interface Props<T extends Option> {
     name: string;
     allText: string;
     placeholder: string;
+    optionColorHue: number,
     options: T[];
     selected: T[];
     onChange: (selected: T[]) => void;
@@ -40,23 +41,76 @@ const ValueContainer = ({ children, ...props }: ValueContainerProps): JSX.Elemen
     );
 };
 
-const customStyles: StylesConfig<any, true> = {
-    option: (provided, state) => ({
-        ...provided,
-        borderBottom: '1px dotted pink',
-        color: state.isSelected ? 'red' : 'blue',
-        padding: 20,
-    }),
-    control: (provided) => ({
-        ...provided,
-        backgroundColor: '#22292e',
-        borderColor: '#596570'
-    }),
-    singleValue: (provided, state) => {
-        const opacity = state.isDisabled ? 0.5 : 1;
-        const transition = 'opacity 300ms';
+const OptionElement = ({ children, ...props }: OptionProps<any, true>): JSX.Element => {
+    const {
+      data
+    } = props
+    console.log(data);
+    
+    return (
+      <div style={{ color: 'black'}}>
+        {`${data.id} - ${data.id}`}
+        {children}
+      </div>
+    )
+};
 
-        return { ...provided, opacity, transition };
+const customStyles = (props: Props<any>): StylesConfig<any, true> => {
+    const accentBorder = `hsl(${props.optionColorHue}, 50%, 60%)`;
+    const indicatorStyles = {
+        ":hover": {
+            color: 'white'
+        }
+    };
+    return {
+        menu: (provided) => ({
+            ...provided,
+            //backgroundColor: '#66696b',
+        }),
+        option: (provided, state) => ({
+            ...provided,
+            //backgroundColor: state.isSelected ? `hsl(${props.optionColorHue}deg 100% 65%)` : 'white',
+            //color: state.isSelected ? 'white' : 'black',
+        }),
+        control: (provided, state) => ({
+            ...provided,
+            backgroundColor: '#1e2529',
+            borderColor: state.menuIsOpen ? accentBorder : '#596570',
+            ":hover": {
+                borderColor: accentBorder,
+            },
+            boxShadow: state.menuIsOpen ? '0 0 0 1px ' + accentBorder : 'none',
+        }),
+        multiValue: (provided) => ({
+            ...provided,
+            backgroundColor: `hsl(${props.optionColorHue}deg 100% 65%)`,
+        }),
+        multiValueLabel: (provided) => ({
+            ...provided,
+            color: 'white',
+        }),
+        multiValueRemove: (provided) => ({
+            ...provided,
+            borderTopLeftRadius: 0,
+            borderBottomLeftRadius: 0,
+            color: 'white',
+            cursor: 'pointer',
+            ":hover": {
+                backgroundColor: `hsl(${props.optionColorHue}deg 100% 75%)`
+            }
+        }),
+        input: (provided) => ({
+            ...provided,
+            color: 'white',
+        }),
+        dropdownIndicator: (provided) => ({
+            ...provided,
+            ...indicatorStyles
+        }),
+        clearIndicator: (provided) => ({
+            ...provided,
+            ...indicatorStyles
+        })
     }
 };
 
@@ -69,11 +123,11 @@ const FilterSelect = <T extends Option>(props: Props<T>) => {
         closeMenuOnSelect={false}
         blurInputOnSelect={false}
         hideSelectedOptions={false}
-        components={{ ValueContainer }}
+        components={{ ValueContainer, Option: OptionElement }}
         getOptionValue={option => option.id}
         getOptionLabel={option => option.name}
         defaultValue={props.selected}
-        styles={customStyles}
+        styles={customStyles(props)}
         // @ts-ignore
         onChange={props.onChange}
     />;

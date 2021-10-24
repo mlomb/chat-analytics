@@ -47,6 +47,7 @@ const Header = (props: Props) => {
                         placeholder="Select channels..."
                         selected={selectedChannels}
                         onChange={setSelectedChannels}
+                        optionColorHue={266}
                     />
                 </div>
                 <div className="filter">
@@ -58,6 +59,7 @@ const Header = (props: Props) => {
                         placeholder="Select users..."
                         selected={selectedUsers}
                         onChange={setSelectedUsers}
+                        optionColorHue={240}
                     />
                 </div>
                 <div className="filter" style={{ minWidth: "100%" }}>
