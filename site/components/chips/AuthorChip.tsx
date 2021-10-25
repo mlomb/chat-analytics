@@ -12,6 +12,7 @@ import avatar_1 from "../../assets/discord/avatar_1.png";
 import avatar_2 from "../../assets/discord/avatar_2.png";
 import avatar_3 from "../../assets/discord/avatar_3.png";
 import avatar_4 from "../../assets/discord/avatar_4.png";
+import ImageSmooth from "../basic/ImageSmooth";
 const DiscordDefaultAvatars = [avatar_0, avatar_1, avatar_2, avatar_3, avatar_4];
 
 const AuthorChip = ({ platform, author }: Props) => {
@@ -29,6 +30,8 @@ const AuthorChip = ({ platform, author }: Props) => {
     }
 
 // <ImageSmooth src={author.avatarUrl} children={placeholder} />
+const avatar = author.avatarUrl ? <ImageSmooth src={author.avatarUrl} children={placeholder} /> : placeholder;
+/*
     const avatar = author.avatarUrl ? <Img
     loading="lazy"
     width="100%"
@@ -37,8 +40,7 @@ const AuthorChip = ({ platform, author }: Props) => {
     unloader={placeholder}
     loader={placeholder}
     decode={false}
-    key="pepe"
-  /> : placeholder;
+  /> : placeholder;*/
 
     return <div className="chip author-chip">
         <div style={{

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 import { NewAuthor, NewChannel, NewReport } from "../../analyzer/Analyzer";
 import { dataProvider, DataProvider } from "../DataProvider";
@@ -35,6 +35,9 @@ const Header = (props: Props) => {
     const [selectedChannels, setSelectedChannels] = useState<NewChannel[]>([...report.channels]);
     const [selectedUsers, setSelectedUsers] = useState<NewAuthor[]>([...report.authors]);
 
+    const channelChip = useMemo(() => (props: { data: NewChannel }) => <ChannelChip platform="discord" channel={props.data} />, []); // TODO: add platform dependency
+    const authorChip = useMemo(() => (props: { data: NewAuthor }) => <AuthorChip platform="discord" author={props.data} />, []); // TODO: add platform dependency
+    
     return (
         <div className="header">
             <h1>{title}</h1>
@@ -50,7 +53,7 @@ const Header = (props: Props) => {
                         selected={selectedChannels}
                         onChange={setSelectedChannels}
                         optionColorHue={266}
-                        chip={(props: { data: NewChannel }) => <ChannelChip platform="discord" channel={props.data} />}
+                        chip={channelChip}
                     />
                 </div>
                 <div className="filter">
@@ -61,9 +64,10 @@ const Header = (props: Props) => {
                         allText="All users"
                         placeholder="Select users..."
                         selected={selectedUsers}
+                        // @ts-ignore
                         onChange={setSelectedUsers}
                         optionColorHue={240}
-                        chip={(props: { data: NewAuthor }) => <AuthorChip platform="discord" author={props.data} />}
+                        chip={authorChip}
                     />
                 </div>
                 <div className="filter" style={{ minWidth: "100%" }}>

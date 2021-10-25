@@ -1,5 +1,8 @@
-import Select, { CommonProps, components, GroupTypeBase, MultiValueProps, OptionProps, OptionTypeBase, StylesConfig, Theme } from 'react-select';
-import { NewChannel } from '../../analyzer/Analyzer';
+import React, { ReactNode, ReactNodeArray } from 'react';
+import { useMemo } from 'react';
+import Select, { CommonProps, components, createFilter, GroupTypeBase, MultiValueProps, OptionProps, OptionTypeBase, StylesConfig, Theme } from 'react-select';
+import { MenuListComponentProps } from 'react-select/src/components/Menu';
+import { FixedSizeList as List } from "react-window";
 
 interface Option {
     id: string;
@@ -52,6 +55,7 @@ const OptionElement = ({ children, ...props }: OptionProps<any, true>): JSX.Elem
 };
 
 const MultiValue = ({ children, ...props }: MultiValueProps<any>): JSX.Element => {
+    console.log(children);
     return (
       <components.MultiValue {...props}>
           <props.selectProps.chip data={props.data} />
@@ -59,8 +63,28 @@ const MultiValue = ({ children, ...props }: MultiValueProps<any>): JSX.Element =
     );
 };
 
-const customStyles = (props: Props<any>): StylesConfig<any, true> => {
-    const accentBorder = `hsl(${props.optionColorHue}, 50%, 60%)`;
+const MenuList = ({ options, children, maxHeight, getValue }: MenuListComponentProps<any, true>): JSX.Element => {
+    const childrens = children as ReactNodeArray;
+    
+    const height = 35;
+    const [value] = getValue();
+    const initialOffset = options.indexOf(value) * height;
+
+    return (
+        <List
+            width="100%"
+            height={maxHeight}
+            itemCount={childrens.length}
+            itemSize={height}
+            initialScrollOffset={initialOffset}
+            >
+            {({ index, style }) => <div style={style}>{childrens[index]}</div>}
+        </List>
+    );
+};
+
+const customStyles = (colorHue: number): StylesConfig<any, true> => {
+    const accentBorder = `hsl(${colorHue}, 50%, 60%)`;
     const indicatorStyles = {
         ":hover": {
             color: 'white'
@@ -73,7 +97,7 @@ const customStyles = (props: Props<any>): StylesConfig<any, true> => {
         }),
         option: (provided, state) => ({
             ...provided,
-            //backgroundColor: state.isSelected ? `hsl(${props.optionColorHue}deg 100% 65%)` : 'white',
+            //backgroundColor: state.isSelected ? `hsl(${colorHue}deg 100% 65%)` : 'white',
             //color: state.isSelected ? 'white' : 'black',
         }),
         control: (provided, state) => ({
@@ -87,7 +111,7 @@ const customStyles = (props: Props<any>): StylesConfig<any, true> => {
         }),
         multiValue: (provided) => ({
             ...provided,
-            backgroundColor: `hsl(${props.optionColorHue}deg 100% 65%)`,
+            backgroundColor: `hsl(${colorHue}deg 100% 65%)`,
         }),
         multiValueLabel: (provided) => ({
             ...provided,
@@ -100,7 +124,7 @@ const customStyles = (props: Props<any>): StylesConfig<any, true> => {
             color: 'white',
             cursor: 'pointer',
             ":hover": {
-                backgroundColor: `hsl(${props.optionColorHue}deg 100% 75%)`
+                backgroundColor: `hsl(${colorHue}deg 100% 75%)`
             }
         }),
         input: (provided) => ({
@@ -118,7 +142,19 @@ const customStyles = (props: Props<any>): StylesConfig<any, true> => {
     }
 };
 
+
+const Components = {
+    MenuList,
+    ValueContainer,
+    MultiValue,
+    Option: OptionElement
+};
+
+const filterFn = createFilter({ ignoreAccents: false });
+
 const FilterSelect = <T extends Option>(props: Props<T>) => {
+    const Styles = useMemo(() => customStyles(props.optionColorHue), [props.optionColorHue]);
+
     return <Select
         name={props.name}
         options={props.options}
@@ -127,20 +163,15 @@ const FilterSelect = <T extends Option>(props: Props<T>) => {
         closeMenuOnSelect={false}
         blurInputOnSelect={false}
         hideSelectedOptions={false}
-        components={{
-            ValueContainer,
-            MultiValue: MultiValue,
-            Option: OptionElement
-        }}
-        getOptionValue={option => option.id}
-        getOptionLabel={option => option.name}
+        components={Components}
         defaultValue={props.selected}
-        styles={customStyles(props)}
+        styles={Styles}
         chip={props.chip}
+        filterOption={filterFn}
 
         // @ts-ignore
         onChange={props.onChange}
     />;
 };
 
-export default FilterSelect;
+export default React.memo(FilterSelect);
