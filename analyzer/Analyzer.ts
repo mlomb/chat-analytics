@@ -1,6 +1,6 @@
 import Tokenizer from 'wink-tokenizer';
 
-import { Author, Channel, Database, ID, Message } from "./Types";
+import { Author, Channel, Database, DiscordAuthor, ID, Message } from "./Types";
 
 /*
 var sentiment = require('multilang-sentiment');
@@ -62,7 +62,9 @@ export type NewAuthor = {
             [date: string]: DayAggregation;
         };
     }
-}
+    avatarUrl?: string;
+    discord?: DiscordAuthor;
+};
 
 export type NewReport = {
     title: string;
@@ -114,11 +116,16 @@ const analyze = (db: Database): NewReport => {
     const dateToString = (date: Date): string => date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate();
 
     for(let [id, author] of db.authors) {
-        authors.set(id, {
+        const new_author: NewAuthor = {
             id,
             name: author.name,
-            channels: { }
-        });
+            channels: { },
+            avatarUrl: author.avatarUrl
+        };
+        if(db.platform == "discord") {
+            new_author.discord = author.discord;
+        }
+        authors.set(id, new_author);
     }
 
     for(let ch of db.channels) {

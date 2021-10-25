@@ -2,7 +2,9 @@ import { useState } from "react";
 
 import { NewAuthor, NewChannel, NewReport } from "../../analyzer/Analyzer";
 import { dataProvider, DataProvider } from "../DataProvider";
+import AuthorChip from "./chips/AuthorChip";
 
+import ChannelChip from "./chips/ChannelChip";
 import FilterSelect from "./FilterSelect";
 import TimeSelector from "./TimeSelector";
 
@@ -48,6 +50,7 @@ const Header = (props: Props) => {
                         selected={selectedChannels}
                         onChange={setSelectedChannels}
                         optionColorHue={266}
+                        chip={(props: { data: NewChannel }) => <ChannelChip platform="discord" channel={props.data} />}
                     />
                 </div>
                 <div className="filter">
@@ -60,6 +63,7 @@ const Header = (props: Props) => {
                         selected={selectedUsers}
                         onChange={setSelectedUsers}
                         optionColorHue={240}
+                        chip={(props: { data: NewAuthor }) => <AuthorChip platform="discord" author={props.data} />}
                     />
                 </div>
                 <div className="filter" style={{ minWidth: "100%" }}>

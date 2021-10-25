@@ -32,7 +32,15 @@ const config = {
                 { loader: "css-loader" },
                 { loader: 'postcss-loader', options: { postcssOptions: { plugins: [require("autoprefixer"), require("cssnano")] } } },
                 { loader: "less-loader", options: { lessOptions: { javascriptEnabled: true } } }
-            ] },
+            ]},
+            {
+                test: /\.(svg|png|jpe?g|gif|mp4)$/,
+                loader: 'url-loader',
+                options: {
+                    limit: 2048,
+                    name: '[hash:8].[ext]'
+                }
+            }
         ]
     },
     resolve: {

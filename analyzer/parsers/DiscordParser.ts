@@ -30,9 +30,16 @@ export class DiscordParser extends Parser {
                     let author: Author = {
                         id: msg.author.id,
                         name: msg.author.nickname,
-                        bot: msg.author.isBot
+                        bot: msg.author.isBot,
+                        discord: {
+                            // @ts-ignore
+                            discriminator: msg.author.discriminator % 5
+                        }
                     };
-                    if(msg.author.avatarUrl) author.avatarUrl = msg.author.avatarUrl;
+                    if(msg.author.avatarUrl) {
+                        // TODO: make sure size is 32px
+                        author.avatarUrl = msg.author.avatarUrl;
+                    }
                     if(msg.author.color) author.color = msg.author.color;
                     authors.set(msg.author.id, author);
                 }

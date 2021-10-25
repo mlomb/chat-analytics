@@ -1,4 +1,5 @@
-import Select, { CommonProps, components, GroupTypeBase, OptionProps, OptionTypeBase, StylesConfig, Theme } from 'react-select';
+import Select, { CommonProps, components, GroupTypeBase, MultiValueProps, OptionProps, OptionTypeBase, StylesConfig, Theme } from 'react-select';
+import { NewChannel } from '../../analyzer/Analyzer';
 
 interface Option {
     id: string;
@@ -13,6 +14,7 @@ interface Props<T extends Option> {
     options: T[];
     selected: T[];
     onChange: (selected: T[]) => void;
+    chip: (props: { data: any }) => JSX.Element;
 };
 
 interface ValueContainerProps extends CommonProps<OptionTypeBase, true, GroupTypeBase<OptionTypeBase>> {
@@ -42,17 +44,19 @@ const ValueContainer = ({ children, ...props }: ValueContainerProps): JSX.Elemen
 };
 
 const OptionElement = ({ children, ...props }: OptionProps<any, true>): JSX.Element => {
-    const {
-      data
-    } = props
-    console.log(data);
-    
     return (
       <div style={{ color: 'black'}}>
-        {`${data.id} - ${data.id}`}
-        {children}
+          <props.selectProps.chip data={props.data} />
       </div>
     )
+};
+
+const MultiValue = ({ children, ...props }: MultiValueProps<any>): JSX.Element => {
+    return (
+      <components.MultiValue {...props}>
+          <props.selectProps.chip data={props.data} />
+      </components.MultiValue>
+    );
 };
 
 const customStyles = (props: Props<any>): StylesConfig<any, true> => {
@@ -123,11 +127,17 @@ const FilterSelect = <T extends Option>(props: Props<T>) => {
         closeMenuOnSelect={false}
         blurInputOnSelect={false}
         hideSelectedOptions={false}
-        components={{ ValueContainer, Option: OptionElement }}
+        components={{
+            ValueContainer,
+            MultiValue: MultiValue,
+            Option: OptionElement
+        }}
         getOptionValue={option => option.id}
         getOptionLabel={option => option.name}
         defaultValue={props.selected}
         styles={customStyles(props)}
+        chip={props.chip}
+
         // @ts-ignore
         onChange={props.onChange}
     />;

@@ -13,6 +13,8 @@ import DonutChart from "./DonutChart";
 import PieChart from "./PieChart";
 import SimpleTable from "./SimpleTable";
 import HeatMapChart from "./HeatMapChart";
+import ChannelChip from "./chips/ChannelChip";
+import AuthorChip from "./chips/AuthorChip";
 
 const TabContainer = (props: {
     currentValue: string;
@@ -56,6 +58,27 @@ const ReportPage = () => {
 
         <TabContainer currentValue={tab} value="messages">
             <CardContainer>
+                <Card num={2}>
+                    <Title>Testing</Title>
+                    <ChannelChip platform="discord" channel={{
+                        id: "123",
+                        name: "general"
+                    }} />
+                    <ChannelChip platform="whatsapp" channel={report.channels[0]} />
+                    <ChannelChip platform="telegram" channel={report.channels[0]} />
+                    
+                    <AuthorChip platform="discord" author={{
+                        id: "123",
+                        name: "Piru",
+                        channels: {},
+                        avatarUrl: "https://cdn.discordapp.com/avatars/343588565688516618/84fc3dc816a42510f138fdcbf13b745c.png?size=40",
+                        discord: {
+                            discriminator: 0,
+                        }
+                    }} />
+                    <AuthorChip platform="whatsapp" author={report.authors[0]} />
+                    <AuthorChip platform="telegram" author={report.authors[0]} />
+                </Card>
                 <Card num={2}>
                     <Title>Messages sent per day &amp; month</Title>
                     <MessagesGraph/>
