@@ -1,7 +1,8 @@
+// @ts-nocheck TODO: fix
 import React, { ReactNode, ReactNodeArray } from 'react';
 import { useMemo } from 'react';
-import Select, { CommonProps, components, createFilter, GroupTypeBase, MultiValueProps, OptionProps, OptionTypeBase, StylesConfig, Theme } from 'react-select';
-import { MenuListComponentProps } from 'react-select/src/components/Menu';
+import Select, { CommonProps, components, createFilter, MultiValueProps, OptionProps, StylesConfig, Theme } from 'react-select';
+//import { MenuListComponentProps } from 'react-select/src/components/Menu';
 import { FixedSizeList as List } from "react-window";
 
 interface Option {
@@ -20,7 +21,7 @@ interface Props<T extends Option> {
     chip: (props: { data: any }) => JSX.Element;
 };
 
-interface ValueContainerProps extends CommonProps<OptionTypeBase, true, GroupTypeBase<OptionTypeBase>> {
+interface ValueContainerProps extends CommonProps<any, true, Group> {
     children: any;
 };
 
@@ -168,6 +169,7 @@ const FilterSelect = <T extends Option>(props: Props<T>) => {
         styles={Styles}
         chip={props.chip}
         filterOption={filterFn}
+        isDisabled={props.options.length <= 1}
 
         // @ts-ignore
         onChange={props.onChange}

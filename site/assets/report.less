@@ -26,6 +26,7 @@ body {
     .menu {
         display: flex;
         position: relative;
+        overflow: hidden;
         
         a {
             display: block;
@@ -110,6 +111,8 @@ body {
 }
 
 .card {
+    height: 700px;
+    min-width: 320px;
     border-radius: 15px;
     background: #22292f;
     box-shadow: 0 1px 3px rgb(0 0 0 / 12%), 0 1px 2px rgb(0 0 0 / 24%);
@@ -175,7 +178,43 @@ body {
     }
 }
 
-
+/* AnimatedBars */
+.AnimatedBars {
+    min-height: 200px;
+    margin: 0 15px;
+}
+.AnimatedBars__header {
+    display: flex;
+    justify-content: space-between;
+    text-transform: uppercase;
+    color: #636b77;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+.AnimatedBars__body {
+    position: relative;
+    height: 200px;
+}
+.AnimatedBars__item {
+    position: absolute;
+    left: 0;
+    transition: 0.5s top;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    user-select: none;
+}
+.AnimatedBars__bar {
+    position: absolute;
+    height: 100%;
+    transition: 0.5s width;
+    border-radius: 3px;
+}
+.AnimatedBars__value, .AnimatedBars__unit {
+    z-index: 1;
+    padding: 5px;
+}
 
 
 

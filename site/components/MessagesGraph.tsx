@@ -66,11 +66,6 @@ const MessagesGraph = () => {
             createChart(dataProvider.getPerMonthData())
         ];
         
-        /*let title = charts[0].titles.create();
-        title.text = "Messages sent per day & month";
-        title.fontSize = 20;
-        title.marginBottom = 10;*/
-        
         charts[0].yAxes.getIndex(0)!.title.text = "Messages sent";
         charts[1].height = 100;
 
@@ -90,7 +85,7 @@ const MessagesGraph = () => {
         };
     }, []);
 
-    return <div ref={chartDiv} style={{ width: "100%", height: "700px" }}></div>;
+    return <div ref={chartDiv} style={{ width: "100%", height: "90%" }}></div>;
 };
 
 export default MessagesGraph;
