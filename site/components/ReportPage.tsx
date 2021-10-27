@@ -130,9 +130,6 @@ const ReportPage = () => {
                 <Card num={1}>
                     <Title>Messages stats</Title>
                     <SimpleTable/>
-                </Card>
-                <Card num={1}>
-                    <Title>Messages kind</Title>
                     <PieChart />
                 </Card>
                 <Card num={2}>

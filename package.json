@@ -8,7 +8,6 @@
   "author": "Martin Emiliano Lombardo <to@mlomb.me>",
   "license": "MIT",
   "devDependencies": {
-    "@amcharts/amcharts4": "^4.10.22",
     "@amcharts/amcharts5": "^5.0.0-beta.37",
     "@types/react": "^17.0.33",
     "@types/react-dom": "^17.0.10",

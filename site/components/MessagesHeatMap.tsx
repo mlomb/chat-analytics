@@ -1,15 +1,12 @@
 import { useLayoutEffect, useRef } from "react";
 
-import * as am4core from "@amcharts/amcharts4/core";
-import * as am4charts from "@amcharts/amcharts4/charts";
-
 interface Props {
     timeRange: [Date, Date]
 };
 
 const MessagesHeatMap = (props: Props) => {
     const chartDiv = useRef<HTMLDivElement>(null);
-    const chart = useRef<am4charts.XYChart | null>(null);
+    /*const chart = useRef<am4charts.XYChart | null>(null);
 
     useLayoutEffect(() => {
         let x = am4core.create(chartDiv.current!, am4charts.XYChart);
@@ -65,7 +62,7 @@ const MessagesHeatMap = (props: Props) => {
 
         chart.current = x;
         return x.dispose;
-    }, []);
+    }, []);*/
 
     /*useLayoutEffect(() => {
         chart.current!.data = props.data.per_time_of_week;
