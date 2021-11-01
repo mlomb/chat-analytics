@@ -6,15 +6,6 @@ import { Compressed, decompress } from "compress-json";
 import ReportPage from "./components/ReportPage";
 import { initDataProvider } from "./DataProvider";
 
-// set amcharts theme
-import { useTheme, options } from "@amcharts/amcharts4/core";
-import am4themes_dark from "@amcharts/amcharts4/themes/dark";
-import am4themes_animated from "@amcharts/amcharts4/themes/animated";
-useTheme(am4themes_dark);
-//useTheme(am4themes_animated);
-options.queue = true;
-options.onlyShowOnViewport = true;
-
 declare global {
     interface Window {
         __REPORT_DATA__: Compressed | undefined

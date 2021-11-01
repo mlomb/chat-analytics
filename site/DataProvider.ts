@@ -34,6 +34,7 @@ const dateToString = (date: Date): string => monthToString(date) + "-" + date.ge
 export class DataProvider extends EventEmitter {
 
     private generalData: GeneralStats;
+    //private generalData: GeneralStats;
     private perDay: DataPerDate[] = [];
     private perMonth: DataPerDate[] = [];
     private wordData: FrequencyData[] = [];

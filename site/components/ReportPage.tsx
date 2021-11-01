@@ -27,16 +27,9 @@ const TabContainer = (props: {
     </div>;
 };
 
-const CardContainer = (props: {
-    children: React.ReactNode;
-}) => {
-    return <div className="card-container">
-        {props.children}
-    </div>;
-};
-
-
-const Title = ({ children }: any) => <div className="card-title">{children}</div>;
+const CardContainer = (props: { children: React.ReactNode; }) => <div className="card-container">{props.children}</div>;
+//const ChartContainer = ({ children }: { children: React.ReactNode }) => <div className="ChartContainer">{children}</div>;
+const Title = ({ children }: { children: React.ReactNode }) => <div className="card-title">{children}</div>;
 
 const ReportPage = () => {
     const report = dataProvider.getSource();
