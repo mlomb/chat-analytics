@@ -119,6 +119,7 @@ body {
 
 /* TimeSelector */
 .TimeSelector {
+    width: 100%;
     border: 1px solid #596570;
     box-sizing: border-box;
     border-radius: 5px;
@@ -140,6 +141,7 @@ body {
     height: 100%;
 }
 
+/* Chip */
 .Chip {
     display: flex;
     align-items: center;
@@ -151,6 +153,13 @@ body {
 
     span {
         margin-left: 3px;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+    }
+
+    span + * {
+        flex-shrink: 0;
     }
 }
 

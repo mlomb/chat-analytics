@@ -11,7 +11,7 @@ const MessagesGraph = () => {
 
     useLayoutEffect(() => {
         const root = am5.Root.new(chartDiv.current!);
-        root.setThemes(Themes(root, true));
+        root.setThemes(Themes(root, false)); // Do not animate!
 
         const chartStep = root.container.children.push(am5xy.XYChart.new(root, {
             layout: root.verticalLayout
@@ -55,10 +55,10 @@ const MessagesGraph = () => {
             noRisers: true,
             stroke: am5.color(0x479ADB),
             fill: am5.color(0x479ADB),
-            tooltipText: "[bold]{valueX.formatDate('EEEE, MMM dd yyyy')}:[/] {messages} messages sent",
+            /*tooltipText: "[bold]{valueX.formatDate('EEEE, MMM dd yyyy')}:[/] {messages} messages sent",
             tooltip: am5.Tooltip.new(root, {
                 pointerOrientation: "horizontal",
-            })
+            })*/
         }));
 
         chartStep.yAxes.getIndex(0)!.children.unshift(
@@ -94,14 +94,11 @@ const MessagesGraph = () => {
             xAxis: createDateAxis(chartColumn, 'month'),
             yAxis: createValueAxis(chartColumn),
             fill: am5.color(0x479ADB),
-            tooltipText: "[bold]{valueX.formatDate('MMM yyyy')}:[/] {messages} messages sent",
+            /*tooltipText: "[bold]{valueX.formatDate('MMM yyyy')}:[/] {messages} messages sent",
             tooltip: am5.Tooltip.new(root, {
                 pointerOrientation: "horizontal",
-            })
+            })*/
         }));
-        (chartColumn.xAxes.getIndex(0)! as am5xy.DateAxis<any>).set("gridIntervals", [
-            { timeUnit: "month", count: 1 }
-        ]);
         chartColumn.yAxes.getIndex(0)!.children.unshift(
             am5.Label.new(root, {
                 rotation: -90,

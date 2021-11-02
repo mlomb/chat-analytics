@@ -1,21 +1,20 @@
-import { useMemo, useState } from "react";
+import { NewAuthor, NewChannel } from "../../analyzer/Analyzer";
+import { dataProvider } from "../DataProvider";
 
-import { NewAuthor, NewChannel, NewReport } from "../../analyzer/Analyzer";
-import { dataProvider, DataProvider } from "../DataProvider";
-import AuthorChip from "./chips/AuthorChip";
-
-import ChannelChip from "./chips/ChannelChip";
 import FilterSelect from "./FilterSelect";
 import TimeSelector from "./TimeSelector";
 
+type ChipFn = (props: { data: any }) => JSX.Element;
+
 interface Props {
-    title: string;
     tab: string;
     setTab: (tab: string) => void;
     selectedChannels: NewChannel[];
     selectedAuthors: NewAuthor[];
-    setSelectedChannels: (channels: NewChannel[]) => void;
     setSelectedAuthors: (authors: NewAuthor[]) => void;
+    setSelectedChannels: (channels: NewChannel[]) => void;
+    authorChip: ChipFn;
+    channelChip: ChipFn;
 }
 
 const Tab = (props: {
@@ -36,41 +35,38 @@ const Tab = (props: {
 };
 
 const Header = (props: Props) => {
-    const { tab, setTab, title } = props;
+    const { tab, setTab } = props;
     const report = dataProvider.getSource();
-
-    const [selectedChannels, setSelectedChannels] = useState<NewChannel[]>([...report.channels]);
-    const [selectedUsers, setSelectedUsers] = useState<NewAuthor[]>([...report.authors]);
-
-    const channelChip = useMemo(() => (props: { data: NewChannel }) => <ChannelChip platform="telegram" channel={props.data} />, []); // TODO: add platform dependency
-    const authorChip = useMemo(() => (props: { data: NewAuthor }) => <AuthorChip platform="telegram" author={props.data} />, []); // TODO: add platform dependency
 
     return (
         <div className="Header">
-            <h1>{title}</h1>
+            <h1>{report.title}</h1>
             <h2>chat analysis report</h2>
             <div className="Filters">
                 <div className="Filters__Filter">
                     <label htmlFor="channels">Channels</label>
                     <FilterSelect
+                        id="channels"
                         options={report.channels}
                         placeholder="Select channels..."
-                        selected={selectedChannels}
-                        onChange={setSelectedChannels}
+                        selected={props.selectedChannels}
+                        // @ts-ignore
+                        onChange={props.setSelectedChannels}
                         optionColorHue={266}
-                        itemComponent={channelChip}
+                        itemComponent={props.channelChip}
                     />
                 </div>
                 <div className="Filters__Filter">
                     <label htmlFor="authors">Authors</label>
                     <FilterSelect
+                        id="authors"
                         options={report.authors}
-                        placeholder="Select users..."
-                        selected={selectedUsers}
+                        placeholder="Select authors..."
+                        selected={props.selectedAuthors}
                         // @ts-ignore
-                        onChange={setSelectedUsers}
+                        onChange={props.setSelectedAuthors}
                         optionColorHue={240}
-                        itemComponent={authorChip}
+                        itemComponent={props.authorChip}
                     />
                 </div>
                 <div className="Filters__Filter" style={{ minWidth: "100%" }}>

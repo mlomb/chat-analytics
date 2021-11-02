@@ -1,6 +1,6 @@
 import { Platform } from "../../../analyzer/Types";
 import { NewAuthor } from "../../../analyzer/Analyzer";
-import { Img } from 'react-image';
+import ImageSmooth from "../basic/ImageSmooth";
 
 interface Props {
     platform: Platform,
@@ -12,11 +12,10 @@ import avatar_1 from "../../assets/discord/avatar_1.png";
 import avatar_2 from "../../assets/discord/avatar_2.png";
 import avatar_3 from "../../assets/discord/avatar_3.png";
 import avatar_4 from "../../assets/discord/avatar_4.png";
-import ImageSmooth from "../basic/ImageSmooth";
 const DiscordDefaultAvatars = [avatar_0, avatar_1, avatar_2, avatar_3, avatar_4];
 
 const AuthorChip = ({ platform, author }: Props) => {
-    let placeholder: JSX.Element;
+    let placeholder: JSX.Element | null;
     if(platform === "discord") {
         placeholder = <img
             src={DiscordDefaultAvatars[author.discord!.discriminator]}
@@ -26,9 +25,9 @@ const AuthorChip = ({ platform, author }: Props) => {
             }}
         />;
     } else if(platform === "telegram") {
-        placeholder = <div>A</div>; // TODO
+        placeholder = <div>A</div>; // TODO: telegram avatars
     } else {
-        placeholder = <div>Nope</div>;
+        placeholder = null;
     }
 
     const avatar = author.avatarUrl ? <ImageSmooth src={author.avatarUrl} children={placeholder} /> : placeholder;

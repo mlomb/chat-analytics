@@ -38,16 +38,16 @@ const ReportPage = () => {
     const report = dataProvider.getSource();
 
     const [selectedChannels, setSelectedChannels] = useState<NewChannel[]>([...report.channels]);
-    const [selectedUsers, setSelectedUsers] = useState<NewAuthor[]>([...report.authors]);
+    const [selectedAuthors, setSelectedAuthors] = useState<NewAuthor[]>([...report.authors]);
     const [tab, setTab] = useState("messages");
 
     // let data = useMemo(()=> dataProvider.(selectedChannels, selectedUsers, report), [selectedChannels, selectedUsers]);
 
     console.log("report", report);
-    console.log("selection", selectedUsers, selectedChannels);
+    console.log("selection", selectedAuthors, selectedChannels);
     //console.log("data", data);
 
-    useLayoutEffect(() => dataProvider.updateAuthors(selectedUsers), [selectedUsers]);
+    useLayoutEffect(() => dataProvider.updateAuthors(selectedAuthors), [selectedAuthors]);
     useLayoutEffect(() => dataProvider.updateChannels(selectedChannels), [selectedChannels]);
 
     const [barsTestAuthors, setBarsTestAuthors] = useState([
@@ -103,11 +103,20 @@ const ReportPage = () => {
         return () => clearInterval(interval);
     }, []);
 
-    const channelChip = useMemo(() => (props: { data: NewChannel }) => <ChannelChip platform="telegram" channel={props.data} />, []); // TODO: add platform dependency
-    const authorChip = useMemo(() => (props: { data: NewAuthor }) => <AuthorChip platform="telegram" author={props.data} />, []); // TODO: add platform dependency
+    const channelChip = useMemo(() => (props: { data: NewChannel }) => <ChannelChip platform="discord" channel={props.data} />, []); // TODO: add platform dependency
+    const authorChip = useMemo(() => (props: { data: NewAuthor }) => <AuthorChip platform="discord" author={props.data} />, []); // TODO: add platform dependency
     
     return <>
-        <Header title={report.title} tab={tab} setTab={setTab} />
+        <Header
+            tab={tab}
+            setTab={setTab}
+            selectedChannels={selectedChannels}
+            setSelectedChannels={setSelectedChannels}
+            selectedAuthors={selectedAuthors}
+            setSelectedAuthors={setSelectedAuthors}
+            authorChip={authorChip}
+            channelChip={channelChip}
+        />
 
         <TabContainer currentValue={tab} value="messages">
             <CardContainer>

@@ -7,6 +7,16 @@ import * as am5xy from "@amcharts/amcharts5/xy";
 import { dataProvider } from "../DataProvider";
 
 const SB_HEIGHT = 50;
+const RESETS = {
+    paddingBottom: 0,
+    paddingTop: 0,
+    paddingLeft: 0,
+    paddingRight: 0,
+    marginBottom: 0,
+    marginTop: 0,
+    marginLeft: 0,
+    marginRight: 0
+};
 
 const TimeSelector = () => {
     const chartDiv = useRef<HTMLDivElement>(null);
@@ -18,28 +28,14 @@ const TimeSelector = () => {
         const chart = root.container.children.push(
             am5xy.XYChart.new(root, {
                 layout: root.verticalLayout,
-                paddingBottom: 0,
-                paddingTop: 0,
-                paddingLeft: 0,
-                paddingRight: 0,
-                marginBottom: 0,
-                marginTop: 0,
-                marginLeft: 0,
-                marginRight: 0
+                ...RESETS
             })
         );
 
         const scrollbarX = am5xy.XYChartScrollbar.new(root, {
             orientation: "horizontal",
             height: SB_HEIGHT,
-            paddingBottom: 0,
-            paddingTop: 0,
-            paddingLeft: 0,
-            paddingRight: 0,
-            marginBottom: 0,
-            marginTop: 0,
-            marginLeft: 0,
-            marginRight: 0,
+            ...RESETS
         });
 
         scrollbarX.get("background")!.setAll({
@@ -107,9 +103,8 @@ const TimeSelector = () => {
 
     return <div
         ref={chartDiv}
-        className="time-selector"
+        className="TimeSelector"
         style={{
-            width: "100%",
             height: SB_HEIGHT + 2
         }}
     ></div>;

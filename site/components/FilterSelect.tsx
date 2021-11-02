@@ -1,7 +1,10 @@
 import React, { useMemo, ReactNode } from 'react';
-import Select, { CommonProps, components, GroupBase, MenuListProps, MultiValueProps, OptionProps, StylesConfig, ValueContainerProps } from 'react-select';
+import Select, { components, MenuListProps, MultiValueProps, OptionProps, StylesConfig, ValueContainerProps } from 'react-select';
 import { FilterOptionOption } from 'react-select/dist/declarations/src/filters';
-import { FixedSizeList as List } from "react-window";
+import { FixedSizeList as List } from 'react-window';
+
+const OPTION_HEIGHT = 35;
+const MENU_PADDING = 10;
 
 interface TOption {
     id: string;
@@ -12,6 +15,7 @@ interface TOption {
 type ItemComponent = (props: { data: any }) => JSX.Element;
 
 interface Props<T extends TOption> {
+    id: string;
     placeholder: string;
     optionColorHue: number;
     options: T[];
@@ -44,10 +48,12 @@ const ValueContainer = (props: ValueContainerProps<TOption, true>): JSX.Element 
 
 const Option = (props: OptionProps<TOption, true>): JSX.Element => {
     return (
-        <div style={{ color: 'black'}}>
-            {/*@ts-ignore*/}
-            <props.selectProps.itemComponent data={props.data} />
-        </div>
+        <components.Option {...props}>
+            <div>
+                {/*@ts-ignore*/}
+                <props.selectProps.itemComponent data={props.data} />
+            </div>
+        </components.Option>
     )
 };
 
@@ -63,24 +69,29 @@ const MultiValue = (props: MultiValueProps<TOption, true>): JSX.Element => {
 const MenuList = ({ options, children, maxHeight, getValue }: MenuListProps<TOption, true>): JSX.Element => {
     if(!Array.isArray(children)) {
         // NoOptionsMessage
-        return <>{children}</>;
+        return <React.Fragment>{children}</React.Fragment>;
     }
 
     const childrens = children as ReactNode[];
     
-    const height = 35;
+    const height = OPTION_HEIGHT;
     const [value] = getValue();
     const initialOffset = options.indexOf(value) * height;
 
     return (
         <List
             width="100%"
-            height={Math.min(childrens.length * height, maxHeight)}
+            height={Math.min(childrens.length * height + 2 * MENU_PADDING, maxHeight)}
             itemCount={childrens.length}
             itemSize={height}
             initialScrollOffset={initialOffset}
         >
-            {({ index, style }) => <div style={style}>{childrens[index]}</div>}
+            {({ index, style }) => <div style={{
+                ...style,
+                top: `${parseFloat(style.top+'') + MENU_PADDING}px`
+            }}>
+                {childrens[index]}
+            </div>}
         </List>
     );
 };
@@ -102,14 +113,24 @@ const customStyles = (colorHue: number): StylesConfig<any, true> => {
         }
     });
     return {
-        menu: (provided) => ({
-            ...provided,
-            //backgroundColor: '#66696b',
-        }),
         option: (provided, state) => ({
-            ...provided,
-            //backgroundColor: state.isSelected ? `hsl(${colorHue}deg 100% 65%)` : 'white',
-            //color: state.isSelected ? 'white' : 'black',
+            height: OPTION_HEIGHT,
+            display: "flex",
+            alignItems: "center",
+            cursor: "pointer",
+            padding: "0 8px",
+            backgroundColor: state.isFocused ? `hsl(${colorHue}, 100%, 90%)` : (state.isSelected ? `hsl(${colorHue}, 100%, 94%)` : "inherit"),
+            ":hover": {
+                backgroundColor: `hsl(${colorHue}, 100%, 90%)`
+            },
+            "> div": {
+                color: "white",
+                backgroundColor: state.isSelected ? `hsl(${colorHue}, 100%, 65%)` : '#999999',
+                padding: 3,
+                display: "inline-block",
+                borderRadius: 3,
+                overflow: "hidden"
+            }
         }),
         control: (provided, state) => ({
             ...provided,
@@ -118,7 +139,7 @@ const customStyles = (colorHue: number): StylesConfig<any, true> => {
             ":hover": {
                 borderColor: accentBorder,
             },
-            boxShadow: state.menuIsOpen ? '0 0 0 1px ' + accentBorder : 'none',
+            boxShadow: state.menuIsOpen ? '0 0 0 1px ' + accentBorder : 'none'
         }),
         multiValue: (provided) => ({
             ...provided,
@@ -160,6 +181,7 @@ const FilterSelect = <T extends TOption>(props: Props<T>) => {
     const Styles = useMemo(() => customStyles(props.optionColorHue), [props.optionColorHue]);
 
     return <Select
+        id={props.id}
         options={props.options}
         placeholder={props.placeholder}
         isMulti={true}
@@ -173,9 +195,12 @@ const FilterSelect = <T extends TOption>(props: Props<T>) => {
         isDisabled={props.options.length <= 1}
         getOptionValue={getOptionValue}
         getOptionLabel={getOptionLabel}
-        itemComponent={props.itemComponent}
+        
         // @ts-ignore
         onChange={props.onChange}
+
+        // custom props
+        itemComponent={props.itemComponent}
     />;
 };
 
