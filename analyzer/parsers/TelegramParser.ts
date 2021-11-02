@@ -2,20 +2,19 @@ import { Parser } from "../Parser";
 import { Author, Database, ID, Message } from "../Types";
 
 export class TelegramParser extends Parser {
-
     parse(files: string[]): Database {
         let messages: Message[] = [];
         let authors = new Map<ID, Author>();
         let titles: string[] = [];
-        for(let file_content of files) {
+        for (let file_content of files) {
             let data = JSON.parse(file_content);
             titles.push(data.name);
             console.log(data);
-            
-            for(let msg of data.messages) {
-                const author_id = msg.from_id+'';
-                if(!msg.from) continue; // TODO: fix
-                if(msg.type === "message") {
+
+            for (let msg of data.messages) {
+                const author_id = msg.from_id + "";
+                if (!msg.from) continue; // TODO: fix
+                if (msg.type === "message") {
                     messages.push({
                         type: "message",
                         author: author_id,
@@ -23,11 +22,11 @@ export class TelegramParser extends Parser {
                         date: new Date(msg.date),
                     });
                 }
-                if(!authors.has(author_id)) {
+                if (!authors.has(author_id)) {
                     let author: Author = {
                         id: author_id,
                         name: msg.from,
-                        bot: false
+                        bot: false,
                     };
                     authors.set(author_id, author);
                 }
@@ -38,22 +37,23 @@ export class TelegramParser extends Parser {
             platform: "telegram",
             title: titles.length === 1 ? titles[0] : `${titles.length} Telegram chats`,
             // TODO: fix
-            channels: [{
-                id: "default",
-                messages,
-                name: titles[0]
-            }],
-            authors
+            channels: [
+                {
+                    id: "default",
+                    messages,
+                    name: titles[0],
+                },
+            ],
+            authors,
         };
     }
 
     parseTextArray(text: any): string {
-        if(typeof text === "string") {
+        if (typeof text === "string") {
             return text;
         } else {
             // TODO: parse text array correctly
             return text.map((t: any) => t.text).join(" ");
         }
     }
-
 }

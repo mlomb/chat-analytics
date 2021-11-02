@@ -15,7 +15,7 @@ const RESETS = {
     marginBottom: 0,
     marginTop: 0,
     marginLeft: 0,
-    marginRight: 0
+    marginRight: 0,
 };
 
 const TimeSelector = () => {
@@ -28,19 +28,19 @@ const TimeSelector = () => {
         const chart = root.container.children.push(
             am5xy.XYChart.new(root, {
                 layout: root.verticalLayout,
-                ...RESETS
+                ...RESETS,
             })
         );
 
         const scrollbarX = am5xy.XYChartScrollbar.new(root, {
             orientation: "horizontal",
             height: SB_HEIGHT,
-            ...RESETS
+            ...RESETS,
         });
 
         scrollbarX.get("background")!.setAll({
             fill: am5.Color.fromHex(0x1e2529),
-            fillOpacity: 0.01
+            fillOpacity: 0.01,
         });
         chart.plotContainer.set("visible", false);
         chart.rightAxesContainer.set("visible", false);
@@ -52,7 +52,7 @@ const TimeSelector = () => {
         const xAxis = scrollbarX.chart.xAxes.push(
             am5xy.DateAxis.new(root, {
                 baseInterval: { timeUnit: "day", count: 1 },
-                renderer: am5xy.AxisRendererX.new(root, { })
+                renderer: am5xy.AxisRendererX.new(root, {}),
             })
         );
 
@@ -60,7 +60,7 @@ const TimeSelector = () => {
             am5xy.ValueAxis.new(root, {
                 renderer: am5xy.AxisRendererY.new(root, {}),
                 min: 0,
-                maxPrecision: 0
+                maxPrecision: 0,
             })
         );
 
@@ -70,44 +70,46 @@ const TimeSelector = () => {
                 yAxis: yAxis,
                 valueYField: "messages",
                 valueXField: "date",
-                noRisers: true
+                noRisers: true,
             })
         );
 
         series.strokes.template.setAll({
             strokeWidth: 2,
-            strokeOpacity: 0.5
+            strokeOpacity: 0.5,
         });
         series.fills.template.setAll({
             fillOpacity: 0.2,
-            visible: true
+            visible: true,
         });
 
-        const dateAxisChanged = (ev: { start: number, end: number }) => {
+        const dateAxisChanged = (ev: { start: number; end: number }) => {
             let start = xAxis.positionToDate(ev.start);
             let end = xAxis.positionToDate(ev.end);
-            if(start > end) [start, end] = [end, start];
+            if (start > end) [start, end] = [end, start];
             dataProvider.updateTimeRange(start, end);
         };
         scrollbarX.events.on("rangechanged", dateAxisChanged);
 
         // TODO: update efficient
         const onDataUpdated = () => series.data.setAll(dataProvider.getPerDayData());
-        dataProvider.on('updated-data', onDataUpdated);
+        dataProvider.on("updated-data", onDataUpdated);
 
         return () => {
-            dataProvider.off('updated-data', onDataUpdated);
+            dataProvider.off("updated-data", onDataUpdated);
             root.dispose();
         };
     }, []);
 
-    return <div
-        ref={chartDiv}
-        className="TimeSelector"
-        style={{
-            height: SB_HEIGHT + 2
-        }}
-    ></div>;
+    return (
+        <div
+            ref={chartDiv}
+            className="TimeSelector"
+            style={{
+                height: SB_HEIGHT + 2,
+            }}
+        ></div>
+    );
 };
 
 export default TimeSelector;

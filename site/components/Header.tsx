@@ -24,14 +24,16 @@ const Tab = (props: {
     onChange: (value: string) => void;
 }) => {
     const selected = props.currentValue === props.value;
-    return <a
-        className={selected ? "active" : ""}
-        onClick={() => props.onChange(props.value)}
-        role="tab"
-        aria-selected={selected}
-    >
-        {props.children}
-    </a>;
+    return (
+        <a
+            className={selected ? "active" : ""}
+            onClick={() => props.onChange(props.value)}
+            role="tab"
+            aria-selected={selected}
+        >
+            {props.children}
+        </a>
+    );
 };
 
 const Header = (props: Props) => {
@@ -71,17 +73,31 @@ const Header = (props: Props) => {
                 </div>
                 <div className="Filters__Filter" style={{ minWidth: "100%" }}>
                     <label htmlFor="authors">Time</label>
-                    <TimeSelector/>
+                    <TimeSelector />
                 </div>
             </div>
             <div className="Header__Tabs" role="tablist">
-                <Tab currentValue={tab} onChange={setTab} value="messages">💬 Messages</Tab>
-                <Tab currentValue={tab} onChange={setTab} value="language">🅰️ Language</Tab>
-                <Tab currentValue={tab} onChange={setTab} value="emojis">😃 Emojis</Tab>
-                <Tab currentValue={tab} onChange={setTab} value="interaction">🌀 Interaction</Tab>
-                <Tab currentValue={tab} onChange={setTab} value="sentiment">💙 Sentiment</Tab>
-                <Tab currentValue={tab} onChange={setTab} value="external">🔗 External</Tab>
-                <Tab currentValue={tab} onChange={setTab} value="timeline">📅 Timeline</Tab>
+                <Tab currentValue={tab} onChange={setTab} value="messages">
+                    💬 Messages
+                </Tab>
+                <Tab currentValue={tab} onChange={setTab} value="language">
+                    🅰️ Language
+                </Tab>
+                <Tab currentValue={tab} onChange={setTab} value="emojis">
+                    😃 Emojis
+                </Tab>
+                <Tab currentValue={tab} onChange={setTab} value="interaction">
+                    🌀 Interaction
+                </Tab>
+                <Tab currentValue={tab} onChange={setTab} value="sentiment">
+                    💙 Sentiment
+                </Tab>
+                <Tab currentValue={tab} onChange={setTab} value="external">
+                    🔗 External
+                </Tab>
+                <Tab currentValue={tab} onChange={setTab} value="timeline">
+                    📅 Timeline
+                </Tab>
             </div>
         </div>
     );

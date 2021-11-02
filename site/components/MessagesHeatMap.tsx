@@ -1,8 +1,8 @@
 import { useLayoutEffect, useRef } from "react";
 
 interface Props {
-    timeRange: [Date, Date]
-};
+    timeRange: [Date, Date];
+}
 
 const MessagesHeatMap = (props: Props) => {
     const chartDiv = useRef<HTMLDivElement>(null);

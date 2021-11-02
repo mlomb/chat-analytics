@@ -4,7 +4,7 @@ import { dataProvider } from "../DataProvider";
 
 interface Props {
     getData: "getWordsData" | "getEmojisData";
-};
+}
 
 const WordCloudGraph = (props: Props) => {
     const chartDiv = useRef<HTMLDivElement>(null);

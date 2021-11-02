@@ -1,6 +1,6 @@
 export type ID = string;
 
-export type Platform = 'discord' | 'telegram' | 'whatsapp';
+export type Platform = "discord" | "telegram" | "whatsapp";
 
 export type DiscordAuthor = {
     discriminator: 0 | 1 | 2 | 3 | 4;
@@ -19,7 +19,7 @@ export type Author = {
 // join chat, etc
 export type Event = {
     type: "event";
-}
+};
 
 export type Message = {
     type: "message";

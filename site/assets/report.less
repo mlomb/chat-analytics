@@ -6,10 +6,11 @@
 
 body {
     -webkit-font-smoothing: antialiased;
-    font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,Noto Sans,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji;
+    font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Arial, Noto Sans, sans-serif,
+        Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol, Noto Color Emoji;
     font-size: 14px;
     color: white;
-    background: #1C232B;
+    background: #1c232b;
 }
 
 /* Header */
@@ -21,8 +22,8 @@ body {
 
     padding: 15px 15px 0;
     margin-bottom: 10px;
-    background-color: #22292F;
-    border-bottom: @line-size solid #282F35;
+    background-color: #22292f;
+    border-bottom: @line-size solid #282f35;
 
     .Header__Tabs {
         position: relative;
@@ -32,7 +33,7 @@ body {
 
         a {
             display: block;
-            color: #535A65;
+            color: #535a65;
             text-decoration: none;
             text-transform: uppercase;
             padding: @tab-padding;
@@ -46,10 +47,10 @@ body {
             &:hover {
                 color: #636b77;
             }
-            
+
             &::after {
                 content: "";
-                background: linear-gradient(90deg,#9c00ff,#385bf7);
+                background: linear-gradient(90deg, #9c00ff, #385bf7);
                 height: 1px;
                 position: absolute;
                 left: 5px;
@@ -59,7 +60,8 @@ body {
                 transform: scaleX(0);
                 border-radius: 5px;
             }
-            &.active::after, &:hover::after {
+            &.active::after,
+            &:hover::after {
                 transform: scaleX(1);
             }
 
@@ -92,7 +94,7 @@ body {
     flex-wrap: wrap;
     margin-bottom: 10px;
     margin-top: 15px;
-    
+
     .Filters__Filter {
         flex: 1;
 
@@ -113,7 +115,6 @@ body {
                 margin-right: 0;
             }
         }
-
     }
 }
 
@@ -176,9 +177,15 @@ body {
     box-shadow: 0 1px 3px rgb(0 0 0 / 12%), 0 1px 2px rgb(0 0 0 / 24%);
     margin: 20px;
 
-    &.card-1 { width: 33%; }
-    &.card-2 { width: 66%; }
-    &.card-3 { width: 100%; }
+    &.card-1 {
+        width: 33%;
+    }
+    &.card-2 {
+        width: 66%;
+    }
+    &.card-3 {
+        width: 100%;
+    }
 }
 
 .card-title {
@@ -203,26 +210,16 @@ body {
             width: 0;
             white-space: nowrap;
             color: #636363;
-            content:
-            ". . . . . . . . . . . . . . . . . . . . "
-            ". . . . . . . . . . . . . . . . . . . . "
-            ". . . . . . . . . . . . . . . . . . . . "
-            ". . . . . . . . . . . . . . . . . . . . "
-            ". . . . . . . . . . . . . . . . . . . . "
-            ". . . . . . . . . . . . . . . . . . . . "
-            ". . . . . . . . . . . . . . . . . . . . "
-            ". . . . . . . . . . . . . . . . . . . . "
-            ". . . . . . . . . . . . . . . . . . . . "
-            ". . . . . . . . . . . . . . . . . . . . "
-            ". . . . . . . . . . . . . . . . . . . . "
-            ". . . . . . . . . . . . . . . . . . . . "
-            ". . . . . . . . . . . . . . . . . . . . "
-            ". . . . . . . . . . . . . . . . . . . . "
-            ". . . . . . . . . . . . . . . . . . . . "
-            ". . . . . . . . . . . . . . . . . . . . "
-            ". . . . . . . . . . . . . . . . . . . . "
-            ". . . . . . . . . . . . . . . . . . . . "
-            ". . . . . . . . . . . . . . . . . . . . ";
+            content: ". . . . . . . . . . . . . . . . . . . . " ". . . . . . . . . . . . . . . . . . . . "
+                ". . . . . . . . . . . . . . . . . . . . " ". . . . . . . . . . . . . . . . . . . . "
+                ". . . . . . . . . . . . . . . . . . . . " ". . . . . . . . . . . . . . . . . . . . "
+                ". . . . . . . . . . . . . . . . . . . . " ". . . . . . . . . . . . . . . . . . . . "
+                ". . . . . . . . . . . . . . . . . . . . " ". . . . . . . . . . . . . . . . . . . . "
+                ". . . . . . . . . . . . . . . . . . . . " ". . . . . . . . . . . . . . . . . . . . "
+                ". . . . . . . . . . . . . . . . . . . . " ". . . . . . . . . . . . . . . . . . . . "
+                ". . . . . . . . . . . . . . . . . . . . " ". . . . . . . . . . . . . . . . . . . . "
+                ". . . . . . . . . . . . . . . . . . . . " ". . . . . . . . . . . . . . . . . . . . "
+                ". . . . . . . . . . . . . . . . . . . . ";
         }
         span:first-child {
             padding-right: 0.33em;
@@ -269,7 +266,8 @@ body {
     transition: 0.5s width;
     border-radius: 3px;
 }
-.AnimatedBars__value, .AnimatedBars__unit {
+.AnimatedBars__value,
+.AnimatedBars__unit {
     z-index: 1;
     padding: 5px;
 }

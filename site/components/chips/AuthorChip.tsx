@@ -3,9 +3,9 @@ import { NewAuthor } from "../../../analyzer/Analyzer";
 import ImageSmooth from "../basic/ImageSmooth";
 
 interface Props {
-    platform: Platform,
-    author: NewAuthor
-};
+    platform: Platform;
+    author: NewAuthor;
+}
 
 import avatar_0 from "../../assets/discord/avatar_0.png";
 import avatar_1 from "../../assets/discord/avatar_1.png";
@@ -16,15 +16,17 @@ const DiscordDefaultAvatars = [avatar_0, avatar_1, avatar_2, avatar_3, avatar_4]
 
 const AuthorChip = ({ platform, author }: Props) => {
     let placeholder: JSX.Element | null;
-    if(platform === "discord") {
-        placeholder = <img
-            src={DiscordDefaultAvatars[author.discord!.discriminator]}
-            style={{
-                width: "100%",
-                height: "100%",
-            }}
-        />;
-    } else if(platform === "telegram") {
+    if (platform === "discord") {
+        placeholder = (
+            <img
+                src={DiscordDefaultAvatars[author.discord!.discriminator]}
+                style={{
+                    width: "100%",
+                    height: "100%",
+                }}
+            />
+        );
+    } else if (platform === "telegram") {
         placeholder = <div>A</div>; // TODO: telegram avatars
     } else {
         placeholder = null;
@@ -32,18 +34,22 @@ const AuthorChip = ({ platform, author }: Props) => {
 
     const avatar = author.avatarUrl ? <ImageSmooth src={author.avatarUrl} children={placeholder} /> : placeholder;
 
-    return <div className="Chip">
-        <div style={{
-            position: "relative",
-            width: 20,
-            height: 20,
-            overflow: "hidden",
-            borderRadius: "50%"
-        }}>
-            {avatar}
+    return (
+        <div className="Chip">
+            <div
+                style={{
+                    position: "relative",
+                    width: 20,
+                    height: 20,
+                    overflow: "hidden",
+                    borderRadius: "50%",
+                }}
+            >
+                {avatar}
+            </div>
+            <span>{author.name}</span>
         </div>
-        <span>{author.name}</span>
-    </div>
+    );
 };
 
 export default AuthorChip;

@@ -1,6 +1,6 @@
 export default null as any;
 
-import { compress } from 'compress-json';
+import { compress } from "compress-json";
 
 import { Platform } from "../analyzer/Types";
 import { Parser } from "../analyzer/Parser";
@@ -13,7 +13,7 @@ import { analyze } from "../analyzer/Analyzer";
 let reportPage: string;
 
 var xhr = new XMLHttpRequest();
-xhr.responseType = 'text';
+xhr.responseType = "text";
 xhr.onload = () => {
     if (xhr.readyState === xhr.DONE) {
         if (xhr.status < 400) {
@@ -49,17 +49,24 @@ export type Message = StartMessage | StatusMessage;
 async function start(msg: StartMessage) {
     // Load files
     let files: string[] = [];
-    for(let i = 0; i < msg.files.length; i++) {
+    for (let i = 0; i < msg.files.length; i++) {
         files.push(await msg.files[i].text());
     }
 
     // Create parser
     let parser: Parser;
-    switch(msg.platform) {
-        case 'discord': parser = new DiscordParser(); break;
-        case 'whatsapp': parser = new WhatsAppParser(); break;
-        case 'telegram': parser = new TelegramParser(); break;
-        default: return null;
+    switch (msg.platform) {
+        case "discord":
+            parser = new DiscordParser();
+            break;
+        case "whatsapp":
+            parser = new WhatsAppParser();
+            break;
+        case "telegram":
+            parser = new TelegramParser();
+            break;
+        default:
+            return null;
     }
 
     // Parse files
@@ -72,12 +79,12 @@ async function start(msg: StartMessage) {
     console.log(report_data);
 
     let page = reportPage.replace("undefined", report_data);
-    let blob = new Blob([page], {type : 'text/html'});
+    let blob = new Blob([page], { type: "text/html" });
 
     // @ts-ignore
     self.postMessage(<WorkerResult>{
         blob,
-        url: URL.createObjectURL(blob)
+        url: URL.createObjectURL(blob),
     });
 }
 
@@ -86,7 +93,7 @@ if (typeof window === "undefined" && typeof self !== "undefined") {
 
     // This should only run inside the Web Worker
     self.onmessage = (ev: MessageEvent<Message>) => {
-        if(ev.data.type === "start") {
+        if (ev.data.type === "start") {
             start(ev.data);
         }
     };

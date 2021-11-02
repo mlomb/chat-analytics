@@ -1,4 +1,4 @@
-import Tokenizer from 'wink-tokenizer';
+import Tokenizer from "wink-tokenizer";
 
 import { Author, Channel, Database, DiscordAuthor, ID, Message } from "./Types";
 
@@ -19,7 +19,7 @@ type Aggregation = {
     total_letters: number;
     words: { [word: string]: number };
     emojis: { [emoji: string]: number };
-//    by_day: { [day: string]: Aggregation };
+    //    by_day: { [day: string]: Aggregation };
 };
 
 type ReportData = {
@@ -38,7 +38,6 @@ type Channels = {
 
 type MessageEvent = {
     type: "message";
-
 };
 
 type DayAggregation = {
@@ -61,15 +60,15 @@ export type NewAuthor = {
         [id: string]: {
             [date: string]: DayAggregation;
         };
-    }
+    };
     avatarUrl?: string;
     discord?: DiscordAuthor;
 };
 
 export type NewReport = {
     title: string;
-    channels: NewChannel[],
-    authors: NewAuthor[],
+    channels: NewChannel[];
+    authors: NewAuthor[];
     minDate: string;
     maxDate: string;
 };
@@ -85,11 +84,11 @@ const tokenizer = new Tokenizer();
 
 const processMessage = (msg: Message, aggr: DayAggregation) => {
     aggr.messages++;
-    
+
     let tokens = tokenizer.tokenize(msg.content);
-    for(let token of tokens) {
+    for (let token of tokens) {
         let value = token.value.toLocaleLowerCase();
-        switch(token.tag) {
+        switch (token.tag) {
             // "email" | "punctuation" | "number" | "time" | "hashtag" | "mention" | "emoticon" | "ordinal" | "quoted_phrase" | "url" | "symbol" | "currency" | "alien"
             case "word":
                 aggr.words[value] = (aggr.words[value] || 0) + 1;
@@ -113,43 +112,44 @@ const analyze = (db: Database): NewReport => {
     let minDate: Date | null = null;
     let maxDate: Date | null = null;
 
-    const dateToString = (date: Date): string => date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate();
+    const dateToString = (date: Date): string =>
+        date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate();
 
-    for(let [id, author] of db.authors) {
+    for (let [id, author] of db.authors) {
         const new_author: NewAuthor = {
             id,
             name: author.name,
-            channels: { }
+            channels: {},
         };
-        if(author.avatarUrl !== undefined) {
+        if (author.avatarUrl !== undefined) {
             new_author.avatarUrl = author.avatarUrl;
         }
-        if(db.platform == "discord") {
+        if (db.platform == "discord") {
             new_author.discord = author.discord;
         }
         authors.set(id, new_author);
     }
 
-    for(let ch of db.channels) {
+    for (let ch of db.channels) {
         channels.push({
             id: ch.id,
-            name: ch.name
+            name: ch.name,
         });
 
-        for(let msg of ch.messages) {
-            if(minDate === null || msg.date < minDate) minDate = msg.date;
-            if(maxDate === null || msg.date > maxDate) maxDate = msg.date;
+        for (let msg of ch.messages) {
+            if (minDate === null || msg.date < minDate) minDate = msg.date;
+            if (maxDate === null || msg.date > maxDate) maxDate = msg.date;
 
             let date = dateToString(msg.date);
             let author = authors.get(msg.author)!;
-            if(!(ch.id in author.channels)) {
-                author.channels[ch.id] = { };
+            if (!(ch.id in author.channels)) {
+                author.channels[ch.id] = {};
             }
-            if(!(date in author.channels[ch.id])) {
+            if (!(date in author.channels[ch.id])) {
                 author.channels[ch.id][date] = {
                     messages: 0,
-                    words: { },
-                    emojis: { }
+                    words: {},
+                    emojis: {},
                 };
             }
             let aggr = author.channels[ch.id][date];
@@ -162,7 +162,7 @@ const analyze = (db: Database): NewReport => {
         channels,
         authors: Array.from(authors.values()),
         minDate: dateToString(minDate!),
-        maxDate: dateToString(maxDate!)
+        maxDate: dateToString(maxDate!),
     };
 
     console.log(report);

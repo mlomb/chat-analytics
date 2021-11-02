@@ -30,9 +30,7 @@ const dateToString = (date: Date): string => monthToString(date) + "-" + date.ge
 // updated-zoom: instant (drag time slider)
 // updated-data: debounced
 
-
 export class DataProvider extends EventEmitter {
-
     // @ts-ignore
     private generalData: GeneralStats;
     //private generalData: GeneralStats;
@@ -66,13 +64,13 @@ export class DataProvider extends EventEmitter {
             const monthKey = monthToString(day);
             let dayData = {
                 date: day.getTime(),
-                messages: 0
+                messages: 0,
             };
             let monthData = monthsData.get(monthKey);
-            if(monthData === undefined) {
+            if (monthData === undefined) {
                 monthData = {
                     date: new Date(day.getFullYear(), day.getMonth(), 1).getTime(),
-                    messages: 0
+                    messages: 0,
                 };
                 monthsData.set(monthKey, monthData);
                 this.perMonth.push(monthData);
@@ -82,7 +80,7 @@ export class DataProvider extends EventEmitter {
                 dayKey,
                 monthKey,
                 dayData,
-                monthData
+                monthData,
             });
             this.perDay.push(dayData);
         }
@@ -108,19 +106,19 @@ export class DataProvider extends EventEmitter {
     updateTimeRange(start: Date, end: Date) {
         this.activeStartDate = start;
         this.activeEndDate = end;
-        this.emit('updated-zoom');
+        this.emit("updated-zoom");
         this.needUpdate();
     }
 
     update() {
         this.recomputeData();
         console.log("updated-data");
-        this.emit('updated-data');
+        this.emit("updated-data");
     }
 
     needUpdate() {
         // debounce
-        if(this.updateTimer) {
+        if (this.updateTimer) {
             // cancel previous timer
             clearTimeout(this.updateTimer);
         }
@@ -131,7 +129,7 @@ export class DataProvider extends EventEmitter {
     }
 
     // TODO: includeInData(author, channel, date), excludeFromData(author, channel, date)
-    
+
     // NOTE: this is expensive, it should be optimized knowing which kind of update it was
     //       (updateChannels, updateAuthors, updateTimeRange)
     recomputeData() {
@@ -143,22 +141,22 @@ export class DataProvider extends EventEmitter {
         for (let monthData of this.perMonth) monthData.messages = 0;
 
         for (let { dayKey, dayData, monthData } of this.dates) {
-            for(const author of this.activeAuthors) {
-                for(const channel of this.activeChannels) {
-                    if(channel.id in author.channels) {
+            for (const author of this.activeAuthors) {
+                for (const channel of this.activeChannels) {
+                    if (channel.id in author.channels) {
                         const from_user_in_channel = author.channels[channel.id];
-                        if(dayKey in from_user_in_channel) {
+                        if (dayKey in from_user_in_channel) {
                             let messages = from_user_in_channel[dayKey].messages;
                             dayData.messages += messages;
                             monthData.messages += messages;
 
                             const words = from_user_in_channel[dayKey].words;
-                            for(const word in words) {
+                            for (const word in words) {
                                 wordsAggr.set(word, (wordsAggr.get(word) || 0) + words[word]);
                             }
-                            
+
                             const emojis = from_user_in_channel[dayKey].emojis;
-                            for(const emoji in emojis) {
+                            for (const emoji in emojis) {
                                 emojisAggr.set(emoji, (emojisAggr.get(emoji) || 0) + emojis[emoji]);
                             }
                         }
@@ -169,7 +167,7 @@ export class DataProvider extends EventEmitter {
 
         const deMap = (map: Map<string, number>): FrequencyData[] => {
             let res = [];
-            for(const [value, count] of map) {
+            for (const [value, count] of map) {
                 res.push({ value, count });
             }
             res.sort((a, b) => b.count - a.count);
@@ -203,7 +201,7 @@ export class DataProvider extends EventEmitter {
     getEnd(): Date {
         return this.activeEndDate;
     }
-};
+}
 
 export declare var dataProvider: DataProvider;
 

@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "scripts": {
     "dev": "webpack serve --progress",
+    "format": "prettier --write .",
     "build": "cross-env MODE=production webpack"
   },
   "author": "Martin Emiliano Lombardo <to@mlomb.me>",
@@ -26,6 +27,7 @@
     "mini-css-extract-plugin": "^2.4.3",
     "multilang-sentiment": "^1.2.0",
     "postcss-loader": "^6.2.0",
+    "prettier": "^2.4.1",
     "react": "^17.0.2",
     "react-countup": "^6.0.0",
     "react-dev-utils": "^6.0.5",
