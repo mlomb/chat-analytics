@@ -119,9 +119,11 @@ const analyze = (db: Database): NewReport => {
         const new_author: NewAuthor = {
             id,
             name: author.name,
-            channels: { },
-            avatarUrl: author.avatarUrl
+            channels: { }
         };
+        if(author.avatarUrl !== undefined) {
+            new_author.avatarUrl = author.avatarUrl;
+        }
         if(db.platform == "discord") {
             new_author.discord = author.discord;
         }

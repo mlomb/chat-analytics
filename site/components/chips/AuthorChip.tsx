@@ -25,24 +25,15 @@ const AuthorChip = ({ platform, author }: Props) => {
                 height: "100%",
             }}
         />;
+    } else if(platform === "telegram") {
+        placeholder = <div>A</div>; // TODO
     } else {
         placeholder = <div>Nope</div>;
     }
 
-// <ImageSmooth src={author.avatarUrl} children={placeholder} />
-const avatar = author.avatarUrl ? <ImageSmooth src={author.avatarUrl} children={placeholder} /> : placeholder;
-/*
-    const avatar = author.avatarUrl ? <Img
-    loading="lazy"
-    width="100%"
-    height="100%"
-    src={[author.avatarUrl]}
-    unloader={placeholder}
-    loader={placeholder}
-    decode={false}
-  /> : placeholder;*/
+    const avatar = author.avatarUrl ? <ImageSmooth src={author.avatarUrl} children={placeholder} /> : placeholder;
 
-    return <div className="chip author-chip">
+    return <div className="Chip">
         <div style={{
             position: "relative",
             width: 20,

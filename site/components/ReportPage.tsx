@@ -22,7 +22,10 @@ const TabContainer = (props: {
     value: string;
     children: React.ReactNode;
 }) => {
-    return <div style={{ display: props.currentValue === props.value ? "block" : "none" }}>
+    return <div
+        style={{ display: props.currentValue === props.value ? "block" : "none" }}
+        role="tabpanel"
+    >
         {props.children}
     </div>;
 };
@@ -66,7 +69,7 @@ const ReportPage = () => {
     ]);
     const [barsTestChannels, setBarsTestChannels] = useState([
         { data: report.channels[0], value: 1, },
-        { data: report.channels[1], value: 2, },
+        /*{ data: report.channels[1], value: 2, },
         { data: report.channels[2], value: 3, },
         { data: report.channels[3], value: 4, },
         { data: report.channels[4], value: 5, },
@@ -79,7 +82,7 @@ const ReportPage = () => {
         { data: report.channels[11], value: 12, },
         { data: report.channels[12], value: 13, },
         { data: report.channels[13], value: 14, },
-        { data: report.channels[14], value: 15, },
+        { data: report.channels[14], value: 15, },*/
     ]);
     useEffect(() => {
         const interval = setInterval(() => {
@@ -100,8 +103,8 @@ const ReportPage = () => {
         return () => clearInterval(interval);
     }, []);
 
-    const channelChip = useMemo(() => (props: { data: NewChannel }) => <ChannelChip platform="discord" channel={props.data} />, []); // TODO: add platform dependency
-    const authorChip = useMemo(() => (props: { data: NewAuthor }) => <AuthorChip platform="discord" author={props.data} />, []); // TODO: add platform dependency
+    const channelChip = useMemo(() => (props: { data: NewChannel }) => <ChannelChip platform="telegram" channel={props.data} />, []); // TODO: add platform dependency
+    const authorChip = useMemo(() => (props: { data: NewAuthor }) => <AuthorChip platform="telegram" author={props.data} />, []); // TODO: add platform dependency
     
     return <>
         <Header title={report.title} tab={tab} setTab={setTab} />

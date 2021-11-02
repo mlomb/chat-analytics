@@ -1,38 +1,33 @@
-// @ts-nocheck TODO: fix
-import React, { ReactNode, ReactNodeArray } from 'react';
-import { useMemo } from 'react';
-import Select, { CommonProps, components, createFilter, MultiValueProps, OptionProps, StylesConfig, Theme } from 'react-select';
-//import { MenuListComponentProps } from 'react-select/src/components/Menu';
+import React, { useMemo, ReactNode } from 'react';
+import Select, { CommonProps, components, GroupBase, MenuListProps, MultiValueProps, OptionProps, StylesConfig, ValueContainerProps } from 'react-select';
+import { FilterOptionOption } from 'react-select/dist/declarations/src/filters';
 import { FixedSizeList as List } from "react-window";
 
-interface Option {
+interface TOption {
     id: string;
     name: string;
+    name_searchable?: string; // TODO: remove ?
 };
 
-interface Props<T extends Option> {
-    name: string;
-    allText: string;
+type ItemComponent = (props: { data: any }) => JSX.Element;
+
+interface Props<T extends TOption> {
     placeholder: string;
-    optionColorHue: number,
+    optionColorHue: number;
     options: T[];
     selected: T[];
     onChange: (selected: T[]) => void;
-    chip: (props: { data: any }) => JSX.Element;
+    itemComponent: ItemComponent;
 };
 
-interface ValueContainerProps extends CommonProps<any, true, Group> {
-    children: any;
-};
-
-const ValueContainer = ({ children, ...props }: ValueContainerProps): JSX.Element => {
+const ValueContainer = (props: ValueContainerProps<TOption, true>): JSX.Element => {
     if(!props.hasValue) {
         // placeholder and input
-        return <components.ValueContainer {...props}>{children}</components.ValueContainer>;
+        return <components.ValueContainer {...props}>{props.children}</components.ValueContainer>;
     }
-
+    
     const CHIPS_LIMIT = 3;
-    const [chips, otherChildren] = children;
+    const [chips, otherChildren] = props.children as [ReactNode[], ReactNode];
     const overflowCounter = props.getValue().length;
     const displayChips = chips.slice(0, CHIPS_LIMIT);
   
@@ -47,25 +42,31 @@ const ValueContainer = ({ children, ...props }: ValueContainerProps): JSX.Elemen
     );
 };
 
-const OptionElement = ({ children, ...props }: OptionProps<any, true>): JSX.Element => {
+const Option = (props: OptionProps<TOption, true>): JSX.Element => {
     return (
-      <div style={{ color: 'black'}}>
-          <props.selectProps.chip data={props.data} />
-      </div>
+        <div style={{ color: 'black'}}>
+            {/*@ts-ignore*/}
+            <props.selectProps.itemComponent data={props.data} />
+        </div>
     )
 };
 
-const MultiValue = ({ children, ...props }: MultiValueProps<any>): JSX.Element => {
-    console.log(children);
+const MultiValue = (props: MultiValueProps<TOption, true>): JSX.Element => {
     return (
-      <components.MultiValue {...props}>
-          <props.selectProps.chip data={props.data} />
-      </components.MultiValue>
+        <components.MultiValue {...props}>
+            {/*@ts-ignore*/}
+            <props.selectProps.itemComponent data={props.data} />
+        </components.MultiValue>
     );
 };
 
-const MenuList = ({ options, children, maxHeight, getValue }: MenuListComponentProps<any, true>): JSX.Element => {
-    const childrens = children as ReactNodeArray;
+const MenuList = ({ options, children, maxHeight, getValue }: MenuListProps<TOption, true>): JSX.Element => {
+    if(!Array.isArray(children)) {
+        // NoOptionsMessage
+        return <>{children}</>;
+    }
+
+    const childrens = children as ReactNode[];
     
     const height = 35;
     const [value] = getValue();
@@ -74,23 +75,32 @@ const MenuList = ({ options, children, maxHeight, getValue }: MenuListComponentP
     return (
         <List
             width="100%"
-            height={maxHeight}
+            height={Math.min(childrens.length * height, maxHeight)}
             itemCount={childrens.length}
             itemSize={height}
             initialScrollOffset={initialOffset}
-            >
+        >
             {({ index, style }) => <div style={style}>{childrens[index]}</div>}
         </List>
     );
 };
 
+const Components = {
+    MenuList,
+    MultiValue,
+    Option,
+    ValueContainer
+};
+
 const customStyles = (colorHue: number): StylesConfig<any, true> => {
     const accentBorder = `hsl(${colorHue}, 50%, 60%)`;
-    const indicatorStyles = {
+    const indicatorStyles = (provided: any, state: any) => ({
+        ...provided,
+        color: `hsl(0, 0%, ${state.menuIsOpen ? 90 : 80}%)`,
         ":hover": {
             color: 'white'
         }
-    };
+    });
     return {
         menu: (provided) => ({
             ...provided,
@@ -103,8 +113,8 @@ const customStyles = (colorHue: number): StylesConfig<any, true> => {
         }),
         control: (provided, state) => ({
             ...provided,
-            backgroundColor: '#1e2529',
-            borderColor: state.menuIsOpen ? accentBorder : '#596570',
+            backgroundColor: state.isDisabled ? '#181c1e' : '#1e2529',
+            borderColor: state.isDisabled ? '#373a3d' : (state.menuIsOpen ? accentBorder : '#596570'),
             ":hover": {
                 borderColor: accentBorder,
             },
@@ -118,12 +128,13 @@ const customStyles = (colorHue: number): StylesConfig<any, true> => {
             ...provided,
             color: 'white',
         }),
-        multiValueRemove: (provided) => ({
+        multiValueRemove: (provided, state) => ({
             ...provided,
             borderTopLeftRadius: 0,
             borderBottomLeftRadius: 0,
             color: 'white',
             cursor: 'pointer',
+            width: state.isDisabled ? 0 : 'auto',
             ":hover": {
                 backgroundColor: `hsl(${colorHue}deg 100% 75%)`
             }
@@ -132,32 +143,23 @@ const customStyles = (colorHue: number): StylesConfig<any, true> => {
             ...provided,
             color: 'white',
         }),
-        dropdownIndicator: (provided) => ({
-            ...provided,
-            ...indicatorStyles
-        }),
-        clearIndicator: (provided) => ({
-            ...provided,
-            ...indicatorStyles
-        })
+        dropdownIndicator: indicatorStyles,
+        clearIndicator: indicatorStyles
     }
 };
 
+const filterFn = (option: FilterOptionOption<TOption>, candidate: string):
+    // TODO: use name_searchable
+    // TODO: also satinize candidate
+    boolean => option.data.name!.indexOf(candidate) > -1;
 
-const Components = {
-    MenuList,
-    ValueContainer,
-    MultiValue,
-    Option: OptionElement
-};
+const getOptionValue = (option: TOption) => option.id;
+const getOptionLabel = (option: TOption) => option.name;
 
-const filterFn = createFilter({ ignoreAccents: false });
-
-const FilterSelect = <T extends Option>(props: Props<T>) => {
+const FilterSelect = <T extends TOption>(props: Props<T>) => {
     const Styles = useMemo(() => customStyles(props.optionColorHue), [props.optionColorHue]);
 
     return <Select
-        name={props.name}
         options={props.options}
         placeholder={props.placeholder}
         isMulti={true}
@@ -167,10 +169,11 @@ const FilterSelect = <T extends Option>(props: Props<T>) => {
         components={Components}
         defaultValue={props.selected}
         styles={Styles}
-        chip={props.chip}
         filterOption={filterFn}
         isDisabled={props.options.length <= 1}
-
+        getOptionValue={getOptionValue}
+        getOptionLabel={getOptionLabel}
+        itemComponent={props.itemComponent}
         // @ts-ignore
         onChange={props.onChange}
     />;
