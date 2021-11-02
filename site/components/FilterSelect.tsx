@@ -131,12 +131,12 @@ const customStyles = (colorHue: number): StylesConfig<any, true> => {
             cursor: "pointer",
             padding: "0 8px",
             backgroundColor: state.isFocused
-                ? `hsl(${colorHue}, 100%, 90%)`
-                : state.isSelected
                 ? `hsl(${colorHue}, 100%, 94%)`
-                : "inherit",
+                : state.isSelected
+                ? `hsl(${colorHue}, 100%, 90%)`
+                : "white",
             ":hover": {
-                backgroundColor: `hsl(${colorHue}, 100%, 90%)`,
+                backgroundColor: state.isSelected ? `hsl(${colorHue}, 100%, 88%)` : `hsl(${colorHue}, 100%, 97%)`,
             },
             "> div": {
                 color: "white",
