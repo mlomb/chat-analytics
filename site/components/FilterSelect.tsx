@@ -124,7 +124,7 @@ const customStyles = (colorHue: number): StylesConfig<any, true> => {
         },
     });
     return {
-        option: (provided, state) => ({
+        option: (_, state) => ({
             height: OPTION_HEIGHT,
             display: "flex",
             alignItems: "center",

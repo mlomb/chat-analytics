@@ -1,6 +1,7 @@
 import EventEmitter from "events";
 
 import { NewAuthor, NewChannel, NewReport } from "../analyzer/Analyzer";
+import { Platform } from "../analyzer/Types";
 
 export type DataPerDate = {
     date: number; // timestamp
@@ -194,6 +195,10 @@ export class DataProvider extends EventEmitter {
         return this.emojiData;
     }
 
+    getPlatform(): Platform {
+        return this.source.platform;
+    }
+
     getStart(): Date {
         return this.activeStartDate;
     }
@@ -203,8 +208,10 @@ export class DataProvider extends EventEmitter {
     }
 }
 
+export declare var platform: Platform;
 export declare var dataProvider: DataProvider;
 
 export const initDataProvider = (source: NewReport) => {
     dataProvider = new DataProvider(source);
+    platform = source.platform;
 };

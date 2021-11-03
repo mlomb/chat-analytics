@@ -1,6 +1,6 @@
 import Tokenizer from "wink-tokenizer";
 
-import { Author, Channel, Database, DiscordAuthor, ID, Message } from "./Types";
+import { Author, Channel, Database, DiscordAuthor, ID, Message, Platform } from "./Types";
 
 /*
 var sentiment = require('multilang-sentiment');
@@ -66,6 +66,7 @@ export type NewAuthor = {
 };
 
 export type NewReport = {
+    platform: Platform;
     title: string;
     channels: NewChannel[];
     authors: NewAuthor[];
@@ -158,6 +159,7 @@ const analyze = (db: Database): NewReport => {
     }
 
     let report: NewReport = {
+        platform: db.platform,
         title: db.title,
         channels,
         authors: Array.from(authors.values()),

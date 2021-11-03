@@ -1,12 +1,11 @@
-import { Platform } from "../../../analyzer/Types";
 import { NewChannel } from "../../../analyzer/Analyzer";
+import { platform } from "../../DataProvider";
 
 interface Props {
-    platform: Platform;
-    channel: NewChannel;
+    data: NewChannel;
 }
 
-const ChannelChip = ({ platform, channel }: Props) => {
+const ChannelChip = ({ data }: Props) => {
     return (
         <div className="Chip">
             {/* # icon */}
@@ -20,7 +19,7 @@ const ChannelChip = ({ platform, channel }: Props) => {
                     ></path>
                 </svg>
             )}
-            <span>{channel.name}</span>
+            <span>{data.name}</span>
         </div>
     );
 };

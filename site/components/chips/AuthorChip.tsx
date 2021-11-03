@@ -1,10 +1,9 @@
-import { Platform } from "../../../analyzer/Types";
 import { NewAuthor } from "../../../analyzer/Analyzer";
 import ImageSmooth from "../basic/ImageSmooth";
+import { platform } from "../../DataProvider";
 
 interface Props {
-    platform: Platform;
-    author: NewAuthor;
+    data: NewAuthor;
 }
 
 import avatar_0 from "../../assets/discord/avatar_0.png";
@@ -14,12 +13,12 @@ import avatar_3 from "../../assets/discord/avatar_3.png";
 import avatar_4 from "../../assets/discord/avatar_4.png";
 const DiscordDefaultAvatars = [avatar_0, avatar_1, avatar_2, avatar_3, avatar_4];
 
-const AuthorChip = ({ platform, author }: Props) => {
+const AuthorChip = ({ data }: Props) => {
     let placeholder: JSX.Element | null;
     if (platform === "discord") {
         placeholder = (
             <img
-                src={DiscordDefaultAvatars[author.discord!.discriminator]}
+                src={DiscordDefaultAvatars[data.discord!.discriminator]}
                 style={{
                     width: "100%",
                     height: "100%",
@@ -32,22 +31,12 @@ const AuthorChip = ({ platform, author }: Props) => {
         placeholder = null;
     }
 
-    const avatar = author.avatarUrl ? <ImageSmooth src={author.avatarUrl} children={placeholder} /> : placeholder;
+    const avatar = data.avatarUrl ? <ImageSmooth src={data.avatarUrl} children={placeholder} /> : placeholder;
 
     return (
         <div className="Chip">
-            <div
-                style={{
-                    position: "relative",
-                    width: 20,
-                    height: 20,
-                    overflow: "hidden",
-                    borderRadius: "50%",
-                }}
-            >
-                {avatar}
-            </div>
-            <span>{author.name}</span>
+            <div className="Chip__Avatar">{avatar}</div>
+            <span>{data.name}</span>
         </div>
     );
 };

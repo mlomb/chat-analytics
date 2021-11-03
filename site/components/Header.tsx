@@ -1,10 +1,10 @@
-import { NewAuthor, NewChannel } from "../../analyzer/Analyzer";
 import { dataProvider } from "../DataProvider";
+import { NewAuthor, NewChannel } from "../../analyzer/Analyzer";
+import AuthorChip from "./chips/AuthorChip";
+import ChannelChip from "./chips/ChannelChip";
 
 import FilterSelect from "./FilterSelect";
 import TimeSelector from "./TimeSelector";
-
-type ChipFn = (props: { data: any }) => JSX.Element;
 
 interface Props {
     tab: string;
@@ -13,8 +13,6 @@ interface Props {
     selectedAuthors: NewAuthor[];
     setSelectedAuthors: (authors: NewAuthor[]) => void;
     setSelectedChannels: (channels: NewChannel[]) => void;
-    authorChip: ChipFn;
-    channelChip: ChipFn;
 }
 
 const Tab = (props: {
@@ -55,7 +53,7 @@ const Header = (props: Props) => {
                         // @ts-ignore
                         onChange={props.setSelectedChannels}
                         optionColorHue={266}
-                        itemComponent={props.channelChip}
+                        itemComponent={ChannelChip}
                     />
                 </div>
                 <div className="Filters__Filter">
@@ -68,7 +66,7 @@ const Header = (props: Props) => {
                         // @ts-ignore
                         onChange={props.setSelectedAuthors}
                         optionColorHue={240}
-                        itemComponent={props.authorChip}
+                        itemComponent={AuthorChip}
                     />
                 </div>
                 <div className="Filters__Filter" style={{ minWidth: "100%" }}>
