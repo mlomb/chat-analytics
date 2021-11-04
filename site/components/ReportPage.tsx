@@ -43,8 +43,8 @@ const ReportPage = () => {
 
     // let data = useMemo(()=> dataProvider.(selectedChannels, selectedUsers, report), [selectedChannels, selectedUsers]);
 
-    console.log("report", report);
-    console.log("selection", selectedAuthors, selectedChannels);
+    //console.log("report", report);
+    //console.log("selection", selectedAuthors, selectedChannels);
     //console.log("data", data);
 
     useLayoutEffect(() => dataProvider.updateAuthors(selectedAuthors), [selectedAuthors]);

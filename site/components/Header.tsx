@@ -3,7 +3,7 @@ import { NewAuthor, NewChannel } from "../../analyzer/Analyzer";
 import AuthorChip from "./chips/AuthorChip";
 import ChannelChip from "./chips/ChannelChip";
 
-import FilterSelect from "./FilterSelect";
+import FilterSelect, { SelectSpecialOpcion } from "./FilterSelect";
 import TimeSelector from "./TimeSelector";
 
 interface Props {
@@ -34,6 +34,28 @@ const Tab = (props: {
     );
 };
 
+const channelsSpecialOptions: SelectSpecialOpcion<NewChannel>[] = [
+    {
+        name: "Select all channels",
+        filter: (options) => options,
+    },
+];
+
+const authorsSpecialOptions: SelectSpecialOpcion<NewAuthor>[] = [
+    {
+        name: "Select all authors",
+        filter: (options) => options,
+    },
+    {
+        name: "Select all non-bot authors",
+        filter: (options) => options.filter((o) => o.bot === false),
+    },
+    {
+        name: "Select all bot authors",
+        filter: (options) => options.filter((o) => o.bot === true),
+    },
+];
+
 const Header = (props: Props) => {
     const { tab, setTab } = props;
     const report = dataProvider.getSource();
@@ -54,6 +76,7 @@ const Header = (props: Props) => {
                         onChange={props.setSelectedChannels}
                         optionColorHue={266}
                         itemComponent={ChannelChip}
+                        specialOptions={channelsSpecialOptions}
                     />
                 </div>
                 <div className="Filters__Filter">
@@ -67,6 +90,8 @@ const Header = (props: Props) => {
                         onChange={props.setSelectedAuthors}
                         optionColorHue={240}
                         itemComponent={AuthorChip}
+                        // @ts-ignore
+                        specialOptions={authorsSpecialOptions}
                     />
                 </div>
                 <div className="Filters__Filter" style={{ minWidth: "100%" }}>

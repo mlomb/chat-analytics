@@ -8,18 +8,23 @@ import Select, {
     ValueContainerProps,
 } from "react-select";
 import { FilterOptionOption } from "react-select/dist/declarations/src/filters";
-import { FixedSizeList as List } from "react-window";
+import { FixedSizeList, ListChildComponentProps } from "react-window";
 
 const OPTION_HEIGHT = 35;
 const MENU_PADDING = 10;
 
-interface TOption {
+type TOption = {
     id: string;
     name: string;
     name_searchable?: string; // TODO: remove ?
-}
+};
 
 type ItemComponent = (props: { data: any }) => JSX.Element;
+
+export interface SelectSpecialOpcion<T extends TOption> {
+    name: string;
+    filter: (options: T[]) => T[];
+}
 
 interface Props<T extends TOption> {
     id: string;
@@ -29,6 +34,7 @@ interface Props<T extends TOption> {
     selected: T[];
     onChange: (selected: T[]) => void;
     itemComponent: ItemComponent;
+    specialOptions?: SelectSpecialOpcion<T>[];
 }
 
 const ValueContainer = (props: ValueContainerProps<TOption, true>): JSX.Element => {
@@ -73,37 +79,57 @@ const MultiValue = (props: MultiValueProps<TOption, true>): JSX.Element => {
     );
 };
 
-const MenuList = ({ options, children, maxHeight, getValue }: MenuListProps<TOption, true>): JSX.Element => {
+const MenuList = ({
+    options,
+    children,
+    maxHeight,
+    getValue,
+    selectProps,
+}: MenuListProps<TOption, true>): JSX.Element => {
     if (!Array.isArray(children)) {
         // NoOptionsMessage
-        return <React.Fragment>{children}</React.Fragment>;
+        return <>{children}</>;
     }
 
+    const specialOptions =
+        // @ts-ignore
+        selectProps.inputValue.length > 0 ? [] : (selectProps.specialOptions as SelectSpecialOpcion<TOption>[]);
     const childrens = children as ReactNode[];
 
     const height = OPTION_HEIGHT;
     const [value] = getValue();
     const initialOffset = options.indexOf(value) * height;
 
+    // NOTE: having the special options not being real options
+    // breaks keyboard navigation and accesibility :(
+    const SpecialItem = (props: { specialOption: SelectSpecialOpcion<any> }) => {
+        return <p>{props.specialOption.name}</p>;
+    };
+
+    const Item = ({ index, style }: ListChildComponentProps<any>) => (
+        <div
+            style={{
+                ...style,
+                top: `${parseFloat(style.top + "") + MENU_PADDING}px`,
+            }}
+        >
+            {index < specialOptions.length ? (
+                <SpecialItem specialOption={specialOptions[index]} />
+            ) : (
+                childrens[index - specialOptions.length]
+            )}
+        </div>
+    );
+
     return (
-        <List
+        <FixedSizeList
             width="100%"
-            height={Math.min(childrens.length * height + 2 * MENU_PADDING, maxHeight)}
-            itemCount={childrens.length}
+            height={Math.min((childrens.length + specialOptions.length) * height + 2 * MENU_PADDING, maxHeight)}
+            itemCount={childrens.length + specialOptions.length}
             itemSize={height}
             initialScrollOffset={initialOffset}
-        >
-            {({ index, style }) => (
-                <div
-                    style={{
-                        ...style,
-                        top: `${parseFloat(style.top + "") + MENU_PADDING}px`,
-                    }}
-                >
-                    {childrens[index]}
-                </div>
-            )}
-        </List>
+            children={Item}
+        />
     );
 };
 
@@ -114,6 +140,8 @@ const Components = {
     ValueContainer,
 };
 
+// I prefer to use @emotion CSS with everything related to react-select
+// so no classes are mixed with CSS-in-JS
 const customStyles = (colorHue: number): StylesConfig<any, true> => {
     const accentBorder = `hsl(${colorHue}, 50%, 60%)`;
     const indicatorStyles = (provided: any, state: any) => ({
@@ -130,14 +158,11 @@ const customStyles = (colorHue: number): StylesConfig<any, true> => {
             alignItems: "center",
             cursor: "pointer",
             padding: "0 8px",
-            backgroundColor: state.isFocused
-                ? `hsl(${colorHue}, 100%, 94%)`
-                : state.isSelected
-                ? `hsl(${colorHue}, 100%, 90%)`
-                : "white",
+            backgroundColor: state.isSelected ? `hsl(${colorHue}, 100%, 90%)` : "white",
             ":hover": {
-                backgroundColor: state.isSelected ? `hsl(${colorHue}, 100%, 88%)` : `hsl(${colorHue}, 100%, 97%)`,
+                backgroundColor: `hsl(${colorHue}, 100%, 88%)`,
             },
+            // option chip
             "> div": {
                 color: "white",
                 backgroundColor: state.isSelected ? `hsl(${colorHue}, 100%, 65%)` : "#999999",
@@ -145,6 +170,23 @@ const customStyles = (colorHue: number): StylesConfig<any, true> => {
                 display: "inline-block",
                 borderRadius: 3,
                 overflow: "hidden",
+            },
+        }),
+        menu: (provided) => ({
+            ...provided,
+            // special options
+            p: {
+                display: "flex",
+                alignItems: "center",
+                width: "100%",
+                height: "100%",
+                color: "black",
+                padding: "0 10px",
+                boxSizing: "border-box",
+                cursor: "pointer",
+                ": hover": {
+                    backgroundColor: "#e5e5e5",
+                },
             },
         }),
         control: (provided, state) => ({
@@ -217,6 +259,7 @@ const FilterSelect = <T extends TOption>(props: Props<T>) => {
             onChange={props.onChange}
             // custom props
             itemComponent={props.itemComponent}
+            specialOptions={props.specialOptions}
         />
     );
 };

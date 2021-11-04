@@ -56,6 +56,7 @@ export type NewChannel = {
 export type NewAuthor = {
     id: string;
     name: string;
+    bot: boolean;
     channels: {
         [id: string]: {
             [date: string]: DayAggregation;
@@ -120,6 +121,7 @@ const analyze = (db: Database): NewReport => {
         const new_author: NewAuthor = {
             id,
             name: author.name,
+            bot: author.bot,
             channels: {},
         };
         if (author.avatarUrl !== undefined) {
