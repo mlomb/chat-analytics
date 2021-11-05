@@ -113,13 +113,6 @@ const MenuList = ({
         selectProps.inputValue.length > 0 ? [] : (selectProps.specialOptions as SelectSpecialOpcion<TOption>[]);
     const childrens = children as ReactElement[];
 
-    for (const children of childrens) {
-        // NOTE: fix lag
-        // see: https://github.com/JedWatson/react-select/issues/3128#issuecomment-442060543
-        delete children.props.innerProps.onMouseMove;
-        delete children.props.innerProps.onMouseOver;
-    }
-
     // make sure to have the focused option in scroll
     // NOTE: there is a little bug with the scroll and keyboard navigation
     // see: https://github.com/bvaughn/react-window/issues/540
@@ -142,20 +135,30 @@ const MenuList = ({
         return <p onClick={activateFilter}>{props.specialOption.name}</p>;
     };
 
-    const Item = ({ index, style }: ListChildComponentProps<any>) => (
-        <div
-            style={{
-                ...style,
-                top: `${parseFloat(style.top + "") + MENU_PADDING}px`,
-            }}
-        >
-            {index < specialOptions.length ? (
-                <SpecialItem specialOption={specialOptions[index]} />
-            ) : (
-                childrens[index - specialOptions.length]
-            )}
-        </div>
-    );
+    const Item = ({ index, style }: ListChildComponentProps<any>) => {
+        let children: ReactElement;
+
+        if (index < specialOptions.length) {
+            children = <SpecialItem specialOption={specialOptions[index]} />;
+        } else {
+            children = childrens[index - specialOptions.length];
+
+            // NOTE: fix lag
+            // see: https://github.com/JedWatson/react-select/issues/3128#issuecomment-442060543
+            if ("onMouseMove" in children.props.innerProps) delete children.props.innerProps.onMouseMove;
+            if ("onMouseOver" in children.props.innerProps) delete children.props.innerProps.onMouseOver;
+        }
+
+        return (
+            <div
+                style={{
+                    ...style,
+                    top: `${parseFloat(style.top + "") + MENU_PADDING}px`,
+                }}
+                children={children}
+            />
+        );
+    };
 
     return (
         <FixedSizeList

@@ -5,16 +5,37 @@ interface Props {
     children: React.ReactNode; // placeholder
 }
 
+// NOTE: store loading status to avoid flickering in some conditions
+// false: error loading
+// true: loaded correctly
+const loadStatus: { [url: string]: "ok" | "error" } = {};
+
 const ImageSmooth = ({ src, children }: Props) => {
-    const [loaded, setLoaded] = useState(false);
-    const onLoad = () => setLoaded(true);
+    const [status, setStatus] = useState(loadStatus[src] || "loading");
+    const onLoad = () => {
+        loadStatus[src] = "ok";
+        setStatus("ok");
+    };
+    const onError = () => {
+        loadStatus[src] = "error";
+        setStatus("error");
+    };
 
     return (
         <>
-            {!loaded && children}
-            <img loading="lazy" src={src} className="ImageSmooth" style={{ opacity: loaded ? 1 : 0 }} onLoad={onLoad} />
+            {status !== "ok" && children}
+            {status !== "error" && (
+                <img
+                    loading="lazy"
+                    src={src}
+                    className="ImageSmooth"
+                    style={{ opacity: status === "ok" ? 1 : 0 }}
+                    onLoad={onLoad}
+                    onError={onError}
+                />
+            )}
         </>
     );
 };
 
-export default memo(ImageSmooth);
+export default ImageSmooth;
