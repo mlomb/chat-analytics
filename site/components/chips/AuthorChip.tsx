@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { NewAuthor } from "../../../analyzer/Analyzer";
 import ImageSmooth from "../basic/ImageSmooth";
 import { platform } from "../../DataProvider";
@@ -41,4 +42,4 @@ const AuthorChip = ({ data }: Props) => {
     );
 };
 
-export default AuthorChip;
+export default memo(AuthorChip) as typeof AuthorChip;

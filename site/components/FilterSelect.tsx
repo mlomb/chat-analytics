@@ -1,4 +1,4 @@
-import React, { useMemo, ReactNode, useRef, forwardRef, ReactChild, ReactElement } from "react";
+import { memo, useMemo, ReactNode, useRef, forwardRef, ReactElement } from "react";
 import Select, {
     components,
     MenuListProps,
@@ -93,11 +93,13 @@ const innerElementType = forwardRef(({ style, ...rest }: any, ref) => (
     />
 ));
 
+// HACK: read below
+let lastIndexFocused = -1;
+
 const MenuList = ({
     options,
     children,
     maxHeight,
-    getValue,
     selectProps,
     focusedOption,
 }: MenuListProps<TOption, true>): JSX.Element => {
@@ -123,7 +125,11 @@ const MenuList = ({
     // see: https://github.com/bvaughn/react-window/issues/540
     const listRef = useRef<FixedSizeList>(null);
     const optionIndex = options.indexOf(focusedOption);
-    listRef.current?.scrollToItem(optionIndex + specialOptions.length);
+    // NOTE: this is a hack to aviod scrolling when props change
+    if (lastIndexFocused != optionIndex) {
+        listRef.current?.scrollToItem(optionIndex + specialOptions.length);
+        lastIndexFocused = optionIndex;
+    }
 
     // NOTE: having the special options not being real options
     // breaks keyboard navigation and accesibility :(
@@ -293,4 +299,4 @@ const FilterSelect = <T extends TOption>(props: Props<T>) => {
     );
 };
 
-export default React.memo(FilterSelect) as typeof FilterSelect;
+export default memo(FilterSelect) as typeof FilterSelect;
