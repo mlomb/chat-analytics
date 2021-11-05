@@ -43,15 +43,15 @@ const channelsSpecialOptions: SelectSpecialOpcion<NewChannel>[] = [
 
 const authorsSpecialOptions: SelectSpecialOpcion<NewAuthor>[] = [
     {
-        name: "Select all authors",
+        name: "Select all authors (🧍➕🤖)",
         filter: (options) => options,
     },
     {
-        name: "Select all non-bot authors",
+        name: "Select all non-bot authors (🧍)",
         filter: (options) => options.filter((o) => o.bot === false),
     },
     {
-        name: "Select all bot authors",
+        name: "Select all bot authors (🤖)",
         filter: (options) => options.filter((o) => o.bot === true),
     },
 ];
@@ -72,7 +72,6 @@ const Header = (props: Props) => {
                         options={report.channels}
                         placeholder="Select channels..."
                         selected={props.selectedChannels}
-                        // @ts-ignore
                         onChange={props.setSelectedChannels}
                         optionColorHue={266}
                         itemComponent={ChannelChip}
@@ -86,11 +85,9 @@ const Header = (props: Props) => {
                         options={report.authors}
                         placeholder="Select authors..."
                         selected={props.selectedAuthors}
-                        // @ts-ignore
                         onChange={props.setSelectedAuthors}
                         optionColorHue={240}
                         itemComponent={AuthorChip}
-                        // @ts-ignore
                         specialOptions={authorsSpecialOptions}
                     />
                 </div>

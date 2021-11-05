@@ -1,4 +1,4 @@
-import React, { useMemo, ReactNode } from "react";
+import React, { useMemo, ReactNode, useRef, forwardRef, ReactChild, ReactElement } from "react";
 import Select, {
     components,
     MenuListProps,
@@ -7,8 +7,10 @@ import Select, {
     StylesConfig,
     ValueContainerProps,
 } from "react-select";
+import memoizeOne from "memoize-one";
 import { FilterOptionOption } from "react-select/dist/declarations/src/filters";
 import { FixedSizeList, ListChildComponentProps } from "react-window";
+import { searchFormat } from "../../analyzer/Utils";
 
 const OPTION_HEIGHT = 35;
 const MENU_PADDING = 10;
@@ -16,7 +18,7 @@ const MENU_PADDING = 10;
 type TOption = {
     id: string;
     name: string;
-    name_searchable?: string; // TODO: remove ?
+    name_searchable: string;
 };
 
 type ItemComponent = (props: { data: any }) => JSX.Element;
@@ -79,6 +81,18 @@ const MultiValue = (props: MultiValueProps<TOption, true>): JSX.Element => {
     );
 };
 
+// allows padding
+const innerElementType = forwardRef(({ style, ...rest }: any, ref) => (
+    <div
+        ref={ref}
+        style={{
+            ...style,
+            height: `${parseFloat(style.height) + MENU_PADDING * 2}px`,
+        }}
+        {...rest}
+    />
+));
+
 const MenuList = ({
     options,
     children,
@@ -94,16 +108,28 @@ const MenuList = ({
     const specialOptions =
         // @ts-ignore
         selectProps.inputValue.length > 0 ? [] : (selectProps.specialOptions as SelectSpecialOpcion<TOption>[]);
-    const childrens = children as ReactNode[];
+    const childrens = children as ReactElement[];
 
-    const height = OPTION_HEIGHT;
+    for (const children of childrens) {
+        // NOTE: fix lag
+        // see: https://github.com/JedWatson/react-select/issues/3128#issuecomment-442060543
+        delete children.props.innerProps.onMouseMove;
+        delete children.props.innerProps.onMouseOver;
+    }
+
     const [value] = getValue();
-    const initialOffset = options.indexOf(value) * height;
+    const optionIndex = options.indexOf(value);
+    const initialOffset = optionIndex * OPTION_HEIGHT;
 
     // NOTE: having the special options not being real options
     // breaks keyboard navigation and accesibility :(
     const SpecialItem = (props: { specialOption: SelectSpecialOpcion<any> }) => {
-        return <p>{props.specialOption.name}</p>;
+        const activateFilter = (): void => {
+            const filtered = props.specialOption.filter(options as TOption[]);
+            // @ts-ignore (dont supply actionMeta)
+            selectProps.onChange(filtered);
+        };
+        return <p onClick={activateFilter}>{props.specialOption.name}</p>;
     };
 
     const Item = ({ index, style }: ListChildComponentProps<any>) => (
@@ -124,10 +150,11 @@ const MenuList = ({
     return (
         <FixedSizeList
             width="100%"
-            height={Math.min((childrens.length + specialOptions.length) * height + 2 * MENU_PADDING, maxHeight)}
+            height={Math.min((childrens.length + specialOptions.length) * OPTION_HEIGHT + 2 * MENU_PADDING, maxHeight)}
             itemCount={childrens.length + specialOptions.length}
-            itemSize={height}
+            itemSize={OPTION_HEIGHT}
             initialScrollOffset={initialOffset}
+            innerElementType={innerElementType}
             children={Item}
         />
     );
@@ -142,7 +169,7 @@ const Components = {
 
 // I prefer to use @emotion CSS with everything related to react-select
 // so no classes are mixed with CSS-in-JS
-const customStyles = (colorHue: number): StylesConfig<any, true> => {
+const customStyles = (colorHue: number): StylesConfig<TOption, true> => {
     const accentBorder = `hsl(${colorHue}, 50%, 60%)`;
     const indicatorStyles = (provided: any, state: any) => ({
         ...provided,
@@ -158,7 +185,7 @@ const customStyles = (colorHue: number): StylesConfig<any, true> => {
             alignItems: "center",
             cursor: "pointer",
             padding: "0 8px",
-            backgroundColor: state.isSelected ? `hsl(${colorHue}, 100%, 90%)` : "white",
+            backgroundColor: state.isFocused ? `hsl(${colorHue}, 100%, 88%)` : "",
             ":hover": {
                 backgroundColor: `hsl(${colorHue}, 100%, 88%)`,
             },
@@ -226,12 +253,9 @@ const customStyles = (colorHue: number): StylesConfig<any, true> => {
     };
 };
 
-const filterFn = (
-    option: FilterOptionOption<TOption>,
-    candidate: string
-): // TODO: use name_searchable
-// TODO: also satinize candidate
-boolean => option.data.name!.indexOf(candidate) > -1;
+const memoizedSearchFormat = memoizeOne(searchFormat);
+const filterFn = (option: FilterOptionOption<TOption>, candidate: string): boolean =>
+    option.data.name_searchable.indexOf(memoizedSearchFormat(candidate)) > -1;
 
 const getOptionValue = (option: TOption) => option.id;
 const getOptionLabel = (option: TOption) => option.name;
@@ -264,4 +288,5 @@ const FilterSelect = <T extends TOption>(props: Props<T>) => {
     );
 };
 
-export default React.memo(FilterSelect);
+export default FilterSelect;
+// export default React.memo(FilterSelect);

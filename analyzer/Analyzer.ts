@@ -1,4 +1,5 @@
 import Tokenizer from "wink-tokenizer";
+import { searchFormat } from "./Utils";
 
 import { Author, Channel, Database, DiscordAuthor, ID, Message, Platform } from "./Types";
 
@@ -51,11 +52,13 @@ type Event = MessageEvent;
 export type NewChannel = {
     id: string;
     name: string;
+    name_searchable: string;
 };
 
 export type NewAuthor = {
     id: string;
     name: string;
+    name_searchable: string;
     bot: boolean;
     channels: {
         [id: string]: {
@@ -121,6 +124,7 @@ const analyze = (db: Database): NewReport => {
         const new_author: NewAuthor = {
             id,
             name: author.name,
+            name_searchable: searchFormat(author.name),
             bot: author.bot,
             channels: {},
         };
@@ -137,6 +141,7 @@ const analyze = (db: Database): NewReport => {
         channels.push({
             id: ch.id,
             name: ch.name,
+            name_searchable: searchFormat(ch.name),
         });
 
         for (let msg of ch.messages) {
@@ -168,6 +173,9 @@ const analyze = (db: Database): NewReport => {
         minDate: dateToString(minDate!),
         maxDate: dateToString(maxDate!),
     };
+
+    // TODO: also sort by number of messages
+    report.authors.sort((a, b) => +a.bot - +b.bot);
 
     console.log(report);
 
