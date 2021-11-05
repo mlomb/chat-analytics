@@ -99,6 +99,7 @@ const MenuList = ({
     maxHeight,
     getValue,
     selectProps,
+    focusedOption,
 }: MenuListProps<TOption, true>): JSX.Element => {
     if (!Array.isArray(children)) {
         // NoOptionsMessage
@@ -117,9 +118,12 @@ const MenuList = ({
         delete children.props.innerProps.onMouseOver;
     }
 
-    const [value] = getValue();
-    const optionIndex = options.indexOf(value);
-    const initialOffset = optionIndex * OPTION_HEIGHT;
+    // make sure to have the focused option in scroll
+    // NOTE: there is a little bug with the scroll and keyboard navigation
+    // see: https://github.com/bvaughn/react-window/issues/540
+    const listRef = useRef<FixedSizeList>(null);
+    const optionIndex = options.indexOf(focusedOption);
+    listRef.current?.scrollToItem(optionIndex + specialOptions.length);
 
     // NOTE: having the special options not being real options
     // breaks keyboard navigation and accesibility :(
@@ -149,11 +153,12 @@ const MenuList = ({
 
     return (
         <FixedSizeList
+            ref={listRef}
             width="100%"
             height={Math.min((childrens.length + specialOptions.length) * OPTION_HEIGHT + 2 * MENU_PADDING, maxHeight)}
             itemCount={childrens.length + specialOptions.length}
             itemSize={OPTION_HEIGHT}
-            initialScrollOffset={initialOffset}
+            initialScrollOffset={0}
             innerElementType={innerElementType}
             children={Item}
         />
@@ -288,5 +293,4 @@ const FilterSelect = <T extends TOption>(props: Props<T>) => {
     );
 };
 
-export default FilterSelect;
-// export default React.memo(FilterSelect);
+export default React.memo(FilterSelect) as typeof FilterSelect;
