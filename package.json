@@ -2,10 +2,10 @@
   "name": "chats-analyzer",
   "version": "0.1.0",
   "scripts": {
+    "build": "webpack build --env production --progress",
     "dev": "webpack serve --progress",
     "format": "prettier --write .",
-    "format-check": "prettier --check .",
-    "build": "cross-env MODE=production webpack"
+    "format-check": "prettier --check ."
   },
   "author": "Martin Emiliano Lombardo <to@mlomb.me>",
   "license": "MIT",
@@ -18,7 +18,6 @@
     "@types/wink-tokenizer": "^4.0.3",
     "autoprefixer": "^10.4.0",
     "compress-json": "^1.0.5",
-    "cross-env": "^7.0.3",
     "css-loader": "^6.5.1",
     "cssnano": "^5.0.9",
     "html-inline-css-webpack-plugin": "^1.11.1",
@@ -32,7 +31,6 @@
     "prettier": "^2.4.1",
     "react": "^17.0.2",
     "react-countup": "^6.0.0",
-    "react-dev-utils": "6.0.5",
     "react-dom": "^17.0.2",
     "react-select": "^5.2.0",
     "react-window": "^1.8.6",

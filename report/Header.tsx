@@ -111,7 +111,7 @@ const Header = (props: Props) => {
             </div>
             <div className="Header__Tabs" role="tablist">
                 {tabs.map((t) => (
-                    <TabSwitch currentValue={tab} onChange={setTab} value={t.value} children={t.name} />
+                    <TabSwitch key={t.value} currentValue={tab} onChange={setTab} value={t.value} children={t.name} />
                 ))}
             </div>
         </div>

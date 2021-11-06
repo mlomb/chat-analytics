@@ -13,9 +13,9 @@ declare global {
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
-    if (window.__REPORT_DATA__ === undefined) {
-        window.__REPORT_DATA__ = await require(/* webpackChunkName: "sample" */ "./report_sample_data.json");
-    }
+    window.__REPORT_DATA__ = env.isProd
+        ? window.__REPORT_DATA__
+        : require(/* webpackChunkName: "sample" */ "./report_sample_data.json");
 
     if (window.__REPORT_DATA__ !== undefined) {
         const REPORT_DATA = decompress(window.__REPORT_DATA__);
