@@ -4,7 +4,7 @@ import { Themes } from "./AmCharts5";
 import * as am5 from "@amcharts/amcharts5";
 import * as am5xy from "@amcharts/amcharts5/xy";
 
-import { dataProvider } from "../DataProvider";
+import { dataProvider } from "@report/DataProvider";
 
 interface Props {}
 

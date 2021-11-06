@@ -3,7 +3,6 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const HTMLInlineCSSWebpackPlugin = require("html-inline-css-webpack-plugin").default;
 const InlineChunkHtmlPlugin = require("react-dev-utils/InlineChunkHtmlPlugin");
-const webpack = require("webpack");
 
 const mode = process.env.MODE || "development";
 const prod = !(mode === "development");
@@ -14,8 +13,8 @@ console.log("Mode:", mode);
 const config = {
     target: "web",
     entry: {
-        index: resolve("site/Index.tsx"),
-        report: resolve("site/Report.tsx"),
+        app: resolve("app/index.tsx"),
+        report: resolve("report/index.tsx"),
     },
     mode,
     output: {
@@ -58,35 +57,38 @@ const config = {
     },
     resolve: {
         extensions: [".ts", ".tsx", ".js", ".jsx"],
+        // NOTE: keep in sync with tsconfig.json
+        alias: {
+            "@app": resolve("app/"),
+            "@assets": resolve("assets/"),
+            "@pipeline": resolve("pipeline/"),
+            "@report": resolve("report/"),
+        },
     },
     plugins: [
         new HtmlWebpackPlugin({
-            chunks: ["index"],
-            template: resolve("site/assets/index.html"),
+            chunks: ["app"],
+            template: resolve("assets/app.html"),
             filename: "index.html",
             minify: prod,
         }),
         new HtmlWebpackPlugin({
             chunks: ["report"],
-            template: resolve("site/assets/report.html"),
+            template: resolve("assets/report.html"),
             filename: "report.html",
             minify: prod,
         }),
         new MiniCssExtractPlugin(),
-    ].concat(
-        prod
-            ? [new HTMLInlineCSSWebpackPlugin(), new InlineChunkHtmlPlugin(HtmlWebpackPlugin, [/.*/])]
-            : [new webpack.HotModuleReplacementPlugin()]
-    ),
+    ].concat(prod ? [new HTMLInlineCSSWebpackPlugin(), new InlineChunkHtmlPlugin(HtmlWebpackPlugin, [/.*/])] : []),
     optimization: {
         minimize: prod,
     },
     devtool: prod ? undefined : "source-map",
     devServer: {
         host: "0.0.0.0",
-        static: {
+        /*static: {
             publicPath: resolve("public"),
-        },
+        },*/
         client: {
             overlay: true,
             progress: true,

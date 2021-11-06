@@ -1,10 +1,10 @@
-import { dataProvider } from "../DataProvider";
-import { NewAuthor, NewChannel } from "../../analyzer/Analyzer";
-import AuthorChip from "./chips/AuthorChip";
-import ChannelChip from "./chips/ChannelChip";
+import { dataProvider } from "@report/DataProvider";
+import { NewAuthor, NewChannel } from "@pipeline/Analyzer";
+import AuthorChip from "./components/core/AuthorChip";
+import ChannelChip from "./components/core/ChannelChip";
 
-import FilterSelect, { SelectSpecialOpcion } from "./FilterSelect";
-import TimeSelector from "./TimeSelector";
+import FilterSelect, { SelectSpecialOpcion } from "./components/FilterSelect";
+import TimeSelector from "./components/TimeSelector";
 
 interface Props {
     tab: string;

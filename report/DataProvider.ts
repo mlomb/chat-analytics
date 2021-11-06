@@ -1,7 +1,7 @@
 import EventEmitter from "events";
 
-import { NewAuthor, NewChannel, NewReport } from "../analyzer/Analyzer";
-import { Platform } from "../analyzer/Types";
+import { NewAuthor, NewChannel, NewReport } from "@pipeline/Analyzer";
+import { Platform } from "@pipeline/Types";
 
 export type DataPerDate = {
     date: number; // timestamp

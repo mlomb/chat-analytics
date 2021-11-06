@@ -1,5 +1,5 @@
-import { NewChannel } from "../../../analyzer/Analyzer";
-import { platform } from "../../DataProvider";
+import { NewChannel } from "@pipeline/Analyzer";
+import { platform } from "@report/DataProvider";
 
 interface Props {
     data: NewChannel;

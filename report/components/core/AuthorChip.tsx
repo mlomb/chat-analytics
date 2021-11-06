@@ -1,17 +1,17 @@
 import { memo } from "react";
-import { NewAuthor } from "../../../analyzer/Analyzer";
-import ImageSmooth from "../basic/ImageSmooth";
-import { platform } from "../../DataProvider";
+import { NewAuthor } from "@pipeline/Analyzer";
+import ImageSmooth from "./ImageSmooth";
+import { platform } from "@report/DataProvider";
 
 interface Props {
     data: NewAuthor;
 }
 
-import avatar_0 from "../../assets/discord/avatar_0.png";
-import avatar_1 from "../../assets/discord/avatar_1.png";
-import avatar_2 from "../../assets/discord/avatar_2.png";
-import avatar_3 from "../../assets/discord/avatar_3.png";
-import avatar_4 from "../../assets/discord/avatar_4.png";
+import avatar_0 from "@assets/discord/avatar_0.png";
+import avatar_1 from "@assets/discord/avatar_1.png";
+import avatar_2 from "@assets/discord/avatar_2.png";
+import avatar_3 from "@assets/discord/avatar_3.png";
+import avatar_4 from "@assets/discord/avatar_4.png";
 const DiscordDefaultAvatars = [avatar_0, avatar_1, avatar_2, avatar_3, avatar_4];
 
 const AuthorChip = ({ data }: Props) => {

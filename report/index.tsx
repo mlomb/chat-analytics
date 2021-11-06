@@ -1,10 +1,10 @@
-import "./assets/report.less";
+import "@assets/report.less";
 import ReactDOM from "react-dom";
 
 import { Compressed, decompress } from "compress-json";
 
-import ReportPage from "./components/ReportPage";
-import { initDataProvider } from "./DataProvider";
+import ReportPage from "@report/ReportPage";
+import { initDataProvider } from "@report/DataProvider";
 
 declare global {
     interface Window {

@@ -3,7 +3,7 @@ import { useLayoutEffect, useRef } from "react";
 import * as am5 from "@amcharts/amcharts5";
 import * as am5percent from "@amcharts/amcharts5/percent";
 
-import { dataProvider } from "../DataProvider";
+import { dataProvider } from "@report/DataProvider";
 import { Themes } from "./AmCharts5";
 
 interface Props {}

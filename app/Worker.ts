@@ -2,13 +2,13 @@ export default null as any;
 
 import { compress } from "compress-json";
 
-import { Platform } from "../analyzer/Types";
-import { Parser } from "../analyzer/Parser";
+import { Platform } from "@pipeline/Types";
+import { Parser } from "@pipeline/Parser";
 
-import { WhatsAppParser } from "../analyzer/parsers/WhatsAppParser";
-import { DiscordParser } from "../analyzer/parsers/DiscordParser";
-import { TelegramParser } from "../analyzer/parsers/TelegramParser";
-import { analyze } from "../analyzer/Analyzer";
+import { WhatsAppParser } from "@pipeline/parsers/WhatsAppParser";
+import { DiscordParser } from "@pipeline/parsers/DiscordParser";
+import { TelegramParser } from "@pipeline/parsers/TelegramParser";
+import { analyze } from "@pipeline/Analyzer";
 
 let reportPage: string;
 

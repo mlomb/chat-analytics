@@ -12,7 +12,7 @@ import Select, {
 import memoizeOne from "memoize-one";
 import { FilterOptionOption } from "react-select/dist/declarations/src/filters";
 import { FixedSizeList, ListChildComponentProps } from "react-window";
-import { searchFormat } from "../../analyzer/Utils";
+import { searchFormat } from "@pipeline/Utils";
 
 const OPTION_HEIGHT = 35;
 

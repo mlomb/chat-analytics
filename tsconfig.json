@@ -8,6 +8,13 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "downlevelIteration": true
+    "downlevelIteration": true,
+    "baseUrl": "./",
+    "paths": {
+      "@app/*": ["app/*"],
+      "@assets/*": ["assets/*"],
+      "@pipeline/*": ["pipeline/*"],
+      "@report/*": ["report/*"]
+    }
   }
 }

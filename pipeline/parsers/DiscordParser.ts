@@ -1,5 +1,5 @@
-import { Parser } from "../Parser";
-import { Author, Channel, Database, Message, ID } from "../Types";
+import { Parser } from "@pipeline/Parser";
+import { Author, Channel, Database, Message, ID } from "@pipeline/Types";
 
 export class DiscordParser extends Parser {
     parse(files: string[]): Database {

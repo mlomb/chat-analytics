@@ -1,7 +1,7 @@
 import Tokenizer from "wink-tokenizer";
-import { searchFormat } from "./Utils";
+import { searchFormat } from "@pipeline/Utils";
 
-import { Author, Channel, Database, DiscordAuthor, ID, Message, Platform } from "./Types";
+import { Author, Channel, Database, DiscordAuthor, ID, Message, Platform } from "@pipeline/Types";
 
 /*
 var sentiment = require('multilang-sentiment');

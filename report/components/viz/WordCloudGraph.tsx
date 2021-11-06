@@ -1,6 +1,6 @@
 import { useLayoutEffect, useRef } from "react";
 
-import { dataProvider } from "../DataProvider";
+import { dataProvider } from "@report/DataProvider";
 
 interface Props {
     getData: "getWordsData" | "getEmojisData";

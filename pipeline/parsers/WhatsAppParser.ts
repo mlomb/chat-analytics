@@ -1,5 +1,5 @@
-import { Parser } from "../Parser";
-import { Author, Database, ID, Message } from "../Types";
+import { Parser } from "@pipeline/Parser";
+import { Author, Database, ID, Message } from "@pipeline/Types";
 
 /*
     There is a convenient parser already out there

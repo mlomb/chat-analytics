@@ -1,21 +1,21 @@
 import { useEffect, useLayoutEffect, useMemo, useState } from "react";
 
-import { NewAuthor, NewChannel, NewReport } from "../../analyzer/Analyzer";
-import { dataProvider, DataProvider } from "../DataProvider";
+import { NewAuthor, NewChannel, NewReport } from "@pipeline/Analyzer";
+import { dataProvider, DataProvider } from "@report/DataProvider";
 import Header from "./Header";
-import Card from "./Card";
-import FilterSelect from "./FilterSelect";
-import TimeSelector from "./TimeSelector";
-import MessagesGraph from "./MessagesGraph";
-import MessagesHeatMap from "./MessagesHeatMap";
-import WordCloudGraph from "./WordCloudGraph";
-import DonutChart from "./DonutChart";
-import PieChart from "./PieChart";
-import SimpleTable from "./SimpleTable";
-import HeatMapChart from "./HeatMapChart";
-import ChannelChip from "./chips/ChannelChip";
-import AuthorChip from "./chips/AuthorChip";
-import AnimatedBars, { AnimatedBarEntry } from "./AnimatedBars";
+import Card from "./components/Card";
+import FilterSelect from "./components/FilterSelect";
+import TimeSelector from "./components/TimeSelector";
+import MessagesGraph from "./components/viz/MessagesGraph";
+import MessagesHeatMap from "./components/viz/MessagesHeatMap";
+import WordCloudGraph from "./components/viz/WordCloudGraph";
+import DonutChart from "./components/viz/DonutChart";
+import PieChart from "./components/viz/PieChart";
+import SimpleTable from "./components/viz/SimpleTable";
+import HeatMapChart from "./components/viz/HeatMapChart";
+import AnimatedBars, { AnimatedBarEntry } from "./components/viz/AnimatedBars";
+import ChannelChip from "./components/core/ChannelChip";
+import AuthorChip from "./components/core/AuthorChip";
 
 const TabContainer = (props: { currentValue: string; value: string; children: React.ReactNode }) => {
     return (
@@ -99,7 +99,7 @@ const ReportPage = () => {
                 newBars[i].value = Math.round(newBars[i].value);
             }
             setBarsTestChannels(newBars);
-        }, 5000);
+        }, 500000000);
         return () => clearInterval(interval);
     }, []);
 
