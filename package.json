@@ -4,6 +4,7 @@
   "scripts": {
     "dev": "webpack serve --progress",
     "format": "prettier --write .",
+    "format-check": "prettier --check .",
     "build": "cross-env MODE=production webpack"
   },
   "author": "Martin Emiliano Lombardo <to@mlomb.me>",
