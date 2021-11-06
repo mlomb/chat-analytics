@@ -16,19 +16,7 @@ import HeatMapChart from "./components/viz/HeatMapChart";
 import AnimatedBars, { AnimatedBarEntry } from "./components/viz/AnimatedBars";
 import ChannelChip from "./components/core/ChannelChip";
 import AuthorChip from "./components/core/AuthorChip";
-
-const TabContainer = (props: { currentValue: string; value: string; children: React.ReactNode }) => {
-    return (
-        <div
-            style={{
-                display: props.currentValue === props.value ? "block" : "none",
-            }}
-            role="tabpanel"
-        >
-            {props.children}
-        </div>
-    );
-};
+import { TabContainer } from "./Tabs";
 
 const CardContainer = (props: { children: React.ReactNode }) => <div className="card-container">{props.children}</div>;
 //const ChartContainer = ({ children }: { children: React.ReactNode }) => <div className="ChartContainer">{children}</div>;

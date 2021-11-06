@@ -5,6 +5,7 @@ import ChannelChip from "./components/core/ChannelChip";
 
 import FilterSelect, { SelectSpecialOpcion } from "./components/FilterSelect";
 import TimeSelector from "./components/TimeSelector";
+import { TabSwitch } from "./Tabs";
 
 interface Props {
     tab: string;
@@ -14,25 +15,6 @@ interface Props {
     setSelectedAuthors: (authors: NewAuthor[]) => void;
     setSelectedChannels: (channels: NewChannel[]) => void;
 }
-
-const Tab = (props: {
-    currentValue: string;
-    value: string;
-    children: React.ReactNode;
-    onChange: (value: string) => void;
-}) => {
-    const selected = props.currentValue === props.value;
-    return (
-        <a
-            className={selected ? "active" : ""}
-            onClick={() => props.onChange(props.value)}
-            role="tab"
-            aria-selected={selected}
-        >
-            {props.children}
-        </a>
-    );
-};
 
 const channelsSpecialOptions: SelectSpecialOpcion<NewChannel>[] = [
     {
@@ -53,6 +35,37 @@ const authorsSpecialOptions: SelectSpecialOpcion<NewAuthor>[] = [
     {
         name: "Select all bot authors (🤖)",
         filter: (options) => options.filter((o) => o.bot === true),
+    },
+];
+
+const tabs = [
+    {
+        name: "💬 Messages",
+        value: "messages",
+    },
+    {
+        name: "🅰️ Language",
+        value: "language",
+    },
+    {
+        name: "😃 Emojis",
+        value: "emojis",
+    },
+    {
+        name: "🌀 Interaction",
+        value: "interaction",
+    },
+    {
+        name: "💙 Sentiment",
+        value: "sentiment",
+    },
+    {
+        name: "🔗 External",
+        value: "external",
+    },
+    {
+        name: "📅 Timeline",
+        value: "timeline",
     },
 ];
 
@@ -97,27 +110,9 @@ const Header = (props: Props) => {
                 </div>
             </div>
             <div className="Header__Tabs" role="tablist">
-                <Tab currentValue={tab} onChange={setTab} value="messages">
-                    💬 Messages
-                </Tab>
-                <Tab currentValue={tab} onChange={setTab} value="language">
-                    🅰️ Language
-                </Tab>
-                <Tab currentValue={tab} onChange={setTab} value="emojis">
-                    😃 Emojis
-                </Tab>
-                <Tab currentValue={tab} onChange={setTab} value="interaction">
-                    🌀 Interaction
-                </Tab>
-                <Tab currentValue={tab} onChange={setTab} value="sentiment">
-                    💙 Sentiment
-                </Tab>
-                <Tab currentValue={tab} onChange={setTab} value="external">
-                    🔗 External
-                </Tab>
-                <Tab currentValue={tab} onChange={setTab} value="timeline">
-                    📅 Timeline
-                </Tab>
+                {tabs.map((t) => (
+                    <TabSwitch currentValue={tab} onChange={setTab} value={t.value} children={t.name} />
+                ))}
             </div>
         </div>
     );
