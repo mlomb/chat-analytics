@@ -1,8 +1,10 @@
-import { memo, useMemo, ReactNode, useRef, forwardRef, ReactElement } from "react";
+import { memo, useMemo, ReactNode, useRef, forwardRef, ReactElement, useLayoutEffect, useCallback } from "react";
 import Select, {
     components,
+    InputActionMeta,
     MenuListProps,
     MultiValueProps,
+    OnChangeValue,
     OptionProps,
     StylesConfig,
     ValueContainerProps,
@@ -13,7 +15,6 @@ import { FixedSizeList, ListChildComponentProps } from "react-window";
 import { searchFormat } from "../../analyzer/Utils";
 
 const OPTION_HEIGHT = 35;
-const MENU_PADDING = 10;
 
 type TOption = {
     id: string;
@@ -81,18 +82,6 @@ const MultiValue = (props: MultiValueProps<TOption, true>): JSX.Element => {
     );
 };
 
-// allows padding
-const innerElementType = forwardRef(({ style, ...rest }: any, ref) => (
-    <div
-        ref={ref}
-        style={{
-            ...style,
-            height: `${parseFloat(style.height) + MENU_PADDING * 2}px`,
-        }}
-        {...rest}
-    />
-));
-
 // HACK: read below
 let lastIndexFocused = -1;
 
@@ -118,11 +107,14 @@ const MenuList = ({
     // see: https://github.com/bvaughn/react-window/issues/540
     const listRef = useRef<FixedSizeList>(null);
     const optionIndex = options.indexOf(focusedOption);
-    // NOTE: this is a hack to aviod scrolling when props change
-    if (lastIndexFocused != optionIndex) {
-        listRef.current?.scrollToItem(optionIndex + specialOptions.length);
-        lastIndexFocused = optionIndex;
-    }
+
+    useLayoutEffect(() => {
+        // NOTE: this check is a hack to aviod scrolling when props change
+        if (optionIndex >= 0 && lastIndexFocused != optionIndex) {
+            listRef.current?.scrollToItem(optionIndex + specialOptions.length);
+            lastIndexFocused = optionIndex;
+        }
+    });
 
     // NOTE: having the special options not being real options
     // breaks keyboard navigation and accesibility :(
@@ -131,6 +123,8 @@ const MenuList = ({
             const filtered = props.specialOption.filter(options as TOption[]);
             // @ts-ignore (dont supply actionMeta)
             selectProps.onChange(filtered);
+            // reset scroll
+            lastIndexFocused = -1;
         };
         return <p onClick={activateFilter}>{props.specialOption.name}</p>;
     };
@@ -153,7 +147,7 @@ const MenuList = ({
             <div
                 style={{
                     ...style,
-                    top: `${parseFloat(style.top + "") + MENU_PADDING}px`,
+                    top: `${parseFloat(style.top + "")}px`,
                 }}
                 children={children}
             />
@@ -164,11 +158,10 @@ const MenuList = ({
         <FixedSizeList
             ref={listRef}
             width="100%"
-            height={Math.min((childrens.length + specialOptions.length) * OPTION_HEIGHT + 2 * MENU_PADDING, maxHeight)}
+            height={Math.min((childrens.length + specialOptions.length) * OPTION_HEIGHT, maxHeight)}
             itemCount={childrens.length + specialOptions.length}
             itemSize={OPTION_HEIGHT}
             initialScrollOffset={0}
-            innerElementType={innerElementType}
             children={Item}
         />
     );
@@ -215,6 +208,7 @@ const customStyles = (colorHue: number): StylesConfig<TOption, true> => {
         }),
         menu: (provided) => ({
             ...provided,
+            overflow: "hidden",
             // special options
             p: {
                 display: "flex",
@@ -273,9 +267,21 @@ const filterFn = (option: FilterOptionOption<TOption>, candidate: string): boole
 
 const getOptionValue = (option: TOption) => option.id;
 const getOptionLabel = (option: TOption) => option.name;
+const onInputChange = (newValue: string, actionMeta: InputActionMeta) => {
+    // reset focused item when search input changes
+    if (actionMeta && actionMeta.action === "input-change") {
+        lastIndexFocused = -1;
+    }
+    return newValue;
+};
 
 const FilterSelect = <T extends TOption>(props: Props<T>) => {
     const Styles = useMemo(() => customStyles(props.optionColorHue), [props.optionColorHue]);
+
+    const onChange = useCallback(
+        (newValue: OnChangeValue<TOption, true>) => props.onChange(newValue as T[]),
+        [props.onChange]
+    );
 
     return (
         <Select
@@ -293,9 +299,10 @@ const FilterSelect = <T extends TOption>(props: Props<T>) => {
             isDisabled={props.options.length <= 1}
             getOptionValue={getOptionValue}
             getOptionLabel={getOptionLabel}
-            // @ts-ignore
-            onChange={props.onChange}
+            onChange={onChange}
+            onInputChange={onInputChange}
             // custom props
+            // @ts-ignore
             itemComponent={props.itemComponent}
             specialOptions={props.specialOptions}
         />

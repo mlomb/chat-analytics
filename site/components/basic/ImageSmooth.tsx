@@ -1,4 +1,4 @@
-import { memo, useState } from "react";
+import { useState } from "react";
 
 interface Props {
     src: string;
@@ -11,7 +11,7 @@ interface Props {
 const loadStatus: { [url: string]: "ok" | "error" } = {};
 
 const ImageSmooth = ({ src, children }: Props) => {
-    const [status, setStatus] = useState(loadStatus[src] || "loading");
+    const [status, setStatus] = useState<"ok" | "error" | "loading">(loadStatus[src] || "loading");
     const onLoad = () => {
         loadStatus[src] = "ok";
         setStatus("ok");
