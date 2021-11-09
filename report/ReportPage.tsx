@@ -18,7 +18,7 @@ import ChannelChip from "./components/core/ChannelChip";
 import AuthorChip from "./components/core/AuthorChip";
 import { TabContainer } from "./Tabs";
 
-const CardContainer = (props: { children: React.ReactNode }) => <div className="card-container">{props.children}</div>;
+const CardContainer = (props: { children: React.ReactNode }) => <div className="CardContainer">{props.children}</div>;
 //const ChartContainer = ({ children }: { children: React.ReactNode }) => <div className="ChartContainer">{children}</div>;
 const Title = ({ children }: { children: React.ReactNode }) => <div className="card-title">{children}</div>;
 
@@ -109,6 +109,14 @@ const ReportPage = () => {
                         <MessagesGraph />
                     </Card>
                     <Card num={1}>
+                        <Title>Messages stats</Title>
+                        <SimpleTable />
+                        <PieChart />
+                    </Card>
+                    <Card num={1}>
+                        <Title>Poner algo aca</Title>
+                    </Card>
+                    <Card num={1}>
                         <Title>Most messages sent by author</Title>
                         <AnimatedBars
                             what="Author"
@@ -130,11 +138,6 @@ const ReportPage = () => {
                             colorHue={266}
                         />
                     </Card>
-                    <Card num={1}>
-                        <Title>Messages stats</Title>
-                        <SimpleTable />
-                        <PieChart />
-                    </Card>
                     <Card num={2}>
                         <Title>Messages heatmap</Title>
                         <HeatMapChart />
@@ -142,27 +145,31 @@ const ReportPage = () => {
                 </CardContainer>
             </TabContainer>
             <TabContainer currentValue={tab} value="language">
-                <Card num={2}>
-                    <WordCloudGraph getData="getWordsData" />
-                </Card>
-                <Card num={1}>
-                    <Title>Most used words</Title>
-                    <AnimatedBars
-                        what="Word"
-                        unit="Times used"
-                        data={barsTestChannels}
-                        itemComponent={ChannelChip}
-                        maxItems={16}
-                    />
-                </Card>
-                <Card num={2}>
-                    <DonutChart />
-                </Card>
+                <CardContainer>
+                    <Card num={2}>
+                        <WordCloudGraph getData="getWordsData" />
+                    </Card>
+                    <Card num={1}>
+                        <Title>Most used words</Title>
+                        <AnimatedBars
+                            what="Word"
+                            unit="Times used"
+                            data={barsTestChannels}
+                            itemComponent={ChannelChip}
+                            maxItems={16}
+                        />
+                    </Card>
+                    <Card num={2}>
+                        <DonutChart />
+                    </Card>
+                </CardContainer>
             </TabContainer>
             <TabContainer currentValue={tab} value="emojis">
-                <Card num={2}>
-                    <WordCloudGraph getData="getEmojisData" />
-                </Card>
+                <CardContainer>
+                    <Card num={2}>
+                        <WordCloudGraph getData="getEmojisData" />
+                    </Card>
+                </CardContainer>
             </TabContainer>
 
             {/*<MessagesHeatMap timeRange={selectedTimeRange} />*/}

@@ -4,7 +4,7 @@ interface Props {
 }
 
 const Card = (props: Props) => {
-    return <div className={"card card-" + props.num}>{props.children}</div>;
+    return <div className={"Card Card--" + props.num}>{props.children}</div>;
 };
 
 export default Card;
