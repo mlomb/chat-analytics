@@ -20,7 +20,6 @@ import { TabContainer } from "./Tabs";
 
 const CardContainer = (props: { children: React.ReactNode }) => <div className="CardContainer">{props.children}</div>;
 //const ChartContainer = ({ children }: { children: React.ReactNode }) => <div className="ChartContainer">{children}</div>;
-const Title = ({ children }: { children: React.ReactNode }) => <div className="card-title">{children}</div>;
 
 const ReportPage = () => {
     const report = dataProvider.getSource();
@@ -104,20 +103,17 @@ const ReportPage = () => {
 
             <TabContainer currentValue={tab} value="messages">
                 <CardContainer>
-                    <Card num={2}>
-                        <Title>Messages sent per day &amp; month</Title>
+                    <Card num={2} title="Messages sent per day &amp; month">
                         <MessagesGraph />
                     </Card>
-                    <Card num={1}>
-                        <Title>Messages stats</Title>
+                    <Card num={1} title="Messages stats">
                         <SimpleTable />
                         <PieChart />
                     </Card>
-                    <Card num={1}>
-                        <Title>Poner algo aca</Title>
+                    <Card num={1} title="Poner algo aca">
+                        this is content
                     </Card>
-                    <Card num={1}>
-                        <Title>Most messages sent by author</Title>
+                    <Card num={1} title="Most messages sent by author">
                         <AnimatedBars
                             what="Author"
                             unit="Total messages"
@@ -127,8 +123,7 @@ const ReportPage = () => {
                             colorHue={240}
                         />
                     </Card>
-                    <Card num={1}>
-                        <Title>Most messages sent by channel</Title>
+                    <Card num={1} title="Most messages sent by channel">
                         <AnimatedBars
                             what="Channel"
                             unit="Total messages"
@@ -138,8 +133,7 @@ const ReportPage = () => {
                             colorHue={266}
                         />
                     </Card>
-                    <Card num={2}>
-                        <Title>Messages heatmap</Title>
+                    <Card num={2} title="Messages heatmap">
                         <HeatMapChart />
                     </Card>
                 </CardContainer>
@@ -149,8 +143,7 @@ const ReportPage = () => {
                     <Card num={2}>
                         <WordCloudGraph getData="getWordsData" />
                     </Card>
-                    <Card num={1}>
-                        <Title>Most used words</Title>
+                    <Card num={1} title="Most used words">
                         <AnimatedBars
                             what="Word"
                             unit="Times used"

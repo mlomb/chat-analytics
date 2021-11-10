@@ -181,12 +181,38 @@ body {
     padding: @cards-gap;
     margin: auto;
 }
-
 .Card {
+    position: relative;
     min-width: @card-min-width;
     border-radius: 15px;
     background: #22292f;
     box-shadow: 0 1px 3px rgb(0 0 0 / 12%), 0 1px 2px rgb(0 0 0 / 24%);
+}
+.Card_title {
+    font-size: 20px;
+    padding: 10px;
+    margin-bottom: 15px;
+    text-align: center;
+    border-bottom: 5px solid #282f35;
+}
+.Card_loading {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgb(0 0 0 / 41%);
+    border-radius: 15px;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    user-select: none;
+    font-family: monospace;
+    img {
+        margin-bottom: 15px;
+    }
 }
 @media (min-width: (2 * @card-min-width + 3 * @cards-gap)) {
     .CardContainer {
@@ -217,13 +243,6 @@ body {
     }
 }
 
-.card-title {
-    font-size: 20px;
-    padding: 10px;
-    margin-bottom: 15px;
-    text-align: center;
-    border-bottom: 5px solid #282f35;
-}
 
 /* Simple Table */
 .simple-table {
