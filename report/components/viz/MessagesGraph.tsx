@@ -154,7 +154,9 @@ const MessagesGraph = () => {
             style={{
                 width: "100%",
                 height: "89%",
+                minHeight: 600,
                 marginLeft: 5,
+                marginBottom: 5,
             }}
         ></div>
     );

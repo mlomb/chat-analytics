@@ -176,22 +176,17 @@ body {
 
 .CardContainer {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(1, 1fr);
     grid-gap: @cards-gap;
-    margin: @cards-gap;
+    padding: @cards-gap;
+    margin: auto;
 }
 
 .Card {
     min-width: @card-min-width;
-    height: 700px;
     border-radius: 15px;
     background: #22292f;
     box-shadow: 0 1px 3px rgb(0 0 0 / 12%), 0 1px 2px rgb(0 0 0 / 24%);
-}
-@media (min-width: (1 * @card-min-width + 2 * @cards-gap)) {
-    .CardContainer {
-        grid-template-columns: repeat(1, 1fr);
-    }
 }
 @media (min-width: (2 * @card-min-width + 3 * @cards-gap)) {
     .CardContainer {
@@ -213,6 +208,12 @@ body {
     }
     .Card--3 {
         grid-column: span 3;
+    }
+}
+@media (min-width: 1280px) {
+    .CardContainer {
+        padding: 20px;
+        max-width: 1500px;
     }
 }
 
@@ -263,7 +264,6 @@ body {
 
 /* AnimatedBars */
 .AnimatedBars {
-    min-height: 200px;
     margin: 0 15px;
 }
 .AnimatedBars__header {
@@ -276,7 +276,6 @@ body {
 }
 .AnimatedBars__body {
     position: relative;
-    height: 200px;
 }
 .AnimatedBars__item {
     position: absolute;

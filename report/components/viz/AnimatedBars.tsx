@@ -1,6 +1,8 @@
 import { memo, useRef } from "react";
 import CountUp from "react-countup";
 
+const ITEM_STRIDE = 40;
+
 export interface AnimatedBarEntry {
     data: {
         id: string | number;
@@ -25,7 +27,7 @@ const Item = (props: {
     percent: number;
 }) => {
     return (
-        <div className="AnimatedBars__item" style={{ top: props.rank * 40 + "px" }}>
+        <div className="AnimatedBars__item" style={{ top: props.rank * ITEM_STRIDE + "px" }}>
             <div
                 className="AnimatedBars__bar"
                 style={{
@@ -53,7 +55,7 @@ const AnimatedBars = (props: Props) => {
                 <div>{props.what}</div>
                 <div>{props.unit}</div>
             </div>
-            <div className="AnimatedBars__body">
+            <div className="AnimatedBars__body" style={{ minHeight: ITEM_STRIDE * sortedById.length }}>
                 {sortedById.map((entry) => (
                     <Item
                         entry={entry}
