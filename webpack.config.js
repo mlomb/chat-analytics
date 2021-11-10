@@ -24,7 +24,8 @@ module.exports = (env) => {
         },
         module: {
             rules: [
-                { test: /worker\./i, loader: "worker-loader" },
+                { test: /WorkerApp/, loader: "worker-loader" },
+                { test: /WorkerReport/, loader: "worker-loader", options: { inline: "fallback" } },
                 { test: /\.tsx?$/, loader: "ts-loader", exclude: [/node_modules/] },
                 {
                     test: /\.less$/,

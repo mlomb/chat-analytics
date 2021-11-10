@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 
 import { Platform } from "@pipeline/Types";
 
-import Worker, { WorkerResult } from "@app/Worker";
+import Worker, { WorkerResult } from "@app/WorkerApp";
 
 const HomePage = () => {
     const [platform, setPlatform] = useState<Platform | undefined>(undefined);
