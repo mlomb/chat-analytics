@@ -1,3 +1,4 @@
+import { useLayoutEffect, useState } from "react";
 import { dataProvider } from "@report/DataProvider";
 import { NewAuthor, NewChannel } from "@pipeline/Analyzer";
 import AuthorChip from "./components/core/AuthorChip";
@@ -6,14 +7,11 @@ import ChannelChip from "./components/core/ChannelChip";
 import FilterSelect, { SelectSpecialOpcion } from "./components/FilterSelect";
 import TimeSelector from "./components/TimeSelector";
 import { TabSwitch } from "./Tabs";
+import { dataDispatcher } from "./DataDispatcher";
 
 interface Props {
     tab: string;
     setTab: (tab: string) => void;
-    selectedChannels: NewChannel[];
-    selectedAuthors: NewAuthor[];
-    setSelectedAuthors: (authors: NewAuthor[]) => void;
-    setSelectedChannels: (channels: NewChannel[]) => void;
 }
 
 const channelsSpecialOptions: SelectSpecialOpcion<NewChannel>[] = [
@@ -73,6 +71,12 @@ const Header = (props: Props) => {
     const { tab, setTab } = props;
     const report = dataProvider.getSource();
 
+    const [selectedChannels, setSelectedChannels] = useState<NewChannel[]>([...report.channels]);
+    const [selectedAuthors, setSelectedAuthors] = useState<NewAuthor[]>([...report.authors]);
+
+    useLayoutEffect(() => dataDispatcher.updateAuthors(selectedAuthors), [selectedAuthors]);
+    useLayoutEffect(() => dataDispatcher.updateChannels(selectedChannels), [selectedChannels]);
+
     return (
         <div className="Header">
             <h1>{report.title}</h1>
@@ -84,8 +88,8 @@ const Header = (props: Props) => {
                         id="channels"
                         options={report.channels}
                         placeholder="Select channels..."
-                        selected={props.selectedChannels}
-                        onChange={props.setSelectedChannels}
+                        selected={selectedChannels}
+                        onChange={setSelectedChannels}
                         optionColorHue={266}
                         itemComponent={ChannelChip}
                         specialOptions={channelsSpecialOptions}
@@ -97,8 +101,8 @@ const Header = (props: Props) => {
                         id="authors"
                         options={report.authors}
                         placeholder="Select authors..."
-                        selected={props.selectedAuthors}
-                        onChange={props.setSelectedAuthors}
+                        selected={selectedAuthors}
+                        onChange={setSelectedAuthors}
                         optionColorHue={240}
                         itemComponent={AuthorChip}
                         specialOptions={authorsSpecialOptions}

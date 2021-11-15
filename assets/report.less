@@ -195,7 +195,7 @@ body {
     text-align: center;
     border-bottom: 5px solid #282f35;
 }
-.Card_loading {
+.Card_overlay {
     position: absolute;
     top: 0;
     left: 0;
@@ -210,8 +210,15 @@ body {
     align-items: center;
     user-select: none;
     font-family: monospace;
+    font-size: 20px;
+    opacity: 1;
+    transition: 0.25s opacity;
     img {
         margin-bottom: 15px;
+    }
+    &.Card_overlay--hidden {
+        opacity: 0;
+        pointer-events: none;
     }
 }
 @media (min-width: (2 * @card-min-width + 3 * @cards-gap)) {

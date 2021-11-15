@@ -32,6 +32,7 @@
     "react": "^17.0.2",
     "react-countup": "^6.0.0",
     "react-dom": "^17.0.2",
+    "react-intersection-observer": "^8.32.2",
     "react-select": "^5.2.0",
     "react-window": "^1.8.6",
     "ts-loader": "^9.2.6",

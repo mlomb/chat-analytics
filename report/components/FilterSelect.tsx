@@ -209,6 +209,7 @@ const customStyles = (colorHue: number): StylesConfig<TOption, true> => {
         menu: (provided) => ({
             ...provided,
             overflow: "hidden",
+            zIndex: 5,
             // special options
             p: {
                 display: "flex",

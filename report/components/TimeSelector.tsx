@@ -5,6 +5,7 @@ import * as am5 from "@amcharts/amcharts5";
 import * as am5xy from "@amcharts/amcharts5/xy";
 
 import { dataProvider } from "@report/DataProvider";
+import { dataDispatcher } from "@report/DataDispatcher";
 
 const SB_HEIGHT = 50;
 const RESETS = {
@@ -88,6 +89,7 @@ const TimeSelector = () => {
             let end = xAxis.positionToDate(ev.end);
             if (start > end) [start, end] = [end, start];
             dataProvider.updateTimeRange(start, end);
+            dataDispatcher.updateTimeRange(start, end);
         };
         scrollbarX.events.on("rangechanged", dateAxisChanged);
 

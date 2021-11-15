@@ -17,6 +17,7 @@ import AnimatedBars, { AnimatedBarEntry } from "./components/viz/AnimatedBars";
 import ChannelChip from "./components/core/ChannelChip";
 import AuthorChip from "./components/core/AuthorChip";
 import { TabContainer } from "./Tabs";
+import { MessageStatsBlock } from "@pipeline/wrap/Types";
 
 const CardContainer = (props: { children: React.ReactNode }) => <div className="CardContainer">{props.children}</div>;
 //const ChartContainer = ({ children }: { children: React.ReactNode }) => <div className="ChartContainer">{children}</div>;
@@ -24,8 +25,6 @@ const CardContainer = (props: { children: React.ReactNode }) => <div className="
 const ReportPage = () => {
     const report = dataProvider.getSource();
 
-    const [selectedChannels, setSelectedChannels] = useState<NewChannel[]>([...report.channels]);
-    const [selectedAuthors, setSelectedAuthors] = useState<NewAuthor[]>([...report.authors]);
     const [tab, setTab] = useState("messages");
 
     // let data = useMemo(()=> dataProvider.(selectedChannels, selectedUsers, report), [selectedChannels, selectedUsers]);
@@ -33,9 +32,6 @@ const ReportPage = () => {
     //console.log("report", report);
     //console.log("selection", selectedAuthors, selectedChannels);
     //console.log("data", data);
-
-    useLayoutEffect(() => dataProvider.updateAuthors(selectedAuthors), [selectedAuthors]);
-    useLayoutEffect(() => dataProvider.updateChannels(selectedChannels), [selectedChannels]);
 
     const [barsTestAuthors, setBarsTestAuthors] = useState([
         { data: report.authors[0], value: 1 },
@@ -92,28 +88,21 @@ const ReportPage = () => {
 
     return (
         <>
-            <Header
-                tab={tab}
-                setTab={setTab}
-                selectedChannels={selectedChannels}
-                setSelectedChannels={setSelectedChannels}
-                selectedAuthors={selectedAuthors}
-                setSelectedAuthors={setSelectedAuthors}
-            />
+            <Header tab={tab} setTab={setTab} />
 
             <TabContainer currentValue={tab} value="messages">
                 <CardContainer>
-                    <Card num={2} title="Messages sent per day &amp; month">
+                    <Card num={2} blockKey="message-per-cycle" title="Messages sent per day &amp; month">
                         <MessagesGraph />
                     </Card>
-                    <Card num={1} title="Messages stats">
+                    <Card blockKey="message-stats" num={1} title="Messages stats">
                         <SimpleTable />
                         <PieChart />
                     </Card>
-                    <Card num={1} title="Poner algo aca">
+                    <Card num={1} blockKey="message-algo" title="Poner algo aca">
                         this is content
                     </Card>
-                    <Card num={1} title="Most messages sent by author">
+                    <Card num={1} blockKey="message-most-author" title="Most messages sent by author">
                         <AnimatedBars
                             what="Author"
                             unit="Total messages"
@@ -123,7 +112,7 @@ const ReportPage = () => {
                             colorHue={240}
                         />
                     </Card>
-                    <Card num={1} title="Most messages sent by channel">
+                    <Card num={1} blockKey="message-most-channel" title="Most messages sent by channel">
                         <AnimatedBars
                             what="Channel"
                             unit="Total messages"
@@ -133,17 +122,17 @@ const ReportPage = () => {
                             colorHue={266}
                         />
                     </Card>
-                    <Card num={2} title="Messages heatmap">
+                    <Card num={2} blockKey="message-heatmap" title="Messages heatmap">
                         <HeatMapChart />
                     </Card>
                 </CardContainer>
             </TabContainer>
             <TabContainer currentValue={tab} value="language">
                 <CardContainer>
-                    <Card num={2}>
+                    <Card num={2} blockKey="language-word-cloud">
                         <WordCloudGraph getData="getWordsData" />
                     </Card>
-                    <Card num={1} title="Most used words">
+                    <Card num={1} blockKey="language-words" title="Most used words">
                         <AnimatedBars
                             what="Word"
                             unit="Times used"
@@ -152,14 +141,14 @@ const ReportPage = () => {
                             maxItems={16}
                         />
                     </Card>
-                    <Card num={2}>
+                    <Card num={2} blockKey="language-language">
                         <DonutChart />
                     </Card>
                 </CardContainer>
             </TabContainer>
             <TabContainer currentValue={tab} value="emojis">
                 <CardContainer>
-                    <Card num={2}>
+                    <Card num={2} blockKey="emojis-cloud">
                         <WordCloudGraph getData="getEmojisData" />
                     </Card>
                 </CardContainer>
