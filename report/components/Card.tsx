@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { InView } from "react-intersection-observer";
 
 import Spinner from "@assets/spinner.svg";
-import { BlockData, BlockKey, BlockState } from "@pipeline/wrap/Types";
+import { BlockData, BlockKey, BlockState } from "@pipeline/wrap/Blocks";
 import { dataDispatcher } from "@report/DataDispatcher";
 
 interface Props {
