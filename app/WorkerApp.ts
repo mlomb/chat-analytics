@@ -5,10 +5,10 @@ import { compress } from "compress-json";
 import { Platform } from "@pipeline/Types";
 import { Parser } from "@pipeline/Parser";
 
-import { WhatsAppParser } from "@pipeline/parsers/WhatsAppParser";
-import { DiscordParser } from "@pipeline/parsers/DiscordParser";
-import { TelegramParser } from "@pipeline/parsers/TelegramParser";
+import { WhatsAppParser } from "@pipeline/parse/WhatsAppParser";
+import { TelegramParser } from "@pipeline/parse/TelegramParser";
 import { analyze } from "@pipeline/Analyzer";
+import { parse } from "@pipeline/parse/Parse";
 
 let reportPage: string;
 
@@ -53,11 +53,15 @@ async function start(msg: StartMessage) {
         files.push(await msg.files[i].text());
     }
 
+    let a = parse(files, msg.platform);
+    console.log(a);
+
     // Create parser
     let parser: Parser;
     switch (msg.platform) {
         case "discord":
-            parser = new DiscordParser();
+            /* TODO: remove */
+            parser = new WhatsAppParser();
             break;
         case "whatsapp":
             parser = new WhatsAppParser();

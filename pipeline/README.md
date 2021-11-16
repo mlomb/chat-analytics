@@ -9,7 +9,7 @@ The process is divided in multiple steps:
 1. [BLOCKS](#BLOCKS): generate data blocks that will be consumed by the cards in the UI
 
 Steps 1 and 2 happen when the data is uploaded.
-Step 3 occur in the report page (already exported) when a card in the UI requires the final processing.
+Step 3 occur in the report page (already exported) when a card in the UI requires final processing.
 
 #### Why not generate data blocks during preprocessing?
 
@@ -28,5 +28,3 @@ something something
 ## BLOCKS
 
 something something
-
-

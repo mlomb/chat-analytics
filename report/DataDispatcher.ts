@@ -2,7 +2,7 @@ import EventEmitter from "events";
 
 import { NewAuthor, NewChannel, NewReport } from "@pipeline/Analyzer";
 import { Platform } from "@pipeline/Types";
-import { BlockData, BlockKey, BlockState } from "@pipeline/wrap/Blocks";
+import { BlockData, BlockKey, BlockState } from "@pipeline/blocks/Blocks";
 
 import Worker from "@report/WorkerReport";
 

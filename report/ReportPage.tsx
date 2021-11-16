@@ -17,7 +17,7 @@ import AnimatedBars, { AnimatedBarEntry } from "./components/viz/AnimatedBars";
 import ChannelChip from "./components/core/ChannelChip";
 import AuthorChip from "./components/core/AuthorChip";
 import { TabContainer } from "./Tabs";
-import { MessagesPerCycleBlock } from "@pipeline/wrap/MessagesPerCycle";
+import { MessagesPerCycleBlock } from "@pipeline/blocks/MessagesPerCycle";
 
 const CardContainer = (props: { children: React.ReactNode }) => <div className="CardContainer">{props.children}</div>;
 //const ChartContainer = ({ children }: { children: React.ReactNode }) => <div className="ChartContainer">{children}</div>;
