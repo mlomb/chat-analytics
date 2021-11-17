@@ -1,5 +1,4 @@
-import { Parser } from "@pipeline/Parser";
-import { Author, Database, ID, Message } from "@pipeline/Types";
+import { Parser } from "@pipeline/parse/Parser";
 
 /*
     There is a convenient parser already out there
@@ -7,44 +6,48 @@ import { Author, Database, ID, Message } from "@pipeline/Types";
 import { parseStringSync } from "whatsapp-chat-parser";
 
 export class WhatsAppParser extends Parser {
-    parse(files: string[]): Database {
-        let messages: Message[] = [];
-        let authors = new Map<ID, Author>();
-        for (let file_content of files) {
-            let parsed = parseStringSync(file_content);
-            console.log(JSON.stringify(parsed, null, 4));
-            for (let msg of parsed) {
-                if (msg.author !== "System") {
-                    if (!authors.has(msg.author)) {
-                        authors.set(msg.author, {
-                            id: msg.author,
-                            name: msg.author,
-                            bot: false,
-                        });
-                    }
-                    messages.push({
-                        type: "message",
-                        author: msg.author,
-                        date: msg.date,
-                        content: msg.message,
-                    });
-                } else {
-                    // TODO: parse system messages
-                }
+    private channelId = 0;
+    private messageId = 0;
+
+    constructor() {
+        super("whatsapp");
+    }
+
+    parse(file_content: string) {
+        const parsed = parseStringSync(file_content);
+
+        const channel = this.addChannel(
+            {
+                id: this.channelId++ + "",
+                name: "default",
+            },
+            0
+        );
+
+        for (const message of parsed) {
+            const timestamp = message.date.getTime();
+
+            if (message.author !== "System") {
+                this.addAuthor(
+                    {
+                        id: message.author,
+                        name: message.author,
+                        bot: false,
+                    },
+                    timestamp
+                );
+                this.addMessage({
+                    id: this.messageId++ + "",
+                    authorId: message.author,
+                    channelId: channel.id,
+                    content: message.message,
+                    timestamp,
+                });
+            } else {
+                // TODO: parse system messages
             }
         }
 
-        return {
-            platform: "whatsapp",
-            title: "WhatsApp chat", // TODO: chat or group
-            channels: [
-                {
-                    id: "default",
-                    messages,
-                    name: "Default",
-                },
-            ],
-            authors,
-        };
+        this.updateTitle("WhatsApp chat", 0); // TODO: chat or group
     }
 }

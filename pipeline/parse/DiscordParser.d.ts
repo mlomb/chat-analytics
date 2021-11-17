@@ -39,7 +39,7 @@ interface Message {
 }
 
 interface Author {
-    id: string;
+    id: Snowflake;
     name: string;
     discriminator: string;
     nickname: string;

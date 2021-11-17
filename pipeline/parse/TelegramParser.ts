@@ -1,54 +1,55 @@
-import { Parser } from "@pipeline/Parser";
-import { Author, Database, ID, Message } from "@pipeline/Types";
+import { TelegramExportFile, TextArray } from "@pipeline/parse/TelegramParser.d";
+import { Parser } from "@pipeline/parse/Parser";
 
 export class TelegramParser extends Parser {
-    parse(files: string[]): Database {
-        let messages: Message[] = [];
-        let authors = new Map<ID, Author>();
-        let titles: string[] = [];
-        for (let file_content of files) {
-            let data = JSON.parse(file_content);
-            titles.push(data.name);
-            console.log(data);
+    constructor() {
+        super("telegram");
+    }
 
-            for (let msg of data.messages) {
-                const author_id = msg.from_id + "";
-                if (!msg.from) continue; // TODO: fix
-                if (msg.type === "message") {
-                    messages.push({
-                        type: "message",
-                        author: author_id,
-                        content: this.parseTextArray(msg.text),
-                        date: new Date(msg.date),
-                    });
-                }
-                if (!authors.has(author_id)) {
-                    let author: Author = {
-                        id: author_id,
-                        name: msg.from,
-                        bot: false,
-                    };
-                    authors.set(author_id, author);
-                }
+    parse(file_content: string) {
+        let data = JSON.parse(file_content) as TelegramExportFile;
+
+        // store channel
+        const lastMessageTimestamp =
+            data.messages.length > 0 ? Date.parse(data.messages[data.messages.length - 1].date) : 0;
+        const channel = this.addChannel(
+            {
+                id: data.id + "",
+                name: data.name,
+            },
+            lastMessageTimestamp
+        );
+
+        for (const message of data.messages) {
+            const authorId = message.from_id + "";
+            const timestamp = Date.parse(message.date);
+
+            if (!message.from) continue; // TODO: fix
+
+            this.addAuthor(
+                {
+                    id: authorId,
+                    name: message.from,
+                    bot: false, // TODO: mark all bot_command's as bot
+                },
+                timestamp
+            );
+
+            if (message.type === "message") {
+                this.addMessage({
+                    id: message.id + "",
+                    channelId: channel.id,
+                    authorId,
+                    content: this.parseTextArray(message.text),
+                    timestamp,
+                });
             }
         }
 
-        return {
-            platform: "telegram",
-            title: titles.length === 1 ? titles[0] : `${titles.length} Telegram chats`,
-            // TODO: fix
-            channels: [
-                {
-                    id: "default",
-                    messages,
-                    name: titles[0],
-                },
-            ],
-            authors,
-        };
+        this.updateTitle(data.name, 0);
     }
 
-    parseTextArray(text: any): string {
+    parseTextArray(text: string | TextArray[]): string {
         if (typeof text === "string") {
             return text;
         } else {

@@ -1,13 +1,19 @@
 /*
-    This is the common interface generated after parsing
+This is the common interface generated after parsing
 
-    It doesnt need to be trivally serializable because it will be consumed by the preprocess step
+It doesnt need to be trivally serializable because it will be consumed by the preprocess step
 */
+
+import { ID, Timestamp } from "@pipeline/Types";
+
 export interface Database {
     platform: Platform;
     title: string;
     authors: Map<ID, Author>;
     channels: Map<ID, Channel>;
+    messages: {
+        [channelId: ID]: Message[];
+    };
 }
 
 export interface DiscordAuthor {
@@ -24,24 +30,23 @@ export interface Author {
     discord?: DiscordAuthor;
 }
 
+export interface Channel {
+    id: ID;
+    name: string;
+}
+
 // join chat, etc
 export interface Event {
     type: "event";
 }
 
 export interface Message {
-    type: "message";
-    channel?: Channel;
-    author: ID;
-    reply_to?: Message;
-    date: Date;
+    id: ID;
+    channelId: ID;
+    authorId: ID;
     content: string;
+    timestamp: Timestamp;
+    replyToId?: ID;
 
     // TODO: emails, metions
-}
-
-export interface Channel {
-    id: ID;
-    name: string;
-    messages: Message[];
 }

@@ -3,12 +3,12 @@ export default null as any;
 import { compress } from "compress-json";
 
 import { Platform } from "@pipeline/Types";
-import { Parser } from "@pipeline/Parser";
 
+import { Parser } from "@pipeline/parse/Parser";
+import { DiscordParser } from "@pipeline/parse/DiscordParser";
 import { WhatsAppParser } from "@pipeline/parse/WhatsAppParser";
 import { TelegramParser } from "@pipeline/parse/TelegramParser";
 import { analyze } from "@pipeline/Analyzer";
-import { parse } from "@pipeline/parse/Parse";
 
 let reportPage: string;
 
@@ -48,20 +48,16 @@ export type Message = StartMessage | StatusMessage;
 
 async function start(msg: StartMessage) {
     // Load files
-    let files: string[] = [];
+    const files: string[] = [];
     for (let i = 0; i < msg.files.length; i++) {
         files.push(await msg.files[i].text());
     }
-
-    let a = parse(files, msg.platform);
-    console.log(a);
 
     // Create parser
     let parser: Parser;
     switch (msg.platform) {
         case "discord":
-            /* TODO: remove */
-            parser = new WhatsAppParser();
+            parser = new DiscordParser();
             break;
         case "whatsapp":
             parser = new WhatsAppParser();
@@ -74,16 +70,20 @@ async function start(msg: StartMessage) {
     }
 
     // Parse files
-    let db = parser.parse(files);
+    for (const file_content of files) {
+        parser.parse(file_content);
+    }
+    const db = parser.database;
+    console.log(db);
 
     // Analyze chats
-    let report = analyze(db);
+    const report = analyze(db);
 
-    let report_data = JSON.stringify(compress(report));
+    const report_data = JSON.stringify(compress(report));
     console.log(report_data);
 
-    let page = reportPage.replace("undefined", report_data);
-    let blob = new Blob([page], { type: "text/html" });
+    const page = reportPage.replace("undefined", report_data);
+    const blob = new Blob([page], { type: "text/html" });
 
     // @ts-ignore
     self.postMessage(<WorkerResult>{
