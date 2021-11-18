@@ -10,7 +10,6 @@ export class DiscordParser extends Parser {
     parse(file_content: string): void {
         const data = JSON.parse(file_content) as DiscordExportFile;
 
-        debugger;
         // store channel
         const lastMessageTimestamp =
             data.messages.length > 0 ? Date.parse(data.messages[data.messages.length - 1].timestamp) : 0;

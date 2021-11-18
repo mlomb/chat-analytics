@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import Tokenizer from "wink-tokenizer";
 import { searchFormat } from "@pipeline/Utils";
 

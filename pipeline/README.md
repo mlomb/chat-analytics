@@ -19,7 +19,13 @@ The report UI allows the user to filter authors, channels and time periods, mean
 
 ## PARSE
 
-something something
+Every platform parser inheriths from the Parser class.
+
+Check out platform implementations:
+
+* [DiscordParser](pipeline/parse/DiscordParser.ts)
+* [TelegramParser](pipeline/parse/TelegramParser.ts)
+* [WhatsAppParser](pipeline/parse/WhatsApparser.ts)
 
 ## PREPROCESS
 
