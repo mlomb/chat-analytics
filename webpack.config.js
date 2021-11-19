@@ -50,7 +50,7 @@ module.exports = (env) => {
                     test: /\.(svg|png|jpe?g|gif|mp4)$/,
                     loader: "url-loader",
                     options: {
-                        limit: 2048,
+                        limit: 2 ** 16,
                         name: "[hash:8].[ext]",
                     },
                 },
