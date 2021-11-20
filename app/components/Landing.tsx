@@ -25,7 +25,10 @@ const Landing = ({ onStart }: Props) => {
                 Free and <span>open source</span>.
                 <br />
                 <br />
-                Supports {Platforms.map((p) => p.logo)}
+                Supports{" "}
+                {Platforms.map((p) => (
+                    <span key={p.platform}>{p.logo}</span>
+                ))}
             </div>
             <div className="Landing__buttons">
                 <Button color={[258, 90, 61]} className="Landing_cta" onClick={onStart}>
