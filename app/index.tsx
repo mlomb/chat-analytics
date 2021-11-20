@@ -1,9 +1,5 @@
-import "@assets/app.less";
-
 import ReactDOM from "react-dom";
 
-import LandingPage from "@app/LandingPage";
+import HomePage from "@app/HomePage";
 
-document.addEventListener("DOMContentLoaded", () => {
-    ReactDOM.render(<LandingPage />, document.getElementById("app"));
-});
+ReactDOM.render(<HomePage />, document.getElementById("app"));

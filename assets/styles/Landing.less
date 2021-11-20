@@ -1,0 +1,46 @@
+.Landing {
+    min-width: 300px;
+    margin: 0 165px;
+    transition: opacity 0.5s;
+}
+
+.Landing__title {
+    font-size: 48px;
+    color: white;
+    line-height: 1.2;
+}
+
+.Landing__desc {
+    color: #7f8fa4;
+    margin: 20px 0 50px;
+
+    .sameline {
+        margin-bottom: 5px;
+    }
+
+    img {
+        margin: 0 4px 0px 10px;
+        width: 1rem;
+        height: 1rem;
+    }
+}
+
+.Landing__buttons {
+    display: flex;
+}
+
+.Landing__sameline {
+    display: inline-flex;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.Landing_cta {
+    margin-right: 25px;
+    box-shadow: 0 14px 30px 0 rgb(118 64 245 / 20%);
+
+    &:hover {
+        box-shadow: 0 20px 35px 0 rgb(118 64 245 / 20%);
+        transform: scale(1.05);
+    }
+}
