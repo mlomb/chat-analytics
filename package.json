@@ -44,5 +44,8 @@
     "whatsapp-chat-parser": "^3.2.1",
     "wink-tokenizer": "^5.2.3",
     "worker-loader": "^3.0.8"
+  },
+  "dependencies": {
+    "@emotion/react": "^11.6.0"
   }
 }

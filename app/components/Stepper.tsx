@@ -1,4 +1,4 @@
-import Tick from "@assets/tick.svg";
+import Tick from "@assets/images/tick.svg";
 
 interface Props {
     step: number;
