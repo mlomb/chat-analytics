@@ -13,30 +13,48 @@
 .Landing__desc {
     color: #7f8fa4;
     margin: 20px 0 50px;
-
-    .sameline {
-        margin-bottom: 5px;
-    }
-
-    img {
-        margin: 0 4px 0px 10px;
-        width: 1rem;
-        height: 1rem;
-    }
 }
 
 .Landing__buttons {
     display: flex;
+
+    a {
+        margin-left: 15px;
+    }
+    a:last-child {
+        margin-left: 25px;
+    }
 }
 
 .Landing__sameline {
     display: inline-flex;
     align-items: center;
     flex-wrap: wrap;
+    margin-bottom: 5px;
+}
+
+.Landing__platforms-line {
+    display: flex;
+    align-items: center;
+    user-select: none;
+}
+
+.Landing__platform {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    width: 1.7rem;
+    height: 1.7rem;
+    margin-left: 5px;
+
+    img {
+        width: 55%;
+        height: 55%;
+    }
 }
 
 .Landing_cta {
-    margin-right: 25px;
     box-shadow: 0 14px 30px 0 rgb(118 64 245 / 20%);
 
     &:hover {

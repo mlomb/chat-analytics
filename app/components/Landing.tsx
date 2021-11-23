@@ -17,7 +17,7 @@ const Landing = ({ onStart }: Props) => {
             <div className="Landing__title">Generate in-depth chat analysis reports</div>
             <div className="Landing__desc">
                 <div className="Landing__sameline">
-                    Everything is done in your browser.
+                    Everything is processed in your browser.
                     <img src={Lock} alt="Lock" />
                     No data leaves.
                 </div>
@@ -25,16 +25,29 @@ const Landing = ({ onStart }: Props) => {
                 Free and <span>open source</span>.
                 <br />
                 <br />
-                Supports{" "}
-                {Platforms.map((p) => (
-                    <span key={p.platform}>{p.logo}</span>
-                ))}
+                <div className="Landing__platforms-line">
+                    <span>Supports</span>
+                    {Platforms.map((p) => (
+                        <div
+                            className="Landing__platform"
+                            key={p.platform}
+                            style={{
+                                backgroundColor: `hsl(${p.color[0]}, ${p.color[1]}%, ${p.color[2]}%)`,
+                            }}
+                        >
+                            {p.logo}
+                        </div>
+                    ))}
+                </div>
             </div>
             <div className="Landing__buttons">
                 <Button color={[258, 90, 61]} className="Landing_cta" onClick={onStart}>
                     Generate a report
                 </Button>
-                <Button color={[207, 23, 8]} href="https://github.com">
+                <Button color={[244, 90, 61]} href="/demo" target="_blank">
+                    View Demo
+                </Button>
+                <Button color={[207, 23, 8]} href="https://github.com" target="_blank">
                     <img src={GitHub} alt="GitHub" />
                     GitHub
                 </Button>

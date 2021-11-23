@@ -1,5 +1,6 @@
 .Steps {
-    width: 400px;
+    width: 100%;
+    max-width: 550px;
     background-color: #26303b;
     padding: 15px;
     border-radius: 8px;
@@ -7,6 +8,27 @@
 
 .PlatformSelect__buttons {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(3, 1fr);
     grid-gap: 10px;
+}
+
+.FilesSelect__drop-area {
+    border: 3px dashed #ffffff38;
+    background: #2d3742;
+    border-radius: 10px;
+    cursor: pointer;
+    padding: 10px;
+    text-align: center;
+    user-select: none;
+
+    span {
+        background: #1c232b;
+        padding: 2px 5px;
+        border-radius: 7px;
+    }
+
+    &:hover {
+        border-color: #9e9e9e;
+        background: #3c454f;
+    }
 }

@@ -1,6 +1,6 @@
 import "@assets/styles/Button.less";
 
-import { ReactNode } from "react";
+import { HTMLAttributeAnchorTarget, ReactNode } from "react";
 import { css } from "@emotion/react";
 
 interface Props {
@@ -8,6 +8,7 @@ interface Props {
     className?: string;
     children: ReactNode;
     href?: string;
+    target?: HTMLAttributeAnchorTarget;
     onClick?: () => void;
 }
 
@@ -26,7 +27,7 @@ const Button = (props: Props) => {
     const classes = ["Button", props.className || ""].join(" ");
 
     return props.href ? (
-        <a className={classes} href={props.href} css={cssStyles} children={props.children} />
+        <a className={classes} href={props.href} target={props.target} css={cssStyles} children={props.children} />
     ) : (
         <button className={classes} onClick={props.onClick} css={cssStyles} children={props.children} />
     );
