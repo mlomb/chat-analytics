@@ -5,11 +5,9 @@ import Button from "@app/components/Button";
 
 interface Props {
     platform: Platform | null;
-    onBack: () => void;
-    onNext: () => void;
 }
 
-const ExportChats = ({ platform, onBack, onNext }: Props) => (
+const ExportChats = ({ platform }: Props) => (
     <div className="ExportChats">
         You need to export the chats you want to analyze.
         <br />
@@ -22,18 +20,13 @@ const ExportChats = ({ platform, onBack, onNext }: Props) => (
             <li>When asked to export with or without media, select "Without Media".</li>
             <li>Save the file and transfer it to this device.</li>
         </ol>
+        <br />
         For more information about exporting, please visit the{" "}
         <a href="https://faq.whatsapp.com/android/chats/how-to-save-your-chat-history" target="_blank">
             official link
         </a>
         .
         <br />
-        <Button color={[212, 17, 12]} onClick={onBack}>
-            Back
-        </Button>
-        <Button color={[258, 90, 61]} onClick={onNext}>
-            Continue
-        </Button>
     </div>
 );
 
