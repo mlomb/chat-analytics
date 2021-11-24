@@ -20,14 +20,16 @@ interface ItemInfo {
 const StatusItem = ({ info }: { info: ItemInfo }) => {
     return (
         <div className="StatusItem">
-            <img src={info.status === "pending" ? Spinner : Tick} />
+            <div className="StatusItem__icon">
+                <img src={info.status === "pending" ? Spinner : Tick} />
+            </div>
             {info.title}
         </div>
     );
 };
 
 const GenerationProgress = ({ platform }: Props) => (
-    <div>
+    <div className="GenerationProgress">
         <StatusItem
             info={{
                 status: "error",
@@ -59,6 +61,7 @@ const GenerationProgress = ({ platform }: Props) => (
                 title: "Generate report",
             }}
         />
+        <div className="GenerationProgress__shadow"></div>
     </div>
 );
 

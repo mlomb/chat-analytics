@@ -71,8 +71,13 @@ const Steps = () => {
                         </Button>
                     </div>
                 </div>
-                <GenerationProgress platform={state.platform} />
-                <div>D</div>
+                <div>
+                    <GenerationProgress platform={state.platform} />
+                    <Button color={NextColor} onClick={() => setState({ ...state, currentStep: 4 })}>
+                        NEXT (TESTING)
+                    </Button>
+                </div>
+                <div>Done step</div>
             </Stepper>
         </div>
     );
