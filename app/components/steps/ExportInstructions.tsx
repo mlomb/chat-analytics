@@ -1,14 +1,12 @@
 import { Platform } from "@pipeline/Types";
 import { Platforms } from "@app/Platforms";
 
-import Button from "@app/components/Button";
-
 interface Props {
     platform: Platform | null;
 }
 
-const ExportChats = ({ platform }: Props) => (
-    <div className="ExportChats">
+const ExportInstructions = ({ platform }: Props) => (
+    <div>
         You need to export the chats you want to analyze.
         <br />
         Below you can find official instructions:
@@ -30,4 +28,4 @@ const ExportChats = ({ platform }: Props) => (
     </div>
 );
 
-export default ExportChats;
+export default ExportInstructions;

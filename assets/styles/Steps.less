@@ -22,16 +22,21 @@
     grid-gap: 10px;
 }
 
+.FilesSelect__zone {
+    margin: 8px 0;
+}
+
 .FilesSelect__dropzone {
     border: 3px dashed #59b2ff38;
     background: #2b3949;
     border-radius: 10px;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
     cursor: pointer;
     padding: 10px;
     text-align: center;
     user-select: none;
     transition: background-color 0.2s ease, border-color 0.2s ease;
-    margin: 8px 0;
 
     span {
         background: #1c232b;
@@ -54,4 +59,14 @@
     height: 25px;
     padding: 0 10px;
     margin-left: 8px;
+}
+
+.FilesSelect__info {
+    background: #25313f;
+    border: 3px solid #355371;
+    border-top: none;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+    padding: 5px;
+    text-align: center;
 }

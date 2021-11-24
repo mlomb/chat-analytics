@@ -7,8 +7,9 @@ import Stepper from "@app/components/Stepper";
 import Button from "@app/components/Button";
 
 import PlatformSelect from "./PlatformSelect";
-import ExportChats from "./ExportChats";
+import ExportInstructions from "./ExportInstructions";
 import FilesSelect from "./FilesSelect";
+import GenerationProgress from "./GenerationProgress";
 
 // prettier-ignore
 const StepTitles = [
@@ -19,23 +20,8 @@ const StepTitles = [
     "View/Download report"
 ];
 
-const StepNavButtons = (props: {
-    onBack: () => void;
-    onNext: () => void;
-    nextDisabled?: boolean;
-    nextText: string;
-}) => {
-    return (
-        <div className="Steps__nav">
-            <Button color={[216, 10, 10]} onClick={props.onBack}>
-                Back
-            </Button>
-            <Button color={[258, 90, 61]} onClick={props.onNext} disabled={props.nextDisabled}>
-                {props.nextText}
-            </Button>
-        </div>
-    );
-};
+const BackColor: [number, number, number] = [216, 10, 10];
+const NextColor: [number, number, number] = [258, 90, 61];
 
 const Steps = () => {
     const [state, setState] = useState<{
@@ -53,12 +39,18 @@ const Steps = () => {
             <Stepper step={state.currentStep} stepTitles={StepTitles}>
                 <PlatformSelect pickPlatform={(p) => setState({ ...state, currentStep: 1, platform: p })} />
                 <div>
-                    <ExportChats platform={state.platform} />
-                    <StepNavButtons
-                        onBack={() => setState({ ...state, currentStep: 0, platform: null })}
-                        onNext={() => setState({ ...state, currentStep: 2 })}
-                        nextText="Continue"
-                    />
+                    <ExportInstructions platform={state.platform} />
+                    <div className="Steps__nav">
+                        <Button
+                            color={BackColor}
+                            onClick={() => setState({ ...state, currentStep: 0, platform: null })}
+                        >
+                            Back
+                        </Button>
+                        <Button color={NextColor} onClick={() => setState({ ...state, currentStep: 2 })}>
+                            Continue
+                        </Button>
+                    </div>
                 </div>
                 <div>
                     <FilesSelect
@@ -66,14 +58,20 @@ const Steps = () => {
                         files={state.files}
                         onFilesUpdate={(files) => setState({ ...state, files })}
                     />
-                    <StepNavButtons
-                        onBack={() => setState({ ...state, currentStep: 1, files: [] })}
-                        onNext={() => setState({ ...state, currentStep: 3 })}
-                        nextText="Generate report!"
-                        nextDisabled={state.files.length === 0}
-                    />
+                    <div className="Steps__nav">
+                        <Button color={BackColor} onClick={() => setState({ ...state, currentStep: 1, files: [] })}>
+                            Back
+                        </Button>
+                        <Button
+                            color={NextColor}
+                            disabled={state.files.length === 0}
+                            onClick={() => setState({ ...state, currentStep: 3 })}
+                        >
+                            Generate report!
+                        </Button>
+                    </div>
                 </div>
-                <div>C</div>
+                <GenerationProgress platform={state.platform} />
                 <div>D</div>
             </Stepper>
         </div>

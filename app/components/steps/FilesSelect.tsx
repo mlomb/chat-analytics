@@ -17,9 +17,32 @@ const FilesSelect = ({ platform, files, onFilesUpdate }: Props) => {
 
     const onFileClick = () => fileRef.current!.click();
 
+    const mergeFiles = (newFiles: File[]) => {
+        console.log("AAAAAAA");
+
+        const merged: File[] = [...files];
+        newFiles.forEach((file) => {
+            let found = false;
+            for (let existingFile of merged) {
+                if (
+                    existingFile.name === file.name &&
+                    existingFile.size === file.size &&
+                    existingFile.lastModified === file.lastModified
+                ) {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                merged.push(file);
+            }
+        });
+        onFilesUpdate(merged);
+    };
+
     const onFileChange = () => {
-        console.log(fileRef.current!.files!.length > 0 ? fileRef.current!.files : "Drag your audio file or click here");
-        onFilesUpdate(Array.from(fileRef.current!.files!));
+        mergeFiles(Array.from(fileRef.current!.files!));
+        fileRef.current!.value = "";
     };
 
     const onDrag = (e: DragEvent<HTMLDivElement>) => {
@@ -39,10 +62,14 @@ const FilesSelect = ({ platform, files, onFilesUpdate }: Props) => {
 
             case "drop":
                 setDragover(false);
-                fileRef.current!.files = e.dataTransfer!.files;
-                onFileChange();
+                mergeFiles(Array.from(e.dataTransfer!.files));
                 break;
         }
+    };
+
+    const onClear = () => {
+        onFilesUpdate([]);
+        fileRef.current!.value = "";
     };
 
     const platformInfo = Platforms.find((p) => p.platform === platform);
@@ -50,35 +77,39 @@ const FilesSelect = ({ platform, files, onFilesUpdate }: Props) => {
     return (
         <div className="FilesSelect">
             Select the files from the previous step:
-            <div
-                className={["FilesSelect__dropzone", dragover ? "FilesSelect__dropzone--dragover" : ""].join(" ")}
-                onClick={onFileClick}
-                onDrop={onDrag}
-                onDragOver={onDrag}
-                onDragEnd={onDrag}
-                onDragEnter={onDrag}
-                onDragLeave={onDrag}
-            >
-                Drop <span>{platformInfo?.defaultFilename}</span> files here
-                <br />
-                or click to browse
+            <div className="FilesSelect__zone">
+                <div
+                    className={["FilesSelect__dropzone", dragover ? "FilesSelect__dropzone--dragover" : ""].join(" ")}
+                    onClick={onFileClick}
+                    onDrop={onDrag}
+                    onDragOver={onDrag}
+                    onDragEnd={onDrag}
+                    onDragEnter={onDrag}
+                    onDragLeave={onDrag}
+                >
+                    Drop <span>{platformInfo?.defaultFilename}</span> files here
+                    <br />
+                    or click to browse
+                </div>
+                <div className="FilesSelect__info">
+                    {files.length === 0 ? (
+                        <>No files selected</>
+                    ) : (
+                        <>
+                            {files.length} file{files.length === 1 ? "" : "s"} selected
+                        </>
+                    )}
+                    <Button
+                        className="FilesSelect__clear"
+                        color={[0, 50, 50]}
+                        onClick={onClear}
+                        disabled={files.length === 0}
+                    >
+                        Clear
+                    </Button>
+                </div>
             </div>
             <input type="file" hidden multiple onChange={onFileChange} ref={fileRef} />
-            {files.length === 0 ? (
-                <>No files selected</>
-            ) : (
-                <>
-                    {files.length} file{files.length === 1 ? "" : "s"} selected
-                </>
-            )}
-            <Button
-                className="FilesSelect__clear"
-                color={[0, 50, 50]}
-                onClick={() => onFilesUpdate([])}
-                disabled={files.length === 0}
-            >
-                Clear
-            </Button>
         </div>
     );
 };
