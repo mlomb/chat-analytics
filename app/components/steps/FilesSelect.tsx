@@ -1,4 +1,5 @@
 import { useRef, useState, DragEvent } from "react";
+import prettyBytes from "pretty-bytes";
 
 import { Platform } from "@pipeline/Types";
 import { Platforms } from "@app/Platforms";
@@ -94,7 +95,8 @@ const FilesSelect = ({ platform, files, onFilesUpdate }: Props) => {
                         <>No files selected</>
                     ) : (
                         <>
-                            {files.length} file{files.length === 1 ? "" : "s"} selected
+                            {files.length} file{files.length === 1 ? "" : "s"} selected (
+                            {prettyBytes(files.reduce((acc, file) => acc + file.size, 0))})
                         </>
                     )}
                     <Button

@@ -8,6 +8,7 @@ interface Props {
     className?: string;
     children: ReactNode;
     disabled?: boolean;
+    download?: any;
     href?: string;
     target?: HTMLAttributeAnchorTarget;
     onClick?: () => void;
@@ -31,7 +32,14 @@ const Button = (props: Props) => {
     const classes = ["Button", props.className || ""].join(" ");
 
     return props.href ? (
-        <a className={classes} href={props.href} target={props.target} css={cssStyles} children={props.children} />
+        <a
+            className={classes}
+            href={props.href}
+            target={props.target}
+            css={cssStyles}
+            children={props.children}
+            download={props.download}
+        />
     ) : (
         <button
             className={classes}

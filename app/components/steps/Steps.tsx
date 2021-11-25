@@ -32,7 +32,7 @@ const Steps = () => {
         platform: Platform | null;
         files: File[];
         worker: Worker | null;
-        result: Blob | null;
+        result: ReportResult | null;
     }>({
         currentStep: 0,
         platform: null,
@@ -61,9 +61,9 @@ const Steps = () => {
                         ...state,
                         currentStep: 4,
                         worker: null,
-                        result: data.blob,
+                        result: data,
                     });
-                }, 1000);
+                }, 600);
             }
         };
         // <InitMessage>
@@ -112,7 +112,7 @@ const Steps = () => {
                     </div>
                 </div>
                 <GenerationProgress worker={state.worker} />
-                <ViewDownloadReport blob={state.result} />
+                <ViewDownloadReport result={state.result} />
             </Stepper>
         </div>
     );

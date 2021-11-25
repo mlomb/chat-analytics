@@ -14,6 +14,13 @@ export interface InitMessage {
 export interface ReportResult {
     type: "result";
     blob: Blob;
+    time: number;
+    title: string;
+    counts: {
+        authors: number;
+        channels: number;
+        messages: number;
+    };
 }
 
 async function* run(msg: InitMessage): AsyncGenerator<StepInfo | ReportResult> {
@@ -52,7 +59,19 @@ async function* run(msg: InitMessage): AsyncGenerator<StepInfo | ReportResult> {
     //
     console.log(database);
 
-    yield { type: "result", blob: new Blob([JSON.stringify(database)], { type: "text/html" }) };
+    const blob = new Blob(["Aqui pondria un reporte si lo hubiera generado"], { type: "text/html" });
+
+    yield {
+        type: "result",
+        blob,
+        time: Date.now(),
+        title: database.title,
+        counts: {
+            authors: database.authors.size,
+            channels: database.channels.size,
+            messages: Object.values(database.messages).reduce((acc, val) => acc + val.length, 0),
+        },
+    };
 }
 
 self.onmessage = async (ev: MessageEvent<InitMessage>) => {
