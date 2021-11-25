@@ -18,8 +18,6 @@ const FilesSelect = ({ platform, files, onFilesUpdate }: Props) => {
     const onFileClick = () => fileRef.current!.click();
 
     const mergeFiles = (newFiles: File[]) => {
-        console.log("AAAAAAA");
-
         const merged: File[] = [...files];
         newFiles.forEach((file) => {
             let found = false;

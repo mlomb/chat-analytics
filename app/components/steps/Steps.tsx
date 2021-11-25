@@ -1,8 +1,10 @@
 import "@assets/styles/Steps.less";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
-import { Platform } from "@pipeline/Types";
+import { Platform, StepInfo } from "@pipeline/Types";
+import WorkerApp from "@app/WorkerApp";
+
 import Stepper from "@app/components/Stepper";
 import Button from "@app/components/Button";
 
@@ -28,11 +30,38 @@ const Steps = () => {
         currentStep: number;
         platform: Platform | null;
         files: File[];
+        worker: Worker | null;
     }>({
         currentStep: 0,
         platform: null,
         files: [],
+        worker: null,
     });
+
+    useEffect(() => state.worker?.terminate(), []);
+
+    const startGeneration = () => {
+        const worker = new WorkerApp() as Worker;
+        worker.onerror = (e) => {
+            console.log(e);
+            alert("An error ocurred inside the WebWorker, please raise an issue on GitHub.\n\n Error: " + e.message);
+            worker.terminate();
+            // TODO: ui feedback
+        };
+        worker.onmessage = (e: MessageEvent<StepInfo>) => {
+            // TODO: check for completion
+        };
+        // <InitMessage>
+        worker.postMessage({
+            platform: state.platform,
+            files: state.files,
+        });
+        setState({
+            ...state,
+            currentStep: 3,
+            worker,
+        });
+    };
 
     return (
         <div className="Steps">
@@ -62,20 +91,13 @@ const Steps = () => {
                         <Button color={BackColor} onClick={() => setState({ ...state, currentStep: 1, files: [] })}>
                             Back
                         </Button>
-                        <Button
-                            color={NextColor}
-                            disabled={state.files.length === 0}
-                            onClick={() => setState({ ...state, currentStep: 3 })}
-                        >
+                        <Button color={NextColor} disabled={state.files.length === 0} onClick={startGeneration}>
                             Generate report!
                         </Button>
                     </div>
                 </div>
                 <div>
-                    <GenerationProgress platform={state.platform} />
-                    <Button color={NextColor} onClick={() => setState({ ...state, currentStep: 4 })}>
-                        NEXT (TESTING)
-                    </Button>
+                    <GenerationProgress worker={state.worker} />
                 </div>
                 <div>Done step</div>
             </Stepper>

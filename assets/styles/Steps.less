@@ -74,6 +74,7 @@
 .GenerationProgress {
     user-select: none;
     position: relative;
+    /*min-height: 24px * 6;*/
 }
 
 .GenerationProgress__shadow {
@@ -101,10 +102,24 @@
     height: 1.5rem;
     margin-right: 7px;
     border-radius: 10%;
-    background: #3560c8;
+    transition: background-color 0.4s ease;
 
     img {
         width: 1rem;
         height: 1rem;
+    }
+}
+
+.StatusItem__progress {
+    color: #8d8a8a;
+    margin-left: 10px;
+}
+
+.StatusItem {
+    &.StatusItem--status-pending .StatusItem__icon {
+        background: #3560c8;
+    }
+    &.StatusItem--status-success .StatusItem__icon {
+        background: #52c835;
     }
 }
