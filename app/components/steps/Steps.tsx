@@ -2,8 +2,8 @@ import "@assets/styles/Steps.less";
 
 import { useEffect, useState } from "react";
 
-import { Platform, StepInfo } from "@pipeline/Types";
-import WorkerApp from "@app/WorkerApp";
+import { Platform } from "@pipeline/Types";
+import WorkerApp, { ReportResult } from "@app/WorkerApp";
 
 import Stepper from "@app/components/Stepper";
 import Button from "@app/components/Button";
@@ -12,6 +12,7 @@ import PlatformSelect from "./PlatformSelect";
 import ExportInstructions from "./ExportInstructions";
 import FilesSelect from "./FilesSelect";
 import GenerationProgress from "./GenerationProgress";
+import ViewDownloadReport from "./ViewDownloadReport";
 
 // prettier-ignore
 const StepTitles = [
@@ -31,11 +32,13 @@ const Steps = () => {
         platform: Platform | null;
         files: File[];
         worker: Worker | null;
+        result: Blob | null;
     }>({
         currentStep: 0,
         platform: null,
         files: [],
         worker: null,
+        result: null,
     });
 
     useEffect(() => state.worker?.terminate(), []);
@@ -48,8 +51,20 @@ const Steps = () => {
             worker.terminate();
             // TODO: ui feedback
         };
-        worker.onmessage = (e: MessageEvent<StepInfo>) => {
-            // TODO: check for completion
+        worker.onmessage = (e: MessageEvent<ReportResult>) => {
+            const data = e.data;
+            if (data.type === "result") {
+                worker.terminate();
+                // give a small delay
+                setTimeout(() => {
+                    setState({
+                        ...state,
+                        currentStep: 4,
+                        worker: null,
+                        result: data.blob,
+                    });
+                }, 1000);
+            }
         };
         // <InitMessage>
         worker.postMessage({
@@ -96,10 +111,8 @@ const Steps = () => {
                         </Button>
                     </div>
                 </div>
-                <div>
-                    <GenerationProgress worker={state.worker} />
-                </div>
-                <div>Done step</div>
+                <GenerationProgress worker={state.worker} />
+                <ViewDownloadReport blob={state.result} />
             </Stepper>
         </div>
     );

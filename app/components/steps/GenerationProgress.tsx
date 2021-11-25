@@ -43,40 +43,43 @@ const GenerationProgress = ({ worker }: Props) => {
     ]);
 
     useEffect(() => {
-        if (worker) {
-            worker.onmessage = (e: MessageEvent<StepInfo>) => {
-                const data = e.data;
-                if (!(data.type === "new" || data.type === "progress" || data.type === "done")) {
-                    return;
+        if (worker === null) return;
+
+        const oldonmessage = worker.onmessage?.bind(worker);
+        worker.onmessage = (e: MessageEvent<StepInfo>) => {
+            if (oldonmessage) oldonmessage(e);
+
+            const data = e.data;
+            if (!["new", "progress", "done"].includes(data.type)) return;
+
+            setItems((prevState: ItemInfo[]) => {
+                const newItems = [...prevState];
+                if (data.type === "new") {
+                    newItems.push({
+                        status: "pending",
+                        title: data.title,
+                        progress: data.total != undefined ? [0, data.total] : undefined,
+                    });
+                } else if (data.type === "progress") {
+                    const last = prevState[prevState.length - 1];
+                    newItems.splice(-1);
+                    newItems.push({
+                        ...last,
+                        progress: [data.progress, last.progress![1]],
+                    });
+                } else if (data.type === "done") {
+                    const last = prevState[prevState.length - 1];
+                    newItems.splice(-1);
+                    newItems.push({
+                        ...last,
+                        status: "success",
+                    });
                 }
-                setItems((prevState: ItemInfo[]) => {
-                    const newItems = [...prevState];
-                    if (data.type === "new") {
-                        newItems.push({
-                            status: "pending",
-                            title: data.title,
-                            progress: data.total != undefined ? [0, data.total] : undefined,
-                        });
-                    } else if (data.type === "progress") {
-                        const last = prevState[prevState.length - 1];
-                        newItems.splice(-1);
-                        newItems.push({
-                            ...last,
-                            progress: [data.progress, last.progress![1]],
-                        });
-                    } else if (data.type === "done") {
-                        const last = prevState[prevState.length - 1];
-                        newItems.splice(-1);
-                        newItems.push({
-                            ...last,
-                            status: "success",
-                        });
-                    }
-                    return newItems;
-                });
-            };
-        }
+                return newItems;
+            });
+        };
     }, [worker]);
+
     return (
         <div className="GenerationProgress">
             {items.slice(-6).map((item, index) => (

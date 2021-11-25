@@ -11,7 +11,12 @@ export interface InitMessage {
     files: File[];
 }
 
-async function* run(msg: InitMessage): AsyncGenerator<StepInfo> {
+export interface ReportResult {
+    type: "result";
+    blob: Blob;
+}
+
+async function* run(msg: InitMessage): AsyncGenerator<StepInfo | ReportResult> {
     //
     // 1. Parse files
     //
@@ -46,6 +51,8 @@ async function* run(msg: InitMessage): AsyncGenerator<StepInfo> {
     // 2. Preprocess database
     //
     console.log(database);
+
+    yield { type: "result", blob: new Blob([JSON.stringify(database)], { type: "text/html" }) };
 }
 
 self.onmessage = async (ev: MessageEvent<InitMessage>) => {
