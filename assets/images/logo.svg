@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="47.903461mm"
+   height="47.78437mm"
+   viewBox="0 0 47.903462 47.784371"
+   version="1.1"
+   id="svg5"
+   inkscape:version="1.1.1 (3bf5ae0d25, 2021-09-20)"
+   sodipodi:docname="logo.svg"
+   inkscape:export-filename="C:\Users\mlomb\Desktop\chats-analyzer\assets\public\favicon.png"
+   inkscape:export-xdpi="96"
+   inkscape:export-ydpi="96"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview7"
+     pagecolor="#1c232b"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="0"
+     inkscape:document-units="mm"
+     showgrid="false"
+     inkscape:zoom="7.2407736"
+     inkscape:cx="85.142836"
+     inkscape:cy="151.5722"
+     inkscape:window-width="2560"
+     inkscape:window-height="1377"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs2" />
+  <g
+     inkscape:label="Capa 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-13.257733,-1.7939962)">
+    <path
+       style="fill:#ffffff;stroke:#ffffff;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 14.609999,16.453719 V 28.786193"
+       id="path259" />
+    <path
+       style="fill:none;stroke:#ffffff;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 14.609999,28.786193 c 0.846116,12.89119 11.589685,11.589684 11.589685,11.589684 H 41.767 m 5.865352,0 h 1.442316 c 0,0 10.765155,0.579821 10.705015,-10.90702 -0.06014,-11.48684 0,-14.193164 0,-14.193164"
+       id="path261"
+       sodipodi:nodetypes="cccccsc" />
+    <path
+       style="fill:none;stroke:#ffffff;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 14.609999,16.453719 25.643041,7.3994845 31.936856,11.949742 42.865979,3.0618557 55.411081,17.563144 59.779682,15.275693 v 0"
+       id="path380" />
+    <path
+       style="fill:none;stroke:#ffffff;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 20.795103,23.601804 21.560566,0.04253"
+       id="path382" />
+    <path
+       style="fill:none;stroke:#ffffff;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 46.565722,23.601804 6.591495,0.08505"
+       id="path384" />
+    <path
+       style="fill:none;stroke:#ffffff;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 21.645618,28.875 c 31.001289,0.21263 31.001289,0.21263 31.001289,0.21263"
+       id="path386" />
+    <path
+       style="fill:none;stroke:#ffffff;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 21.73067,32.78737 c 24.707475,0 24.707475,0 24.707475,0"
+       id="path388" />
+    <circle
+       style="fill:#ff0000;fill-rule:evenodd;stroke:#ffffff;stroke-width:0.264583"
+       id="path472"
+       cx="25.64304"
+       cy="7.3994842"
+       r="1.0327053" />
+    <circle
+       style="fill:#ff0000;fill-rule:evenodd;stroke:#ffffff;stroke-width:0.264583"
+       id="path474"
+       cy="11.949741"
+       cx="31.936857"
+       r="0.75722617" />
+    <circle
+       style="fill:#ff0000;fill-rule:evenodd;stroke:#ffffff;stroke-width:0.264583"
+       id="path476"
+       cx="42.865978"
+       cy="3.0618556"
+       r="1.1355679" />
+    <ellipse
+       style="fill:#ff0000;fill-rule:evenodd;stroke:#ffffff;stroke-width:0.264583"
+       id="path480"
+       cx="55.411079"
+       cy="17.563143"
+       rx="1.2930194"
+       ry="1.2629519" />
+    <ellipse
+       style="fill:#ff0000;fill-rule:evenodd;stroke:#ffffff;stroke-width:0.264583"
+       id="path482"
+       cx="59.779682"
+       cy="15.275693"
+       rx="1.2492205"
+       ry="1.2755942" />
+    <circle
+       style="fill:#ff0000;fill-rule:evenodd;stroke:#ffffff;stroke-width:0.264583"
+       id="path484"
+       cx="14.609999"
+       cy="16.453718"
+       r="1.2199744" />
+    <path
+       style="fill:none;stroke:#ffffff;stroke-width:0.31314px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 41.753035,40.445569 47.8827,49.085611 47.864051,40.28775"
+       id="path601" />
+  </g>
+</svg>

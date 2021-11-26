@@ -22,6 +22,10 @@ ol {
     padding: 0 1.8em;
 }
 
+li::marker {
+    color: #a985ff;
+}
+
 .Container {
     position: absolute;
     top: 0;
@@ -49,4 +53,13 @@ ol {
     top: 0;
     z-index: -1;
     user-select: none;
+}
+
+.Logo {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    transform: translateX(-50%);
+    user-select: none;
+    z-index: 0;
 }

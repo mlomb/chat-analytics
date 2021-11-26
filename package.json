@@ -18,6 +18,7 @@
     "@types/wink-tokenizer": "^4.0.3",
     "autoprefixer": "^10.4.0",
     "compress-json": "^1.0.5",
+    "copy-webpack-plugin": "^10.0.0",
     "css-loader": "^6.5.1",
     "cssnano": "^5.0.9",
     "html-inline-css-webpack-plugin": "^1.11.1",

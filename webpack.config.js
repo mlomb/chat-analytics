@@ -1,5 +1,6 @@
 const path = require("path");
 const webpack = require("webpack");
+const CopyPlugin = require("copy-webpack-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const HTMLInlineCSSWebpackPlugin = require("html-inline-css-webpack-plugin").default;
@@ -85,6 +86,9 @@ module.exports = (env) => {
                     isProd: JSON.stringify(isProd),
                     isDev: JSON.stringify(!isProd),
                 },
+            }),
+            new CopyPlugin({
+                patterns: [resolve("assets/public")],
             }),
         ].concat(
             isProd

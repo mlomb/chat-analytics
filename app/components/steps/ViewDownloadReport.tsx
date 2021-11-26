@@ -30,9 +30,9 @@ const ViewDownloadReport = ({ result }: Props) => {
                 <div className="ViewDownloadReport__stats">
                     Your report <b>"{result.title}"</b> is ready!
                     <br />
-                    It contains <b>{result.counts.messages}</b> message{ts(result.counts.messages)} from{" "}
-                    <b>{result.counts.authors}</b> author{ts(result.counts.authors)} in <b>{result.counts.channels}</b>{" "}
-                    channel{ts(result.counts.channels)}.
+                    It contains <b>{result.counts.messages.toLocaleString()}</b> message{ts(result.counts.messages)}{" "}
+                    from <b>{result.counts.authors.toLocaleString()}</b> author{ts(result.counts.authors)} in{" "}
+                    <b>{result.counts.channels.toLocaleString()}</b> channel{ts(result.counts.channels)}.
                 </div>
             )}
             <div className="ViewDownloadReport__buttons">
