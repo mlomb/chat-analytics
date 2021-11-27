@@ -29,10 +29,11 @@
     padding-left: 21px;
     padding-top: 8px;
     border-left: 2px solid #5b5b5b;
-    max-height: 0px;
+    height: 0;
     overflow: hidden;
-    transition: all 0.3s;
+    transition: height 0.3s;
     line-height: 1.5rem;
+    animation-fill-mode: forwards;
 }
 
 .Stepper__entry:last-child .Stepper__content {
@@ -55,7 +56,6 @@
         background: #7640f5;
     }
     .Stepper__content {
-        max-height: 350px;
         padding-top: 10px;
         padding-bottom: 10px;
     }

@@ -5,27 +5,26 @@ interface Props {
     platform: Platform | null;
 }
 
-const ExportInstructions = ({ platform }: Props) => (
-    <div>
-        You need to export the chats you want to analyze.
-        <br />
-        Below you can find official instructions:
-        <br />
-        <ol>
-            <li>Open WhatsApp in your phone and then select the chat you want to analyze.</li>
-            <li>Press the context menu in the top right corner.</li>
-            <li>In the context menu, press "More" and then "Export chat".</li>
-            <li>When asked to export with or without media, select "Without Media".</li>
-            <li>Save the file and transfer it to this device.</li>
-        </ol>
-        <br />
-        For more information about exporting, please visit the{" "}
-        <a href="https://faq.whatsapp.com/android/chats/how-to-save-your-chat-history" target="_blank">
-            official link
-        </a>
-        .
-        <br />
-    </div>
-);
+const ExportInstructions = ({ platform }: Props) => {
+    const platformInfo = Platforms.find((p) => p.platform === platform);
 
+    return (
+        <div className="ExportInstructions">
+            You need to export the chats you want to analyze.
+            <br />
+            <br />
+            Follow these steps to export chats in{" "}
+            <span
+                style={{
+                    color: `hsl(${platformInfo?.color[0]}, ${platformInfo?.color[1]}%, ${platformInfo?.color[2]}%)`,
+                }}
+            >
+                {platformInfo?.title}
+            </span>
+            :
+            <br />
+            {platformInfo?.instructions}
+        </div>
+    );
+};
 export default ExportInstructions;

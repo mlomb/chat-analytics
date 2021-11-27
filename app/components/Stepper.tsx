@@ -1,4 +1,5 @@
 import "@assets/styles/Stepper.less";
+import { useLayoutEffect, useRef } from "react";
 
 import Tick from "@assets/images/tick.svg";
 
@@ -14,6 +15,19 @@ const Stepper = (props: Props) => {
             {props.children.map((child, index) => {
                 const active = props.step === index;
                 const done = index < props.step;
+                const stepContentRef = useRef<HTMLDivElement>(null);
+
+                useLayoutEffect(() => {
+                    const elem = stepContentRef.current!;
+                    if (active) {
+                        // TODO: sometimes scrollHeight is not correct
+                        // and the div results smaller :(
+                        elem.style.height = stepContentRef.current?.scrollHeight + "px";
+                    } else {
+                        elem.style.height = "0px";
+                    }
+                }, [active, stepContentRef]);
+
                 return (
                     <div
                         key={index}
@@ -27,7 +41,9 @@ const Stepper = (props: Props) => {
                             <div className="Stepper__number">{done ? <img src={Tick} /> : index + 1}</div>
                             {props.stepTitles[index]}
                         </div>
-                        <div className={"Stepper__content"}>{child}</div>
+                        <div ref={stepContentRef} className={"Stepper__content"}>
+                            {child}
+                        </div>
                     </div>
                 );
             })}

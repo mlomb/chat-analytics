@@ -87,7 +87,7 @@ const Steps = () => {
                     <div className="Steps__nav">
                         <Button
                             color={BackColor}
-                            onClick={() => setState({ ...state, currentStep: 0, platform: null })}
+                            onClick={() => setState({ ...state, currentStep: 0 /*, platform: null*/ })}
                         >
                             Back
                         </Button>
