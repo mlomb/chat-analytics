@@ -7,6 +7,8 @@ const HTMLInlineCSSWebpackPlugin = require("html-inline-css-webpack-plugin").def
 
 const resolve = (file) => path.resolve(__dirname, file);
 
+const notInline = [/Platforms.tsx$/];
+
 module.exports = (env) => {
     const isProd = env.production == true;
     console.log("isProd:", isProd);
@@ -49,10 +51,24 @@ module.exports = (env) => {
                 },
                 {
                     test: /\.(svg|png|jpe?g|gif|mp4)$/,
+                    loader: "file-loader",
+                    options: {
+                        name: "[hash:8].[ext]",
+                    },
+                    issuer: {
+                        // force NOT inline the following issuers
+                        and: notInline,
+                    },
+                },
+                {
+                    test: /\.(svg|png|jpe?g|gif|mp4)$/,
                     loader: "url-loader",
                     options: {
-                        limit: 2 ** 16,
+                        limit: 2 ** 16, // inline everything
                         name: "[hash:8].[ext]",
+                    },
+                    issuer: {
+                        not: notInline,
                     },
                 },
             ],
