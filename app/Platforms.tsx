@@ -6,6 +6,10 @@ import DiscordLogo from "@assets/images/logos/discord.svg";
 import TelegramLogo from "@assets/images/logos/telegram.svg";
 import WhatsAppLogo from "@assets/images/logos/whatsapp.svg";
 
+import DiscordFormat from "@assets/images/instructions/discord_format.png";
+import DiscordExport from "@assets/images/instructions/discord_export.gif";
+import DiscordChannels from "@assets/images/instructions/discord_channels.png";
+
 import TelegramTreeDots from "@assets/images/instructions/telegram_dots.png";
 import TelegramNoMedia from "@assets/images/instructions/telegram_no_media.png";
 import TelegramFormat from "@assets/images/instructions/telegram_format.png";
@@ -15,6 +19,45 @@ import WhatsAppThreeDots from "@assets/images/instructions/whatsapp_dots.png";
 import WhatsAppIOSNoMedia from "@assets/images/instructions/whatsapp_ios_no_media.png";
 import WhatsAppAndroidNoMedia from "@assets/images/instructions/whatsapp_android_no_media.png";
 import WhatsAppIOSExport from "@assets/images/instructions/whatsapp_ios_export.png";
+
+const DiscordInstructions = () => {
+    return (
+        <>
+            <ol>
+                <li>
+                    Download the latest version of{" "}
+                    <a href="https://github.com/Tyrrrz/DiscordChatExporter/releases/latest" target="_blank">
+                        DiscordChatExporter
+                    </a>
+                    . You will need a Windows PC or use the CLI.
+                </li>
+                <li>
+                    You will have to obtain a bot token or use your account's token. Refer to{" "}
+                    <a
+                        href="https://github.com/Tyrrrz/DiscordChatExporter/wiki/GUI%2C-CLI-and-Formats-explained#using-the-gui"
+                        target="_blank"
+                    >
+                        this guide
+                    </a>{" "}
+                    for more information.
+                </li>
+                <li>
+                    Select the channels you want to export.
+                    <img src={DiscordChannels} height="132" alt="Discord channel selection" />
+                </li>
+                <li>Press the yellow button on the bottom right corner.</li>
+                <li>
+                    Select the format "JSON".
+                    <img src={DiscordFormat} height="64" alt="Discord Export format" />
+                </li>
+                <li>
+                    Go ahead and <b>click Export</b>.
+                    <img src={DiscordExport} height="42" alt="Discord Export button" />
+                </li>
+            </ol>
+        </>
+    );
+};
 
 const TelegramInstructions = () => (
     <>
@@ -40,7 +83,7 @@ const TelegramInstructions = () => (
             </li>
             <li>
                 <b>Unselect all boxes</b>, media files are not analyzed.
-                <img src={TelegramNoMedia} height="272" alt="No media files" />
+                <img src={TelegramNoMedia} height="190" alt="No media files" />
             </li>
             <li>
                 Change the format to <b>Machine-readable JSON</b>.
@@ -125,7 +168,7 @@ export const Platforms: {
         color: [235, 86, 65],
         defaultFilename: "<guild> - <channel> [ID].json",
         logo: <img src={DiscordLogo} alt="Discord" />,
-        instructions: <>No</>,
+        instructions: <DiscordInstructions />,
     },
     {
         platform: "telegram",
