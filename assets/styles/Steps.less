@@ -25,8 +25,26 @@
 .ExportInstructions {
     li img {
         display: block;
-        border-radius: 8px;
+        border-radius: 5px;
         margin: 8px auto;
+    }
+
+    .DeviceButton {
+        background: none;
+        color: #25d466;
+        border: 2px solid #25d466;
+        border-radius: 5px;
+        padding: 4px;
+        font-size: 14px;
+        font-family: inherit;
+        margin: 5px 7px 5px 0;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    .DeviceButton--active {
+        background: #05b947;
+        border-color: #05b947;
+        color: #fff;
     }
 }
 
