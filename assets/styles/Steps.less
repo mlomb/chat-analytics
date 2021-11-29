@@ -1,10 +1,8 @@
 .Steps {
     width: 100%;
-    max-width: 550px;
     background-color: #26303b;
     padding: 15px;
-    border-radius: 8px;
-    box-shadow: 0 14px 30px 0 rgb(0 0 0 / 10%);
+    margin-bottom: 4vh;
 }
 
 .Steps__nav {
@@ -16,17 +14,26 @@
     }
 }
 
+@media (min-width: 600px) {
+    .Steps {
+        width: 550px;
+        border-radius: 8px;
+        box-shadow: 0 14px 30px 0 rgb(0 0 0 / 10%);
+    }
+}
+
 .PlatformSelect__buttons {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
     grid-gap: 10px;
 }
 
 .ExportInstructions {
     li img {
         display: block;
-        border-radius: 5px;
+        max-width: 100%;
         margin: 8px auto;
+        border-radius: 5px;
     }
 
     .DeviceButton {
@@ -89,7 +96,7 @@
     border-color: #ffffff91;
 }
 
-.FilesSelect__clear {
+.Button.FilesSelect__clear {
     height: 25px;
     padding: 0 10px;
     margin-left: 8px;

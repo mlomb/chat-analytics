@@ -12,16 +12,21 @@ const HomePage = () => {
 
     return (
         <>
-            <img className="Logo" src={Logo} alt="" />
-            <div className={"Container" + (showLanding ? " Container--visible" : "")}>
-                <Landing onStart={() => setShowLanding(false)} />
-            </div>
-            <div className={"Container" + (showLanding ? "" : " Container--visible")}>
+            <div className="Container">
+                <img className="Container__logo" src={Logo} alt="chatstbdtbd.app logo" />
                 <Steps />
             </div>
-            <img className="Waves" src={Waves} alt="" />
         </>
     );
 };
 
 export default HomePage;
+/*
+            <div className={"Container" + (showLanding ? " Container--visible" : "")}>
+                <Landing onStart={() => setShowLanding(false)} />
+            </div>
+            <div className={"Container" + (showLanding ? "" : " Container--visible")}>
+            </div>
+            
+<img className="Waves" src={Waves} alt="" />
+*/

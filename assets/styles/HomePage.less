@@ -19,13 +19,31 @@ a {
 }
 
 ol {
-    padding: 0 1.8em;
+    padding: 0 1.4em;
+}
+
+@media (min-width: 450px) {
+    ol {
+        padding: 0 1.8em;
+    }
 }
 
 li::marker {
     color: #a985ff;
 }
 
+.Container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.Container__logo {
+    height: 60px;
+    margin: 3vh 0px 2vh 0px;
+}
+
+/*
 .Container {
     position: absolute;
     top: 0;
@@ -47,7 +65,7 @@ li::marker {
     pointer-events: all;
 }
 
-/* TODO: move to background or smth */
+/* TODO: move to background or smth * /
 .Waves {
     position: absolute;
     top: 0;
@@ -63,3 +81,4 @@ li::marker {
     user-select: none;
     z-index: 0;
 }
+*/

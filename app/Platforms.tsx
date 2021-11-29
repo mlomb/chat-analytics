@@ -43,16 +43,16 @@ const DiscordInstructions = () => {
                 </li>
                 <li>
                     Select the channels you want to export.
-                    <img src={DiscordChannels} height="132" alt="Discord channel selection" />
+                    <img src={DiscordChannels} alt="Discord channel selection" />
                 </li>
                 <li>Press the yellow button on the bottom right corner.</li>
                 <li>
                     Select the format "JSON".
-                    <img src={DiscordFormat} height="64" alt="Discord Export format" />
+                    <img src={DiscordFormat} alt="Discord Export format" />
                 </li>
                 <li>
                     Go ahead and <b>click Export</b>.
-                    <img src={DiscordExport} height="42" alt="Discord Export button" />
+                    <img src={DiscordExport} alt="Discord Export button" />
                 </li>
             </ol>
         </>
@@ -76,22 +76,22 @@ const TelegramInstructions = () => (
             </li>
             <li>
                 Go to the chat you intend to analyze and <b>tap on the 3 dots</b> in the top right corner.
-                <img src={TelegramTreeDots} height="42" alt="Three dots at the corner" />
+                <img src={TelegramTreeDots} alt="Three dots at the corner" />
             </li>
             <li>
                 Click on <b>Export chat history</b>.
             </li>
             <li>
                 <b>Unselect all boxes</b>, media files are not analyzed.
-                <img src={TelegramNoMedia} height="190" alt="No media files" />
+                <img src={TelegramNoMedia} alt="No media files" />
             </li>
             <li>
                 Change the format to <b>Machine-readable JSON</b>.
-                <img src={TelegramFormat} height="226" alt="Change export format" />
+                <img src={TelegramFormat} alt="Change export format" />
             </li>
             <li>
                 Go ahead and <b>click Export</b>.
-                <img src={TelegramExport} height="45" alt="Export" />
+                <img src={TelegramExport} alt="Export" />
             </li>
         </ol>
     </>
@@ -124,7 +124,7 @@ const WhatsAppInstructions = () => {
                         </li>
                         <li>
                             <b>Press Export chat</b>.
-                            <img src={WhatsAppIOSExport} height="132" alt="Export chat button in iOS" />
+                            <img src={WhatsAppIOSExport} alt="Export chat button in iOS" />
                         </li>
                     </>
                 )}
@@ -132,7 +132,7 @@ const WhatsAppInstructions = () => {
                     <>
                         <li>
                             Go to the chat you intend to analyze and <b>click on the 3 dots</b> in the top right corner.
-                            <img src={WhatsAppThreeDots} height="42" alt="Three dots at the corner" />
+                            <img src={WhatsAppThreeDots} alt="Three dots at the corner" />
                         </li>
                         <li>
                             In the context menu, <b>press More</b> and then <b>Export chat</b>.
@@ -144,7 +144,6 @@ const WhatsAppInstructions = () => {
                     analyzed.
                     <img
                         src={device === "ios" ? WhatsAppIOSNoMedia : WhatsAppAndroidNoMedia}
-                        height="110"
                         alt="Select Without Media"
                     />
                 </li>

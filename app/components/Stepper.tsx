@@ -24,6 +24,7 @@ const Stepper = (props: Props) => {
                         // and the div results smaller :(
                         // TODO: on resize
                         elem.style.height = stepContentRef.current?.scrollHeight + "px";
+                        elem.style.height = "auto";
                     } else {
                         elem.style.height = "0px";
                     }
