@@ -1,11 +1,12 @@
 import "@assets/styles/Stepper.less";
-import { useLayoutEffect, useRef } from "react";
+import React, { useLayoutEffect, useRef } from "react";
 
 import Tick from "@assets/images/tick.svg";
 
 interface Props {
     step: number;
     stepTitles: string[];
+    stepMaxHeights: number[];
     children: JSX.Element[];
 }
 
@@ -15,20 +16,6 @@ const Stepper = (props: Props) => {
             {props.children.map((child, index) => {
                 const active = props.step === index;
                 const done = index < props.step;
-                const stepContentRef = useRef<HTMLDivElement>(null);
-
-                useLayoutEffect(() => {
-                    const elem = stepContentRef.current!;
-                    if (active) {
-                        // TODO: sometimes scrollHeight is not correct
-                        // and the div results smaller :(
-                        // TODO: on resize
-                        elem.style.height = stepContentRef.current?.scrollHeight + "px";
-                        elem.style.height = "auto";
-                    } else {
-                        elem.style.height = "0px";
-                    }
-                }, [active, stepContentRef]);
 
                 return (
                     <div
@@ -38,13 +25,20 @@ const Stepper = (props: Props) => {
                             (active ? " Stepper__entry--active" : "") +
                             (done ? " Stepper__entry--done" : "")
                         }
+                        style={
+                            {
+                                "--max-height": `${props.stepMaxHeights[index]}px`,
+                            } as React.CSSProperties
+                        }
                     >
                         <div className="Stepper__label">
                             <div className="Stepper__number">{done ? <img src={Tick} /> : index + 1}</div>
                             {props.stepTitles[index]}
                         </div>
-                        <div ref={stepContentRef} className={"Stepper__content"}>
-                            {child}
+                        <div className={"Stepper__content"}>
+                            <fieldset disabled={!active}>
+                                <div className={"Stepper__inner"}>{child}</div>
+                            </fieldset>
                         </div>
                     </div>
                 );

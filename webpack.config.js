@@ -9,6 +9,13 @@ const resolve = (file) => path.resolve(__dirname, file);
 
 const notInline = [/Platforms.tsx$/];
 
+let commitHash = "unknown";
+try {
+    commitHash = require("child_process").execSync("git rev-parse --short HEAD").toString().trim();
+} catch (e) {
+    console.log("Can't run git");
+}
+
 module.exports = (env) => {
     const isProd = env.production == true;
     console.log("isProd:", isProd);
@@ -101,6 +108,10 @@ module.exports = (env) => {
                 env: {
                     isProd: JSON.stringify(isProd),
                     isDev: JSON.stringify(!isProd),
+                    build: JSON.stringify({
+                        hash: commitHash,
+                        date: new Date().toISOString(),
+                    }),
                 },
             }),
             new CopyPlugin({

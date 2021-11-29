@@ -22,6 +22,7 @@ const StepTitles = [
     "Generate report",
     "View/Download report"
 ];
+const StepMaxHeights = [360, 1300, 400, 300, 420];
 
 const BackColor: [number, number, number] = [216, 10, 10];
 const NextColor: [number, number, number] = [258, 90, 61];
@@ -80,7 +81,7 @@ const Steps = () => {
 
     return (
         <div className="Steps">
-            <Stepper step={state.currentStep} stepTitles={StepTitles}>
+            <Stepper step={state.currentStep} stepTitles={StepTitles} stepMaxHeights={StepMaxHeights}>
                 <PlatformSelect pickPlatform={(p) => setState({ ...state, currentStep: 1, platform: p })} />
                 <div>
                     <ExportInstructions platform={state.platform} />

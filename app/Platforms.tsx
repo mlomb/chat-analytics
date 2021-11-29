@@ -43,16 +43,16 @@ const DiscordInstructions = () => {
                 </li>
                 <li>
                     Select the channels you want to export.
-                    <img src={DiscordChannels} alt="Discord channel selection" />
+                    <img src={DiscordChannels} />
                 </li>
                 <li>Press the yellow button on the bottom right corner.</li>
                 <li>
                     Select the format "JSON".
-                    <img src={DiscordFormat} alt="Discord Export format" />
+                    <img src={DiscordFormat} />
                 </li>
                 <li>
                     Go ahead and <b>click Export</b>.
-                    <img src={DiscordExport} alt="Discord Export button" />
+                    <img src={DiscordExport} />
                 </li>
             </ol>
         </>
@@ -76,22 +76,22 @@ const TelegramInstructions = () => (
             </li>
             <li>
                 Go to the chat you intend to analyze and <b>tap on the 3 dots</b> in the top right corner.
-                <img src={TelegramTreeDots} alt="Three dots at the corner" />
+                <img src={TelegramTreeDots} />
             </li>
             <li>
                 Click on <b>Export chat history</b>.
             </li>
             <li>
                 <b>Unselect all boxes</b>, media files are not analyzed.
-                <img src={TelegramNoMedia} alt="No media files" />
+                <img src={TelegramNoMedia} />
             </li>
             <li>
                 Change the format to <b>Machine-readable JSON</b>.
-                <img src={TelegramFormat} alt="Change export format" />
+                <img src={TelegramFormat} />
             </li>
             <li>
                 Go ahead and <b>click Export</b>.
-                <img src={TelegramExport} alt="Export" />
+                <img src={TelegramExport} />
             </li>
         </ol>
     </>
@@ -124,7 +124,7 @@ const WhatsAppInstructions = () => {
                         </li>
                         <li>
                             <b>Press Export chat</b>.
-                            <img src={WhatsAppIOSExport} alt="Export chat button in iOS" />
+                            <img src={WhatsAppIOSExport} />
                         </li>
                     </>
                 )}
@@ -132,7 +132,7 @@ const WhatsAppInstructions = () => {
                     <>
                         <li>
                             Go to the chat you intend to analyze and <b>click on the 3 dots</b> in the top right corner.
-                            <img src={WhatsAppThreeDots} alt="Three dots at the corner" />
+                            <img src={WhatsAppThreeDots} />
                         </li>
                         <li>
                             In the context menu, <b>press More</b> and then <b>Export chat</b>.
@@ -142,10 +142,7 @@ const WhatsAppInstructions = () => {
                 <li>
                     When asked to export with or without media, <b>select Without Media</b>. Media files are not
                     analyzed.
-                    <img
-                        src={device === "ios" ? WhatsAppIOSNoMedia : WhatsAppAndroidNoMedia}
-                        alt="Select Without Media"
-                    />
+                    <img src={device === "ios" ? WhatsAppIOSNoMedia : WhatsAppAndroidNoMedia} />
                 </li>
                 <li>Save the file and transfer it to this device, you will need it for the next step.</li>
             </ol>

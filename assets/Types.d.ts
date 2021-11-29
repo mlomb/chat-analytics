@@ -13,4 +13,8 @@ declare module "*.gif" {
 declare const env: {
     isProd: boolean;
     isDev: boolean;
+    build: {
+        hash: string;
+        date: string;
+    };
 };
