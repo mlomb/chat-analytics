@@ -36,11 +36,11 @@ const ViewDownloadReport = ({ result }: Props) => {
                 </div>
             )}
             <div className="ViewDownloadReport__buttons">
-                <Button color={[258, 90, 61]} href={url} download={result?.title + ".html"}>
+                <Button hueColor={[258, 90, 61]} href={url} download={result?.title + ".html"}>
                     <img src={Download} alt="Download" />
                     Download ({prettyBytes(result?.blob.size || 0)})
                 </Button>
-                <Button color={[244, 90, 61]} href={url} target="_blank">
+                <Button hueColor={[244, 90, 61]} href={url} target="_blank">
                     <img src={LinkOut} alt="Link out" />
                     View Locally
                 </Button>

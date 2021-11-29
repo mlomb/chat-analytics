@@ -86,12 +86,12 @@ const Steps = () => {
                     <ExportInstructions platform={state.platform} />
                     <div className="Steps__nav">
                         <Button
-                            color={BackColor}
+                            hueColor={BackColor}
                             onClick={() => setState({ ...state, currentStep: 0 /*, platform: null*/ })}
                         >
                             Back
                         </Button>
-                        <Button color={NextColor} onClick={() => setState({ ...state, currentStep: 2 })}>
+                        <Button hueColor={NextColor} onClick={() => setState({ ...state, currentStep: 2 })}>
                             Continue
                         </Button>
                     </div>
@@ -103,10 +103,10 @@ const Steps = () => {
                         onFilesUpdate={(files) => setState({ ...state, files })}
                     />
                     <div className="Steps__nav">
-                        <Button color={BackColor} onClick={() => setState({ ...state, currentStep: 1, files: [] })}>
+                        <Button hueColor={BackColor} onClick={() => setState({ ...state, currentStep: 1, files: [] })}>
                             Back
                         </Button>
-                        <Button color={NextColor} disabled={state.files.length === 0} onClick={startGeneration}>
+                        <Button hueColor={NextColor} disabled={state.files.length === 0} onClick={startGeneration}>
                             Generate report!
                         </Button>
                     </div>

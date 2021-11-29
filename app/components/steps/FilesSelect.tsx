@@ -101,7 +101,7 @@ const FilesSelect = ({ platform, files, onFilesUpdate }: Props) => {
                     )}
                     <Button
                         className="FilesSelect__clear"
-                        color={[0, 50, 50]}
+                        hueColor={[0, 50, 50]}
                         onClick={onClear}
                         disabled={files.length === 0}
                     >

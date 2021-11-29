@@ -41,13 +41,13 @@ const Landing = ({ onStart }: Props) => {
                 </div>
             </div>
             <div className="Landing__buttons">
-                <Button color={[258, 90, 61]} className="Landing_cta" onClick={onStart}>
+                <Button hueColor={[258, 90, 61]} className="Landing_cta" onClick={onStart}>
                     Generate a report
                 </Button>
-                <Button color={[244, 90, 61]} href="/demo" target="_blank">
+                <Button hueColor={[244, 90, 61]} href="/demo" target="_blank">
                     View Demo
                 </Button>
-                <Button color={[207, 23, 8]} href="https://github.com" target="_blank">
+                <Button hueColor={[207, 23, 8]} href="https://github.com" target="_blank">
                     <img src={GitHub} alt="GitHub" />
                     GitHub
                 </Button>

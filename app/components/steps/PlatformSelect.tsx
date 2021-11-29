@@ -10,7 +10,7 @@ interface Props {
 const PlatformSelect = ({ pickPlatform }: Props) => (
     <div className="PlatformSelect__buttons">
         {Platforms.map((p) => (
-            <Button key={p.platform} color={p.color} onClick={() => pickPlatform(p.platform)}>
+            <Button key={p.platform} hueColor={p.color} onClick={() => pickPlatform(p.platform)}>
                 {p.logo}
                 {p.title}
             </Button>
