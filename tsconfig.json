@@ -4,7 +4,6 @@
     "module": "commonjs",
     "sourceMap": true,
     "jsx": "react-jsx",
-    "jsxImportSource": "@emotion/react",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,

@@ -1,7 +1,6 @@
 import "@assets/styles/Button.less";
 
 import { HTMLAttributeAnchorTarget, ReactNode } from "react";
-import { css } from "@emotion/react";
 
 interface Props {
     color: [number, number, number];
@@ -17,17 +16,11 @@ interface Props {
 const Button = (props: Props) => {
     const [h, s, l] = props.color;
 
-    const cssStyles = [
-        css`
-            background-color: hsl(${h}, ${s}%, ${l}%);
-            &:hover {
-                background-color: hsl(${h}, ${s}%, ${l - 5}%);
-            }
-            &:disabled {
-                background-color: hsl(${h}, 0%, ${l}%);
-            }
-        `,
-    ];
+    const cssStyles = {
+        "--default-color": `hsl(${h}, ${s}%, ${l}%)`,
+        "--hover-color": `hsl(${h}, ${s}%, ${l - 5}%)`,
+        "--disable-color": `hsl(${h}, 0%, ${l}%)`,
+    } as React.CSSProperties;
 
     const classes = ["Button", props.className || ""].join(" ");
 
@@ -36,7 +29,7 @@ const Button = (props: Props) => {
             className={classes}
             href={props.href}
             target={props.target}
-            css={cssStyles}
+            style={cssStyles}
             children={props.children}
             download={props.download}
         />
@@ -44,7 +37,7 @@ const Button = (props: Props) => {
         <button
             className={classes}
             onClick={props.onClick}
-            css={cssStyles}
+            style={cssStyles}
             children={props.children}
             disabled={props.disabled}
         />
