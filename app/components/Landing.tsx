@@ -17,9 +17,11 @@ const Landing = ({ onStart }: Props) => {
             <div className="Landing__title">Generate in-depth chat analysis reports</div>
             <div className="Landing__desc">
                 <div className="Landing__sameline">
-                    Everything is processed in your browser.
-                    <img src={Lock} alt="Lock" />
-                    No data leaves.
+                    <span className="Landing__browser">Everything is processed in your browser.</span>
+                    <span className="Landing__secure">
+                        <img src={Lock} alt="Lock" />
+                        No data leaves.
+                    </span>
                 </div>
                 <br />
                 Free and <span>open source</span>.
@@ -41,7 +43,7 @@ const Landing = ({ onStart }: Props) => {
                 </div>
             </div>
             <div className="Landing__buttons">
-                <Button hueColor={[258, 90, 61]} className="Landing_cta" onClick={onStart}>
+                <Button hueColor={[258, 90, 61]} className="Landing__cta" onClick={onStart}>
                     Generate a report
                 </Button>
                 <Button hueColor={[244, 90, 61]} href="/demo" target="_blank">

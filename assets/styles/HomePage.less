@@ -32,53 +32,17 @@ li::marker {
     color: #a985ff;
 }
 
-.Container {
+@logo-height: 60px;
+@logo-margin-top: 3vh;
+@logo-margin-bottom: 2vh;
+
+.HomePage {
     display: flex;
     flex-direction: column;
     align-items: center;
 }
 
-.Container__logo {
-    height: 60px;
-    margin: 3vh 0px 2vh 0px;
+.HomePage__logo {
+    height: @logo-height;
+    margin: @logo-margin-top 0px @logo-margin-bottom 0px;
 }
-
-/*
-.Container {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
-    transition: opacity 0.3s ease;
-    opacity: 0;
-    pointer-events: none;
-}
-
-.Container--visible {
-    opacity: 1;
-    pointer-events: all;
-}
-
-/* TODO: move to background or smth * /
-.Waves {
-    position: absolute;
-    top: 0;
-    z-index: -1;
-    user-select: none;
-}
-
-.Logo {
-    position: absolute;
-    left: 50%;
-    top: 0;
-    transform: translateX(-50%);
-    user-select: none;
-    z-index: 0;
-}
-*/
