@@ -59,6 +59,18 @@ async function* run(msg: InitMessage): AsyncGenerator<StepInfo | ReportResult> {
     //
     console.log(database);
 
+    // TEMPORAL
+    // GENERATE RANDOM STUFF
+    for (let j = 0; j < 15; j++) {
+        const total = Math.floor(Math.random() * 50);
+        yield { type: "new", title: "thing " + j, total };
+        for (let i = 0; i < total; i++) {
+            yield { type: "progress", progress: i + 1 };
+            await new Promise((resolve) => setTimeout(resolve, Math.random() * 70));
+        }
+        yield { type: "done" };
+    }
+
     const blob = new Blob(["Aqui pondria un reporte si lo hubiera generado"], { type: "text/html" });
 
     yield {

@@ -16,11 +16,21 @@ interface Props {
 const ts = (n: number) => (n === 1 ? "" : "s");
 
 const ViewDownloadReport = ({ result }: Props) => {
-    const [url, setUrl] = useState<string>("");
+    const [file, setFile] = useState<{
+        url: string;
+        filename: string;
+    }>({
+        url: "",
+        filename: "",
+    });
 
     useEffect(() => {
         if (result) {
-            setUrl(URL.createObjectURL(result.blob));
+            const date = new Date();
+            setFile({
+                url: URL.createObjectURL(result.blob),
+                filename: `${result?.title}-${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}.html`,
+            });
         }
     }, [result]);
 
@@ -36,11 +46,11 @@ const ViewDownloadReport = ({ result }: Props) => {
                 </div>
             )}
             <div className="ViewDownloadReport__buttons">
-                <Button hueColor={[258, 90, 61]} href={url} download={result?.title + ".html"}>
+                <Button hueColor={[258, 90, 61]} href={file.url} download={file.filename}>
                     <img src={Download} alt="Download" />
                     Download ({prettyBytes(result?.blob.size || 0)})
                 </Button>
-                <Button hueColor={[244, 90, 61]} href={url} target="_blank">
+                <Button hueColor={[244, 90, 61]} href={file.url} target="_blank">
                     <img src={LinkOut} alt="Link out" />
                     View Locally
                 </Button>

@@ -64,7 +64,7 @@ const Steps = () => {
                         worker: null,
                         result: data,
                     });
-                }, 600);
+                }, 1000);
             }
         };
         // <InitMessage>
