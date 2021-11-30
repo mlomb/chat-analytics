@@ -25,8 +25,8 @@ jobs:
       - run: npm run format-check
 
   deploy:
-    needs: ["build-test", "format-check"]
-    if: success() && github.ref == 'refs/heads/master'
+    needs: build-test
+    if: success() && github.event_name == 'push' && github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
