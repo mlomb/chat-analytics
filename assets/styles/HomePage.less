@@ -32,10 +32,6 @@ li::marker {
     color: #a985ff;
 }
 
-@logo-height: 60px;
-@logo-margin-top: 3vh;
-@logo-margin-bottom: 2vh;
-
 .HomePage {
     display: flex;
     flex-direction: column;
@@ -43,6 +39,8 @@ li::marker {
 }
 
 .HomePage__logo {
-    height: @logo-height;
-    margin: @logo-margin-top 0px @logo-margin-bottom 0px;
+    margin: 3vh 0px 2vh 0px;
+    img {
+        height: 60px;
+    }
 }

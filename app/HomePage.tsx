@@ -11,7 +11,9 @@ const HomePage = () => {
 
     return (
         <div className="HomePage">
-            <img className="HomePage__logo" src={Logo} alt="chatstbdtbd.app logo" />
+            <a href="/" className="HomePage__logo">
+                <img src={Logo} alt="chatstbdtbd.app logo" />
+            </a>
             <div style={{ display: showLanding ? "" : "none" }}>
                 <Landing onStart={() => setShowLanding(false)} />
             </div>

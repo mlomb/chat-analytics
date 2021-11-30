@@ -77,6 +77,12 @@ const Steps = () => {
             currentStep: 3,
             worker,
         });
+
+        // show usaved progress before leaving
+        window.addEventListener("beforeunload", (event) => {
+            // This message is never shown really.
+            event.returnValue = `Are you sure you want to leave?`;
+        });
     };
 
     return (
