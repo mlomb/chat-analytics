@@ -1,5 +1,0 @@
-name = "chats-analyzer"
-zone_id = "981082fe8038327986cbafc5c785a7c5"
-
-[site]
-bucket = "./dist"
