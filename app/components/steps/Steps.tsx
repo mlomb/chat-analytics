@@ -48,9 +48,8 @@ const Steps = () => {
         const worker = new WorkerApp() as Worker;
         worker.onerror = (e) => {
             console.log(e);
-            alert("An error ocurred inside the WebWorker, please raise an issue on GitHub.\n\n Error: " + e.message);
+            alert("An error ocurred creating the WebWorker.\n\n Error: " + e.message);
             worker.terminate();
-            // TODO: ui feedback
         };
         worker.onmessage = (e: MessageEvent<ReportResult>) => {
             const data = e.data;
@@ -79,10 +78,12 @@ const Steps = () => {
         });
 
         // show usaved progress before leaving
-        window.addEventListener("beforeunload", (event) => {
-            // This message is never shown really.
-            event.returnValue = `Are you sure you want to leave?`;
-        });
+        if (env.isProd) {
+            window.addEventListener("beforeunload", (event) => {
+                // This message is never shown really.
+                event.returnValue = `Are you sure you want to leave?`;
+            });
+        }
     };
 
     return (

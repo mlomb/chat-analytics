@@ -87,9 +87,20 @@ async function* run(msg: InitMessage): AsyncGenerator<StepInfo | ReportResult> {
 }
 
 self.onmessage = async (ev: MessageEvent<InitMessage>) => {
-    const gen = run(ev.data);
-    for await (const packet of gen) {
-        self.postMessage(packet);
+    try {
+        const gen = run(ev.data);
+        for await (const packet of gen) {
+            self.postMessage(packet);
+        }
+    } catch (ex) {
+        // handle exceptions
+        if (ex instanceof Error) {
+            self.postMessage({ type: "error", error: ex.message });
+        } else {
+            self.postMessage({ type: "error", error: ex + "" });
+        }
+        console.log("Error ahead ↓");
+        console.error(ex);
     }
 };
 

@@ -16,5 +16,9 @@ export interface ProgressStep {
 export interface DoneStep {
     type: "done";
 }
+export interface ErrorStep {
+    type: "error";
+    error: string;
+}
 
-export type StepInfo = NewStep | ProgressStep | DoneStep;
+export type StepInfo = NewStep | ProgressStep | DoneStep | ErrorStep;
