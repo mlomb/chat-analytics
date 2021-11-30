@@ -1,0 +1,44 @@
+<!doctype html>
+<html>
+<head>
+<title>404</title>
+<style>
+body {
+    background-color: #1c232b;
+    color: #fff;
+    font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,Noto Sans,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji;
+    overflow: hidden;
+}
+a {
+    color: #44dae9;
+    text-decoration: none;
+}
+.center {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    text-align: center;
+}
+.report {
+    display: none;
+}
+</style>
+</head>
+<body>
+<div class="center">
+<h1>404 Not Found</h1>
+<p class="report">
+It looks like someone tried to share with you a chat analysis report.<br/>
+We <b>do not store</b> reports for privacy reasons, please ask your friend to send you the HTML file of the report.<br/>
+</p>
+<p><a href="/">Go back to home page</a></p>
+<script>
+if(window.location.pathname.length === 37) { // "/043b77c5-04ac-42c2-80d2-e3a7aa2f4651"
+    document.querySelector('.report').style.display = 'block';
+}
+</script>
+</div>
+</body>
+</html>
