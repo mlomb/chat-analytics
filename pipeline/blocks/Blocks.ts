@@ -1,5 +1,6 @@
-import { Report } from "@pipeline/Analyzer";
 import { process } from "./MessagesPerCycle";
+
+interface Report {}
 
 export type BlockState = "no-data" | "ready" | "stale" | "loading" | "error";
 

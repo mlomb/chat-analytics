@@ -4,6 +4,15 @@ export type Timestamp = number;
 
 export type Platform = "discord" | "telegram" | "whatsapp";
 
+export interface FileInput {
+    name: string;
+    text(): Promise<string>;
+}
+
+export interface ReportConfig {
+    platform: Platform;
+}
+
 export interface NewStep {
     type: "new";
     title: string;
@@ -20,5 +29,16 @@ export interface ErrorStep {
     type: "error";
     error: string;
 }
+export interface ReportResult {
+    type: "result";
+    title: string;
+    html: string;
+    time: number;
+    counts: {
+        authors: number;
+        channels: number;
+        messages: number;
+    };
+}
 
-export type StepInfo = NewStep | ProgressStep | DoneStep | ErrorStep;
+export type StepInfo = NewStep | ProgressStep | DoneStep | ErrorStep | ReportResult;

@@ -2,8 +2,8 @@ import "@assets/styles/Steps.less";
 
 import { useEffect, useState } from "react";
 
-import { Platform } from "@pipeline/Types";
-import WorkerApp, { ReportResult } from "@app/WorkerApp";
+import { Platform, ReportResult } from "@pipeline/Types";
+import WorkerApp from "@app/WorkerApp";
 
 import Stepper from "@app/components/Stepper";
 import Button from "@app/components/Button";

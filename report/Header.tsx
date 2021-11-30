@@ -1,3 +1,4 @@
+// @ts-nocheck TODO: remove
 import { useLayoutEffect, useState } from "react";
 import { dataProvider } from "@report/DataProvider";
 import { NewAuthor, NewChannel } from "@pipeline/Analyzer";

@@ -1,3 +1,4 @@
+// @ts-nocheck TODO: remove
 import { memo } from "react";
 import { NewAuthor } from "@pipeline/Analyzer";
 import ImageSmooth from "./ImageSmooth";

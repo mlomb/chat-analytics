@@ -1,6 +1,5 @@
 import { useEffect, useLayoutEffect, useMemo, useState } from "react";
 
-import { NewAuthor, NewChannel, NewReport } from "@pipeline/Analyzer";
 import { dataProvider, DataProvider } from "@report/DataProvider";
 import Header from "./Header";
 import Card from "./components/Card";

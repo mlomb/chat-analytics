@@ -1,0 +1,3 @@
+it("empty", () => {
+    expect("").toStrictEqual("");
+});

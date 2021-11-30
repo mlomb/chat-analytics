@@ -1,3 +1,4 @@
+// @ts-nocheck TODO: remove
 import EventEmitter from "events";
 
 import { NewAuthor, NewChannel, NewReport } from "@pipeline/Analyzer";

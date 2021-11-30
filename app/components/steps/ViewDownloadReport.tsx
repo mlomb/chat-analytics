@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import prettyBytes from "pretty-bytes";
 
-import { ReportResult } from "@app/WorkerApp";
 import Button from "@app/components/Button";
+
+import { ReportResult } from "@pipeline/Types";
 
 import LinkOut from "@assets/images/link-out.svg";
 import Download from "@assets/images/download.svg";
@@ -17,9 +18,11 @@ const ts = (n: number) => (n === 1 ? "" : "s");
 
 const ViewDownloadReport = ({ result }: Props) => {
     const [file, setFile] = useState<{
+        blob: Blob | null;
         url: string;
         filename: string;
     }>({
+        blob: null,
         url: "",
         filename: "",
     });
@@ -27,8 +30,10 @@ const ViewDownloadReport = ({ result }: Props) => {
     useEffect(() => {
         if (result) {
             const date = new Date();
+            const blob = new Blob([result.html], { type: "text/html" });
             setFile({
-                url: URL.createObjectURL(result.blob),
+                blob,
+                url: URL.createObjectURL(blob),
                 filename: `${result?.title}-${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}.html`,
             });
         }
@@ -48,7 +53,7 @@ const ViewDownloadReport = ({ result }: Props) => {
             <div className="ViewDownloadReport__buttons">
                 <Button hueColor={[258, 90, 61]} href={file.url} download={file.filename}>
                     <img src={Download} alt="Download" />
-                    Download ({prettyBytes(result?.blob.size || 0)})
+                    Download ({prettyBytes(file.blob?.size || 0)})
                 </Button>
                 <Button hueColor={[244, 90, 61]} href={file.url} target="_blank">
                     <img src={LinkOut} alt="Link out" />
