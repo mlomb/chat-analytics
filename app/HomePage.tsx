@@ -7,17 +7,25 @@ import Steps from "@app/components/steps/Steps";
 import Logo from "@assets/images/logo.svg";
 
 const HomePage = () => {
-    const [showLanding, setShowLanding] = useState(true);
+    const [index, setIndex] = useState(0);
+
+    const fireAnimation = () => {
+        setIndex(1);
+        setTimeout(() => setIndex(2), 200);
+    };
 
     return (
         <div className="HomePage">
             <a href="/" className="HomePage__logo">
                 <img src={Logo} alt="chatstbdtbd.app logo" />
             </a>
-            <div style={{ display: showLanding ? "" : "none" }}>
-                <Landing onStart={() => setShowLanding(false)} />
+            <div
+                className={["HomePage__container", index > 0 ? "HomePage__container--fade-out" : ""].join(" ")}
+                style={{ display: index >= 2 ? "none" : "block" }}
+            >
+                <Landing onStart={fireAnimation} />
             </div>
-            <div style={{ display: !showLanding ? "" : "none" }}>
+            <div className={["HomePage__container", index >= 2 ? "HomePage__container--fade-in" : ""].join(" ")}>
                 <Steps />
             </div>
         </div>

@@ -44,3 +44,33 @@ li::marker {
         height: 60px;
     }
 }
+
+.HomePage__container {
+    display: none;
+    animation-fill-mode: forwards;
+}
+.HomePage__container--fade-out {
+    animation: fadeOut 0.2s;
+}
+.HomePage__container--fade-in {
+    display: block;
+    animation: fadeIn 0.2s;
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
