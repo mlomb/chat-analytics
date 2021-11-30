@@ -2,13 +2,15 @@ import { DiscordExportFile } from "@pipeline/parse/DiscordParser.d";
 import { Parser } from "@pipeline/parse/Parser";
 import { Author } from "@pipeline/parse/Database";
 
+import { parseJSON } from "@pipeline/parse/Common";
+
 export class DiscordParser extends Parser {
     constructor() {
         super("discord");
     }
 
     parse(file_content: string): void {
-        const data = JSON.parse(file_content) as DiscordExportFile;
+        let data = parseJSON<DiscordExportFile>(file_content);
 
         // store channel
         const lastMessageTimestamp =

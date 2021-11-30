@@ -1,13 +1,15 @@
 import { TelegramExportFile, TextArray } from "@pipeline/parse/TelegramParser.d";
 import { Parser } from "@pipeline/parse/Parser";
 
+import { parseJSON } from "@pipeline/parse/Common";
+
 export class TelegramParser extends Parser {
     constructor() {
         super("telegram");
     }
 
     parse(file_content: string) {
-        let data = JSON.parse(file_content) as TelegramExportFile;
+        let data = parseJSON<TelegramExportFile>(file_content);
 
         // store channel
         const lastMessageTimestamp =

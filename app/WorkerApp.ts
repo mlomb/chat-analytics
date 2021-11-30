@@ -46,7 +46,11 @@ async function* run(msg: InitMessage): AsyncGenerator<StepInfo | ReportResult> {
     yield { type: "new", title: "Read and parse files", total: msg.files.length };
     for (let i = 0; i < msg.files.length; i++) {
         const content = await msg.files[i].text();
-        parser.parse(content);
+        try {
+            parser.parse(content);
+        } catch (ex) {
+            throw new Error(`Error parsing file "${msg.files[i].name}":\n${(ex as Error).message}`);
+        }
         yield { type: "progress", progress: i + 1 };
     }
     yield { type: "done" };
