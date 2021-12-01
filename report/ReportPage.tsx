@@ -1,89 +1,25 @@
-import { useEffect, useLayoutEffect, useMemo, useState } from "react";
+import "@assets/styles/ReportPage.less";
 
-import { dataProvider, DataProvider } from "@report/DataProvider";
-import Header from "./Header";
-import Card from "./components/Card";
-import FilterSelect from "./components/FilterSelect";
-import TimeSelector from "./components/TimeSelector";
-import MessagesGraph from "./components/viz/MessagesGraph";
-import MessagesHeatMap from "./components/viz/MessagesHeatMap";
-import WordCloudGraph from "./components/viz/WordCloudGraph";
-import DonutChart from "./components/viz/DonutChart";
-import PieChart from "./components/viz/PieChart";
-import SimpleTable from "./components/viz/SimpleTable";
-import HeatMapChart from "./components/viz/HeatMapChart";
-import AnimatedBars, { AnimatedBarEntry } from "./components/viz/AnimatedBars";
-import ChannelChip from "./components/core/ChannelChip";
-import AuthorChip from "./components/core/AuthorChip";
-import { TabContainer } from "./Tabs";
-import { MessagesPerCycleBlock } from "@pipeline/blocks/MessagesPerCycle";
+import { useState } from "react";
+
+import Header from "@report/components/Header";
+import { TabContainer } from "@report/components/Tabs";
+
+import Card from "@report/components/Card";
+import MessagesGraph from "@report/components/viz/MessagesGraph";
+import WordCloudGraph from "@report/components/viz/WordCloudGraph";
+import DonutChart from "@report/components/viz/DonutChart";
+import PieChart from "@report/components/viz/PieChart";
+import SimpleTable from "@report/components/viz/SimpleTable";
+import HeatMapChart from "@report/components/viz/HeatMapChart";
+import AnimatedBars from "@report/components/viz/AnimatedBars";
+import ChannelChip from "@report/components/core/ChannelChip";
+import AuthorChip from "@report/components/core/AuthorChip";
 
 const CardContainer = (props: { children: React.ReactNode }) => <div className="CardContainer">{props.children}</div>;
-//const ChartContainer = ({ children }: { children: React.ReactNode }) => <div className="ChartContainer">{children}</div>;
 
 const ReportPage = () => {
-    const report = dataProvider.getSource();
-
     const [tab, setTab] = useState("messages");
-
-    // let data = useMemo(()=> dataProvider.(selectedChannels, selectedUsers, report), [selectedChannels, selectedUsers]);
-
-    //console.log("report", report);
-    //console.log("selection", selectedAuthors, selectedChannels);
-    //console.log("data", data);
-
-    const [barsTestAuthors, setBarsTestAuthors] = useState([
-        { data: report.authors[0], value: 1 },
-        { data: report.authors[1], value: 2 },
-        { data: report.authors[2], value: 3 },
-        { data: report.authors[3], value: 4 },
-        { data: report.authors[4], value: 5 },
-        { data: report.authors[5], value: 6 },
-        { data: report.authors[6], value: 7 },
-        { data: report.authors[7], value: 8 },
-        { data: report.authors[8], value: 9 },
-        { data: report.authors[9], value: 10 },
-        { data: report.authors[10], value: 11 },
-        { data: report.authors[11], value: 12 },
-        { data: report.authors[12], value: 13 },
-        { data: report.authors[13], value: 14 },
-        { data: report.authors[14], value: 15 },
-    ]);
-    const [barsTestChannels, setBarsTestChannels] = useState([
-        { data: report.channels[0], value: 1 },
-        /*{ data: report.channels[1], value: 2, },
-        { data: report.channels[2], value: 3, },
-        { data: report.channels[3], value: 4, },
-        { data: report.channels[4], value: 5, },
-        { data: report.channels[5], value: 6, },
-        { data: report.channels[6], value: 7, },
-        { data: report.channels[7], value: 8, },
-        { data: report.channels[8], value: 9, },
-        { data: report.channels[9], value: 10, },
-        { data: report.channels[10], value: 11, },
-        { data: report.channels[11], value: 12, },
-        { data: report.channels[12], value: 13, },
-        { data: report.channels[13], value: 14, },
-        { data: report.channels[14], value: 15, },*/
-    ]);
-    useEffect(() => {
-        const interval = setInterval(() => {
-            let newBars = JSON.parse(JSON.stringify(barsTestAuthors));
-            for (let i = 0; i < newBars.length; i++) {
-                newBars[i].value += Math.random() * 1000000;
-                newBars[i].value = Math.round(newBars[i].value);
-            }
-            setBarsTestAuthors(newBars);
-
-            newBars = JSON.parse(JSON.stringify(barsTestChannels));
-            for (let i = 0; i < newBars.length; i++) {
-                newBars[i].value += Math.random() * 1000000;
-                newBars[i].value = Math.round(newBars[i].value);
-            }
-            setBarsTestChannels(newBars);
-        }, 500000000);
-        return () => clearInterval(interval);
-    }, []);
 
     return (
         <>
@@ -92,7 +28,7 @@ const ReportPage = () => {
             <TabContainer currentValue={tab} value="messages">
                 <CardContainer>
                     <Card num={2} blockKey="message-per-cycle" title="Messages sent per day &amp; month">
-                        <MessagesGraph />
+                        {/*<MessagesGraph />*/}
                     </Card>
                     <Card blockKey="message-stats" num={1} title="Messages stats">
                         <SimpleTable />
@@ -105,7 +41,7 @@ const ReportPage = () => {
                         <AnimatedBars
                             what="Author"
                             unit="Total messages"
-                            data={barsTestAuthors}
+                            data={[]}
                             itemComponent={AuthorChip}
                             maxItems={16}
                             colorHue={240}
@@ -115,7 +51,7 @@ const ReportPage = () => {
                         <AnimatedBars
                             what="Channel"
                             unit="Total messages"
-                            data={barsTestChannels}
+                            data={[]}
                             itemComponent={ChannelChip}
                             maxItems={16}
                             colorHue={266}
@@ -135,7 +71,7 @@ const ReportPage = () => {
                         <AnimatedBars
                             what="Word"
                             unit="Times used"
-                            data={barsTestChannels}
+                            data={[]}
                             itemComponent={ChannelChip}
                             maxItems={16}
                         />
@@ -152,8 +88,6 @@ const ReportPage = () => {
                     </Card>
                 </CardContainer>
             </TabContainer>
-
-            {/*<MessagesHeatMap timeRange={selectedTimeRange} />*/}
         </>
     );
 };

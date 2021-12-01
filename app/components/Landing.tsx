@@ -20,7 +20,7 @@ const Landing = ({ onStart }: Props) => {
                     <span className="Landing__browser">Everything is processed in your browser.</span>
                     <span className="Landing__secure">
                         <img src={Lock} alt="Lock" />
-                        No data leaves.
+                        No data leaves your device.
                     </span>
                 </div>
                 <br />

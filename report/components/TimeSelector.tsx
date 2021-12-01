@@ -5,7 +5,6 @@ import * as am5 from "@amcharts/amcharts5";
 import * as am5xy from "@amcharts/amcharts5/xy";
 
 import { dataProvider } from "@report/DataProvider";
-import { dataDispatcher } from "@report/DataDispatcher";
 
 const SB_HEIGHT = 50;
 const RESETS = {
@@ -89,16 +88,15 @@ const TimeSelector = () => {
             let end = xAxis.positionToDate(ev.end);
             if (start > end) [start, end] = [end, start];
             dataProvider.updateTimeRange(start, end);
-            dataDispatcher.updateTimeRange(start, end);
         };
         scrollbarX.events.on("rangechanged", dateAxisChanged);
 
         // TODO: update efficient
-        const onDataUpdated = () => series.data.setAll(dataProvider.getPerDayData());
-        dataProvider.on("updated-data", onDataUpdated);
+        // const onDataUpdated = () => series.data.setAll(dataProvider.getPerDayData());
+        //dataProvider.on("updated-data", onDataUpdated);
 
         return () => {
-            dataProvider.off("updated-data", onDataUpdated);
+            //dataProvider.off("updated-data", onDataUpdated);
             root.dispose();
         };
     }, []);
@@ -108,7 +106,7 @@ const TimeSelector = () => {
             ref={chartDiv}
             className="TimeSelector"
             style={{
-                height: SB_HEIGHT + 2,
+                height: SB_HEIGHT + 1,
             }}
         ></div>
     );

@@ -23,9 +23,9 @@ Every platform parser inheriths from the Parser class.
 
 Check out platform implementations:
 
-* [DiscordParser](pipeline/parse/DiscordParser.ts)
-* [TelegramParser](pipeline/parse/TelegramParser.ts)
-* [WhatsAppParser](pipeline/parse/WhatsApparser.ts)
+* [DiscordParser](parse/DiscordParser.ts)
+* [TelegramParser](parse/TelegramParser.ts)
+* [WhatsAppParser](parse/WhatsApparser.ts)
 
 ## PREPROCESS
 
@@ -34,3 +34,7 @@ something something
 ## BLOCKS
 
 something something
+
+#### Is this PARSE, PREPROCESS, BLOCKS thing over-engineered?
+
+Maybe. Probably.

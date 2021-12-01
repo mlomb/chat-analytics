@@ -1,0 +1,99 @@
+.Header {
+    @tab-width: 90px;
+    @tab-padding: 10px;
+    @tab-stride: @tab-width + 2 * @tab-padding;
+    @line-size: 5px;
+
+    padding: 15px 15px 0;
+    margin-bottom: 10px;
+    background-color: #22292f;
+    border-bottom: @line-size solid #282f35;
+
+    .Header__Tabs {
+        position: relative;
+        display: flex;
+        flex-wrap: wrap;
+        margin-bottom: 5px;
+
+        a {
+            display: block;
+            color: #535a65;
+            text-decoration: none;
+            text-transform: uppercase;
+            padding: @tab-padding;
+            font-size: 18px;
+            font-weight: bold;
+            text-align: center;
+            transition: color 0.1s;
+            cursor: pointer;
+            user-select: none;
+            position: relative;
+
+            &:hover {
+                color: #636b77;
+            }
+
+            &::after {
+                content: "";
+                background: linear-gradient(90deg, #9c00ff, #385bf7);
+                height: 1px;
+                position: absolute;
+                left: 5px;
+                right: 5px;
+                bottom: 2.5px;
+                transition: all 250ms ease 0s;
+                transform: scaleX(0);
+                border-radius: 5px;
+            }
+            &.active::after,
+            &:hover::after {
+                transform: scaleX(1);
+            }
+
+            &.active {
+                color: white;
+                &::after {
+                    height: 3px;
+                }
+            }
+        }
+    }
+
+    h1 {
+        font-size: 32px;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+    }
+    h2 {
+        color: #636b77;
+        font-size: 17px;
+        font-style: italic;
+    }
+}
+
+.Header__info {
+    display: flex;
+    flex-direction: column-reverse;
+    align-items: stretch;
+}
+
+.Header__title {
+    min-width: 0;
+}
+
+.Header__link {
+    display: flex;
+    justify-content: center;
+}
+
+@media (min-width: 900px) {
+    .Header__info {
+        align-items: center;
+        justify-content: space-between;
+        flex-direction: row;
+    }
+    .Header__title {
+        margin-right: 50px;
+    }
+}

@@ -1,5 +1,3 @@
-import {} from "react";
-
 export const TabContainer = (props: { currentValue: string; value: string; children: React.ReactNode }) => {
     return (
         <div

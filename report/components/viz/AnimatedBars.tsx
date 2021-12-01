@@ -47,7 +47,7 @@ const Item = (props: {
 const AnimatedBars = (props: Props) => {
     const sortedById = props.data.slice().sort((a, b) => (a.data.id > b.data.id ? 1 : -1));
     const sortedByValue = props.data.slice().sort((a, b) => b.value - a.value);
-    const maxValue = sortedByValue[0].value;
+    const maxValue = sortedByValue.length ? sortedByValue[0].value : 0;
 
     return (
         <div className="AnimatedBars">

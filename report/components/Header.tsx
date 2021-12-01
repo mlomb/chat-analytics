@@ -1,28 +1,31 @@
-// @ts-nocheck TODO: remove
-import { useLayoutEffect, useState } from "react";
-import { dataProvider } from "@report/DataProvider";
-import { NewAuthor, NewChannel } from "@pipeline/Analyzer";
-import AuthorChip from "./components/core/AuthorChip";
-import ChannelChip from "./components/core/ChannelChip";
+import "@assets/styles/Header.less";
 
-import FilterSelect, { SelectSpecialOpcion } from "./components/FilterSelect";
-import TimeSelector from "./components/TimeSelector";
-import { TabSwitch } from "./Tabs";
-import { dataDispatcher } from "./DataDispatcher";
+import { useLayoutEffect, useState } from "react";
+
+import { dataProvider } from "@report/DataProvider";
+import { Author, Channel } from "@pipeline/preprocess/ProcessedData";
+
+import AuthorChip from "@report/components/core/AuthorChip";
+import ChannelChip from "@report/components/core/ChannelChip";
+import { TabSwitch } from "@report/components/Tabs";
+import TimeSelector from "@report/components/TimeSelector";
+import FilterSelect, { SelectSpecialOpcion } from "@report/components/FilterSelect";
+
+import Logo from "@assets/images/logo.svg";
 
 interface Props {
     tab: string;
     setTab: (tab: string) => void;
 }
 
-const channelsSpecialOptions: SelectSpecialOpcion<NewChannel>[] = [
+const channelsSpecialOptions: SelectSpecialOpcion<Channel>[] = [
     {
         name: "Select all channels",
         filter: (options) => options,
     },
 ];
 
-const authorsSpecialOptions: SelectSpecialOpcion<NewAuthor>[] = [
+const authorsSpecialOptions: SelectSpecialOpcion<Author>[] = [
     {
         name: "Select all authors (🧍➕🤖)",
         filter: (options) => options,
@@ -70,24 +73,33 @@ const tabs = [
 
 const Header = (props: Props) => {
     const { tab, setTab } = props;
-    const report = dataProvider.getSource();
+    const source = dataProvider.source;
 
-    const [selectedChannels, setSelectedChannels] = useState<NewChannel[]>([...report.channels]);
-    const [selectedAuthors, setSelectedAuthors] = useState<NewAuthor[]>([...report.authors]);
+    const [selectedChannels, setSelectedChannels] = useState<Channel[]>([...source.channels]);
+    const [selectedAuthors, setSelectedAuthors] = useState<Author[]>([...source.authors]);
 
-    useLayoutEffect(() => dataDispatcher.updateAuthors(selectedAuthors), [selectedAuthors]);
-    useLayoutEffect(() => dataDispatcher.updateChannels(selectedChannels), [selectedChannels]);
+    useLayoutEffect(() => dataProvider.updateAuthors(selectedAuthors), [selectedAuthors]);
+    useLayoutEffect(() => dataProvider.updateChannels(selectedChannels), [selectedChannels]);
 
     return (
         <div className="Header">
-            <h1>{report.title}</h1>
-            <h2>chat analysis report</h2>
+            <div className="Header__info">
+                <span className="Header__title">
+                    <h1>{source.title}</h1>
+                    <h2>chat analysis report</h2>
+                </span>
+                <div className="Header__link">
+                    <a href="https://chatstbdtbd.app" target="_blank">
+                        <img src={Logo} alt="chatstbdtbd.app logo" height="60" />
+                    </a>
+                </div>
+            </div>
             <div className="Filters">
                 <div className="Filters__Filter">
                     <label htmlFor="channels">Channels</label>
                     <FilterSelect
                         id="channels"
-                        options={report.channels}
+                        options={source.channels}
                         placeholder="Select channels..."
                         selected={selectedChannels}
                         onChange={setSelectedChannels}
@@ -100,7 +112,7 @@ const Header = (props: Props) => {
                     <label htmlFor="authors">Authors</label>
                     <FilterSelect
                         id="authors"
-                        options={report.authors}
+                        options={source.authors}
                         placeholder="Select authors..."
                         selected={selectedAuthors}
                         onChange={setSelectedAuthors}

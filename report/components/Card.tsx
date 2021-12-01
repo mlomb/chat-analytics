@@ -3,7 +3,7 @@ import { InView } from "react-intersection-observer";
 
 import Spinner from "@assets/images/spinner.svg";
 import { BlockData, BlockKey, BlockState } from "@pipeline/blocks/Blocks";
-import { dataDispatcher } from "@report/DataDispatcher";
+import { dataProvider } from "@report/DataProvider";
 
 interface Props {
     // TODO: enforce correct type
@@ -35,16 +35,16 @@ const Card = (props: Props) => {
         const updateContent = (state: BlockState, data?: BlockData) => {
             setContent({ state, data: data || content.data });
         };
-        dataDispatcher.on(props.blockKey, updateContent);
+        dataProvider.on(props.blockKey, updateContent);
 
         return () => {
             // make sure to deactivate
-            dataDispatcher.toggleBlock(props.blockKey, id, false);
-            dataDispatcher.off(props.blockKey, updateContent);
+            dataProvider.toggleBlock(props.blockKey, id, false);
+            dataProvider.off(props.blockKey, updateContent);
         };
     }, []);
 
-    const onChange = (inView: boolean) => dataDispatcher.toggleBlock(props.blockKey, id, inView);
+    const onChange = (inView: boolean) => dataProvider.toggleBlock(props.blockKey, id, inView);
 
     return (
         <InView onChange={onChange} className={"Card Card--" + props.num}>

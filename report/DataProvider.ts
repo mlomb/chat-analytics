@@ -1,218 +1,139 @@
-// @ts-nocheck TODO: remove
 import EventEmitter from "events";
 
-import { NewAuthor, NewChannel, NewReport } from "@pipeline/Analyzer";
 import { Platform } from "@pipeline/Types";
+import { Author, Channel, ProcessedData } from "@pipeline/preprocess/ProcessedData";
+import { BlockData, BlockKey, BlockState } from "@pipeline/blocks/Blocks";
 
-export type DataPerDate = {
-    date: number; // timestamp
-    messages: number;
+import Worker from "@report/WorkerReport";
+
+type QueueEntry = {
+    blockKey: BlockKey;
+    timestamp: number;
 };
-
-export type FrequencyData = {
-    value: string;
-    count: number;
-};
-
-type AttachmentType = "image" | "video" | "voice" | "location" | "file";
-
-export type GeneralStats = {
-    totalMessages: number;
-    totalWords: number;
-    totalLetters: number;
-    totalAttachments: {
-        [type in AttachmentType]: number;
-    };
-};
-
-const monthToString = (date: Date): string => date.getFullYear() + "-" + (date.getMonth() + 1);
-const dateToString = (date: Date): string => monthToString(date) + "-" + date.getDate();
-
-// Events:
-// updated-zoom: instant (drag time slider)
-// updated-data: debounced
 
 export class DataProvider extends EventEmitter {
-    // @ts-ignore
-    private generalData: GeneralStats;
-    //private generalData: GeneralStats;
-    private perDay: DataPerDate[] = [];
-    private perMonth: DataPerDate[] = [];
-    private wordData: FrequencyData[] = [];
-    private emojiData: FrequencyData[] = [];
+    private worker: Worker;
+    private currentBlock?: BlockKey; // if currentBlock===undefined, the worker is available
+    private currentBlockInvalidated: boolean = false;
 
-    private activeChannels: NewChannel[] = [];
-    private activeAuthors: NewAuthor[] = [];
+    // Updated by the UI
+    private activeBlocks: Set<BlockKey> = new Set();
+    private activeIds: Set<number> = new Set();
+    private activeChannels: Channel[] = [];
+    private activeAuthors: Author[] = [];
     private activeStartDate: Date = new Date();
     private activeEndDate: Date = new Date();
 
-    private readonly dates: {
-        date: Date;
-        dayKey: string;
-        monthKey: string;
-        dayData: DataPerDate;
-        monthData: DataPerDate;
-    }[] = [];
-    private updateTimer?: NodeJS.Timeout;
+    // Updated by this class and the Worker
+    private readyBlocks: Map<BlockKey, BlockData | null> = new Map();
 
-    constructor(private readonly source: NewReport) {
+    constructor(public readonly source: ProcessedData) {
         super();
+        this.worker = Worker();
+    }
 
-        const monthsData = new Map<string, DataPerDate>();
-        const start = new Date(source.minDate);
-        const end = new Date(source.maxDate);
-        for (let day = new Date(start); day <= end; day.setDate(day.getDate() + 1)) {
-            const dayKey = dateToString(day);
-            const monthKey = monthToString(day);
-            let dayData = {
-                date: day.getTime(),
-                messages: 0,
-            };
-            let monthData = monthsData.get(monthKey);
-            if (monthData === undefined) {
-                monthData = {
-                    date: new Date(day.getFullYear(), day.getMonth(), 1).getTime(),
-                    messages: 0,
-                };
-                monthsData.set(monthKey, monthData);
-                this.perMonth.push(monthData);
+    toggleBlock(blockKey: BlockKey, id: number, active: boolean) {
+        if (active) {
+            this.activeIds.add(id);
+            this.activeBlocks.add(blockKey);
+
+            // try to dispatch right away
+            this.tryToDispatchWork();
+        } else {
+            if (this.activeIds.has(id)) {
+                this.activeBlocks.delete(blockKey);
+                this.activeIds.delete(id);
             }
-            this.dates.push({
-                date: new Date(day),
-                dayKey,
-                monthKey,
-                dayData,
-                monthData,
-            });
-            this.perDay.push(dayData);
         }
-        this.activeStartDate = start;
-        this.activeEndDate = end;
-        this.recomputeData();
+        console.log(this.activeBlocks, this.activeIds);
     }
 
-    getSource(): NewReport {
-        return this.source;
-    }
-
-    updateChannels(channels: NewChannel[]) {
+    updateChannels(channels: Channel[]) {
         this.activeChannels = channels;
-        this.needUpdate();
+        this.invalidateBlocks([]);
     }
 
-    updateAuthors(authors: NewAuthor[]) {
+    updateAuthors(authors: Author[]) {
         this.activeAuthors = authors;
-        this.needUpdate();
+        this.invalidateBlocks([]);
     }
 
     updateTimeRange(start: Date, end: Date) {
         this.activeStartDate = start;
         this.activeEndDate = end;
-        this.emit("updated-zoom");
-        this.needUpdate();
+        //this.emit("updated-zoom");
+        this.invalidateBlocks([]);
     }
 
-    update() {
-        this.recomputeData();
-        console.log("updated-data");
-        this.emit("updated-data");
-    }
+    tryToDispatchWork() {
+        // pick an active block that is not ready
+        const pendingBlocks = [...this.activeBlocks].filter((k) => !this.readyBlocks.has(k));
 
-    needUpdate() {
-        // debounce
-        if (this.updateTimer) {
-            // cancel previous timer
-            clearTimeout(this.updateTimer);
+        // if there is pending work and the worker is available
+        if (pendingBlocks.length > 0 && this.currentBlock === undefined) {
+            // work goes brrr
+            this.dispatchWork(pendingBlocks[0]);
         }
-        this.updateTimer = setTimeout(() => {
-            this.updateTimer = undefined;
-            this.update();
-        }, 2000);
     }
 
-    // TODO: includeInData(author, channel, date), excludeFromData(author, channel, date)
+    private dispatchWork(blockKey: BlockKey) {
+        // make worker unavailable
+        this.currentBlock = blockKey;
+        this.currentBlockInvalidated = false;
 
-    // NOTE: this is expensive, it should be optimized knowing which kind of update it was
-    //       (updateChannels, updateAuthors, updateTimeRange)
-    recomputeData() {
-        console.log("recomputing data");
-        let wordsAggr = new Map<string, number>();
-        let emojisAggr = new Map<string, number>();
+        // notify that this block is loading
+        this.emit(blockKey, "loading", undefined);
 
-        for (let dayData of this.perDay) dayData.messages = 0;
-        for (let monthData of this.perMonth) monthData.messages = 0;
+        // TODO: replace with real work
+        setTimeout(() => {
+            this.onWorkDone(blockKey, "ready", {});
+        }, Math.random() * 700 + 150);
+    }
 
-        for (let { dayKey, dayData, monthData } of this.dates) {
-            for (const author of this.activeAuthors) {
-                for (const channel of this.activeChannels) {
-                    if (channel.id in author.channels) {
-                        const from_user_in_channel = author.channels[channel.id];
-                        if (dayKey in from_user_in_channel) {
-                            let messages = from_user_in_channel[dayKey].messages;
-                            dayData.messages += messages;
-                            monthData.messages += messages;
+    private onWorkDone(blockKey: BlockKey, state: BlockState, data: BlockData | null) {
+        console.assert(this.currentBlock === blockKey);
 
-                            const words = from_user_in_channel[dayKey].words;
-                            for (const word in words) {
-                                wordsAggr.set(word, (wordsAggr.get(word) || 0) + words[word]);
-                            }
-
-                            const emojis = from_user_in_channel[dayKey].emojis;
-                            for (const emoji in emojis) {
-                                emojisAggr.set(emoji, (emojisAggr.get(emoji) || 0) + emojis[emoji]);
-                            }
-                        }
-                    }
-                }
-            }
+        // make sure the block we were working hasnt been invalidated
+        if (this.currentBlockInvalidated) {
+            // notify the UI
+            this.emit(blockKey, "stale", undefined);
+        } else {
+            // store block result in case it is needed later
+            // and notify the UI
+            this.readyBlocks.set(blockKey, data);
+            this.emit(blockKey, state, data);
         }
 
-        const deMap = (map: Map<string, number>): FrequencyData[] => {
-            let res = [];
-            for (const [value, count] of map) {
-                res.push({ value, count });
+        // make worker available again and try to dispatch more work
+        this.currentBlock = undefined;
+        this.currentBlockInvalidated = false;
+        this.tryToDispatchWork();
+    }
+
+    private invalidateBlocks(exception: BlockKey[]) {
+        // invalidate all ready blocks with exceptions
+        for (const blockKey of this.readyBlocks.keys()) {
+            if (!exception.includes(blockKey)) {
+                // must invalidate
+                // remove from ready blocks and notify UI of stale data
+                this.readyBlocks.delete(blockKey);
+                this.emit(blockKey, "stale", undefined);
             }
-            res.sort((a, b) => b.count - a.count);
-            return res.slice(0, 100);
-        };
+        }
+        // if we are currently working on a block, mark to invalidate
+        if (this.currentBlock !== undefined && !exception.includes(this.currentBlock)) {
+            this.currentBlockInvalidated = true;
+        }
 
-        this.wordData = deMap(wordsAggr);
-        this.emojiData = deMap(emojisAggr);
-    }
-
-    getPerDayData(): DataPerDate[] {
-        return this.perDay;
-    }
-
-    getPerMonthData(): DataPerDate[] {
-        return this.perMonth;
-    }
-
-    getWordsData(): FrequencyData[] {
-        return this.wordData;
-    }
-
-    getEmojisData(): FrequencyData[] {
-        return this.emojiData;
-    }
-
-    getPlatform(): Platform {
-        return this.source.platform;
-    }
-
-    getStart(): Date {
-        return this.activeStartDate;
-    }
-
-    getEnd(): Date {
-        return this.activeEndDate;
+        // recompute
+        this.tryToDispatchWork();
     }
 }
 
 export declare var platform: Platform;
 export declare var dataProvider: DataProvider;
 
-export const initDataProvider = (source: NewReport) => {
+export const initDataProvider = (source: ProcessedData) => {
     dataProvider = new DataProvider(source);
     platform = source.platform;
 };
