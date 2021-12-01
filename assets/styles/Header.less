@@ -97,3 +97,48 @@
         margin-right: 50px;
     }
 }
+
+.Filters {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+    margin-top: 15px;
+
+    .Filters__Filter {
+        flex: 1;
+
+        label {
+            display: block;
+            margin: 6px 5px 5px;
+            font-size: 15px;
+            font-weight: bold;
+        }
+
+        &:first-child {
+            margin-right: 10px;
+        }
+
+        @media (max-width: 1279px) {
+            min-width: 100%;
+            &:first-child {
+                margin-right: 0;
+            }
+        }
+    }
+}
+
+.TimeSelector {
+    width: 100%;
+    border: 1px solid #596570;
+    box-sizing: border-box;
+    border-radius: 5px;
+    overflow: hidden;
+    background-color: #1e2529;
+    user-select: none;
+
+    canvas {
+        image-rendering: pixelated;
+    }
+}

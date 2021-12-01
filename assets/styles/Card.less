@@ -1,0 +1,79 @@
+@card-min-width: 300px;
+@cards-gap: 10px;
+
+.CardContainer {
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    grid-gap: @cards-gap;
+    padding: @cards-gap;
+    margin: auto;
+}
+.Card {
+    position: relative;
+    min-width: @card-min-width;
+    min-height: 180px;
+    border-radius: 15px;
+    background: #22292f;
+    box-shadow: 0 1px 3px rgb(0 0 0 / 12%), 0 1px 2px rgb(0 0 0 / 24%);
+}
+.Card_title {
+    font-size: 20px;
+    padding: 10px;
+    margin-bottom: 15px;
+    text-align: center;
+    border-bottom: 5px solid #282f35;
+}
+.Card_overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgb(0 0 0 / 41%);
+    border-radius: 15px;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    user-select: none;
+    font-family: monospace;
+    font-size: 20px;
+    opacity: 1;
+    transition: 0.25s opacity;
+    img {
+        margin-bottom: 15px;
+    }
+    &.Card_overlay--hidden {
+        opacity: 0;
+        pointer-events: none;
+    }
+}
+@media (min-width: (2 * @card-min-width + 3 * @cards-gap)) {
+    .CardContainer {
+        grid-template-columns: repeat(2, 2fr);
+    }
+    .Card--2 {
+        grid-column: span 2;
+    }
+    .Card--3 {
+        grid-column: span 2;
+    }
+}
+@media (min-width: (3 * @card-min-width + 4 * @cards-gap)) {
+    .CardContainer {
+        grid-template-columns: repeat(3, 3fr);
+    }
+    .Card--2 {
+        grid-column: span 2;
+    }
+    .Card--3 {
+        grid-column: span 3;
+    }
+}
+@media (min-width: 1280px) {
+    .CardContainer {
+        padding: 20px;
+        max-width: 1500px;
+    }
+}

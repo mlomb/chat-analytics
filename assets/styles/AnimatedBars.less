@@ -1,0 +1,35 @@
+.AnimatedBars {
+    margin: 0 15px;
+}
+.AnimatedBars__header {
+    display: flex;
+    justify-content: space-between;
+    text-transform: uppercase;
+    color: #636b77;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+.AnimatedBars__body {
+    position: relative;
+}
+.AnimatedBars__item {
+    position: absolute;
+    left: 0;
+    transition: 0.5s top;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    user-select: none;
+}
+.AnimatedBars__bar {
+    position: absolute;
+    height: 100%;
+    transition: 0.5s width;
+    border-radius: 3px;
+}
+.AnimatedBars__value,
+.AnimatedBars__unit {
+    z-index: 1;
+    padding: 5px;
+}

@@ -1,4 +1,5 @@
-import { memo, useRef } from "react";
+import "@assets/styles/AnimatedBars.less";
+
 import CountUp from "react-countup";
 
 const ITEM_STRIDE = 40;

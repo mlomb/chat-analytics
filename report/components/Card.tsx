@@ -1,3 +1,5 @@
+import "@assets/styles/Card.less";
+
 import { useEffect, useState } from "react";
 import { InView } from "react-intersection-observer";
 
