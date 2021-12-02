@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { InView } from "react-intersection-observer";
 
 import Spinner from "@assets/images/spinner.svg";
-import { BlockData, BlockKey, BlockState } from "@pipeline/blocks/Blocks";
+import { BlockKey, BlockState } from "@pipeline/blocks/Blocks";
 import { dataProvider } from "@report/DataProvider";
 
 interface Props {
@@ -34,7 +34,7 @@ const Card = (props: Props) => {
     });
 
     useEffect(() => {
-        const updateContent = (state: BlockState, data?: BlockData) => {
+        const updateContent = (state: BlockState, data?: any) => {
             setContent({ state, data: data || content.data });
         };
         dataProvider.on(props.blockKey, updateContent);

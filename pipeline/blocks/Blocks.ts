@@ -1,21 +1,16 @@
-import { process } from "./MessagesPerCycle";
-
-interface Report {}
+import { ProcessedData } from "@pipeline/preprocess/ProcessedData";
 
 export type BlockState = "no-data" | "ready" | "stale" | "loading" | "error";
 
-export interface BlockData {}
-
 export type BlockKey = string;
 
-export type BlockProcessFn<T extends BlockData> = (source: Report) => T;
+export type BlockProcessFn<T> = (source: ProcessedData) => T;
 
-const blocks: {
+export const BlockProcessFns: {
     [key: BlockKey]: BlockProcessFn<any>;
-} = {
-    MessagesPerCycleBlock: process,
-};
+} = {};
 
-console.log(blocks);
-
-// uberfile?
+//
+// Register all blocks
+//
+import "./MessagesPerCycle";

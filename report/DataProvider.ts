@@ -4,7 +4,7 @@ import { Platform } from "@pipeline/Types";
 import { Author, Channel, ProcessedData } from "@pipeline/preprocess/ProcessedData";
 import { BlockData, BlockKey, BlockState } from "@pipeline/blocks/Blocks";
 
-import Worker from "@report/WorkerReport";
+import Worker, { BlockResult } from "@report/WorkerReport";
 
 type QueueEntry = {
     blockKey: BlockKey;
@@ -30,6 +30,10 @@ export class DataProvider extends EventEmitter {
     constructor(public readonly source: ProcessedData) {
         super();
         this.worker = Worker();
+        this.worker.onmessage = (e: MessageEvent<BlockResult>) => {
+            const res = e.data;
+            this.onWorkDone(res.blockKey, res.state, res.data);
+        };
     }
 
     toggleBlock(blockKey: BlockKey, id: number, active: boolean) {
@@ -85,9 +89,9 @@ export class DataProvider extends EventEmitter {
         this.emit(blockKey, "loading", undefined);
 
         // TODO: replace with real work
-        setTimeout(() => {
-            this.onWorkDone(blockKey, "ready", {});
-        }, Math.random() * 700 + 150);
+        this.worker.postMessage({
+            blockKey,
+        });
     }
 
     private onWorkDone(blockKey: BlockKey, state: BlockState, data: BlockData | null) {

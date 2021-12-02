@@ -6,6 +6,9 @@ import * as am5xy from "@amcharts/amcharts5/xy";
 
 import { dataProvider } from "@report/DataProvider";
 
+import { BlockState } from "@pipeline/blocks/Blocks";
+import { MessagesPerCycleBlock } from "@pipeline/blocks/MessagesPerCycle";
+
 const SB_HEIGHT = 50;
 const RESETS = {
     paddingBottom: 0,
@@ -92,11 +95,19 @@ const TimeSelector = () => {
         scrollbarX.events.on("rangechanged", dateAxisChanged);
 
         // TODO: update efficient
-        // const onDataUpdated = () => series.data.setAll(dataProvider.getPerDayData());
-        //dataProvider.on("updated-data", onDataUpdated);
+        const blockKey = "MessagesPerCycle";
+        const onDataUpdated = (state: BlockState, data?: MessagesPerCycleBlock) => {
+            console.log(state, data);
+            if (state === "ready") {
+                series.data.setAll(data!.perDay);
+            }
+        };
+        dataProvider.on(blockKey, onDataUpdated);
+        dataProvider.toggleBlock(blockKey, 0, true);
 
         return () => {
-            //dataProvider.off("updated-data", onDataUpdated);
+            dataProvider.off(blockKey, onDataUpdated);
+            dataProvider.toggleBlock(blockKey, 0, false);
             root.dispose();
         };
     }, []);
