@@ -1,24 +1,12 @@
 export default null as any;
 
-import { BlockKey, BlockState, BlockProcessFns } from "@pipeline/blocks/Blocks";
-import { ID, ProcessedData } from "@pipeline/preprocess/ProcessedData";
-
-export interface SourceData {
-    type: "source-data";
-    blockKey: BlockKey;
-}
-
-export interface FilterUpdate {
-    type: "filter-update";
-    activeChannels?: ID[];
-    activeAuthors?: ID[];
-    activeStartDate?: Date;
-    activeEndDate?: Date;
-}
+import { BlockKey, BlockState, BlockProcessFns, Filters } from "@pipeline/blocks/Blocks";
+import { ProcessedData } from "@pipeline/preprocess/ProcessedData";
 
 export interface BlockRequest {
-    type: "block-request";
     blockKey: BlockKey;
+    processedData?: ProcessedData;
+    filters: Partial<Filters>;
 }
 
 export interface BlockResult {
@@ -27,28 +15,39 @@ export interface BlockResult {
     data: any | null;
 }
 
-const source: ProcessedData | null = null;
-const activeChannels: ID[] = [];
-const activeAuthors: ID[] = [];
-const activeStartDate: Date = new Date();
-const activeEndDate: Date = new Date();
+let processedData: ProcessedData | null = null;
+let fitlers: Filters = {
+    channels: [],
+    authors: [],
+    startDate: new Date(),
+    endDate: new Date(),
+};
 
 self.onmessage = async (ev: MessageEvent<BlockRequest>) => {
-    console.log(ev.data);
+    const br: BlockRequest = ev.data;
 
-    await new Promise((resolve) => setTimeout(resolve, Math.random() * 700 + 150 + 1000));
+    // update active data if provided
+    if (br.processedData) processedData = br.processedData;
+    if (br.filters.channels) fitlers.channels = br.filters.channels;
+    if (br.filters.authors) fitlers.authors = br.filters.authors;
+    if (br.filters.startDate) fitlers.startDate = br.filters.startDate;
+    if (br.filters.endDate) fitlers.endDate = br.filters.endDate;
 
-    if (ev.data.blockKey in BlockProcessFns) {
-        const data = BlockProcessFns[ev.data.blockKey](source!);
+    try {
+        if (!processedData) throw new Error("No processed data provided");
+        if (!(br.blockKey in BlockProcessFns)) throw new Error("BlockFn not found");
+
+        const data = BlockProcessFns[br.blockKey](processedData, fitlers);
 
         self.postMessage(<BlockResult>{
-            blockKey: ev.data.blockKey,
+            blockKey: br.blockKey,
             state: "ready",
             data,
         });
-    } else {
+    } catch (err) {
+        console.error(err);
         self.postMessage(<BlockResult>{
-            blockKey: ev.data.blockKey,
+            blockKey: br.blockKey,
             state: "error",
             data: null,
         });

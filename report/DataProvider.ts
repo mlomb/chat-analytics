@@ -4,7 +4,7 @@ import { Platform } from "@pipeline/Types";
 import { Author, Channel, ProcessedData } from "@pipeline/preprocess/ProcessedData";
 import { BlockKey, BlockState } from "@pipeline/blocks/Blocks";
 
-import Worker, { BlockResult } from "@report/WorkerReport";
+import Worker, { BlockRequest, BlockResult } from "@report/WorkerReport";
 
 type QueueEntry = {
     blockKey: BlockKey;
@@ -30,6 +30,11 @@ export class DataProvider extends EventEmitter {
     constructor(public readonly source: ProcessedData) {
         super();
         this.worker = Worker();
+        this.worker.onerror = (e) => {
+            console.log(e);
+            alert("An error ocurred creating the WebWorker.\n\n Error: " + e.message);
+            this.worker.terminate();
+        };
         this.worker.onmessage = (e: MessageEvent<BlockResult>) => {
             const res = e.data;
             this.onWorkDone(res.blockKey, res.state, res.data);
@@ -49,7 +54,7 @@ export class DataProvider extends EventEmitter {
                 this.activeIds.delete(id);
             }
         }
-        console.log(this.activeBlocks, this.activeIds);
+        // console.log(this.activeBlocks, this.activeIds);
     }
 
     updateChannels(channels: Channel[]) {
@@ -88,9 +93,16 @@ export class DataProvider extends EventEmitter {
         // notify that this block is loading
         this.emit(blockKey, "loading", undefined);
 
-        // TODO: replace with real work
-        this.worker.postMessage({
+        // dispatch work
+        this.worker.postMessage(<BlockRequest>{
             blockKey,
+            processedData: this.source,
+            filters: {
+                channels: this.activeChannels.map((c) => c.id),
+                authors: this.activeAuthors.map((c) => c.id),
+                startDate: this.activeStartDate,
+                endDate: this.activeEndDate,
+            },
         });
     }
 
