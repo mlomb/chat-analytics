@@ -2,7 +2,7 @@ import EventEmitter from "events";
 
 import { Platform } from "@pipeline/Types";
 import { Author, Channel, ProcessedData } from "@pipeline/preprocess/ProcessedData";
-import { BlockData, BlockKey, BlockState } from "@pipeline/blocks/Blocks";
+import { BlockKey, BlockState } from "@pipeline/blocks/Blocks";
 
 import Worker, { BlockResult } from "@report/WorkerReport";
 
@@ -25,7 +25,7 @@ export class DataProvider extends EventEmitter {
     private activeEndDate: Date = new Date();
 
     // Updated by this class and the Worker
-    private readyBlocks: Map<BlockKey, BlockData | null> = new Map();
+    private readyBlocks: Map<BlockKey, any | null> = new Map();
 
     constructor(public readonly source: ProcessedData) {
         super();
@@ -94,7 +94,7 @@ export class DataProvider extends EventEmitter {
         });
     }
 
-    private onWorkDone(blockKey: BlockKey, state: BlockState, data: BlockData | null) {
+    private onWorkDone(blockKey: BlockKey, state: BlockState, data: any | null) {
         console.assert(this.currentBlock === blockKey);
 
         // make sure the block we were working hasnt been invalidated
