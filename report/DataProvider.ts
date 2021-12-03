@@ -2,17 +2,14 @@ import EventEmitter from "events";
 
 import { Platform } from "@pipeline/Types";
 import { Author, Channel, ProcessedData } from "@pipeline/preprocess/ProcessedData";
-import { BlockKey, BlockState } from "@pipeline/blocks/Blocks";
+import { BlockKey, BlocksDescMap, BlockState, Trigger } from "@pipeline/blocks/Blocks";
+import { dateToString } from "@pipeline/Utils";
 
-import Worker, { BlockRequest, BlockResult } from "@report/WorkerReport";
-
-type QueueEntry = {
-    blockKey: BlockKey;
-    timestamp: number;
-};
+import Worker, { BlockRequest, BlockResult, BlocksInfo } from "@report/WorkerReport";
 
 export class DataProvider extends EventEmitter {
     private worker: Worker;
+    private validRequestData: Set<Trigger | "source"> = new Set();
     private currentBlock?: BlockKey; // if currentBlock===undefined, the worker is available
     private currentBlockInvalidated: boolean = false;
 
@@ -25,6 +22,7 @@ export class DataProvider extends EventEmitter {
     private activeEndDate: Date = new Date();
 
     // Updated by this class and the Worker
+    private blocksDescs?: BlocksDescMap;
     private readyBlocks: Map<BlockKey, any | null> = new Map();
 
     constructor(public readonly source: ProcessedData) {
@@ -35,9 +33,16 @@ export class DataProvider extends EventEmitter {
             alert("An error ocurred creating the WebWorker.\n\n Error: " + e.message);
             this.worker.terminate();
         };
-        this.worker.onmessage = (e: MessageEvent<BlockResult>) => {
+        this.worker.onmessage = (e: MessageEvent<BlockResult | BlocksInfo>) => {
             const res = e.data;
-            this.onWorkDone(res.blockKey, res.state, res.data);
+            if (res.type === "info") {
+                this.blocksDescs = res.info;
+                // worker is ready, dispatch work
+                console.log("Worker is ready");
+                this.tryToDispatchWork();
+            } else if (res.type === "result") {
+                this.onWorkDone(res.blockKey, res.state, res.data);
+            }
         };
     }
 
@@ -59,22 +64,31 @@ export class DataProvider extends EventEmitter {
 
     updateChannels(channels: Channel[]) {
         this.activeChannels = channels;
-        this.invalidateBlocks([]);
+        this.invalidateBlocks("channels");
     }
 
     updateAuthors(authors: Author[]) {
         this.activeAuthors = authors;
-        this.invalidateBlocks([]);
+        this.invalidateBlocks("authors");
     }
 
     updateTimeRange(start: Date, end: Date) {
+        if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+            console.warn("Invalid date");
+            return;
+        }
         this.activeStartDate = start;
         this.activeEndDate = end;
         //this.emit("updated-zoom");
-        this.invalidateBlocks([]);
+        this.invalidateBlocks("time");
     }
 
     tryToDispatchWork() {
+        if (this.blocksDescs === undefined) {
+            // worker is not ready yet
+            return;
+        }
+
         // pick an active block that is not ready
         const pendingBlocks = [...this.activeBlocks].filter((k) => !this.readyBlocks.has(k));
 
@@ -94,16 +108,28 @@ export class DataProvider extends EventEmitter {
         this.emit(blockKey, "loading", undefined);
 
         // dispatch work
-        this.worker.postMessage(<BlockRequest>{
+        const br: BlockRequest = {
             blockKey,
-            processedData: this.source,
-            filters: {
-                channels: this.activeChannels.map((c) => c.id),
-                authors: this.activeAuthors.map((c) => c.id),
-                startDate: this.activeStartDate,
-                endDate: this.activeEndDate,
-            },
-        });
+            filters: {},
+        };
+        if (!this.validRequestData.has("source")) {
+            br.processedData = this.source;
+            this.validRequestData.add("source");
+        }
+        if (!this.validRequestData.has("channels")) {
+            br.filters.channels = this.activeChannels.map((c) => c.id);
+            this.validRequestData.add("channels");
+        }
+        if (!this.validRequestData.has("authors")) {
+            br.filters.authors = this.activeAuthors.map((a) => a.id);
+            this.validRequestData.add("authors");
+        }
+        if (!this.validRequestData.has("time")) {
+            br.filters.startDate = dateToString(this.activeStartDate);
+            br.filters.endDate = dateToString(this.activeEndDate);
+            this.validRequestData.add("time");
+        }
+        this.worker.postMessage(br);
     }
 
     private onWorkDone(blockKey: BlockKey, state: BlockState, data: any | null) {
@@ -126,10 +152,17 @@ export class DataProvider extends EventEmitter {
         this.tryToDispatchWork();
     }
 
-    private invalidateBlocks(exception: BlockKey[]) {
+    private invalidateBlocks(trigger: Trigger) {
+        this.validRequestData.delete(trigger);
+
+        if (this.blocksDescs === undefined) {
+            // worker is not ready yet
+            return;
+        }
+
         // invalidate all ready blocks with exceptions
         for (const blockKey of this.readyBlocks.keys()) {
-            if (!exception.includes(blockKey)) {
+            if (!(blockKey in this.blocksDescs) || this.blocksDescs[blockKey].triggers.includes(trigger)) {
                 // must invalidate
                 // remove from ready blocks and notify UI of stale data
                 this.readyBlocks.delete(blockKey);
@@ -137,7 +170,10 @@ export class DataProvider extends EventEmitter {
             }
         }
         // if we are currently working on a block, mark to invalidate
-        if (this.currentBlock !== undefined && !exception.includes(this.currentBlock)) {
+        if (
+            this.currentBlock !== undefined &&
+            (!(this.currentBlock in this.blocksDescs) || this.blocksDescs[this.currentBlock].triggers.includes(trigger))
+        ) {
             this.currentBlockInvalidated = true;
         }
 

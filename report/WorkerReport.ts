@@ -1,6 +1,6 @@
 export default null as any;
 
-import { BlockKey, BlockState, BlockProcessFns, Filters } from "@pipeline/blocks/Blocks";
+import { BlockKey, BlocksDesc, BlocksDescMap, BlocksProcessFn, BlockState, Filters } from "@pipeline/blocks/Blocks";
 import { ProcessedData } from "@pipeline/preprocess/ProcessedData";
 
 export interface BlockRequest {
@@ -10,17 +10,23 @@ export interface BlockRequest {
 }
 
 export interface BlockResult {
+    type: "result";
     blockKey: BlockKey;
     state: BlockState;
     data: any | null;
+}
+
+export interface BlocksInfo {
+    type: "info";
+    info: BlocksDescMap;
 }
 
 let processedData: ProcessedData | null = null;
 let fitlers: Filters = {
     channels: [],
     authors: [],
-    startDate: new Date(),
-    endDate: new Date(),
+    startDate: "",
+    endDate: "",
 };
 
 self.onmessage = async (ev: MessageEvent<BlockRequest>) => {
@@ -35,18 +41,20 @@ self.onmessage = async (ev: MessageEvent<BlockRequest>) => {
 
     try {
         if (!processedData) throw new Error("No processed data provided");
-        if (!(br.blockKey in BlockProcessFns)) throw new Error("BlockFn not found");
+        if (!(br.blockKey in BlocksProcessFn)) throw new Error("BlockFn not found");
 
-        const data = BlockProcessFns[br.blockKey](processedData, fitlers);
+        const data = BlocksProcessFn[br.blockKey](processedData, fitlers);
 
         self.postMessage(<BlockResult>{
+            type: "result",
             blockKey: br.blockKey,
             state: "ready",
             data,
         });
     } catch (err) {
-        console.error(err);
+        // console.error(err);
         self.postMessage(<BlockResult>{
+            type: "result",
             blockKey: br.blockKey,
             state: "error",
             data: null,
@@ -55,3 +63,9 @@ self.onmessage = async (ev: MessageEvent<BlockRequest>) => {
 };
 
 console.log("WorkerReport started");
+
+// send initial information about blocks
+self.postMessage(<BlocksInfo>{
+    type: "info",
+    info: BlocksDesc,
+});

@@ -105,3 +105,6 @@ export const searchFormat = (str: string): string => {
     str = stripDiacritics(str); // remove diacritics
     return str;
 };
+
+export const monthToString = (date: Date): string => date.getFullYear() + "-" + (date.getMonth() + 1);
+export const dateToString = (date: Date): string => monthToString(date) + "-" + date.getDate();

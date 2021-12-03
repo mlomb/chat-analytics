@@ -1,4 +1,5 @@
-import { BlockProcessFn, BlockProcessFns } from "./Blocks";
+import { BlockProcessFn, BlocksDesc, BlocksProcessFn } from "@pipeline/blocks/Blocks";
+import { dateToString, monthToString } from "@pipeline/Utils";
 
 type MessagesPerCycle = {
     date: number; // timestamp
@@ -10,10 +11,6 @@ export interface MessagesPerCycleBlock {
     perMonth: MessagesPerCycle[];
 }
 
-const monthToString = (date: Date): string => date.getFullYear() + "-" + (date.getMonth() + 1);
-const dateToString = (date: Date): string => monthToString(date) + "-" + date.getDate();
-
-// This block IGNORES start and end dates in the filter
 export const process: BlockProcessFn<MessagesPerCycleBlock> = (source, filters) => {
     const res: MessagesPerCycleBlock = {
         perDay: [],
@@ -76,4 +73,7 @@ export const process: BlockProcessFn<MessagesPerCycleBlock> = (source, filters) 
     return res;
 };
 
-BlockProcessFns["MessagesPerCycle"] = process;
+BlocksProcessFn["MessagesPerCycle"] = process;
+BlocksDesc["MessagesPerCycle"] = {
+    triggers: ["authors", "channels"],
+};
