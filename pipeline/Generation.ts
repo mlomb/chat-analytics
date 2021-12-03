@@ -1,8 +1,12 @@
+import { compress } from "compress-json";
+
 import { FileInput, ReportConfig, StepInfo } from "@pipeline/Types";
+import { downloadFile } from "@pipeline/Utils";
 import { Parser } from "@pipeline/parse/Parser";
 import { DiscordParser } from "@pipeline/parse/DiscordParser";
 import { WhatsAppParser } from "@pipeline/parse/WhatsAppParser";
 import { TelegramParser } from "@pipeline/parse/TelegramParser";
+import { preprocess } from "./preprocess/Preprocess";
 
 export async function* generateReport(files: FileInput[], config: ReportConfig): AsyncGenerator<StepInfo> {
     //
@@ -40,12 +44,9 @@ export async function* generateReport(files: FileInput[], config: ReportConfig):
     parser = null;
 
     //
-    // 2. Preprocess database
-    //
-    console.log(database);
-
     // TEMPORAL
     // GENERATE RANDOM STUFF
+    //
     for (let j = 0; j < 15; j++) {
         const total = Math.floor(Math.random() * 50);
         yield { type: "new", title: "thing " + j, total };
@@ -56,7 +57,18 @@ export async function* generateReport(files: FileInput[], config: ReportConfig):
         yield { type: "done" };
     }
 
-    const html = "Aqui pondria un reporte si lo hubiera generado";
+    //
+    // 2. Preprocess database
+    //
+    const preprocessed = yield* preprocess(database, config);
+
+    //
+    // 3. Compress data and export
+    //
+    const data_str = JSON.stringify(compress(preprocessed));
+
+    let html = yield* downloadFile("report.html");
+    html = html.replace("undefined", data_str);
 
     yield {
         type: "result",

@@ -1,3 +1,5 @@
+import { StepInfo } from "@pipeline/Types";
+
 // Taken from react-select/src/diacritics.js
 // prettier-ignore
 const diacritics = [
@@ -108,3 +110,23 @@ export const searchFormat = (str: string): string => {
 
 export const monthToString = (date: Date): string => date.getFullYear() + "-" + (date.getMonth() + 1);
 export const dateToString = (date: Date): string => monthToString(date) + "-" + date.getDate();
+
+export const downloadFile = async function* (filepath: string): AsyncGenerator<StepInfo, string> {
+    yield { type: "new", title: "Downloading " + filepath };
+    let text;
+    // NOTE: I know this is ugly, but it works
+    if (typeof window === "undefined" && typeof self === "undefined") {
+        // node
+        // @ts-ignore
+        const fs = typeof env === "undefined" ? require("fs") : null;
+        // @ts-ignore
+        const path = typeof env === "undefined" ? require("path") : null;
+        text = fs.readFileSync(path.resolve(__dirname, "../dist/" + filepath), "utf8");
+    } else {
+        // browser
+        const req = await fetch(filepath);
+        text = await req.text();
+    }
+    yield { type: "done" };
+    return text;
+};
