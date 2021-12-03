@@ -1,7 +1,7 @@
 import { useLayoutEffect, useRef } from "react";
 
-import * as am5 from "@amcharts/amcharts5";
-import * as am5percent from "@amcharts/amcharts5/percent";
+import { Root, Percent, Tooltip } from "@amcharts/amcharts5";
+import { PieChart, PieSeries } from "@amcharts/amcharts5/percent";
 
 import { dataProvider } from "@report/DataProvider";
 import { Themes } from "./AmCharts5";
@@ -12,23 +12,23 @@ const DonutChart = (props: Props) => {
     const chartDiv = useRef<HTMLDivElement>(null);
 
     useLayoutEffect(() => {
-        const root = am5.Root.new(chartDiv.current!);
+        const root = Root.new(chartDiv.current!);
         root.setThemes(Themes(root, true));
 
         const chart = root.container.children.push(
-            am5percent.PieChart.new(root, {
+            PieChart.new(root, {
                 layout: root.verticalLayout,
             })
         );
 
         const series = chart.series.push(
-            am5percent.PieSeries.new(root, {
+            PieSeries.new(root, {
                 name: "Series",
                 valueField: "sales",
                 categoryField: "country",
                 alignLabels: true,
-                innerRadius: new am5.Percent(50),
-                tooltip: am5.Tooltip.new(root, {
+                innerRadius: new Percent(50),
+                tooltip: Tooltip.new(root, {
                     forceHidden: true,
                 }),
             })

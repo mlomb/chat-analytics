@@ -1,34 +1,33 @@
 import { useLayoutEffect, useRef } from "react";
 
-import * as am5 from "@amcharts/amcharts5";
-import * as am5percent from "@amcharts/amcharts5/percent";
+import { Root, Color, Percent, Tooltip } from "@amcharts/amcharts5";
+import { PieChart, PieSeries } from "@amcharts/amcharts5/percent";
 
-import { dataProvider } from "@report/DataProvider";
 import { Themes } from "./AmCharts5";
 
 interface Props {}
 
-const PieChart = (props: Props) => {
+const PieChartGraph = (props: Props) => {
     const chartDiv = useRef<HTMLDivElement>(null);
 
     useLayoutEffect(() => {
-        const root = am5.Root.new(chartDiv.current!);
+        const root = Root.new(chartDiv.current!);
         root.setThemes(Themes(root, true));
 
         const chart = root.container.children.push(
-            am5percent.PieChart.new(root, {
+            PieChart.new(root, {
                 layout: root.verticalLayout,
             })
         );
 
         const series = chart.series.push(
-            am5percent.PieSeries.new(root, {
+            PieSeries.new(root, {
                 name: "Series",
                 valueField: "sales",
                 categoryField: "country",
                 alignLabels: true,
-                innerRadius: new am5.Percent(50),
-                tooltip: am5.Tooltip.new(root, {
+                innerRadius: new Percent(50),
+                tooltip: Tooltip.new(root, {
                     forceHidden: true,
                 }),
             })
@@ -45,7 +44,7 @@ const PieChart = (props: Props) => {
                 country: "Text",
                 sales: 78,
                 sliceSettings: {
-                    fill: am5.color("#00bcd4"),
+                    fill: Color.fromString("#00bcd4"),
                     stroke: null,
                 },
             },
@@ -53,7 +52,7 @@ const PieChart = (props: Props) => {
                 country: "Media",
                 sales: 13,
                 sliceSettings: {
-                    fill: am5.color("#ff9800"),
+                    fill: Color.fromString("#ff9800"),
                     stroke: null,
                 },
             },
@@ -61,7 +60,7 @@ const PieChart = (props: Props) => {
                 country: "Other",
                 sales: 3,
                 sliceSettings: {
-                    fill: am5.color("#ccc"),
+                    fill: Color.fromString("#ccc"),
                     stroke: null,
                 },
                 // stickers, etc
@@ -76,4 +75,4 @@ const PieChart = (props: Props) => {
     return <div ref={chartDiv} style={{ width: "100%", height: "100%", minHeight: 700 }}></div>;
 };
 
-export default PieChart;
+export default PieChartGraph;

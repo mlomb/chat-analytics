@@ -1,8 +1,16 @@
 import { useLayoutEffect, useRef } from "react";
 
 import { Themes } from "./viz/AmCharts5";
-import * as am5 from "@amcharts/amcharts5";
-import * as am5xy from "@amcharts/amcharts5/xy";
+import { Root, Color } from "@amcharts/amcharts5";
+import {
+    XYChart,
+    XYChartScrollbar,
+    DateAxis,
+    ValueAxis,
+    AxisRendererX,
+    AxisRendererY,
+    StepLineSeries,
+} from "@amcharts/amcharts5/xy";
 
 import { dataProvider } from "@report/DataProvider";
 
@@ -25,24 +33,24 @@ const TimeSelector = () => {
     const chartDiv = useRef<HTMLDivElement>(null);
 
     useLayoutEffect(() => {
-        const root = am5.Root.new(chartDiv.current!);
+        const root = Root.new(chartDiv.current!);
         root.setThemes(Themes(root, false));
 
         const chart = root.container.children.push(
-            am5xy.XYChart.new(root, {
+            XYChart.new(root, {
                 layout: root.verticalLayout,
                 ...RESETS,
             })
         );
 
-        const scrollbarX = am5xy.XYChartScrollbar.new(root, {
+        const scrollbarX = XYChartScrollbar.new(root, {
             orientation: "horizontal",
             height: SB_HEIGHT,
             ...RESETS,
         });
 
         scrollbarX.get("background")!.setAll({
-            fill: am5.Color.fromHex(0x1e2529),
+            fill: Color.fromHex(0x1e2529),
             fillOpacity: 0.01,
         });
         chart.plotContainer.set("visible", false);
@@ -53,22 +61,22 @@ const TimeSelector = () => {
         chart.set("scrollbarX", scrollbarX);
 
         const xAxis = scrollbarX.chart.xAxes.push(
-            am5xy.DateAxis.new(root, {
+            DateAxis.new(root, {
                 baseInterval: { timeUnit: "day", count: 1 },
-                renderer: am5xy.AxisRendererX.new(root, {}),
+                renderer: AxisRendererX.new(root, {}),
             })
         );
 
         const yAxis = scrollbarX.chart.yAxes.push(
-            am5xy.ValueAxis.new(root, {
-                renderer: am5xy.AxisRendererY.new(root, {}),
+            ValueAxis.new(root, {
+                renderer: AxisRendererY.new(root, {}),
                 min: 0,
                 maxPrecision: 0,
             })
         );
 
         const series = scrollbarX.chart.series.push(
-            am5xy.StepLineSeries.new(root, {
+            StepLineSeries.new(root, {
                 xAxis: xAxis,
                 yAxis: yAxis,
                 valueYField: "messages",

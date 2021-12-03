@@ -1,7 +1,16 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
-import * as am5 from "@amcharts/amcharts5";
-import * as am5xy from "@amcharts/amcharts5/xy";
+import { Root, Color, Label, p50 } from "@amcharts/amcharts5";
+import {
+    XYChart,
+    DateAxis,
+    ValueAxis,
+    AxisRendererX,
+    AxisRendererY,
+    StepLineSeries,
+    ColumnSeries,
+    XYCursor,
+} from "@amcharts/amcharts5/xy";
 
 import { dataProvider } from "@report/DataProvider";
 import { MessagesPerCycleBlock } from "@pipeline/blocks/MessagesPerCycle";
@@ -10,31 +19,31 @@ import { Themes } from "./AmCharts5";
 const MessagesGraph = ({ data }: { data: MessagesPerCycleBlock }) => {
     const chartDiv = useRef<HTMLDivElement>(null);
     const [charts, setCharts] = useState<{
-        stepSeries: am5xy.StepLineSeries | null;
-        columnSeries: am5xy.ColumnSeries | null;
+        stepSeries: StepLineSeries | null;
+        columnSeries: ColumnSeries | null;
     }>({
         stepSeries: null,
         columnSeries: null,
     });
 
     useLayoutEffect(() => {
-        const root = am5.Root.new(chartDiv.current!);
+        const root = Root.new(chartDiv.current!);
         root.setThemes(Themes(root, false)); // Do not animate!
 
         const chartStep = root.container.children.push(
-            am5xy.XYChart.new(root, {
+            XYChart.new(root, {
                 layout: root.verticalLayout,
             })
         );
         chartStep.zoomOutButton.set("forceHidden", true);
-        chartStep.set("cursor", am5xy.XYCursor.new(root, {}));
+        chartStep.set("cursor", XYCursor.new(root, {}));
         //chartStep.get("cursor")!.lineX.set("visible", false);
         chartStep.get("cursor")!.lineY.set("visible", false);
 
-        const createValueAxis = (chart: am5xy.XYChart) => {
+        const createValueAxis = (chart: XYChart) => {
             return chart.yAxes.push(
-                am5xy.ValueAxis.new(root, {
-                    renderer: am5xy.AxisRendererY.new(root, {
+                ValueAxis.new(root, {
+                    renderer: AxisRendererY.new(root, {
                         inside: false,
                     }),
                     min: 0,
@@ -43,9 +52,9 @@ const MessagesGraph = ({ data }: { data: MessagesPerCycleBlock }) => {
             );
         };
 
-        const createDateAxis = (chart: am5xy.XYChart, timeUnit: "day" | "month") => {
+        const createDateAxis = (chart: XYChart, timeUnit: "day" | "month") => {
             return chart.xAxes.push(
-                am5xy.DateAxis.new(root, {
+                DateAxis.new(root, {
                     baseInterval: {
                         timeUnit,
                         count: 1,
@@ -56,20 +65,20 @@ const MessagesGraph = ({ data }: { data: MessagesPerCycleBlock }) => {
                     periodChangeDateFormats: {
                         month: "[bold]yyyy[/]",
                     },
-                    renderer: am5xy.AxisRendererX.new(root, {}),
+                    renderer: AxisRendererX.new(root, {}),
                 })
             );
         };
 
         const stepSeries = chartStep.series.push(
-            am5xy.StepLineSeries.new(root, {
+            StepLineSeries.new(root, {
                 valueXField: "date",
                 valueYField: "messages",
                 xAxis: createDateAxis(chartStep, "day"),
                 yAxis: createValueAxis(chartStep),
                 noRisers: true,
-                stroke: am5.color(0x479adb),
-                fill: am5.color(0x479adb),
+                stroke: Color.fromHex(0x479adb),
+                fill: Color.fromHex(0x479adb),
                 /*tooltipText: "[bold]{valueX.formatDate('EEEE, MMM dd yyyy')}:[/] {messages} messages sent",
             tooltip: am5.Tooltip.new(root, {
                 pointerOrientation: "horizontal",
@@ -78,11 +87,11 @@ const MessagesGraph = ({ data }: { data: MessagesPerCycleBlock }) => {
         );
 
         chartStep.yAxes.getIndex(0)!.children.unshift(
-            am5.Label.new(root, {
+            Label.new(root, {
                 rotation: -90,
                 text: "Messages sent",
-                y: am5.p50,
-                centerX: am5.p50,
+                y: p50,
+                centerX: p50,
             })
         );
         stepSeries.strokes.template.setAll({
@@ -96,23 +105,23 @@ const MessagesGraph = ({ data }: { data: MessagesPerCycleBlock }) => {
         });
 
         const chartColumn = root.container.children.push(
-            am5xy.XYChart.new(root, {
+            XYChart.new(root, {
                 layout: root.verticalLayout,
                 height: 100,
             })
         );
         chartColumn.zoomOutButton.set("forceHidden", true);
-        chartColumn.set("cursor", am5xy.XYCursor.new(root, {}));
+        chartColumn.set("cursor", XYCursor.new(root, {}));
         chartColumn.get("cursor")!.lineX.set("visible", false);
         chartColumn.get("cursor")!.lineY.set("visible", false);
 
         const columnSeries = chartColumn.series.push(
-            am5xy.ColumnSeries.new(root, {
+            ColumnSeries.new(root, {
                 valueXField: "date",
                 valueYField: "messages",
                 xAxis: createDateAxis(chartColumn, "month"),
                 yAxis: createValueAxis(chartColumn),
-                fill: am5.color(0x479adb),
+                fill: Color.fromHex(0x479adb),
                 /*tooltipText: "[bold]{valueX.formatDate('MMM yyyy')}:[/] {messages} messages sent",
             tooltip: am5.Tooltip.new(root, {
                 pointerOrientation: "horizontal",
@@ -120,13 +129,13 @@ const MessagesGraph = ({ data }: { data: MessagesPerCycleBlock }) => {
             })
         );
         chartColumn.yAxes.getIndex(0)!.children.unshift(
-            am5.Label.new(root, {
+            Label.new(root, {
                 rotation: -90,
                 text: ".....",
                 // invisible text to align with the other graph
                 opacity: 0,
-                y: am5.p50,
-                centerX: am5.p50,
+                y: p50,
+                centerX: p50,
             })
         );
 
@@ -134,7 +143,7 @@ const MessagesGraph = ({ data }: { data: MessagesPerCycleBlock }) => {
 
         const onZoom = () =>
             [chartStep, chartColumn].forEach((c) =>
-                (c.xAxes.getIndex(0) as am5xy.DateAxis<any>).zoomToDates(
+                (c.xAxes.getIndex(0) as DateAxis<any>).zoomToDates(
                     dataProvider.getActiveStartDate(),
                     dataProvider.getActiveEndDate()
                 )
@@ -165,7 +174,7 @@ const MessagesGraph = ({ data }: { data: MessagesPerCycleBlock }) => {
             style={{
                 width: "100%",
                 height: "89%",
-                minHeight: 600,
+                minHeight: 550,
                 marginLeft: 5,
                 marginBottom: 5,
             }}

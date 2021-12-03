@@ -1,10 +1,8 @@
 import { useLayoutEffect, useRef } from "react";
 
 import { Themes } from "./AmCharts5";
-import * as am5 from "@amcharts/amcharts5";
-import * as am5xy from "@amcharts/amcharts5/xy";
-
-import { dataProvider } from "@report/DataProvider";
+import { Root, Color, HeatLegend, Percent } from "@amcharts/amcharts5";
+import { XYChart, AxisRendererX, AxisRendererY, CategoryAxis, ColumnSeries } from "@amcharts/amcharts5/xy";
 
 interface Props {}
 
@@ -12,11 +10,11 @@ const HeatMapChart = (props: Props) => {
     const chartDiv = useRef<HTMLDivElement>(null);
 
     useLayoutEffect(() => {
-        const root = am5.Root.new(chartDiv.current!);
+        const root = Root.new(chartDiv.current!);
         root.setThemes(Themes(root, true));
 
         const chart = root.container.children.push(
-            am5xy.XYChart.new(root, {
+            XYChart.new(root, {
                 panX: false,
                 panY: false,
                 wheelX: "none",
@@ -26,7 +24,7 @@ const HeatMapChart = (props: Props) => {
         );
 
         // Create axes and their renderers
-        var yRenderer = am5xy.AxisRendererY.new(root, {
+        var yRenderer = AxisRendererY.new(root, {
             visible: false,
             minGridDistance: 20,
             inversed: true,
@@ -35,14 +33,14 @@ const HeatMapChart = (props: Props) => {
         yRenderer.grid.template.set("visible", false);
 
         var yAxis = chart.yAxes.push(
-            am5xy.CategoryAxis.new(root, {
+            CategoryAxis.new(root, {
                 maxDeviation: 0,
                 renderer: yRenderer,
                 categoryField: "weekday",
             })
         );
 
-        var xRenderer = am5xy.AxisRendererX.new(root, {
+        var xRenderer = AxisRendererX.new(root, {
             visible: false,
             minGridDistance: 30,
             opposite: true,
@@ -51,7 +49,7 @@ const HeatMapChart = (props: Props) => {
         xRenderer.grid.template.set("visible", false);
 
         var xAxis = chart.xAxes.push(
-            am5xy.CategoryAxis.new(root, {
+            CategoryAxis.new(root, {
                 renderer: xRenderer,
                 categoryField: "hour",
             })
@@ -60,9 +58,9 @@ const HeatMapChart = (props: Props) => {
         // Create series
         // https://www.amcharts.com/docs/v5/charts/xy-chart/#Adding_series
         var series = chart.series.push(
-            am5xy.ColumnSeries.new(root, {
+            ColumnSeries.new(root, {
                 calculateAggregates: true,
-                stroke: am5.color(0xffffff),
+                stroke: Color.fromHex(0xffffff),
                 clustered: false,
                 xAxis: xAxis,
                 yAxis: yAxis,
@@ -76,8 +74,8 @@ const HeatMapChart = (props: Props) => {
             tooltipText: "{value}",
             strokeOpacity: 1,
             strokeWidth: 2,
-            width: am5.percent(100),
-            height: am5.percent(100),
+            width: new Percent(100),
+            height: new Percent(100),
         });
 
         series.columns.template.events.on("pointerover", function (event) {
@@ -98,8 +96,8 @@ const HeatMapChart = (props: Props) => {
         series.set("heatRules", [
             {
                 target: series.columns.template,
-                min: am5.color(0xfffb77),
-                max: am5.color(0xfe131a),
+                min: Color.fromHex(0xfffb77),
+                max: Color.fromHex(0xfe131a),
                 dataField: "value",
                 key: "fill",
             },
@@ -108,10 +106,10 @@ const HeatMapChart = (props: Props) => {
         // Add heat legend
         // https://www.amcharts.com/docs/v5/concepts/legend/heat-legend/
         var heatLegend = chart.bottomAxesContainer.children.push(
-            am5.HeatLegend.new(root, {
+            HeatLegend.new(root, {
                 orientation: "horizontal",
-                endColor: am5.color(0xfffb77),
-                startColor: am5.color(0xfe131a),
+                endColor: Color.fromHex(0xfffb77),
+                startColor: Color.fromHex(0xfe131a),
             })
         );
 
