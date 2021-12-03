@@ -36,7 +36,7 @@ const Card = (props: Props) => {
 
     useEffect(() => {
         const updateContent = (state: BlockState, data?: any) => {
-            setContent({ state, data: data || content.data });
+            setContent((prev) => ({ state, data: data || prev.data }));
         };
         dataProvider.on(props.blockKey, updateContent);
 

@@ -33,6 +33,12 @@ export interface Author {
     channels: {
         [id: ID]: {
             [date: DateStr]: DayAggregation;
+            /*
+            total: number;
+            aggr_day: {
+                [date: DateStr]: DayAggregation;
+            };
+            */
         };
     };
 }

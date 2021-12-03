@@ -33,3 +33,4 @@ export const BlocksDesc: BlocksDescMap = {};
 // Register all blocks
 //
 import "./MessagesPerCycle";
+import "./MessagesStats";

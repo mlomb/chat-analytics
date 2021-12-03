@@ -5,16 +5,15 @@ import { useState } from "react";
 import Header from "@report/components/Header";
 import { TabContainer } from "@report/components/Tabs";
 
+import AuthorChip from "@report/components/core/AuthorChip";
 import Card from "@report/components/Card";
 import MessagesGraph from "@report/components/viz/MessagesGraph";
 import WordCloudGraph from "@report/components/viz/WordCloudGraph";
 import DonutChart from "@report/components/viz/DonutChart";
-import PieChart from "@report/components/viz/PieChart";
-import SimpleTable from "@report/components/viz/SimpleTable";
 import HeatMapChart from "@report/components/viz/HeatMapChart";
 import AnimatedBars from "@report/components/viz/AnimatedBars";
 import ChannelChip from "@report/components/core/ChannelChip";
-import AuthorChip from "@report/components/core/AuthorChip";
+import MessagesStats from "@report/components/viz/MessagesStats";
 
 const CardContainer = (props: { children: React.ReactNode }) => <div className="CardContainer">{props.children}</div>;
 
@@ -29,14 +28,11 @@ const ReportPage = () => {
                 <CardContainer>
                     <Card
                         num={2}
-                        blockKey="MessagesPerCycle"
                         title="Messages sent per day &amp; month"
+                        blockKey="MessagesPerCycle"
                         component={MessagesGraph}
-                    ></Card>
-                    <Card blockKey="message-stats" num={1} title="Messages stats">
-                        <SimpleTable />
-                        <PieChart />
-                    </Card>
+                    />
+                    <Card num={1} title="Messages stats" blockKey="MessagesStats" component={MessagesStats} />
                     <Card num={1} blockKey="message-algo" title="Poner algo aca">
                         this is content
                     </Card>
