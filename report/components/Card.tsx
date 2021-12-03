@@ -8,11 +8,12 @@ import { BlockKey, BlockState } from "@pipeline/blocks/Blocks";
 import { dataProvider } from "@report/DataProvider";
 
 interface Props {
-    // TODO: enforce correct type
-    children: React.ReactNode | ((props: { data: any }) => React.ReactNode);
+    children?: React.ReactNode;
     blockKey: BlockKey;
     title?: string;
     num: 1 | 2 | 3;
+    // TODO: enforce correct type
+    component?: (props: { data: any }) => JSX.Element;
 }
 
 const Indicators = {
@@ -51,7 +52,7 @@ const Card = (props: Props) => {
     return (
         <InView onChange={onChange} className={"Card Card--" + props.num}>
             {props.title ? <div className="Card_title">{props.title}</div> : null}
-            {props.children}
+            {props.component ? <props.component data={content.data} /> : props.children}
             <div className={"Card_overlay" + (content.state === "ready" ? " Card_overlay--hidden" : "")}>
                 <img src={Spinner} alt="Loading" height={60} />
                 {Indicators[content.state]}

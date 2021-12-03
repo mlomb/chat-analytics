@@ -27,9 +27,12 @@ const ReportPage = () => {
 
             <TabContainer currentValue={tab} value="messages">
                 <CardContainer>
-                    <Card num={2} blockKey="message-per-cycle" title="Messages sent per day &amp; month">
-                        {/*<MessagesGraph />*/}
-                    </Card>
+                    <Card
+                        num={2}
+                        blockKey="MessagesPerCycle"
+                        title="Messages sent per day &amp; month"
+                        component={MessagesGraph}
+                    ></Card>
                     <Card blockKey="message-stats" num={1} title="Messages stats">
                         <SimpleTable />
                         <PieChart />

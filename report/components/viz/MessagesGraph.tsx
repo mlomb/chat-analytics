@@ -1,14 +1,21 @@
-// @ts-nocheck
-import { useLayoutEffect, useRef } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
 import * as am5 from "@amcharts/amcharts5";
 import * as am5xy from "@amcharts/amcharts5/xy";
 
 import { dataProvider } from "@report/DataProvider";
+import { MessagesPerCycleBlock } from "@pipeline/blocks/MessagesPerCycle";
 import { Themes } from "./AmCharts5";
 
-const MessagesGraph = () => {
+const MessagesGraph = ({ data }: { data: MessagesPerCycleBlock }) => {
     const chartDiv = useRef<HTMLDivElement>(null);
+    const [charts, setCharts] = useState<{
+        stepSeries: am5xy.StepLineSeries | null;
+        columnSeries: am5xy.ColumnSeries | null;
+    }>({
+        stepSeries: null,
+        columnSeries: null,
+    });
 
     useLayoutEffect(() => {
         const root = am5.Root.new(chartDiv.current!);
@@ -54,7 +61,7 @@ const MessagesGraph = () => {
             );
         };
 
-        const setpSeries = chartStep.series.push(
+        const stepSeries = chartStep.series.push(
             am5xy.StepLineSeries.new(root, {
                 valueXField: "date",
                 valueYField: "messages",
@@ -78,12 +85,12 @@ const MessagesGraph = () => {
                 centerX: am5.p50,
             })
         );
-        setpSeries.strokes.template.setAll({
+        stepSeries.strokes.template.setAll({
             visible: true,
             strokeWidth: 2,
             strokeOpacity: 0.8,
         });
-        setpSeries.fills.template.setAll({
+        stepSeries.fills.template.setAll({
             visible: true,
             fillOpacity: 0.2,
         });
@@ -125,29 +132,32 @@ const MessagesGraph = () => {
 
         root.container.set("layout", root.verticalLayout);
 
-        const charts = [chartStep, chartColumn];
-
         const onZoom = () =>
-            charts.forEach((c) =>
-                (c.xAxes.getIndex(0) as am5xy.DateAxis<any>).zoomToDates(dataProvider.getStart(), dataProvider.getEnd())
+            [chartStep, chartColumn].forEach((c) =>
+                (c.xAxes.getIndex(0) as am5xy.DateAxis<any>).zoomToDates(
+                    dataProvider.getActiveStartDate(),
+                    dataProvider.getActiveEndDate()
+                )
             );
 
-        // TODO: update efficient
-        const onDataUpdated = () => {
-            setpSeries.data.setAll(dataProvider.getPerDayData());
-            columnSeries.data.setAll(dataProvider.getPerMonthData());
-            onZoom();
-        };
-        dataProvider.on("updated-data", onDataUpdated);
-        dataProvider.on("updated-zoom", onZoom);
+        dataProvider.on("trigger-time", onZoom);
         onZoom();
+        setCharts({ stepSeries, columnSeries });
 
         return () => {
-            dataProvider.off("updated-data", onDataUpdated);
-            dataProvider.off("updated-zoom", onZoom);
+            setCharts({ stepSeries: null, columnSeries: null });
+            dataProvider.off("trigger-time", onZoom);
             root.dispose();
         };
     }, []);
+
+    useEffect(() => {
+        if (data) {
+            // TODO: update efficient
+            charts.stepSeries?.data.setAll(data.perDay);
+            charts.columnSeries?.data.setAll(data.perMonth);
+        }
+    }, [charts, data]);
 
     return (
         <div

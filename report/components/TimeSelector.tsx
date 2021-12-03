@@ -94,11 +94,10 @@ const TimeSelector = () => {
         };
         scrollbarX.events.on("rangechanged", dateAxisChanged);
 
-        // TODO: update efficient
         const blockKey = "MessagesPerCycle";
         const onDataUpdated = (state: BlockState, data?: MessagesPerCycleBlock) => {
-            console.log(state, data);
             if (state === "ready") {
+                // TODO: update efficient
                 series.data.setAll(data!.perDay);
             }
         };

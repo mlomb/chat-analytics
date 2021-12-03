@@ -79,7 +79,6 @@ export class DataProvider extends EventEmitter {
         }
         this.activeStartDate = start;
         this.activeEndDate = end;
-        //this.emit("updated-zoom");
         this.invalidateBlocks("time");
     }
 
@@ -90,7 +89,7 @@ export class DataProvider extends EventEmitter {
         }
 
         // pick an active block that is not ready
-        const pendingBlocks = [...this.activeBlocks].filter((k) => !this.readyBlocks.has(k));
+        const pendingBlocks = Array.from(this.activeBlocks).filter((k) => !this.readyBlocks.has(k));
 
         // if there is pending work and the worker is available
         if (pendingBlocks.length > 0 && this.currentBlock === undefined) {
@@ -154,6 +153,7 @@ export class DataProvider extends EventEmitter {
 
     private invalidateBlocks(trigger: Trigger) {
         this.validRequestData.delete(trigger);
+        this.emit("trigger-" + trigger);
 
         if (this.blocksDescs === undefined) {
             // worker is not ready yet
@@ -161,7 +161,8 @@ export class DataProvider extends EventEmitter {
         }
 
         // invalidate all ready blocks with exceptions
-        for (const blockKey of this.readyBlocks.keys()) {
+        const keys = Array.from(this.readyBlocks.keys());
+        for (const blockKey of keys) {
             if (!(blockKey in this.blocksDescs) || this.blocksDescs[blockKey].triggers.includes(trigger)) {
                 // must invalidate
                 // remove from ready blocks and notify UI of stale data
@@ -179,6 +180,14 @@ export class DataProvider extends EventEmitter {
 
         // recompute
         this.tryToDispatchWork();
+    }
+
+    public getActiveStartDate(): Date {
+        return this.activeStartDate;
+    }
+
+    public getActiveEndDate(): Date {
+        return this.activeEndDate;
     }
 }
 
