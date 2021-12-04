@@ -55,17 +55,14 @@ export const process: BlockProcessFn<MessagesPerCycleBlock> = (source, filters) 
         res.perDay.push(dayData);
     }
 
-    for (let { dayKey, dayData, monthData } of dates) {
-        for (const author of source.authors) {
-            if (filters.authors.includes(author.id)) {
-                for (const channelId of filters.channels) {
-                    if (channelId in author.channels) {
-                        const from_user_in_channel = author.channels[channelId];
-                        if (dayKey in from_user_in_channel) {
-                            let messages = from_user_in_channel[dayKey].messages;
-                            dayData.messages += messages;
-                            monthData.messages += messages;
-                        }
+    for (const author of source.authors) {
+        if (filters.authors.includes(author.id)) {
+            for (const channelId of filters.channels) {
+                if (channelId in author.aggrs) {
+                    for (const { dayKey, dayData, monthData } of dates) {
+                        const dayAggr = author.aggrs[dayKey][channelId];
+                        dayData.messages += dayAggr.m;
+                        monthData.messages += dayAggr.m;
                     }
                 }
             }

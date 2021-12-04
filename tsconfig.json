@@ -8,7 +8,7 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "downlevelIteration": false,
+    "downlevelIteration": true,
     "baseUrl": "./",
     "paths": {
       "@app/*": ["app/*"],

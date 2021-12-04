@@ -161,8 +161,7 @@ export class DataProvider extends EventEmitter {
         }
 
         // invalidate all ready blocks with exceptions
-        const keys = Array.from(this.readyBlocks.keys());
-        for (const blockKey of keys) {
+        for (const blockKey of this.readyBlocks.keys()) {
             if (!(blockKey in this.blocksDescs) || this.blocksDescs[blockKey].triggers.includes(trigger)) {
                 // must invalidate
                 // remove from ready blocks and notify UI of stale data

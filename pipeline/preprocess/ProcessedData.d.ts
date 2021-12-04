@@ -30,21 +30,16 @@ export interface Author {
     name: string;
     name_searchable: string;
     bot: boolean;
-    channels: {
-        [id: ID]: {
-            [date: DateStr]: DayAggregation;
-            /*
-            total: number;
-            aggr_day: {
-                [date: DateStr]: DayAggregation;
-            };
-            */
+
+    aggrs: {
+        [date: DateStr]: {
+            [id: ID]: DayAggregation; // channel ID
         };
     };
 }
 
 export type DayAggregation = {
-    messages: number;
-    words: { [word: string]: number };
-    emojis: { [emoji: string]: number };
+    m: number;
+    w: { [word: string]: number };
+    e: { [emoji: string]: number };
 };

@@ -7,17 +7,19 @@ import { initDataProvider } from "@report/DataProvider";
 
 declare global {
     interface Window {
-        __REPORT_DATA__: Compressed | undefined;
+        __PREPROCESSED_DATA__: Compressed | undefined;
     }
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
-    window.__REPORT_DATA__ = env.isProd
-        ? window.__REPORT_DATA__
+    window.__PREPROCESSED_DATA__ = env.isProd
+        ? window.__PREPROCESSED_DATA__
         : require(/* webpackChunkName: "sample" */ "@assets/report_sample.json");
 
-    if (window.__REPORT_DATA__ !== undefined) {
-        const REPORT_DATA = decompress(window.__REPORT_DATA__);
+    if (window.__PREPROCESSED_DATA__ !== undefined) {
+        console.log("Input data size", JSON.stringify(window.__PREPROCESSED_DATA__).length);
+
+        const REPORT_DATA = decompress(window.__PREPROCESSED_DATA__);
         initDataProvider(REPORT_DATA);
         ReactDOM.render(<ReportPage />, document.getElementById("app"));
     } else {
