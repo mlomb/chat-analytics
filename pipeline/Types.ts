@@ -32,8 +32,9 @@ export interface ErrorStep {
 export interface ReportResult {
     type: "result";
     title: string;
+    json?: string;
     html: string;
-    time: number;
+    time: Timestamp;
     counts: {
         authors: number;
         channels: number;

@@ -73,6 +73,7 @@ export async function* generateReport(files: FileInput[], config: ReportConfig):
     yield {
         type: "result",
         title: database.title,
+        json: env.isDev ? data_str : undefined,
         html,
         time: Date.now(),
         counts: {

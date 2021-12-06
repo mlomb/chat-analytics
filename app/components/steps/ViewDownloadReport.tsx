@@ -20,20 +20,24 @@ const ViewDownloadReport = ({ result }: Props) => {
     const [file, setFile] = useState<{
         blob: Blob | null;
         url: string;
+        jsonURL: string;
         filename: string;
     }>({
         blob: null,
         url: "",
+        jsonURL: "",
         filename: "",
     });
 
     useEffect(() => {
         if (result) {
             const date = new Date();
-            const blob = new Blob([result.html], { type: "text/html" });
+            const htmlBlob = new Blob([result.html], { type: "text/html" });
+            const jsonBlob = new Blob([result.json || ""], { type: "application/json" });
             setFile({
-                blob,
-                url: URL.createObjectURL(blob),
+                blob: htmlBlob,
+                url: URL.createObjectURL(htmlBlob),
+                jsonURL: URL.createObjectURL(jsonBlob),
                 filename: `${result?.title}-${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}.html`,
             });
         }
@@ -58,6 +62,9 @@ const ViewDownloadReport = ({ result }: Props) => {
                 <Button hueColor={[244, 90, 61]} href={file.url} target="_blank">
                     <img src={LinkOut} alt="Link out" />
                     View Locally
+                </Button>
+                <Button hueColor={[105, 70, 50]} href={file.jsonURL} download="report_sample.json">
+                    🛠️ Download JSON (dev)
                 </Button>
             </div>
             <div className="ViewDownloadReport__notice">
