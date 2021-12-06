@@ -57,12 +57,13 @@ export const process: BlockProcessFn<MessagesPerCycleBlock> = (source, filters) 
 
     for (const author of source.authors) {
         if (filters.authors.includes(author.id)) {
-            for (const channelId of filters.channels) {
-                if (channelId in author.aggrs) {
-                    for (const { dayKey, dayData, monthData } of dates) {
-                        const dayAggr = author.aggrs[dayKey][channelId];
-                        dayData.messages += dayAggr.m;
-                        monthData.messages += dayAggr.m;
+            for (const { dayKey, dayData, monthData } of dates) {
+                const dayAggr = author.aggrs[dayKey];
+                for (const channelId in dayAggr) {
+                    if (channelId in dayAggr) {
+                        const dayChannelAggr = dayAggr[channelId];
+                        dayData.messages += dayChannelAggr.m;
+                        monthData.messages += dayChannelAggr.m;
                     }
                 }
             }
