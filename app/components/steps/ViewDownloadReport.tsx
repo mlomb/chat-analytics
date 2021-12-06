@@ -63,9 +63,11 @@ const ViewDownloadReport = ({ result }: Props) => {
                     <img src={LinkOut} alt="Link out" />
                     View Locally
                 </Button>
-                <Button hueColor={[105, 70, 50]} href={file.jsonURL} download="report_sample.json">
-                    🛠️ Download JSON (dev)
-                </Button>
+                {env.isDev && (
+                    <Button hueColor={[105, 70, 50]} href={file.jsonURL} download="report_sample.json">
+                        🛠️ Download JSON (dev)
+                    </Button>
+                )}
             </div>
             <div className="ViewDownloadReport__notice">
                 Remember that we don't store your reports, so you can't share the "View Locally" link. To share the
