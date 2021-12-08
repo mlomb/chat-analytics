@@ -20,7 +20,7 @@ const AuthorChip = ({ data }: Props) => {
     if (platform === "discord") {
         placeholder = (
             <img
-                src={DiscordDefaultAvatars[data.discord!.discriminator]}
+                src={DiscordDefaultAvatars[data.discord?.discriminator]}
                 style={{
                     width: "100%",
                     height: "100%",
