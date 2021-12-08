@@ -1,4 +1,4 @@
-import { memo, useMemo, ReactNode, useRef, ReactElement, useLayoutEffect, useCallback } from "react";
+import React, { memo, useMemo, ReactNode, ReactElement, useLayoutEffect, useCallback, useRef } from "react";
 import Select, {
     components,
     InputActionMeta,
@@ -277,6 +277,7 @@ const onInputChange = (newValue: string, actionMeta: InputActionMeta) => {
 };
 
 const FilterSelect = <T extends TOption>(props: Props<T>) => {
+    const ref = React.createRef<any>();
     const Styles = useMemo(() => customStyles(props.optionColorHue), [props.optionColorHue]);
 
     const onChange = useCallback(
@@ -284,8 +285,39 @@ const FilterSelect = <T extends TOption>(props: Props<T>) => {
         [props.onChange]
     );
 
+    /*
+    // TODO: optimize when there are THOUSANDS of options
+    // it doesn't always work :(
+    // really, we should move away from react-select.
+    useLayoutEffect(() => {
+        if (ref.current) {
+            const buildCategorizedOptions = () => {
+                // @ts-ignore
+                return props.options.map(function (groupOrOption, groupOrOptionIndex) {
+                    return {
+                        type: "option",
+                        data: groupOrOption,
+                        isDisabled: false,
+                        isSelected: false, // TODO
+                        label: "label",
+                        value: "value",
+                        index: groupOrOptionIndex,
+                    };
+                });
+            };
+
+            // @ts-ignore
+            ref.current.buildFocusableOptions = buildCategorizedOptions;
+            // @ts-ignore
+            ref.current.buildCategorizedOptions = buildCategorizedOptions;
+            // @ts-ignore
+        }
+    }, []);
+    */
+
     return (
         <Select
+            ref={ref}
             id={props.id}
             options={props.options}
             placeholder={props.placeholder}
