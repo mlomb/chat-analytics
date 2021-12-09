@@ -30,7 +30,7 @@ export async function* generateReport(files: FileInput[], config: ReportConfig):
 
     // Read files and parse
     for (let i = 0; i < files.length; i++) {
-        yield { type: "new", title: "Read and parse", subject: files[i].name };
+        yield { type: "new", title: "Parsing", subject: files[i].name };
         try {
             yield* parser.parse(files[i]);
         } catch (ex) {

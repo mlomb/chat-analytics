@@ -1,9 +1,14 @@
 .Steps {
-    width: 100%;
+    width: 100vw;
     background-color: #26303b;
     padding: 15px;
     margin-bottom: 4vh;
     margin-top: 2vh;
+
+    fieldset {
+        display: grid;
+        display: contents;
+    }
 }
 
 .Steps__nav {
@@ -142,7 +147,20 @@
     margin-bottom: 5px;
     font-size: 14px;
     white-space: nowrap;
-    display: flex;
+}
+
+.StatusItem__subject {
+    min-width: 0;
+    color: #b495ff;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding-left: 5px;
+}
+
+.StatusItem__progress {
+    color: #8d8a8a;
+    margin-left: auto;
+    padding-left: 10px;
 }
 
 .StatusItem__icon {
@@ -151,6 +169,7 @@
     justify-content: center;
     width: 1.5rem;
     height: 1.5rem;
+    min-width: 1.5rem;
     margin-right: 7px;
     border-radius: 10%;
     transition: background-color 0.4s ease;
@@ -161,14 +180,14 @@
     }
 }
 
-.StatusItem__progress {
-    color: #8d8a8a;
-    margin-left: 10px;
-}
-
 .StatusItem {
-    &.StatusItem--status-pending .StatusItem__icon {
-        background: #3560c8;
+    &.StatusItem--status-pending {
+        .StatusItem__progress {
+            color: #d8d8d8;
+        }
+        .StatusItem__icon {
+            background: #3560c8;
+        }
     }
     &.StatusItem--status-success .StatusItem__icon {
         background: #52c835;

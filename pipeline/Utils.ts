@@ -112,7 +112,7 @@ export const monthToString = (date: Date): string => date.getFullYear() + "-" + 
 export const dateToString = (date: Date): string => monthToString(date) + "-" + date.getDate();
 
 export const downloadFile = async function* (filepath: string): AsyncGenerator<StepInfo, string> {
-    yield { type: "new", title: "Downloading " + filepath };
+    yield { type: "new", title: "Downloading", subject: filepath };
     let text;
     // NOTE: I know this is ugly, but it works
     if (typeof window === "undefined" && typeof self === "undefined") {

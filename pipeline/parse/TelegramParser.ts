@@ -2,8 +2,6 @@ import { FileInput } from "@pipeline/Types";
 import { Parser } from "@pipeline/parse/Parser";
 import { TelegramExportFile, TextArray } from "@pipeline/parse/TelegramParser.d";
 
-import { parseJSON } from "@pipeline/parse/Common";
-
 export class TelegramParser extends Parser {
     constructor() {
         super("telegram");
