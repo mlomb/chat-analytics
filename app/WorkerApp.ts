@@ -1,6 +1,6 @@
 export default null as any;
 
-import { ErrorStep, Platform } from "@pipeline/Types";
+import { ErrorStep, FileInput, Platform } from "@pipeline/Types";
 import { generateReport } from "@pipeline/Generation";
 
 export interface InitMessage {
@@ -8,11 +8,15 @@ export interface InitMessage {
     files: File[];
 }
 
+const wrapFile = (file: File): FileInput => ({
+    name: file.name,
+    size: file.size,
+    slice: (start, end) => (start !== undefined ? file.slice(start, end).arrayBuffer() : file.arrayBuffer()),
+});
+
 self.onmessage = async (ev: MessageEvent<InitMessage>) => {
     try {
-        const gen = generateReport(ev.data.files, {
-            platform: ev.data.platform,
-        });
+        const gen = generateReport(ev.data.files.map(wrapFile), { platform: ev.data.platform });
         for await (const packet of gen) {
             self.postMessage(packet);
         }

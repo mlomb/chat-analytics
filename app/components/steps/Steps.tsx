@@ -50,6 +50,7 @@ const Steps = () => {
             console.log(e);
             alert("An error ocurred creating the WebWorker.\n\n Error: " + e.message);
             worker.terminate();
+            if (env.isDev) throw e;
         };
         worker.onmessage = (e: MessageEvent<ReportResult>) => {
             const data = e.data;

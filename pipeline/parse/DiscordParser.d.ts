@@ -9,25 +9,25 @@
 type Snowflake = string;
 
 export interface DiscordExportFile {
-    guild: Guild;
-    channel: Channel;
+    guild: DiscordGuild;
+    channel: DiscordChannel;
     messages: Message[];
     messageCount: number;
 }
 
-interface Guild {
+export interface DiscordGuild {
     id: Snowflake;
     name: string;
     iconUrl: string;
 }
 
-interface Channel {
+export interface DiscordChannel {
     id: Snowflake;
     type: "GuildTextChat" | unknown;
     name: string;
 }
 
-interface Message {
+export interface DiscordMessage {
     id: Snowflake;
     type: "Default" | unknown;
     timestamp: string;
@@ -35,10 +35,10 @@ interface Message {
     callEndedTimestamp: string;
     isPinned: boolean;
     content: string;
-    author: Author;
+    author: DiscordAuthor;
 }
 
-interface Author {
+export interface DiscordAuthor {
     id: Snowflake;
     name: string;
     discriminator: string;

@@ -1,4 +1,4 @@
-import { ID, Timestamp, Platform } from "@pipeline/Types";
+import { ID, Timestamp, Platform, FileInput, StepInfo } from "@pipeline/Types";
 import { Database, Author, Channel, Message } from "@pipeline/parse/Database";
 
 export abstract class Parser {
@@ -14,7 +14,7 @@ export abstract class Parser {
 
     constructor(private readonly platform: Platform) {}
 
-    abstract parse(file_content: string): void;
+    abstract parse(file: FileInput): AsyncGenerator<StepInfo>;
 
     protected addChannel(channel: Channel, timestamp: Timestamp): Channel {
         if (!this.isMoreRecent(channel.id, timestamp)) {

@@ -1,6 +1,6 @@
 import { ID, ReportConfig, StepInfo, Timestamp } from "@pipeline/Types";
 import { Database, Message } from "@pipeline/parse/Database";
-import { Author, Channel, DayAggregation, ProcessedData } from "@pipeline/preprocess/ProcessedData";
+import { Author, Channel, ProcessedData } from "@pipeline/preprocess/ProcessedData";
 import { dateToString, searchFormat } from "@pipeline/Utils";
 
 export const preprocess = async function* (
@@ -20,7 +20,6 @@ export const preprocess = async function* (
             name: author.name,
             name_searchable: searchFormat(author.name),
             bot: author.bot,
-            aggrs: {},
         };
         authors.set(id, new_author);
     }
@@ -32,6 +31,7 @@ export const preprocess = async function* (
             id: id,
             name: channel.name,
             name_searchable: searchFormat(channel.name),
+            messages: [],
         });
     }
     yield { type: "done" };
@@ -50,6 +50,7 @@ export const preprocess = async function* (
                 continue;
             }
 
+            /*
             if (!(date in author.aggrs)) author.aggrs[date] = {};
             if (!(msg.channelId in author.aggrs[date])) {
                 author.aggrs[date][msg.channelId] = {
@@ -61,6 +62,7 @@ export const preprocess = async function* (
 
             const aggr = author.aggrs[date][msg.channelId];
             processMessage(msg, aggr);
+            */
         }
     }
     yield { type: "done" };
@@ -80,7 +82,3 @@ export const preprocess = async function* (
         authors: Array.from(authors.values()),
     };
 };
-
-function processMessage(msg: Message, aggr: DayAggregation) {
-    aggr.m++;
-}

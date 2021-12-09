@@ -23,6 +23,7 @@ export interface Channel {
     id: ID;
     name: string;
     name_searchable: string;
+    messages: Message[];
 }
 
 export interface Author {
@@ -30,16 +31,10 @@ export interface Author {
     name: string;
     name_searchable: string;
     bot: boolean;
-
-    aggrs: {
-        [date: DateStr]: {
-            [id: ID]: DayAggregation; // channel ID
-        };
-    };
 }
 
-export type DayAggregation = {
-    m: number;
-    w: { [word: string]: number };
-    e: { [emoji: string]: number };
-};
+export interface Message {
+    authorId: ID;
+    channelId: ID;
+    date: DateStr;
+}

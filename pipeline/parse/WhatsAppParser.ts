@@ -1,3 +1,4 @@
+import { FileInput } from "@pipeline/Types";
 import { Parser } from "@pipeline/parse/Parser";
 
 /*
@@ -13,7 +14,9 @@ export class WhatsAppParser extends Parser {
         super("whatsapp");
     }
 
-    parse(file_content: string) {
+    async *parse(file: FileInput) {
+        const file_buffer = await file.slice();
+        const file_content = new TextDecoder("utf-8").decode(file_buffer);
         const parsed = parseStringSync(file_content);
 
         const channel = this.addChannel(

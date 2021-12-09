@@ -13,7 +13,7 @@ export async function* generateReport(files: FileInput[], config: ReportConfig):
     // 1. Parse files
     //
     // Create parser
-    let parser: Parser | null;
+    let parser: Parser | null = null;
     switch (config.platform) {
         case "discord":
             parser = new DiscordParser();
@@ -27,18 +27,17 @@ export async function* generateReport(files: FileInput[], config: ReportConfig):
         default:
             throw new Error(`Unknown platform: ${config.platform}`);
     }
+
     // Read files and parse
-    yield { type: "new", title: "Read and parse files", total: files.length };
     for (let i = 0; i < files.length; i++) {
-        const content = await files[i].text();
+        yield { type: "new", title: "Read and parse", subject: files[i].name };
         try {
-            parser.parse(content);
+            yield* parser.parse(files[i]);
         } catch (ex) {
             throw new Error(`Error parsing file "${files[i].name}":\n${(ex as Error).message}`);
         }
-        yield { type: "progress", progress: i + 1 };
+        yield { type: "done" };
     }
-    yield { type: "done" };
 
     const database = parser.database;
     parser = null;
@@ -49,9 +48,9 @@ export async function* generateReport(files: FileInput[], config: ReportConfig):
     //
     for (let j = 0; j < 15; j++) {
         const total = Math.floor(Math.random() * 50);
-        yield { type: "new", title: "thing " + j, total };
+        yield { type: "new", title: "thing " + j };
         for (let i = 0; i < total; i++) {
-            yield { type: "progress", progress: i + 1 };
+            yield { type: "progress", progress: [i + 1, total], format: "number" };
             await new Promise((resolve) => setTimeout(resolve, Math.random() * 5));
         }
         yield { type: "done" };

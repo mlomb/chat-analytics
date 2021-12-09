@@ -1,65 +1,90 @@
-import { DiscordExportFile } from "@pipeline/parse/DiscordParser.d";
+import { FileInput, Timestamp } from "@pipeline/Types";
 import { Parser } from "@pipeline/parse/Parser";
 import { Author } from "@pipeline/parse/Database";
+import JSONStream from "@pipeline/parse/JSONStream";
 
-import { parseJSON } from "@pipeline/parse/Common";
+import { DiscordChannel, DiscordGuild, DiscordMessage, Snowflake } from "@pipeline/parse/DiscordParser.d";
 
 export class DiscordParser extends Parser {
+    private currentGuild: DiscordGuild | null = null;
+    private currentChannel: DiscordChannel | null = null;
+    private lastMessageTimestamp: Timestamp = 0;
+
     constructor() {
         super("discord");
     }
 
-    parse(file_content: string): void {
-        let data = parseJSON<DiscordExportFile>(file_content);
+    async *parse(file: FileInput) {
+        const stream = new JSONStream(file);
 
-        // store channel
-        const lastMessageTimestamp =
-            data.messages.length > 0 ? Date.parse(data.messages[data.messages.length - 1].timestamp) : 0;
-        const channel = this.addChannel(
-            {
-                id: data.channel.id,
-                name: data.channel.name,
-            },
-            lastMessageTimestamp
-        );
+        stream.on<DiscordGuild>("!.guild", (guild) => (this.currentGuild = guild));
+        stream.on<DiscordChannel>("!.channel", (channel) => (this.currentChannel = channel));
+        stream.on<DiscordMessage>("!.messages.*", this.parseMessage.bind(this));
 
-        for (const message of data.messages) {
-            const timestamp = Date.parse(message.timestamp);
+        yield* stream.parse();
 
-            let author: Author = {
-                id: message.author.id,
-                name: message.author.nickname,
-                bot: message.author.isBot,
-                discord: {
-                    // @ts-ignore (modulo)
-                    discriminator: parseInt(message.author.discriminator) % 5,
+        // once streaming is done, update information based on the last message timestamp
+        if (this.currentChannel) {
+            this.addChannel(
+                {
+                    id: this.currentChannel.id,
+                    name: this.currentChannel.name,
                 },
-            };
-            if (message.author.avatarUrl) {
-                // TODO: make sure size is 32px
-                author.avatarUrl = message.author.avatarUrl;
-            }
-            if (message.author.color) {
-                author.color = message.author.color;
-            }
-
-            // store author
-            author = this.addAuthor(author, timestamp);
-
-            // store message
-            if (message.type == "Default") {
-                this.addMessage({
-                    id: message.id,
-                    channelId: channel.id,
-                    authorId: author.id,
-                    timestamp,
-                    content: message.content,
-                });
-            } else {
-                //console.warn("Unhandled message type", message.type);
-            }
+                this.lastMessageTimestamp
+            );
+        }
+        if (this.currentGuild) {
+            this.updateTitle(this.currentGuild.name, this.lastMessageTimestamp);
         }
 
-        this.updateTitle(data.guild.name, lastMessageTimestamp);
+        // reset for the next channel
+        this.currentGuild = null;
+        this.currentChannel = null;
+        this.lastMessageTimestamp = 0;
+    }
+
+    parseMessage(message: DiscordMessage) {
+        if (this.currentChannel === null) {
+            console.log(this.currentGuild, this.currentChannel);
+
+            throw new Error("Channel ID missing");
+        }
+
+        const timestamp = Date.parse(message.timestamp);
+
+        let author: Author = {
+            id: message.author.id,
+            name: message.author.nickname,
+            bot: message.author.isBot,
+            discord: {
+                // @ts-ignore (modulo)
+                discriminator: parseInt(message.author.discriminator) % 5,
+            },
+        };
+        if (message.author.avatarUrl) {
+            // TODO: make sure size is 32px
+            author.avatarUrl = message.author.avatarUrl;
+        }
+        if (message.author.color) {
+            author.color = message.author.color;
+        }
+
+        // store author
+        author = this.addAuthor(author, timestamp);
+
+        // store message
+        if (message.type == "Default") {
+            this.addMessage({
+                id: message.id,
+                channelId: this.currentChannel.id,
+                authorId: author.id,
+                timestamp,
+                content: message.content,
+            });
+        } else {
+            //console.warn("Unhandled message type", message.type);
+        }
+
+        this.lastMessageTimestamp = Math.max(this.lastMessageTimestamp, timestamp);
     }
 }

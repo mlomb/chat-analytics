@@ -6,7 +6,8 @@ export type Platform = "discord" | "telegram" | "whatsapp";
 
 export interface FileInput {
     name: string;
-    text(): Promise<string>;
+    size: number;
+    slice(start?: number, end?: number): Promise<ArrayBuffer>;
 }
 
 export interface ReportConfig {
@@ -16,11 +17,12 @@ export interface ReportConfig {
 export interface NewStep {
     type: "new";
     title: string;
-    total?: number;
+    subject?: string;
 }
 export interface ProgressStep {
     type: "progress";
-    progress: number;
+    progress: [number, number];
+    format: "number" | "bytes";
 }
 export interface DoneStep {
     type: "done";

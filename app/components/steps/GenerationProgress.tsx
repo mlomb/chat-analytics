@@ -6,6 +6,7 @@ import Tick from "@assets/images/tick.svg";
 import Spinner from "@assets/images/spinner.svg";
 import Times from "@assets/images/times.svg";
 import Refresh from "@assets/images/refresh.svg";
+import prettyBytes from "pretty-bytes";
 
 type Status = "pending" | "success" | "error";
 
@@ -16,7 +17,9 @@ interface Props {
 interface ItemInfo {
     status: Status;
     title: string;
+    subject?: string;
     progress?: [number, number];
+    format?: "number" | "bytes";
     error?: string;
 }
 
@@ -27,9 +30,11 @@ const StatusItem = ({ info }: { info: ItemInfo }) => {
                 <img src={info.status === "pending" ? Spinner : info.status === "success" ? Tick : Times} />
             </div>
             {info.title}
+            {info.subject}
             {info.progress && (
                 <div className="StatusItem__progress">
-                    {info.progress[0]} / {info.progress[1]}
+                    {info.format === "number" && `${info.progress[0]} / ${info.progress[1]}`}
+                    {info.format === "bytes" && `${prettyBytes(info.progress[0])} / ${prettyBytes(info.progress[1])}`}
                 </div>
             )}
         </div>
@@ -73,14 +78,15 @@ const GenerationProgress = ({ worker }: Props) => {
                     newItems.push({
                         status: "pending",
                         title: data.title,
-                        progress: data.total != undefined ? [0, data.total] : undefined,
+                        subject: data.subject,
                     });
                 } else if (data.type === "progress") {
                     const last = prevState[prevState.length - 1];
                     newItems.splice(-1);
                     newItems.push({
                         ...last,
-                        progress: [data.progress, last.progress![1]],
+                        progress: data.progress,
+                        format: data.format,
                     });
                 } else if (data.type === "done" || data.type === "error") {
                     const last = prevState[prevState.length - 1];

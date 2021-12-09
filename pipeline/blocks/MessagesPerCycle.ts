@@ -54,7 +54,7 @@ export const process: BlockProcessFn<MessagesPerCycleBlock> = (source, filters) 
         });
         res.perDay.push(dayData);
     }
-
+    /*
     for (const author of source.authors) {
         if (filters.authors.includes(author.id)) {
             for (const { dayKey, dayData, monthData } of dates) {
@@ -68,7 +68,7 @@ export const process: BlockProcessFn<MessagesPerCycleBlock> = (source, filters) 
                 }
             }
         }
-    }
+    }*/
 
     return res;
 };

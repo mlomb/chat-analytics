@@ -1,5 +1,6 @@
-import { TelegramExportFile, TextArray } from "@pipeline/parse/TelegramParser.d";
+import { FileInput } from "@pipeline/Types";
 import { Parser } from "@pipeline/parse/Parser";
+import { TelegramExportFile, TextArray } from "@pipeline/parse/TelegramParser.d";
 
 import { parseJSON } from "@pipeline/parse/Common";
 
@@ -8,7 +9,8 @@ export class TelegramParser extends Parser {
         super("telegram");
     }
 
-    parse(file_content: string) {
+    async *parse(file: FileInput) {
+        /*
         let data = parseJSON<TelegramExportFile>(file_content);
 
         // store channel
@@ -49,6 +51,7 @@ export class TelegramParser extends Parser {
         }
 
         this.updateTitle(data.name, 0);
+        */
     }
 
     parseTextArray(text: string | TextArray[]): string {
