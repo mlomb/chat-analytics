@@ -5,16 +5,17 @@ import { FileInput } from "@pipeline/Types";
 import { generateReport } from "@pipeline/Generation";
 
 const fileNames = fs.readdirSync(path.resolve(__dirname, "../assets/demo"));
-const files: FileInput[] = fileNames.map((file) => ({
-    name: file,
-    text: () =>
-        new Promise<string>((resolve, reject) => {
-            fs.readFile(path.resolve(__dirname, "../assets/demo", file), { encoding: "utf-8" }, (err, data) => {
-                if (err) reject(err);
-                else resolve(data);
-            });
-        }),
-}));
+const files: FileInput[] = fileNames.map((file) => {
+    const filename = path.resolve(__dirname, "../assets/demo", file);
+    const stats = fs.statSync(filename);
+    const content = fs.readFileSync(filename);
+
+    return {
+        name: file,
+        size: stats.size,
+        slice: (start, end) => Promise.resolve(content.slice(start, end)),
+    };
+});
 
 (async () => {
     const gen = generateReport(files, {
@@ -24,7 +25,7 @@ const files: FileInput[] = fileNames.map((file) => ({
     for await (const packet of gen) {
         switch (packet.type) {
             case "new":
-                last = packet.title;
+                last = packet.title + (packet.subject ? " " + packet.subject : "");
                 break;
             case "done":
                 console.log(last);
