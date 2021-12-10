@@ -19,6 +19,7 @@ const CHUNK_SIZE = 1024 * 1024 * (2 * 2); // 4MB
 */
 export default class JSONStream {
     private oboe: Oboe;
+    private error: any = undefined;
 
     constructor(private readonly file: FileInput) {
         this.oboe = oboe();
@@ -30,7 +31,13 @@ export default class JSONStream {
     public on<T>(pattern: string, callback: (object: T) => void) {
         // Oboe.js examples
         // https://web.archive.org/web/20200807153925/http://www.oboejs.com/examples
-        this.oboe.node(pattern, callback);
+        this.oboe.node(pattern, (node) => {
+            try {
+                callback(node);
+            } catch (error) {
+                this.error = error;
+            }
+        });
     }
 
     public async *parse(): AsyncGenerator<ProgressStep> {
@@ -43,6 +50,7 @@ export default class JSONStream {
 
             receivedLength += buffer.byteLength;
             this.oboe.emit("data", str);
+            if (this.error) throw this.error;
             yield { type: "progress", format: "bytes", progress: [receivedLength, this.file.size] };
         }
     }
