@@ -8,11 +8,11 @@ import WorkerApp from "@app/WorkerApp";
 import Stepper from "@app/components/Stepper";
 import Button from "@app/components/Button";
 
-import PlatformSelect from "./PlatformSelect";
-import ExportInstructions from "./ExportInstructions";
-import FilesSelect from "./FilesSelect";
-import GenerationProgress from "./GenerationProgress";
-import ViewDownloadReport from "./ViewDownloadReport";
+import PlatformSelect from "./steps/PlatformSelect";
+import ExportInstructions from "./steps/ExportInstructions";
+import FilesSelect from "./steps/FilesSelect";
+import GenerationProgress from "./steps/GenerationProgress";
+import ViewDownloadReport from "./steps/ViewDownloadReport";
 
 // prettier-ignore
 const StepTitles = [
@@ -41,8 +41,6 @@ const Steps = () => {
         worker: null,
         result: null,
     });
-
-    useEffect(() => state.worker?.terminate(), []);
 
     const startGeneration = () => {
         const worker = new WorkerApp() as Worker;

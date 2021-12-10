@@ -2,7 +2,7 @@ import "@assets/styles/HomePage.less";
 import { useState } from "react";
 
 import Landing from "@app/components/Landing";
-import Steps from "@app/components/steps/Steps";
+import Steps from "@app/components/Steps";
 
 import Logo from "@assets/images/logo.svg";
 
