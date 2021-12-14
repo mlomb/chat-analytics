@@ -82,7 +82,7 @@ module.exports = (env) => {
         },
         resolve: {
             extensions: [".ts", ".tsx", ".js", ".jsx"],
-            // NOTE: keep in sync with tsconfig.json
+            // NOTE: keep in sync with tsconfig.json and package.json
             alias: {
                 "@app": resolve("app/"),
                 "@assets": resolve("assets/"),

@@ -34,7 +34,11 @@ export async function* generateReport(files: FileInput[], config: ReportConfig):
         try {
             yield* parser.parse(files[i]);
         } catch (ex) {
-            throw new Error(`Error parsing file "${files[i].name}":\n${(ex as Error).message}`);
+            if (env.isDev) {
+                throw ex;
+            } else {
+                throw new Error(`Error parsing file "${files[i].name}":\n${(ex as Error).message}`);
+            }
         }
         yield { type: "done" };
     }
