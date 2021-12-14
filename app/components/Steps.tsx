@@ -22,7 +22,7 @@ const StepTitles = [
     "Generate report",
     "View/Download report"
 ];
-const StepMaxHeights = [360, 1300, 400, 300, 420];
+const StepMaxHeights = [360, 1300, 400, 420, 420];
 
 const BackColor: [number, number, number] = [216, 10, 10];
 const NextColor: [number, number, number] = [258, 90, 61];
@@ -46,14 +46,16 @@ const Steps = () => {
         const worker = new WorkerApp() as Worker;
         worker.onerror = (e) => {
             console.log(e);
-            alert("An error ocurred creating the WebWorker.\n\n Error: " + e.message);
             worker.terminate();
+            alert("An error ocurred creating the WebWorker.\n\n Error: " + e.message);
             if (env.isDev) throw e;
         };
         worker.onmessage = (e: MessageEvent<ReportResult>) => {
             const data = e.data;
             if (data.type === "result") {
-                worker.terminate();
+                if (env.isProd) {
+                    worker.terminate();
+                }
                 // give a small delay
                 setTimeout(() => {
                     setState({
