@@ -119,7 +119,7 @@ export default class JSONStream {
         }
     }
     private emit(x: any) {
-        if (!this.topKey) throw new Error("No top key");
+        if (this.topKey === undefined) throw new Error("No top key");
 
         // emit
         if (this.fullCallbacks.has(this.topKey)) {
@@ -176,7 +176,7 @@ export default class JSONStream {
             case "value":
             case "openobject":
             case "closeobject":
-                throw new Error("Expected array");
+                throw new Error("Expected array on key " + this.topKey);
             case "openarray":
                 this.activeHandler = this.fullHandler;
                 break;

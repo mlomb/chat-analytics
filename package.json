@@ -5,7 +5,7 @@
     "build": "webpack build --env production --progress",
     "demo": "ts-node -r tsconfig-paths/register app/Demo.ts",
     "dev": "webpack serve --progress",
-    "test": "jest",
+    "test": "jest --verbose --coverage",
     "test:watch": "jest --watchAll",
     "format": "prettier --write .",
     "format-check": "prettier --check ."
