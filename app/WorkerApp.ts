@@ -15,8 +15,12 @@ const wrapFile = (file: File): FileInput => ({
 });
 
 self.onmessage = async (ev: MessageEvent<InitMessage>) => {
+    // Sort files by lastModified
+    // Very important so we always keep the most recent information (author, message, etc)
+    const files = ev.data.files.sort((a, b) => (b.lastModified || 0) - (a.lastModified || 0));
+
     try {
-        const gen = generateReport(ev.data.files.map(wrapFile), { platform: ev.data.platform });
+        const gen = generateReport(files.map(wrapFile), { platform: ev.data.platform });
         for await (const packet of gen) {
             self.postMessage(packet);
         }
