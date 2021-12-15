@@ -64,19 +64,25 @@ export async function* generateReport(files: FileInput[], config: ReportConfig):
     const preprocessed = yield* preprocess(database, config);
 
     //
-    // 3. Compress data and export
+    // 3. Compress data
     //
-    const data_str = JSON.stringify(compress(preprocessed));
+    yield { type: "new", title: "Compress data" };
+    let data_str = JSON.stringify(compress(preprocessed));
+    yield { type: "done" };
 
-    let html = yield* downloadFile("report.html");
-    html = html.replace("undefined", data_str);
+    //
+    // 4. Export
+    //
+    const html = yield* downloadFile("report.html");
+    const parts = html.split("undefined");
+    const final_html = parts[0] + data_str + parts[1]; // StringConcat
 
     yield {
         type: "result",
         title: database.title,
         // @ts-ignore
         json: typeof env !== "undefined" && env.isDev ? data_str : undefined,
-        html,
+        html: final_html,
         time: Date.now(),
         counts: {
             authors: database.authors.size,
