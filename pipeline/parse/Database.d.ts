@@ -9,8 +9,8 @@ import { ID, Timestamp } from "@pipeline/Types";
 export interface Database {
     platform: Platform;
     title: string;
-    authors: Map<ID, Author>;
-    channels: Map<ID, Channel>;
+    authors: Author[];
+    channels: Channel[];
     messages: {
         [channelId: ID]: Message[];
     };
@@ -21,7 +21,6 @@ export interface DiscordAuthor {
 }
 
 export interface Author {
-    id: ID;
     name: string;
     bot: boolean;
     avatarUrl?: string;
@@ -31,7 +30,6 @@ export interface Author {
 }
 
 export interface Channel {
-    id: ID;
     name: string;
 }
 
@@ -41,8 +39,6 @@ export interface Event {
 }
 
 export interface Message {
-    id: ID;
-    channelId: ID;
     authorId: ID;
     content: string;
     timestamp: Timestamp;

@@ -17,7 +17,7 @@ import { searchFormat } from "@pipeline/Utils";
 const OPTION_HEIGHT = 35;
 
 type TOption = {
-    id: string;
+    id: string | number;
     name: string;
     name_searchable: string;
 };
@@ -266,7 +266,7 @@ const memoizedSearchFormat = memoizeOne(searchFormat);
 const filterFn = (option: FilterOptionOption<TOption>, candidate: string): boolean =>
     option.data.name_searchable.indexOf(memoizedSearchFormat(candidate)) > -1;
 
-const getOptionValue = (option: TOption) => option.id;
+const getOptionValue = (option: TOption) => option.id + "";
 const getOptionLabel = (option: TOption) => option.name;
 const onInputChange = (newValue: string, actionMeta: InputActionMeta) => {
     // reset focused item when search input changes

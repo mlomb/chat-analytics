@@ -1,12 +1,12 @@
-import { FileInput } from "@pipeline/Types";
+import { FileInput, ID } from "@pipeline/Types";
 import { Parser } from "@pipeline/parse/Parser";
 import { Author } from "@pipeline/parse/Database";
 import JSONStream from "@pipeline/parse/JSONStream";
 
-import { DiscordChannel, DiscordGuild, DiscordMessage, Snowflake } from "@pipeline/parse/DiscordParser.d";
+import { DiscordChannel, DiscordGuild, DiscordMessage } from "@pipeline/parse/DiscordParser.d";
 
 export class DiscordParser extends Parser {
-    private channelId?: Snowflake;
+    private channelId?: ID;
 
     constructor() {
         super("discord");
@@ -25,8 +25,7 @@ export class DiscordParser extends Parser {
     }
 
     private parseChannel(channel: DiscordChannel) {
-        this.channelId = channel.id;
-        this.addChannel({ id: channel.id, name: channel.name });
+        this.channelId = this.addChannel(channel.id, { name: channel.name });
     }
 
     private parseMessage(message: DiscordMessage) {
@@ -34,33 +33,28 @@ export class DiscordParser extends Parser {
 
         const timestamp = Date.parse(message.timestamp);
 
-        if (!this.database.authors.has(message.author.id)) {
-            let author: Author = {
-                id: message.author.id,
-                name: message.author.nickname,
-                bot: message.author.isBot,
-                discord: {
-                    // @ts-ignore (modulo)
-                    discriminator: parseInt(message.author.discriminator) % 5,
-                },
-            };
-            if (message.author.avatarUrl) {
-                // TODO: make sure size is 32px
-                author.avatarUrl = message.author.avatarUrl;
-            }
-            if (message.author.color) {
-                author.color = message.author.color;
-            }
-
-            // store author
-            this.addAuthor(author);
+        let author: Author = {
+            name: message.author.nickname,
+            bot: message.author.isBot,
+            discord: {
+                // @ts-ignore (modulo)
+                discriminator: parseInt(message.author.discriminator) % 5,
+            },
+        };
+        if (message.author.avatarUrl) {
+            // TODO: make sure size is 32px
+            author.avatarUrl = message.author.avatarUrl;
+        }
+        if (message.author.color) {
+            author.color = message.author.color;
         }
 
+        // store author
+        const authorId = this.addAuthor(message.author.id, author);
+
         if (message.type == "Default") {
-            this.addMessage({
-                id: message.id,
-                channelId: this.channelId,
-                authorId: message.author.id,
+            this.addMessage(message.id, this.channelId, {
+                authorId,
                 timestamp,
                 content: message.content,
             });

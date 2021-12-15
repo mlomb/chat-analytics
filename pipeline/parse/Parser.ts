@@ -1,33 +1,46 @@
-import { Platform, FileInput, StepInfo } from "@pipeline/Types";
+import { Platform, FileInput, StepInfo, ID, RawID } from "@pipeline/Types";
 import { Database, Author, Channel, Message } from "@pipeline/parse/Database";
+import IDMapper from "@pipeline/parse/IDMapper";
 
 export abstract class Parser {
     public database: Database = {
         platform: this.platform,
         title: "Chat",
-        authors: new Map(),
-        channels: new Map(),
+        authors: [],
+        channels: [],
         messages: {},
     };
+
+    protected authorIDMapper = new IDMapper();
+    protected channelIDMapper = new IDMapper();
+    // each channel has its own list of messages, along with its IDs
+    protected messageIDMapper: IDMapper[] = [];
 
     constructor(private readonly platform: Platform) {}
 
     abstract parse(file: FileInput): AsyncGenerator<StepInfo>;
 
-    protected addChannel(channel: Channel) {
-        this.database.channels.set(channel.id, channel);
+    protected addChannel(rawId: RawID, channel: Channel): ID {
+        const id = this.channelIDMapper.get(rawId);
+        this.database.channels[id] = channel;
+        this.messageIDMapper[id] = new IDMapper();
+        return id;
     }
 
-    protected addAuthor(author: Author) {
-        this.database.authors.set(author.id, author);
+    protected addAuthor(rawId: RawID, author: Author): ID {
+        const id = this.authorIDMapper.get(rawId);
+        this.database.authors[id] = author;
+        return id;
     }
 
-    protected addMessage(message: Message) {
-        if (!(message.channelId in this.database.messages)) {
-            this.database.messages[message.channelId] = [message];
+    protected addMessage(rawId: RawID, channelId: ID, message: Message): ID {
+        const id = this.messageIDMapper[channelId].get(rawId);
+        if (id === 0) {
+            this.database.messages[channelId] = [message];
         } else {
-            this.database.messages[message.channelId].push(message);
+            this.database.messages[channelId][id] = message;
         }
+        return id;
     }
 
     protected updateTitle(title: string): void {

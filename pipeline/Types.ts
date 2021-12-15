@@ -1,4 +1,8 @@
-export type ID = string;
+// Raw ID that comes from the platform
+export type RawID = string | number;
+
+// Internal ID that is used in the pipeline (incremental)
+export type ID = number;
 
 export type Timestamp = number;
 

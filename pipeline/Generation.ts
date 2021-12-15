@@ -85,8 +85,8 @@ export async function* generateReport(files: FileInput[], config: ReportConfig):
         html: final_html,
         time: Date.now(),
         counts: {
-            authors: database.authors.size,
-            channels: database.channels.size,
+            authors: database.authors.length,
+            channels: database.channels.length,
             messages: Object.values(database.messages).reduce((acc, val) => acc + val.length, 0),
         },
     };

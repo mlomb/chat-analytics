@@ -6,7 +6,7 @@ It needs to be trivally serializable because it will be stored in the report fil
 
 import { Platform } from "@pipeline/Types";
 
-type ID = string;
+type ID = number;
 type DateStr = string; // YYYY-MM-DD
 
 export interface ProcessedData {

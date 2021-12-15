@@ -7,8 +7,8 @@ import { Parser } from "@pipeline/parse/Parser";
 import { parseStringSync } from "whatsapp-chat-parser";
 
 export class WhatsAppParser extends Parser {
-    private channelId = 0;
-    private messageId = 0;
+    private channelIndex = 0;
+    private messageIndex = 0;
 
     constructor() {
         super("whatsapp");
@@ -19,10 +19,7 @@ export class WhatsAppParser extends Parser {
         const file_content = new TextDecoder("utf-8").decode(file_buffer);
         const parsed = parseStringSync(file_content);
 
-        const channelId = this.channelId++ + "";
-
-        this.addChannel({
-            id: channelId,
+        const channelId = this.addChannel(this.channelIndex++, {
             name: "default",
         });
 
@@ -30,15 +27,12 @@ export class WhatsAppParser extends Parser {
             const timestamp = message.date.getTime();
 
             if (message.author !== "System") {
-                this.addAuthor({
-                    id: message.author,
+                const authorId = this.addAuthor(message.author, {
                     name: message.author,
                     bot: false,
                 });
-                this.addMessage({
-                    id: this.messageId++ + "",
-                    authorId: message.author,
-                    channelId: channelId,
+                this.addMessage(this.messageIndex++, channelId, {
+                    authorId,
                     content: message.message,
                     timestamp,
                 });
