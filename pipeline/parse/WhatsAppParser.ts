@@ -21,7 +21,7 @@ export class WhatsAppParser extends Parser {
 
         const channelId = this.channelId++ + "";
 
-        const channel = this.addChannel({
+        this.addChannel({
             id: channelId,
             name: "default",
         });
