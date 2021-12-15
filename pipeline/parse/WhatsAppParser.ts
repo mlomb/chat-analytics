@@ -19,30 +19,26 @@ export class WhatsAppParser extends Parser {
         const file_content = new TextDecoder("utf-8").decode(file_buffer);
         const parsed = parseStringSync(file_content);
 
-        const channel = this.addChannel(
-            {
-                id: this.channelId++ + "",
-                name: "default",
-            },
-            0
-        );
+        const channelId = this.channelId++ + "";
+
+        const channel = this.addChannel({
+            id: channelId,
+            name: "default",
+        });
 
         for (const message of parsed) {
             const timestamp = message.date.getTime();
 
             if (message.author !== "System") {
-                this.addAuthor(
-                    {
-                        id: message.author,
-                        name: message.author,
-                        bot: false,
-                    },
-                    timestamp
-                );
+                this.addAuthor({
+                    id: message.author,
+                    name: message.author,
+                    bot: false,
+                });
                 this.addMessage({
                     id: this.messageId++ + "",
                     authorId: message.author,
-                    channelId: channel.id,
+                    channelId: channelId,
                     content: message.message,
                     timestamp,
                 });
@@ -51,6 +47,6 @@ export class WhatsAppParser extends Parser {
             }
         }
 
-        this.updateTitle("WhatsApp chat", 0); // TODO: chat or group
+        this.updateTitle("WhatsApp chat"); // TODO: chat or group
     }
 }

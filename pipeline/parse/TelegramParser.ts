@@ -1,58 +1,61 @@
 import { FileInput } from "@pipeline/Types";
 import { Parser } from "@pipeline/parse/Parser";
-import { TelegramExportFile, TextArray } from "@pipeline/parse/TelegramParser.d";
+import { TelegramMessage, TextArray } from "@pipeline/parse/TelegramParser.d";
+
+import JSONStream from "@pipeline/parse/JSONStream";
 
 export class TelegramParser extends Parser {
+    private channelId?: string;
+    private channelName?: string;
+
     constructor() {
         super("telegram");
     }
 
     async *parse(file: FileInput) {
-        /*
-        let data = parseJSON<TelegramExportFile>(file_content);
+        const stream = new JSONStream(file);
 
-        // store channel
-        const lastMessageTimestamp =
-            data.messages.length > 0 ? Date.parse(data.messages[data.messages.length - 1].date) : 0;
-        const channel = this.addChannel(
-            {
-                id: data.id + "",
-                name: data.name,
-            },
-            lastMessageTimestamp
-        );
+        stream.onFull<string>("id", (channelId) => (this.channelId = channelId));
+        stream.onFull<string>("title", (channelName) => (this.channelName = channelName));
+        stream.onArray<TelegramMessage>("messages", this.parseMessage.bind(this));
 
-        for (const message of data.messages) {
-            const authorId = message.from_id + "";
-            const timestamp = Date.parse(message.date);
+        yield* stream.parse();
 
-            if (!message.from) continue; // TODO: fix
+        if (this.channelId === undefined) throw new Error("Missing channel ID");
 
-            this.addAuthor(
-                {
-                    id: authorId,
-                    name: message.from,
-                    bot: false, // TODO: mark all bot_command's as bot
-                },
-                timestamp
-            );
+        if (this.channelName) this.updateTitle(this.channelName);
+        this.addChannel({ id: this.channelId, name: this.channelName || this.database.title });
 
-            if (message.type === "message") {
-                this.addMessage({
-                    id: message.id + "",
-                    channelId: channel.id,
-                    authorId,
-                    content: this.parseTextArray(message.text),
-                    timestamp,
-                });
-            }
-        }
-
-        this.updateTitle(data.name, 0);
-        */
+        this.channelId = undefined;
+        this.channelName = undefined;
     }
 
-    parseTextArray(text: string | TextArray[]): string {
+    private parseMessage(message: TelegramMessage) {
+        if (this.channelId === undefined) throw new Error("Missing channel ID");
+
+        const authorId = message.from_id + "";
+        const timestamp = Date.parse(message.date);
+
+        if (!message.from) return; // TODO: fix
+
+        this.addAuthor({
+            id: authorId,
+            name: message.from,
+            bot: false, // TODO: mark all bot_command's as bot
+        });
+
+        if (message.type === "message") {
+            this.addMessage({
+                id: message.id + "",
+                channelId: this.channelId,
+                authorId,
+                content: this.parseTextArray(message.text),
+                timestamp,
+            });
+        }
+    }
+
+    private parseTextArray(text: string | TextArray[]): string {
         if (typeof text === "string") {
             return text;
         } else {

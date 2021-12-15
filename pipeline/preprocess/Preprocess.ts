@@ -38,6 +38,8 @@ export const preprocess = async function* (
 
     yield { type: "new", title: "Processing messages" };
     for (const channel of channels) {
+        if (!(channel.id in database.messages)) continue;
+
         for (const msg of database.messages[channel.id]) {
             if (minDate === 0 || msg.timestamp < minDate) minDate = msg.timestamp;
             if (maxDate === 0 || msg.timestamp > maxDate) maxDate = msg.timestamp;

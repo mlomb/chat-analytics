@@ -11,7 +11,7 @@ export interface TelegramExportFile {
     messages: Message[];
 }
 
-interface Message {
+interface TelegramMessage {
     id: number;
     type: "message" | "service" | unknown;
     date: string;
