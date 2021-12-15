@@ -35,10 +35,10 @@ export abstract class Parser {
 
     protected addMessage(rawId: RawID, channelId: ID, message: Message): ID {
         const id = this.messageIDMapper[channelId].get(rawId);
-        if (id === 0) {
-            this.database.messages[channelId] = [message];
-        } else {
+        if (channelId in this.database.messages) {
             this.database.messages[channelId][id] = message;
+        } else {
+            this.database.messages[channelId] = [message];
         }
         return id;
     }
