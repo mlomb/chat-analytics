@@ -69,10 +69,10 @@ const TelegramInstructions = () => (
                         Telegram Desktop
                     </a>{" "}
                 </b>
-                on your PC and login using your phone.
+                on your computer.
             </li>
             <li>
-                <b>Open the Telegram Desktop application</b> on your computer and <b>login using your phone</b>.
+                <b>Open the Telegram Desktop application</b> and <b>login using your phone</b>.
             </li>
             <li>
                 Go to the chat you intend to analyze and <b>tap on the 3 dots</b> in the top right corner.
