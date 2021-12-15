@@ -26,6 +26,7 @@ export const process: BlockProcessFn<MessagesPerCycleBlock> = (source, filters) 
     }[] = [];
 
     const start = new Date(source.minDate);
+    const startUTC = Date.UTC(start.getFullYear(), start.getMonth(), start.getDate());
     const end = new Date(source.maxDate);
     const monthsData = new Map<string, MessagesPerCycle>();
 
@@ -54,21 +55,25 @@ export const process: BlockProcessFn<MessagesPerCycleBlock> = (source, filters) 
         });
         res.perDay.push(dayData);
     }
-    /*
-    for (const author of source.authors) {
-        if (filters.authors.includes(author.id)) {
-            for (const { dayKey, dayData, monthData } of dates) {
-                const dayAggr = author.aggrs[dayKey];
-                for (const channelId in dayAggr) {
-                    if (channelId in dayAggr) {
-                        const dayChannelAggr = dayAggr[channelId];
-                        dayData.messages += dayChannelAggr.m;
-                        monthData.messages += dayChannelAggr.m;
-                    }
+
+    const _MS_PER_DAY = 1000 * 60 * 60 * 24;
+
+    for (const channel of source.channels) {
+        if (filters.channelsSet.has(channel.id)) {
+            for (const message of channel.messages) {
+                if (filters.authorsSet.has(message.authorId)) {
+                    const dateUTC = Date.UTC(message.date[0], message.date[1], message.date[2]);
+
+                    const index = Math.floor((dateUTC - startUTC) / _MS_PER_DAY);
+                    console.assert(index >= 0 && index < dates.length);
+
+                    const dateData = dates[index];
+                    dateData.dayData.messages++;
+                    dateData.monthData.messages++;
                 }
             }
         }
-    }*/
+    }
 
     return res;
 };

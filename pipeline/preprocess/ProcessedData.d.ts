@@ -34,7 +34,7 @@ export interface Author {
 }
 
 export interface Message {
+    date: [number, number, number];
     authorId: ID;
     channelId: ID;
-    date: DateStr;
 }

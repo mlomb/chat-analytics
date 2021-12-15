@@ -7,7 +7,7 @@ export const preprocess = async function* (
     database: Database,
     config: ReportConfig
 ): AsyncGenerator<StepInfo, ProcessedData> {
-    const authors = new Map<ID, Author>();
+    const authors: Author[] = [];
     const channels: Channel[] = [];
 
     let minDate: Timestamp = 0;
@@ -15,18 +15,21 @@ export const preprocess = async function* (
 
     yield { type: "new", title: "Processing authors" };
     for (const [id, author] of database.authors) {
-        const new_author: Author = {
+        authors.push({
             id,
             name: author.name,
             name_searchable: searchFormat(author.name),
             bot: author.bot,
-        };
-        authors.set(id, new_author);
+        });
     }
     yield { type: "done" };
 
     yield { type: "new", title: "Processing channels" };
     for (const [id, channel] of database.channels) {
+        if (!(channel.id in database.messages)) {
+            // no messages in this channel, skip
+            continue;
+        }
         channels.push({
             id: id,
             name: channel.name,
@@ -38,33 +41,17 @@ export const preprocess = async function* (
 
     yield { type: "new", title: "Processing messages" };
     for (const channel of channels) {
-        if (!(channel.id in database.messages)) continue;
-
         for (const msg of database.messages[channel.id]) {
             if (minDate === 0 || msg.timestamp < minDate) minDate = msg.timestamp;
             if (maxDate === 0 || msg.timestamp > maxDate) maxDate = msg.timestamp;
 
-            const date = dateToString(new Date(msg.timestamp));
-            const author = authors.get(msg.authorId);
-
-            if (!author) {
-                console.warn("Missing author", msg.authorId);
-                continue;
-            }
-
-            /*
-            if (!(date in author.aggrs)) author.aggrs[date] = {};
-            if (!(msg.channelId in author.aggrs[date])) {
-                author.aggrs[date][msg.channelId] = {
-                    m: 0,
-                    w: {},
-                    e: {},
-                };
-            }
-
-            const aggr = author.aggrs[date][msg.channelId];
-            processMessage(msg, aggr);
-            */
+            const date = new Date(msg.timestamp);
+            //const dateStr = dateToString(date);
+            channel.messages.push({
+                authorId: msg.authorId,
+                channelId: msg.channelId,
+                date: [date.getFullYear(), date.getMonth(), date.getDate()],
+            });
         }
     }
     yield { type: "done" };
@@ -81,6 +68,6 @@ export const preprocess = async function* (
         maxDate: dateToString(new Date(maxDate)),
 
         channels,
-        authors: Array.from(authors.values()),
+        authors,
     };
 };

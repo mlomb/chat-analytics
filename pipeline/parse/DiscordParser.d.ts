@@ -8,13 +8,6 @@
 
 type Snowflake = string;
 
-export interface DiscordExportFile {
-    guild: DiscordGuild;
-    channel: DiscordChannel;
-    messages: Message[];
-    messageCount: number;
-}
-
 export interface DiscordGuild {
     id: Snowflake;
     name: string;

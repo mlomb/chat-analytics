@@ -4,13 +4,6 @@
     Types here are not remotely complete, but try to keep here what is in use
 */
 
-export interface TelegramExportFile {
-    name: string;
-    type: "private_supergroup" | unknown;
-    id: number;
-    messages: Message[];
-}
-
 interface TelegramMessage {
     id: number;
     type: "message" | "service" | unknown;

@@ -2,7 +2,9 @@ import { ID, DateStr, ProcessedData } from "@pipeline/preprocess/ProcessedData";
 
 export interface Filters {
     channels: ID[];
+    channelsSet: Set<ID>;
     authors: ID[];
+    authorsSet: Set<ID>;
     startDate: DateStr;
     endDate: DateStr;
 }

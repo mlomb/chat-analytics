@@ -24,7 +24,9 @@ export interface BlocksInfo {
 let processedData: ProcessedData | null = null;
 let fitlers: Filters = {
     channels: [],
+    channelsSet: new Set(),
     authors: [],
+    authorsSet: new Set(),
     startDate: "",
     endDate: "",
 };
@@ -34,8 +36,14 @@ self.onmessage = async (ev: MessageEvent<BlockRequest>) => {
 
     // update active data if provided
     if (br.processedData) processedData = br.processedData;
-    if (br.filters.channels) fitlers.channels = br.filters.channels;
-    if (br.filters.authors) fitlers.authors = br.filters.authors;
+    if (br.filters.channels) {
+        fitlers.channels = br.filters.channels;
+        fitlers.channelsSet = new Set(br.filters.channels);
+    }
+    if (br.filters.authors) {
+        fitlers.authors = br.filters.authors;
+        fitlers.authorsSet = new Set(br.filters.authors);
+    }
     if (br.filters.startDate) fitlers.startDate = br.filters.startDate;
     if (br.filters.endDate) fitlers.endDate = br.filters.endDate;
 

@@ -1,4 +1,4 @@
-import { ID, Timestamp, Platform, FileInput, StepInfo } from "@pipeline/Types";
+import { Platform, FileInput, StepInfo } from "@pipeline/Types";
 import { Database, Author, Channel, Message } from "@pipeline/parse/Database";
 
 export abstract class Parser {
