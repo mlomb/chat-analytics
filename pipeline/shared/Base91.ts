@@ -75,3 +75,46 @@ export class Base91Encoder {
         return ret;
     }
 }
+
+export class Base91Decoder {
+    private b = 0;
+    private n = 0;
+    private v = -1;
+
+    decode(chunk: string, last: boolean): Uint8Array {
+        const len = chunk.length;
+        const ret = [];
+
+        let b = this.b;
+        let n = this.n;
+        let v = this.v;
+
+        for (let i = 0; i < len; i++) {
+            const p = table.indexOf(chunk[i]);
+            if (p === -1) continue;
+            if (v < 0) {
+                v = p;
+            } else {
+                v += p * 91;
+                b |= v << n;
+                n += (v & 8191) > 88 ? 13 : 14;
+                do {
+                    ret.push(b & 0xff);
+                    b >>= 8;
+                    n -= 8;
+                } while (n > 7);
+                v = -1;
+            }
+        }
+
+        if (last && v > -1) {
+            ret.push((b | (v << n)) & 0xff);
+        }
+
+        this.b = b;
+        this.n = n;
+        this.v = v;
+
+        return new Uint8Array(ret);
+    }
+}
