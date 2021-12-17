@@ -4,7 +4,7 @@
     Types here are not remotely complete, but try to keep here what is in use
 */
 
-interface TelegramMessage {
+export interface TelegramMessage {
     id: number;
     type: "message" | "service" | unknown;
     date: string;

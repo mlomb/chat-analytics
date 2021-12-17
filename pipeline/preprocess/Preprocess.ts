@@ -3,20 +3,6 @@ import { Database, Message } from "@pipeline/parse/Database";
 import { Author, Channel, ID, ProcessedData } from "@pipeline/preprocess/ProcessedData";
 import { dateToString, searchFormat } from "@pipeline/Utils";
 
-class IDMapper {
-    private id: ID = 0;
-    private mappings: Map<string, ID> = new Map();
-
-    public get(input: string): ID {
-        let id = this.mappings.get(input);
-        if (id === undefined) {
-            id = this.id++;
-            this.mappings.set(input, id);
-        }
-        return id;
-    }
-}
-
 export const preprocess = async function* (
     database: Database,
     config: ReportConfig
@@ -24,16 +10,14 @@ export const preprocess = async function* (
     const authors: Author[] = [];
     const channels: Channel[] = [];
 
-    const authorIDMapper = new IDMapper();
-    const channelIDMapper = new IDMapper();
-
     let minDate: Timestamp = 0;
     let maxDate: Timestamp = 0;
 
     yield { type: "new", title: "Processing authors" };
-    for (const [id, author] of database.authors) {
+    for (let id: ID = 0; id < database.authors.length; id++) {
+        const author = database.authors[id];
         authors.push({
-            id: authorIDMapper.get(id),
+            id,
             name: author.name,
             name_searchable: searchFormat(author.name),
             bot: author.bot,
@@ -42,14 +26,15 @@ export const preprocess = async function* (
     yield { type: "done" };
 
     yield { type: "new", title: "Processing channels" };
-    for (const [id, _channel] of database.channels) {
-        if (!(_channel.id in database.messages)) {
+    for (let id: ID = 0; id < database.channels.length; id++) {
+        const _channel = database.channels[id];
+        if (!(id in database.messages)) {
             // no messages in this channel, skip
             continue;
         }
 
         const channel: Channel = {
-            id: channelIDMapper.get(id),
+            id,
             name: _channel.name,
             name_searchable: searchFormat(_channel.name),
             messages: [],
@@ -63,7 +48,7 @@ export const preprocess = async function* (
             const date = new Date(msg.timestamp);
             //const dateStr = dateToString(date);
             channel.messages.push({
-                authorId: authorIDMapper.get(msg.authorId),
+                authorId: msg.authorId,
                 channelId: channel.id,
                 date: [date.getFullYear(), date.getMonth(), date.getDate()],
             });

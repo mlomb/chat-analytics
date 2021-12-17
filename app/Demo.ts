@@ -1,3 +1,4 @@
+/*
 import fs from "fs";
 import path from "path";
 
@@ -39,3 +40,4 @@ const files: FileInput[] = fileNames.map((file) => {
         }
     }
 })();
+*/

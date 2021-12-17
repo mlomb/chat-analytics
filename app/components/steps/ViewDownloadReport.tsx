@@ -18,26 +18,21 @@ const ts = (n: number) => (n === 1 ? "" : "s");
 
 const ViewDownloadReport = ({ result }: Props) => {
     const [file, setFile] = useState<{
-        blob: Blob | null;
-        url: string;
-        jsonURL: string;
+        dataURL: string;
+        htmlURL: string;
         filename: string;
     }>({
-        blob: null,
-        url: "",
-        jsonURL: "",
+        dataURL: "",
+        htmlURL: "",
         filename: "",
     });
 
     useEffect(() => {
         if (result) {
             const date = new Date();
-            const htmlBlob = new Blob([result.html], { type: "text/html" });
-            const jsonBlob = new Blob([result.json || ""], { type: "application/json" });
             setFile({
-                blob: htmlBlob,
-                url: URL.createObjectURL(htmlBlob),
-                jsonURL: URL.createObjectURL(jsonBlob),
+                dataURL: URL.createObjectURL(result.dataBlob),
+                htmlURL: URL.createObjectURL(result.htmlBlob),
                 filename: `${result?.title}-${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}.html`,
             });
         }
@@ -55,17 +50,17 @@ const ViewDownloadReport = ({ result }: Props) => {
                 </div>
             )}
             <div className="ViewDownloadReport__buttons">
-                <Button hueColor={[258, 90, 61]} href={file.url} download={file.filename}>
+                <Button hueColor={[258, 90, 61]} href={file.htmlURL} download={file.filename}>
                     <img src={Download} alt="Download" />
-                    Download ({prettyBytes(file.blob?.size || 0)})
+                    Download ({prettyBytes(result?.htmlBlob.size || 0)})
                 </Button>
-                <Button hueColor={[244, 90, 61]} href={file.url} target="_blank">
+                <Button hueColor={[244, 90, 61]} href={file.htmlURL} target="_blank">
                     <img src={LinkOut} alt="Link out" />
                     View Locally
                 </Button>
                 {env.isDev && (
-                    <Button hueColor={[105, 70, 50]} href={file.jsonURL} download="report_sample.json">
-                        🛠️ Download JSON (dev)
+                    <Button hueColor={[105, 70, 50]} href={file.dataURL} download="report_sample.json">
+                        🛠️ Download JSON (dev, {prettyBytes(result?.dataBlob.size || 0)})
                     </Button>
                 )}
             </div>

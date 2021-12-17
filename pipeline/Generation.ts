@@ -1,12 +1,15 @@
-import { compress } from "compress-json";
-
 import { FileInput, ReportConfig, StepInfo } from "@pipeline/Types";
+
 import { downloadFile } from "@pipeline/Utils";
 import { Parser } from "@pipeline/parse/Parser";
 import { DiscordParser } from "@pipeline/parse/DiscordParser";
 import { WhatsAppParser } from "@pipeline/parse/WhatsAppParser";
 import { TelegramParser } from "@pipeline/parse/TelegramParser";
-import { preprocess } from "./preprocess/Preprocess";
+import { preprocess } from "@pipeline/preprocess/Preprocess";
+import { Database } from "@pipeline/parse/Database";
+import { ProcessedData } from "@pipeline/preprocess/ProcessedData";
+
+import { compress } from "@pipeline/Compression";
 
 export async function* generateReport(files: FileInput[], config: ReportConfig): AsyncGenerator<StepInfo> {
     //
@@ -41,7 +44,8 @@ export async function* generateReport(files: FileInput[], config: ReportConfig):
         yield { type: "done" };
     }
 
-    const database = parser.database;
+    let database: Database | null = parser.database;
+    // release other parser memory
     parser = null;
 
     //
@@ -58,36 +62,43 @@ export async function* generateReport(files: FileInput[], config: ReportConfig):
         yield { type: "done" };
     }
 
+    // save info
+    const title = database.title;
+    const counts = {
+        authors: database.authors.length,
+        channels: database.channels.length,
+        messages: Object.values(database.messages).reduce((acc, val) => acc + val.length, 0),
+    };
+
     //
     // 2. Preprocess database
     //
-    const preprocessed = yield* preprocess(database, config);
+    let preprocessed: ProcessedData | null = yield* preprocess(database, config);
+    // release db memory
+    database = null;
 
     //
     // 3. Compress data
     //
     yield { type: "new", title: "Compress data" };
-    let data_str = JSON.stringify(compress(preprocessed));
+    const dataBlob = yield* compress(preprocessed);
+    // release preprocessed memory
+    preprocessed = null;
     yield { type: "done" };
 
     //
     // 4. Export
     //
     const html = yield* downloadFile("report.html");
-    const parts = html.split("undefined");
-    const final_html = parts[0] + data_str + parts[1]; // StringConcat
+    const html_parts = html.split("[[[DATA]]]");
+    const htmlBlob = new Blob([html_parts[0], dataBlob, html_parts[1]], { type: "text/html" });
 
     yield {
         type: "result",
-        title: database.title,
-        // @ts-ignore
-        json: typeof env !== "undefined" && env.isDev ? data_str : undefined,
-        html: final_html,
+        title,
+        dataBlob,
+        htmlBlob,
         time: Date.now(),
-        counts: {
-            authors: database.authors.length,
-            channels: database.channels.length,
-            messages: Object.values(database.messages).reduce((acc, val) => acc + val.length, 0),
-        },
+        counts,
     };
 }
