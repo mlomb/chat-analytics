@@ -9,6 +9,7 @@ import Logo from "@assets/images/logo.svg";
 const HomePage = () => {
     const [index, setIndex] = useState(0);
 
+    // aint pretty but it works
     const fireAnimation = () => {
         setIndex(1);
         setTimeout(() => setIndex(2), 200);

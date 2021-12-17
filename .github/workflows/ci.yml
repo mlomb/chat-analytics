@@ -12,7 +12,6 @@ jobs:
           node-version: 14.x
       - run: npm ci
       - run: npm run build
-      - run: npm run demo
       - run: npm run test
 
   format-check:
