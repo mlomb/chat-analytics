@@ -8,14 +8,14 @@ export type Timestamp = number;
 
 export type Platform = "discord" | "telegram" | "whatsapp";
 
+export interface ReportConfig {
+    platform: Platform;
+}
+
 export interface FileInput {
     name: string;
     size: number;
     slice(start?: number, end?: number): Promise<ArrayBuffer>;
-}
-
-export interface ReportConfig {
-    platform: Platform;
 }
 
 export interface NewStep {

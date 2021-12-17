@@ -59,8 +59,8 @@ const ViewDownloadReport = ({ result }: Props) => {
                     View Locally
                 </Button>
                 {env.isDev && (
-                    <Button hueColor={[105, 70, 50]} href={file.dataURL} download="report_sample.json">
-                        🛠️ Download JSON (dev, {prettyBytes(result?.dataBlob.size || 0)})
+                    <Button hueColor={[105, 70, 50]} href={file.dataURL} download="report_sample.data">
+                        🛠️ Download DATA (dev, {prettyBytes(result?.dataBlob.size || 0)})
                     </Button>
                 )}
             </div>

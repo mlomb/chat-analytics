@@ -1,7 +1,7 @@
 export default null as any;
 
 import { ErrorStep, FileInput, Platform } from "@pipeline/Types";
-import { generateReport } from "@pipeline/Generation";
+import { generateReport } from "@pipeline/preprocess/Generation";
 
 export interface InitMessage {
     platform: Platform;

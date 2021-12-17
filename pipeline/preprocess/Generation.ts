@@ -9,7 +9,7 @@ import { preprocess } from "@pipeline/preprocess/Preprocess";
 import { Database } from "@pipeline/parse/Database";
 import { ProcessedData } from "@pipeline/preprocess/ProcessedData";
 
-import { compress } from "@pipeline/Compression";
+import { compress } from "@pipeline/shared/Compression";
 
 export async function* generateReport(files: FileInput[], config: ReportConfig): AsyncGenerator<StepInfo> {
     //
@@ -47,6 +47,8 @@ export async function* generateReport(files: FileInput[], config: ReportConfig):
     let database: Database | null = parser.database;
     // release other parser memory
     parser = null;
+
+    console.log(database);
 
     //
     // TEMPORAL
@@ -90,8 +92,8 @@ export async function* generateReport(files: FileInput[], config: ReportConfig):
     // 4. Export
     //
     const html = yield* downloadFile("report.html");
-    const html_parts = html.split("[[[DATA]]]");
-    const htmlBlob = new Blob([html_parts[0], dataBlob, html_parts[1]], { type: "text/html" });
+    const htmlParts = html.split("[[[DATA]]]");
+    const htmlBlob = new Blob([htmlParts[0], dataBlob, htmlParts[1]], { type: "text/html" });
 
     yield {
         type: "result",

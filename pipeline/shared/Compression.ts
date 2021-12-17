@@ -1,4 +1,5 @@
 import { Gzip } from "fflate";
+import { Base91Encoder } from "@pipeline/shared/Base91";
 
 import { StepInfo } from "@pipeline/Types";
 import { ProcessedData } from "@pipeline/preprocess/ProcessedData";
@@ -8,27 +9,25 @@ import { ProcessedData } from "@pipeline/preprocess/ProcessedData";
 */
 
 async function* compress(data: ProcessedData): AsyncGenerator<StepInfo, Blob> {
-    // https://en.wikipedia.org/wiki/Binary-to-text_encoding
-    /*
-https://news.ycombinator.com/item?id=13049329
-Raw size:     37409
-  gzip(raw):    6170
-  gzip(base16): 7482
-  gzip(base64): 10675
-  gzip(base85): 10549
-So it works better than base64, and it has the advantage of working 4 bytes at a time rather than 3.
-Also note that when you're feeding in binary data the gzip sizes for raw and base-xx data get a lot closer together.
+    // stats
+    let rawJSONSize = 0;
+    let compressedSize = 0;
+    let encodedSize = 0;
 
-
-
-
-    */
+    const base91 = new Base91Encoder();
     const gzipStream = new Gzip();
 
-    const blobParts: BlobPart[] = [];
-    gzipStream.ondata = (chunk) => blobParts.push(chunk);
+    const blobParts: string[] = [];
+    gzipStream.ondata = (chunk, final) => {
+        compressedSize += chunk.length;
+        const encoded = base91.encode(chunk, final);
+        encodedSize += encoded.length;
+        blobParts.push(encoded);
+    };
 
     // For the love of god, find a better way to do this
+    /* ============================= */
+    /* =============💩============= */
     /* ============================= */
     const object = data as any;
     const MAX_PART_SIZE = 1024 * 1024 * 8; // in chars
@@ -41,6 +40,7 @@ Also note that when you're feeding in binary data the gzip sizes for raw and bas
         buffer = "";
     };
     const append = (chunk: string) => {
+        rawJSONSize += chunk.length;
         buffer += chunk;
         if (buffer.length > MAX_PART_SIZE) flush();
     };
@@ -71,8 +71,12 @@ Also note that when you're feeding in binary data the gzip sizes for raw and bas
     append(`}`);
     flush(true);
     /* ============================= */
+    /* ============================= */
+    /* ============================= */
 
-    return new Blob(blobParts, { type: "application/gzip" });
+    console.log("rawJSONSize", rawJSONSize, "compressedSize", compressedSize, "encodedSize", encodedSize);
+
+    return new Blob(blobParts, { type: "text/plain" });
 }
 
 const decompress = async (data: string): Promise<ProcessedData> => {
