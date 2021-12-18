@@ -58,8 +58,9 @@ export const process: BlockProcessFn<MessagesPerCycleBlock> = (source, filters) 
 
     const _MS_PER_DAY = 1000 * 60 * 60 * 24;
 
-    for (const channel of source.channels) {
-        if (filters.channelsSet.has(channel.id)) {
+    for (let channelId = 0; channelId < source.channels.length; channelId++) {
+        const channel = source.channels[channelId];
+        if (filters.channelsSet.has(channelId)) {
             for (const message of channel.messages) {
                 if (filters.authorsSet.has(message.authorId)) {
                     const dateUTC = Date.UTC(message.date[0], message.date[1], message.date[2]);

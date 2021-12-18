@@ -20,14 +20,12 @@ export interface ProcessedData {
 }
 
 export interface Channel {
-    id: ID;
     name: string;
     name_searchable: string;
     messages: Message[];
 }
 
 export interface Author {
-    id: ID;
     name: string;
     name_searchable: string;
     bot: boolean;

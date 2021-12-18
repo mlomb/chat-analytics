@@ -3,7 +3,6 @@ import { useLayoutEffect, useRef } from "react";
 import { Root, Percent, Tooltip } from "@amcharts/amcharts5";
 import { PieChart, PieSeries } from "@amcharts/amcharts5/percent";
 
-import { dataProvider } from "@report/DataProvider";
 import { Themes } from "./AmCharts5";
 
 interface Props {}

@@ -1,10 +1,12 @@
 import "@assets/styles/ReportPage.less";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import Header from "@report/components/Header";
 import { TabContainer } from "@report/components/Tabs";
+import LoadingOverlay from "@report/components/LoadingOverlay";
 
+import { useDataProvider } from "@report/DataProvider";
 import AuthorChip from "@report/components/core/AuthorChip";
 import Card from "@report/components/Card";
 import MessagesGraph from "@report/components/viz/MessagesGraph";
@@ -17,7 +19,7 @@ import MessagesStats from "@report/components/viz/MessagesStats";
 
 const CardContainer = (props: { children: React.ReactNode }) => <div className="CardContainer">{props.children}</div>;
 
-const ReportPage = () => {
+const ReportDashboard = () => {
     const [tab, setTab] = useState("messages");
 
     return (
@@ -87,6 +89,26 @@ const ReportPage = () => {
                     </Card>
                 </CardContainer>
             </TabContainer>
+        </>
+    );
+};
+
+const ReportPage = () => {
+    const [loading, setLoading] = useState(true);
+    const dataProvider = useDataProvider();
+
+    useEffect(
+        () =>
+            void dataProvider.once("ready", () =>
+                setTimeout(() => setLoading(false), 1000 - Math.min(performance.now(), 1000))
+            ),
+        []
+    );
+
+    return (
+        <>
+            {!loading && <ReportDashboard />}
+            <LoadingOverlay loading={loading} />
         </>
     );
 };

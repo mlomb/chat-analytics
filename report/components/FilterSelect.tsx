@@ -16,8 +16,8 @@ import { searchFormat } from "@pipeline/Utils";
 
 const OPTION_HEIGHT = 35;
 
-type TOption = {
-    id: string | number;
+export type TOption = {
+    id: number;
     name: string;
     name_searchable: string;
 };

@@ -1,31 +1,31 @@
 import EventEmitter from "events";
 
-import { Platform } from "@pipeline/Types";
-import { Author, Channel, ProcessedData } from "@pipeline/preprocess/ProcessedData";
 import { BlockKey, BlocksDescMap, BlockState, Trigger } from "@pipeline/blocks/Blocks";
 import { dateToString } from "@pipeline/Utils";
+import { AuthorOption, Basic, ChannelOption } from "@report/Basic";
 
-import Worker, { BlockRequest, BlockResult, BlocksInfo } from "@report/WorkerReport";
+import Worker, { BlockRequestMessage, BlockResult, InitMessage, ReadyMessage } from "@report/WorkerReport";
 
 export class DataProvider extends EventEmitter {
     private worker: Worker;
-    private validRequestData: Set<Trigger | "source"> = new Set();
+    private validRequestData: Set<Trigger> = new Set();
     private currentBlock?: BlockKey; // if currentBlock===undefined, the worker is available
     private currentBlockInvalidated: boolean = false;
 
     // Updated by the UI
     private activeBlocks: Set<BlockKey> = new Set();
     private activeIds: Set<number> = new Set();
-    private activeChannels: Channel[] = [];
-    private activeAuthors: Author[] = [];
+    private activeChannels: ChannelOption[] = [];
+    private activeAuthors: AuthorOption[] = [];
     private activeStartDate: Date = new Date();
     private activeEndDate: Date = new Date();
 
     // Updated by this class and the Worker
+    public basic!: Basic;
     private blocksDescs?: BlocksDescMap;
     private readyBlocks: Map<BlockKey, any | null> = new Map();
 
-    constructor(public readonly source: ProcessedData) {
+    constructor(dataStr: string) {
         super();
         this.worker = Worker();
         this.worker.onerror = (e) => {
@@ -33,10 +33,12 @@ export class DataProvider extends EventEmitter {
             alert("An error ocurred creating the WebWorker.\n\n Error: " + e.message);
             this.worker.terminate();
         };
-        this.worker.onmessage = (e: MessageEvent<BlockResult | BlocksInfo>) => {
+        this.worker.onmessage = (e: MessageEvent<ReadyMessage | BlockResult>) => {
             const res = e.data;
-            if (res.type === "info") {
-                this.blocksDescs = res.info;
+            if (res.type === "ready") {
+                this.emit("ready");
+                this.basic = res.basic;
+                this.blocksDescs = res.blocksDesc;
                 // worker is ready, dispatch work
                 console.log("Worker is ready");
                 this.tryToDispatchWork();
@@ -44,6 +46,7 @@ export class DataProvider extends EventEmitter {
                 this.onWorkDone(res.blockKey, res.state, res.data);
             }
         };
+        this.worker.postMessage(<InitMessage>{ type: "init", dataStr });
     }
 
     toggleBlock(blockKey: BlockKey, id: number, active: boolean) {
@@ -62,12 +65,12 @@ export class DataProvider extends EventEmitter {
         // console.log(this.activeBlocks, this.activeIds);
     }
 
-    updateChannels(channels: Channel[]) {
+    updateChannels(channels: ChannelOption[]) {
         this.activeChannels = channels;
         this.invalidateBlocks("channels");
     }
 
-    updateAuthors(authors: Author[]) {
+    updateAuthors(authors: AuthorOption[]) {
         this.activeAuthors = authors;
         this.invalidateBlocks("authors");
     }
@@ -107,14 +110,11 @@ export class DataProvider extends EventEmitter {
         this.emit(blockKey, "loading", undefined);
 
         // dispatch work
-        const br: BlockRequest = {
+        const br: BlockRequestMessage = {
+            type: "request",
             blockKey,
             filters: {},
         };
-        if (!this.validRequestData.has("source")) {
-            br.processedData = this.source;
-            this.validRequestData.add("source");
-        }
         if (!this.validRequestData.has("channels")) {
             br.filters.channels = this.activeChannels.map((c) => c.id);
             this.validRequestData.add("channels");
@@ -190,10 +190,7 @@ export class DataProvider extends EventEmitter {
     }
 }
 
-export declare var platform: Platform;
-export declare var dataProvider: DataProvider;
+let dataProvider: DataProvider;
 
-export const initDataProvider = (source: ProcessedData) => {
-    dataProvider = new DataProvider(source);
-    platform = source.platform;
-};
+export const initDataProvider = (dataStr: string) => (dataProvider = new DataProvider(dataStr));
+export const useDataProvider = () => dataProvider;

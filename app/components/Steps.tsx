@@ -53,9 +53,8 @@ const Steps = () => {
         worker.onmessage = (e: MessageEvent<ReportResult>) => {
             const data = e.data;
             if (data.type === "result") {
-                if (env.isProd) {
-                    worker.terminate();
-                }
+                // We cant terminate the browser since the Blobs live there
+                // worker.terminate();
                 // give a small delay
                 setTimeout(() => {
                     setState({

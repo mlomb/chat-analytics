@@ -5,7 +5,7 @@ import { InView } from "react-intersection-observer";
 
 import Spinner from "@assets/images/spinner.svg";
 import { BlockKey, BlockState } from "@pipeline/blocks/Blocks";
-import { dataProvider } from "@report/DataProvider";
+import { useDataProvider } from "@report/DataProvider";
 
 interface Props {
     children?: React.ReactNode;
@@ -25,6 +25,7 @@ const Indicators = {
 };
 
 const Card = (props: Props) => {
+    const dataProvider = useDataProvider();
     const [id] = useState(Math.floor(Math.random() * 0xffffffff));
     const [content, setContent] = useState<{
         state: BlockState;

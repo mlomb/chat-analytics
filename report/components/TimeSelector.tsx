@@ -12,7 +12,7 @@ import {
     StepLineSeries,
 } from "@amcharts/amcharts5/xy";
 
-import { dataProvider } from "@report/DataProvider";
+import { useDataProvider } from "@report/DataProvider";
 
 import { BlockState } from "@pipeline/blocks/Blocks";
 import { MessagesPerCycleBlock } from "@pipeline/blocks/MessagesPerCycle";
@@ -30,6 +30,7 @@ const RESETS = {
 };
 
 const TimeSelector = () => {
+    const dataProvider = useDataProvider();
     const chartDiv = useRef<HTMLDivElement>(null);
 
     useLayoutEffect(() => {

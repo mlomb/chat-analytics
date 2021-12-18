@@ -1,11 +1,26 @@
 export default null as any;
 
-import { BlockKey, BlocksDesc, BlocksDescMap, BlocksProcessFn, BlockState, Filters } from "@pipeline/blocks/Blocks";
+import { BlockKey, BlocksDesc, BlocksProcessFn, BlockState, Filters } from "@pipeline/blocks/Blocks";
 import { ProcessedData } from "@pipeline/preprocess/ProcessedData";
+import { decompress } from "@pipeline/shared/Compression";
+import { Basic, computeBasic } from "@report/Basic";
 
-export interface BlockRequest {
+// Receive compressed data
+export interface InitMessage {
+    type: "init";
+    dataStr: string;
+}
+
+// Send required data for the UI
+export interface ReadyMessage {
+    type: "ready";
+    basic: Basic;
+    blocksDesc: typeof BlocksDesc;
+}
+
+export interface BlockRequestMessage {
+    type: "request";
     blockKey: BlockKey;
-    processedData?: ProcessedData;
     filters: Partial<Filters>;
 }
 
@@ -14,11 +29,6 @@ export interface BlockResult {
     blockKey: BlockKey;
     state: BlockState;
     data: any | null;
-}
-
-export interface BlocksInfo {
-    type: "info";
-    info: BlocksDescMap;
 }
 
 let processedData: ProcessedData | null = null;
@@ -31,11 +41,20 @@ let fitlers: Filters = {
     endDate: "",
 };
 
-self.onmessage = async (ev: MessageEvent<BlockRequest>) => {
-    const br: BlockRequest = ev.data;
+const init = async (msg: InitMessage) => {
+    processedData = await decompress(msg.dataStr);
+    self.postMessage(<ReadyMessage>{
+        type: "ready",
+        basic: computeBasic(processedData),
+        blocksDesc: BlocksDesc,
+    });
 
+    console.log(processedData);
+};
+
+const request = async (msg: BlockRequestMessage) => {
+    const br = msg;
     // update active data if provided
-    if (br.processedData) processedData = br.processedData;
     if (br.filters.channels) {
         fitlers.channels = br.filters.channels;
         fitlers.channelsSet = new Set(br.filters.channels);
@@ -70,10 +89,17 @@ self.onmessage = async (ev: MessageEvent<BlockRequest>) => {
     }
 };
 
-console.log("WorkerReport started");
+self.onmessage = async (ev: MessageEvent<InitMessage | BlockRequestMessage>) => {
+    switch (ev.data.type) {
+        case "init":
+            init(ev.data);
+            break;
+        case "request":
+            console.log("Req", ev.data);
 
-// send initial information about blocks
-self.postMessage(<BlocksInfo>{
-    type: "info",
-    info: BlocksDesc,
-});
+            request(ev.data);
+            break;
+    }
+};
+
+console.log("WorkerReport started");

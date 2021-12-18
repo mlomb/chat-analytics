@@ -17,7 +17,6 @@ export const preprocess = async function* (
     for (let id: ID = 0; id < database.authors.length; id++) {
         const author = database.authors[id];
         authors.push({
-            id,
             name: author.name,
             name_searchable: searchFormat(author.name),
             bot: author.bot,
@@ -34,7 +33,6 @@ export const preprocess = async function* (
         }
 
         const channel: Channel = {
-            id,
             name: _channel.name,
             name_searchable: searchFormat(_channel.name),
             messages: [],
@@ -49,7 +47,7 @@ export const preprocess = async function* (
             //const dateStr = dateToString(date);
             channel.messages.push({
                 authorId: msg.authorId,
-                channelId: channel.id,
+                channelId: id,
                 date: [date.getFullYear(), date.getMonth(), date.getDate()],
             });
         }

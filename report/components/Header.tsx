@@ -2,8 +2,8 @@ import "@assets/styles/Header.less";
 
 import { useLayoutEffect, useState } from "react";
 
-import { dataProvider } from "@report/DataProvider";
-import { Author, Channel } from "@pipeline/preprocess/ProcessedData";
+import { useDataProvider } from "@report/DataProvider";
+import { AuthorOption, ChannelOption } from "@report/Basic";
 
 import AuthorChip from "@report/components/core/AuthorChip";
 import ChannelChip from "@report/components/core/ChannelChip";
@@ -18,14 +18,14 @@ interface Props {
     setTab: (tab: string) => void;
 }
 
-const channelsSpecialOptions: SelectSpecialOpcion<Channel>[] = [
+const channelsSpecialOptions: SelectSpecialOpcion<ChannelOption>[] = [
     {
         name: "Select all channels",
         filter: (options) => options,
     },
 ];
 
-const authorsSpecialOptions: SelectSpecialOpcion<Author>[] = [
+const authorsSpecialOptions: SelectSpecialOpcion<AuthorOption>[] = [
     {
         name: "Select all authors (🧍➕🤖)",
         filter: (options) => options,
@@ -73,10 +73,10 @@ const tabs = [
 
 const Header = (props: Props) => {
     const { tab, setTab } = props;
-    const source = dataProvider.source;
+    const dataProvider = useDataProvider();
 
-    const [selectedChannels, setSelectedChannels] = useState<Channel[]>([...source.channels]);
-    const [selectedAuthors, setSelectedAuthors] = useState<Author[]>([...source.authors]);
+    const [selectedChannels, setSelectedChannels] = useState<ChannelOption[]>([...dataProvider.basic.channels]);
+    const [selectedAuthors, setSelectedAuthors] = useState<AuthorOption[]>([...dataProvider.basic.authors]);
 
     useLayoutEffect(() => dataProvider.updateAuthors(selectedAuthors), [selectedAuthors]);
     useLayoutEffect(() => dataProvider.updateChannels(selectedChannels), [selectedChannels]);
@@ -85,7 +85,7 @@ const Header = (props: Props) => {
         <div className="Header">
             <div className="Header__info">
                 <span className="Header__title">
-                    <h1>{source.title}</h1>
+                    <h1>{dataProvider.basic.title}</h1>
                     <h2>chat analysis report</h2>
                 </span>
                 <div className="Header__link">
@@ -99,7 +99,7 @@ const Header = (props: Props) => {
                     <label htmlFor="channels">Channels</label>
                     <FilterSelect
                         id="channels"
-                        options={source.channels}
+                        options={dataProvider.basic.channels}
                         placeholder="Select channels..."
                         selected={selectedChannels}
                         onChange={setSelectedChannels}
@@ -112,7 +112,7 @@ const Header = (props: Props) => {
                     <label htmlFor="authors">Authors</label>
                     <FilterSelect
                         id="authors"
-                        options={source.authors}
+                        options={dataProvider.basic.authors}
                         placeholder="Select authors..."
                         selected={selectedAuthors}
                         onChange={setSelectedAuthors}

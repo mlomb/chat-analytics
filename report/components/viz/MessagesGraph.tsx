@@ -12,11 +12,12 @@ import {
     XYCursor,
 } from "@amcharts/amcharts5/xy";
 
-import { dataProvider } from "@report/DataProvider";
+import { useDataProvider } from "@report/DataProvider";
 import { MessagesPerCycleBlock } from "@pipeline/blocks/MessagesPerCycle";
 import { Themes } from "./AmCharts5";
 
 const MessagesGraph = ({ data }: { data: MessagesPerCycleBlock }) => {
+    const dataProvider = useDataProvider();
     const chartDiv = useRef<HTMLDivElement>(null);
     const [charts, setCharts] = useState<{
         stepSeries: StepLineSeries | null;

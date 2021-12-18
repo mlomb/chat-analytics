@@ -1,5 +1,5 @@
-import { Gzip } from "fflate";
-import { Base91Encoder } from "@pipeline/shared/Base91";
+import { Gzip, gunzipSync } from "fflate";
+import { Base91Decoder, Base91Encoder } from "@pipeline/shared/Base91";
 
 import { StepInfo } from "@pipeline/Types";
 import { ProcessedData } from "@pipeline/preprocess/ProcessedData";
@@ -80,7 +80,13 @@ async function* compress(data: ProcessedData): AsyncGenerator<StepInfo, Blob> {
 }
 
 const decompress = async (data: string): Promise<ProcessedData> => {
-    return {} as ProcessedData;
+    // TODO: stream this
+    const base91 = new Base91Decoder();
+    const buffer = base91.decode(data, true);
+    const jsonBuffer = gunzipSync(buffer);
+    const json = new TextDecoder().decode(jsonBuffer);
+    const out = JSON.parse(json) as ProcessedData;
+    return out;
 };
 
 export { compress, decompress };
