@@ -18,12 +18,14 @@ export interface ReadyMessage {
     blocksDesc: typeof BlocksDesc;
 }
 
+// Receive a request to compute a block
 export interface BlockRequestMessage {
     type: "request";
     blockKey: BlockKey;
     filters: Partial<Filters>;
 }
 
+// Send the computed block back to the UI
 export interface BlockResult {
     type: "result";
     blockKey: BlockKey;
@@ -95,8 +97,6 @@ self.onmessage = async (ev: MessageEvent<InitMessage | BlockRequestMessage>) => 
             init(ev.data);
             break;
         case "request":
-            console.log("Req", ev.data);
-
             request(ev.data);
             break;
     }

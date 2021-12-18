@@ -92,7 +92,10 @@ export async function* generateReport(files: FileInput[], config: ReportConfig):
     //
     const html = yield* downloadFile("report.html");
     const htmlParts = html.split("[[[DATA]]]");
+    console.log(html, htmlParts);
+    console.log([htmlParts[0], dataBlob, htmlParts[1]]);
     const htmlBlob = new Blob([htmlParts[0], dataBlob, htmlParts[1]], { type: "text/html" });
+    console.log(htmlBlob.size);
 
     yield {
         type: "result",
