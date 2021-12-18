@@ -91,11 +91,12 @@ export async function* generateReport(files: FileInput[], config: ReportConfig):
     // 4. Export
     //
     const html = yield* downloadFile("report.html");
-    const htmlParts = html.split("[[[DATA]]]");
-    console.log(html, htmlParts);
-    console.log([htmlParts[0], dataBlob, htmlParts[1]]);
-    const htmlBlob = new Blob([htmlParts[0], dataBlob, htmlParts[1]], { type: "text/html" });
-    console.log(htmlBlob.size);
+    const template = "[[[DATA]]]";
+    const dataTemplateLoc = html.indexOf(template);
+    const htmlBlob = new Blob(
+        [html.slice(0, dataTemplateLoc), dataBlob, html.slice(dataTemplateLoc + template.length)],
+        { type: "text/html" }
+    );
 
     yield {
         type: "result",
