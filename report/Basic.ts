@@ -18,6 +18,8 @@ export interface ChannelOption extends TOption {
 export interface Basic {
     platform: Platform;
     title: string;
+    minDate: string;
+    maxDate: string;
     authors: AuthorOption[];
     channels: ChannelOption[];
 }
@@ -25,6 +27,8 @@ export interface Basic {
 export const computeBasic = (pd: ProcessedData): Basic => ({
     platform: pd.platform,
     title: pd.title,
+    minDate: pd.minDate,
+    maxDate: pd.maxDate,
     authors: pd.authors.map((a, i) => ({
         id: i,
         name: a.name,

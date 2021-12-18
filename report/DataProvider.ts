@@ -36,11 +36,15 @@ export class DataProvider extends EventEmitter {
         this.worker.onmessage = (e: MessageEvent<ReadyMessage | BlockResult>) => {
             const res = e.data;
             if (res.type === "ready") {
-                this.emit("ready");
                 this.basic = res.basic;
                 this.blocksDescs = res.blocksDesc;
+                // set default time range
+                this.activeStartDate = new Date(res.basic.minDate);
+                this.activeEndDate = new Date(res.basic.maxDate);
+
                 // worker is ready, dispatch work
                 console.log("Worker is ready");
+                this.emit("ready");
                 this.tryToDispatchWork();
             } else if (res.type === "result") {
                 this.onWorkDone(res.blockKey, res.state, res.data);

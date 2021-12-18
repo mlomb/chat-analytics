@@ -151,8 +151,10 @@ const MessagesGraph = ({ data }: { data: MessagesPerCycleBlock }) => {
             );
 
         dataProvider.on("trigger-time", onZoom);
-        onZoom();
         setCharts({ stepSeries, columnSeries });
+
+        // must wait to datavalidated before zooming
+        [stepSeries, columnSeries].forEach((c) => c.events.once("datavalidated", onZoom));
 
         return () => {
             setCharts({ stepSeries: null, columnSeries: null });
