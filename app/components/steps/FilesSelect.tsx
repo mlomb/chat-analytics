@@ -44,7 +44,7 @@ const FilesSelect = ({ platform, files, onFilesUpdate }: Props) => {
         fileRef.current!.value = "";
     };
 
-    const onDrag = (e: DragEvent<HTMLDivElement>) => {
+    const onDrag = (e: DragEvent<HTMLButtonElement>) => {
         e.preventDefault();
         e.stopPropagation();
 
@@ -77,7 +77,7 @@ const FilesSelect = ({ platform, files, onFilesUpdate }: Props) => {
         <div className="FilesSelect">
             Select the files from the previous step:
             <div className="FilesSelect__zone">
-                <div
+                <button
                     className={["FilesSelect__dropzone", dragover ? "FilesSelect__dropzone--dragover" : ""].join(" ")}
                     onClick={onFileClick}
                     onDrop={onDrag}
@@ -89,7 +89,7 @@ const FilesSelect = ({ platform, files, onFilesUpdate }: Props) => {
                     Drop <span>{platformInfo?.defaultFilename}</span> files here
                     <br />
                     or click to browse
-                </div>
+                </button>
                 <div className="FilesSelect__info">
                     {files.length === 0 ? (
                         <>No files selected</>
