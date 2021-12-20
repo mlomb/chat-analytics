@@ -82,10 +82,15 @@ async function* compress(data: ProcessedData): AsyncGenerator<StepInfo, Blob> {
 const decompress = async (data: string): Promise<ProcessedData> => {
     // TODO: stream this
     const base91 = new Base91Decoder();
-    const buffer = base91.decode(data, true);
-    const jsonBuffer = gunzipSync(buffer);
-    const json = new TextDecoder().decode(jsonBuffer);
+    let buffer = base91.decode(data, true);
+    data = "";
+    let jsonBuffer = gunzipSync(buffer);
+    buffer = new Uint8Array();
+    let json = new TextDecoder().decode(jsonBuffer);
+    jsonBuffer = new Uint8Array();
     const out = JSON.parse(json) as ProcessedData;
+    json = "";
+
     return out;
 };
 

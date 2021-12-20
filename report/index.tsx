@@ -6,7 +6,9 @@ import ReportPage from "@report/ReportPage";
 import { initDataProvider } from "@report/DataProvider";
 
 document.addEventListener("DOMContentLoaded", async () => {
-    let dataStr: string = document.getElementById("data")!.textContent!;
+    const dataElem = document.getElementById("data")!;
+    let dataStr: string = dataElem.textContent || "";
+    dataElem.remove();
 
     if (env.isDev) {
         //  load from public/ folder
