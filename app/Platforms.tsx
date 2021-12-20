@@ -163,7 +163,7 @@ export const Platforms: {
         title: "Discord",
         color: [235, 86, 65],
         defaultFilename: "<guild> - <channel> [ID].json",
-        logo: <img src={DiscordLogo} alt="Discord" />,
+        logo: <img src={DiscordLogo} alt="" />,
         instructions: <DiscordInstructions />,
     },
     {
@@ -171,7 +171,7 @@ export const Platforms: {
         title: "Telegram",
         color: [200, 79, 52],
         defaultFilename: "result.json",
-        logo: <img src={TelegramLogo} alt="Telegram" />,
+        logo: <img src={TelegramLogo} alt="" />,
         instructions: <TelegramInstructions />,
     },
     {
@@ -179,7 +179,7 @@ export const Platforms: {
         title: "WhatsApp",
         color: [142, 70, 49],
         defaultFilename: "WhatsApp Chat with <chat name>.txt",
-        logo: <img src={WhatsAppLogo} alt="WhatsApp" />,
+        logo: <img src={WhatsAppLogo} alt="" />,
         instructions: <WhatsAppInstructions />,
     },
 ];

@@ -23,10 +23,15 @@ const HomePage = () => {
             <div
                 className={["HomePage__container", index > 0 ? "HomePage__container--fade-out" : ""].join(" ")}
                 style={{ display: index >= 2 ? "none" : "block" }}
+                aria-hidden={index >= 2}
             >
                 <Landing onStart={fireAnimation} />
             </div>
-            <div className={["HomePage__container", index >= 2 ? "HomePage__container--fade-in" : ""].join(" ")}>
+            <div
+                className={["HomePage__container", index >= 2 ? "HomePage__container--fade-in" : ""].join(" ")}
+                aria-hidden={index < 2}
+                style={{ visibility: index < 2 ? "hidden" : "visible" }}
+            >
                 <Steps />
             </div>
         </div>

@@ -30,6 +30,7 @@ const Stepper = (props: Props) => {
                                 "--max-height": `${props.stepMaxHeights[index]}px`,
                             } as React.CSSProperties
                         }
+                        aria-hidden={!active}
                     >
                         <div className="Stepper__label">
                             <div className="Stepper__number">{done ? <img src={Tick} /> : index + 1}</div>
@@ -37,6 +38,7 @@ const Stepper = (props: Props) => {
                         </div>
                         <div className={"Stepper__content"}>
                             <fieldset disabled={!active}>
+                                <legend>{props.stepTitles[index]}</legend>
                                 <div className={"Stepper__inner"}>{child}</div>
                             </fieldset>
                         </div>

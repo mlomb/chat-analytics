@@ -130,7 +130,7 @@ module.exports = (env) => {
         },
         devtool: isProd ? undefined : "source-map",
         devServer: {
-            host: "0.0.0.0",
+            allowedHosts: "all",
             client: {
                 overlay: true,
                 progress: true,

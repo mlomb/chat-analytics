@@ -50,7 +50,7 @@ const Landing = ({ onStart }: Props) => {
                     View Demo
                 </Button>
                 <Button hueColor={[207, 23, 8]} href="https://github.com" target="_blank">
-                    <img src={GitHub} alt="GitHub" />
+                    <img src={GitHub} alt="" />
                     GitHub
                 </Button>
             </div>
