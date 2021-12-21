@@ -1,16 +1,20 @@
-// @ts-nocheck TODO: remove
-import { NewChannel } from "@pipeline/Analyzer";
-import { platform } from "@report/DataProvider";
+import "@assets/styles/Labels.less";
+
+import { ID } from "@pipeline/Types";
+import { useDataProvider } from "@report/DataProvider";
 
 interface Props {
-    data: NewChannel;
+    id: ID;
 }
 
-const ChannelChip = ({ data }: Props) => {
+const ChannelLabel = ({ id }: Props) => {
+    const dp = useDataProvider();
+    const channel = dp.basic.channels[id];
+
     return (
-        <div className="Chip">
+        <div className="Label">
             {/* # icon */}
-            {platform === "discord" && (
+            {"a" + 0 === "discord" && (
                 <svg width="20" height="20" viewBox="0 0 24 24">
                     <path
                         fill="currentColor"
@@ -20,9 +24,9 @@ const ChannelChip = ({ data }: Props) => {
                     ></path>
                 </svg>
             )}
-            <span>{data.name}</span>
+            <span>{channel.name}</span>
         </div>
     );
 };
 
-export default ChannelChip;
+export default ChannelLabel;

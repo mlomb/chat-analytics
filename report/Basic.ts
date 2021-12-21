@@ -1,15 +1,14 @@
 import { Platform } from "@pipeline/Types";
 import { ProcessedData } from "@pipeline/preprocess/ProcessedData";
-import { TOption } from "@report/components/FilterSelect";
 
-export interface AuthorOption extends TOption {
+export interface AuthorOption {
     id: number;
     name: string;
     name_searchable: string;
     bot: boolean;
 }
 
-export interface ChannelOption extends TOption {
+export interface ChannelOption {
     id: number;
     name: string;
     name_searchable: string;

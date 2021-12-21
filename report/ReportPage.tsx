@@ -7,14 +7,13 @@ import { TabContainer } from "@report/components/Tabs";
 import LoadingOverlay from "@report/components/LoadingOverlay";
 
 import { useDataProvider } from "@report/DataProvider";
-import AuthorChip from "@report/components/core/AuthorChip";
+import AuthorChip from "@report/components/core/AuthorLabel";
 import Card from "@report/components/Card";
 import MessagesGraph from "@report/components/viz/MessagesGraph";
 import WordCloudGraph from "@report/components/viz/WordCloudGraph";
 import DonutChart from "@report/components/viz/DonutChart";
 import HeatMapChart from "@report/components/viz/HeatMapChart";
 import AnimatedBars from "@report/components/viz/AnimatedBars";
-import ChannelChip from "@report/components/core/ChannelChip";
 import MessagesStats from "@report/components/viz/MessagesStats";
 
 const CardContainer = (props: { children: React.ReactNode }) => <div className="CardContainer">{props.children}</div>;
@@ -39,24 +38,24 @@ const ReportDashboard = () => {
                         this is content
                     </Card>
                     <Card num={1} blockKey="message-most-author" title="Most messages sent by author">
-                        <AnimatedBars
+                        {/*<AnimatedBars
                             what="Author"
                             unit="Total messages"
                             data={[]}
                             itemComponent={AuthorChip}
                             maxItems={16}
                             colorHue={240}
-                        />
+                        />*/}
                     </Card>
                     <Card num={1} blockKey="message-most-channel" title="Most messages sent by channel">
-                        <AnimatedBars
+                        {/*<AnimatedBars
                             what="Channel"
                             unit="Total messages"
                             data={[]}
                             itemComponent={ChannelChip}
                             maxItems={16}
                             colorHue={266}
-                        />
+                        />*/}
                     </Card>
                     <Card num={2} blockKey="message-heatmap" title="Messages heatmap">
                         <HeatMapChart />
@@ -69,13 +68,13 @@ const ReportDashboard = () => {
                         <WordCloudGraph getData="getWordsData" />
                     </Card>
                     <Card num={1} blockKey="language-words" title="Most used words">
-                        <AnimatedBars
+                        {/*<AnimatedBars
                             what="Word"
                             unit="Times used"
                             data={[]}
                             itemComponent={ChannelChip}
                             maxItems={16}
-                        />
+                        />*/}
                     </Card>
                     <Card num={2} blockKey="language-language">
                         <DonutChart />

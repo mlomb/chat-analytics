@@ -1,5 +1,6 @@
 import EventEmitter from "events";
 
+import { ID } from "@pipeline/Types";
 import { BlockKey, BlocksDescMap, BlockState, Trigger } from "@pipeline/blocks/Blocks";
 import { dateToString } from "@pipeline/Utils";
 import { AuthorOption, Basic, ChannelOption } from "@report/Basic";
@@ -15,8 +16,8 @@ export class DataProvider extends EventEmitter {
     // Updated by the UI
     private activeBlocks: Set<BlockKey> = new Set();
     private activeIds: Set<number> = new Set();
-    private activeChannels: ChannelOption[] = [];
-    private activeAuthors: AuthorOption[] = [];
+    private activeChannels: ID[] = [];
+    private activeAuthors: ID[] = [];
     private activeStartDate: Date = new Date();
     private activeEndDate: Date = new Date();
 
@@ -74,12 +75,12 @@ export class DataProvider extends EventEmitter {
         // console.log(this.activeBlocks, this.activeIds);
     }
 
-    updateChannels(channels: ChannelOption[]) {
+    updateChannels(channels: ID[]) {
         this.activeChannels = channels;
         this.invalidateBlocks("channels");
     }
 
-    updateAuthors(authors: AuthorOption[]) {
+    updateAuthors(authors: ID[]) {
         this.activeAuthors = authors;
         this.invalidateBlocks("authors");
     }
@@ -125,11 +126,11 @@ export class DataProvider extends EventEmitter {
             filters: {},
         };
         if (!this.validRequestData.has("channels")) {
-            br.filters.channels = this.activeChannels.map((c) => c.id);
+            br.filters.channels = this.activeChannels;
             this.validRequestData.add("channels");
         }
         if (!this.validRequestData.has("authors")) {
-            br.filters.authors = this.activeAuthors.map((a) => a.id);
+            br.filters.authors = this.activeAuthors;
             this.validRequestData.add("authors");
         }
         if (!this.validRequestData.has("time")) {

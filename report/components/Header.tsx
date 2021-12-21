@@ -1,15 +1,16 @@
 import "@assets/styles/Header.less";
 
-import { useLayoutEffect, useState } from "react";
+import { useLayoutEffect, useMemo, useState } from "react";
 
-import { useDataProvider } from "@report/DataProvider";
+import { ID } from "@pipeline/Types";
+import { DataProvider, useDataProvider } from "@report/DataProvider";
 import { AuthorOption, ChannelOption } from "@report/Basic";
 
-import AuthorChip from "@report/components/core/AuthorChip";
-import ChannelChip from "@report/components/core/ChannelChip";
+import AuthorLabel from "@report/components/core/AuthorLabel";
+import ChannelLabel from "@report/components/core/ChannelLabel";
 import { TabSwitch } from "@report/components/Tabs";
 import TimeSelector from "@report/components/TimeSelector";
-import FilterSelect, { SelectSpecialOpcion } from "@report/components/FilterSelect";
+import FilterSelect, { FilterOption } from "@report/components/FilterSelect";
 
 import Logo from "@assets/images/logo.svg";
 
@@ -17,28 +18,6 @@ interface Props {
     tab: string;
     setTab: (tab: string) => void;
 }
-
-const channelsSpecialOptions: SelectSpecialOpcion<ChannelOption>[] = [
-    {
-        name: "Select all channels",
-        filter: (options) => options,
-    },
-];
-
-const authorsSpecialOptions: SelectSpecialOpcion<AuthorOption>[] = [
-    {
-        name: "Select all authors (🧍➕🤖)",
-        filter: (options) => options,
-    },
-    {
-        name: "Select all non-bot authors (🧍)",
-        filter: (options) => options.filter((o) => o.bot === false),
-    },
-    {
-        name: "Select all bot authors (🤖)",
-        filter: (options) => options.filter((o) => o.bot === true),
-    },
-];
 
 const tabs = [
     {
@@ -71,12 +50,50 @@ const tabs = [
     },
 ];
 
+const channelsFilterOptionsFn: (dp: DataProvider) => FilterOption[] = (dp) => [
+    {
+        name: "Select all channels",
+        options: dp.basic.channels.map((c) => c.id),
+    },
+];
+
+const authorsFilterOptionsFn: (dp: DataProvider) => FilterOption[] = (dp) => [
+    {
+        name: "Select all authors (🧍➕🤖)",
+        options: dp.basic.authors.map((a) => a.id),
+    },
+    {
+        name: "Select all non-bot authors (🧍)",
+        options: dp.basic.authors.filter((o) => o.bot === false).map((a) => a.id),
+    },
+    {
+        name: "Select all bot authors (🤖)",
+        options: dp.basic.authors.filter((o) => o.bot === true).map((a) => a.id),
+    },
+];
+
+const NumberComponentTest = (props: { id: number }) => {
+    return (
+        <span
+            style={{
+                color: "white",
+                whiteSpace: "nowrap",
+            }}
+        >
+            index {props.id}
+        </span>
+    );
+};
+
 const Header = (props: Props) => {
     const { tab, setTab } = props;
     const dataProvider = useDataProvider();
 
-    const [selectedChannels, setSelectedChannels] = useState<ChannelOption[]>([...dataProvider.basic.channels]);
-    const [selectedAuthors, setSelectedAuthors] = useState<AuthorOption[]>([...dataProvider.basic.authors]);
+    const channelsFilterOptions = useMemo(() => channelsFilterOptionsFn(dataProvider), [dataProvider]);
+    const authorsFilterOptions = useMemo(() => authorsFilterOptionsFn(dataProvider), [dataProvider]);
+
+    const [selectedChannels, setSelectedChannels] = useState<ID[]>(channelsFilterOptions[0].options);
+    const [selectedAuthors, setSelectedAuthors] = useState<ID[]>(authorsFilterOptions[0].options);
 
     useLayoutEffect(() => dataProvider.updateAuthors(selectedAuthors), [selectedAuthors]);
     useLayoutEffect(() => dataProvider.updateChannels(selectedChannels), [selectedChannels]);
@@ -98,27 +115,25 @@ const Header = (props: Props) => {
                 <div className="Filters__Filter">
                     <label htmlFor="channels">Channels</label>
                     <FilterSelect
-                        id="channels"
-                        options={dataProvider.basic.channels}
+                        options={channelsFilterOptions[0].options}
                         placeholder="Select channels..."
                         selected={selectedChannels}
                         onChange={setSelectedChannels}
                         optionColorHue={266}
-                        itemComponent={ChannelChip}
-                        specialOptions={channelsSpecialOptions}
+                        itemComponent={ChannelLabel}
+                        filterOptions={channelsFilterOptions}
                     />
                 </div>
                 <div className="Filters__Filter">
                     <label htmlFor="authors">Authors</label>
                     <FilterSelect
-                        id="authors"
-                        options={dataProvider.basic.authors}
+                        options={authorsFilterOptions[0].options}
                         placeholder="Select authors..."
                         selected={selectedAuthors}
                         onChange={setSelectedAuthors}
                         optionColorHue={240}
-                        itemComponent={AuthorChip}
-                        specialOptions={authorsSpecialOptions}
+                        itemComponent={NumberComponentTest}
+                        filterOptions={authorsFilterOptions}
                     />
                 </div>
                 <div className="Filters__Filter" style={{ minWidth: "100%" }}>
