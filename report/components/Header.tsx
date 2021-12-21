@@ -4,7 +4,6 @@ import { useLayoutEffect, useMemo, useState } from "react";
 
 import { ID } from "@pipeline/Types";
 import { DataProvider, useDataProvider } from "@report/DataProvider";
-import { AuthorOption, ChannelOption } from "@report/Basic";
 
 import AuthorLabel from "@report/components/core/AuthorLabel";
 import ChannelLabel from "@report/components/core/ChannelLabel";
@@ -72,19 +71,6 @@ const authorsFilterOptionsFn: (dp: DataProvider) => FilterOption[] = (dp) => [
     },
 ];
 
-const NumberComponentTest = (props: { id: number }) => {
-    return (
-        <span
-            style={{
-                color: "white",
-                whiteSpace: "nowrap",
-            }}
-        >
-            index {props.id}
-        </span>
-    );
-};
-
 const Header = (props: Props) => {
     const { tab, setTab } = props;
     const dataProvider = useDataProvider();
@@ -132,7 +118,7 @@ const Header = (props: Props) => {
                         selected={selectedAuthors}
                         onChange={setSelectedAuthors}
                         optionColorHue={240}
-                        itemComponent={NumberComponentTest}
+                        itemComponent={AuthorLabel}
                         filterOptions={authorsFilterOptions}
                     />
                 </div>

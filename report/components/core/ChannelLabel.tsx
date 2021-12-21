@@ -1,5 +1,7 @@
 import "@assets/styles/Labels.less";
 
+import { memo } from "react";
+
 import { ID } from "@pipeline/Types";
 import { useDataProvider } from "@report/DataProvider";
 
@@ -29,4 +31,4 @@ const ChannelLabel = ({ id }: Props) => {
     );
 };
 
-export default ChannelLabel;
+export default memo(ChannelLabel) as typeof ChannelLabel;

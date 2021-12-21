@@ -10,7 +10,7 @@
 
 import "@assets/styles/FilterSelect.less";
 
-import React, { memo, useMemo, ReactElement, useCallback, useRef, useState } from "react";
+import React, { memo, useMemo, ReactElement, useRef, useState, useCallback } from "react";
 import { FixedSizeList, ListChildComponentProps } from "react-window";
 
 const OPTION_HEIGHT = 35;
@@ -18,7 +18,8 @@ const CHIPS_LIMIT = 3;
 
 type Index = number;
 type ItemComponent = (props: { id: Index }) => JSX.Element;
-type ChangeFn = (selected: Index[]) => void;
+
+type MouseOrTouchEvent = React.MouseEvent<HTMLElement> | React.TouchEvent<HTMLElement>;
 
 export interface FilterOption {
     name: string;
@@ -28,13 +29,14 @@ export interface FilterOption {
 interface Props {
     options: Index[];
     selected: Index[];
-    onChange: ChangeFn;
+    onChange: (selected: Index[]) => void;
     itemComponent: ItemComponent;
     filterOptions: FilterOption[];
     placeholder: string;
     optionColorHue: number;
 }
 
+// Options displayed in the control
 const ValueOption = ({
     index,
     itemComponent,
@@ -45,10 +47,7 @@ const ValueOption = ({
     onRemove: (index: Index) => void;
 }) => {
     const Item = itemComponent;
-    const onClick = (e: React.MouseEvent<HTMLElement>) => {
-        // e.preventDefault();
-        onRemove(index);
-    };
+    const onClick = () => onRemove(index);
     return (
         <div className="FilterSelect__option">
             <div className="FilterSelect__label">
@@ -61,6 +60,7 @@ const ValueOption = ({
     );
 };
 
+// Option displayed in the menu list
 const DataOptionList = (props: { index: Index; selected: boolean; itemComponent: ItemComponent }) => {
     const Item = props.itemComponent;
     return (
@@ -76,116 +76,223 @@ const DataOptionList = (props: { index: Index; selected: boolean; itemComponent:
     );
 };
 
-const FilterSelect = ({ options, selected, filterOptions, onChange, itemComponent, optionColorHue }: Props) => {
-    const inputRef = useRef<HTMLInputElement>(null);
-    const [open, setOpen] = useState(false);
+interface ItemData {
+    selected: Index[];
+    onChange: (selected: Index[]) => void;
+    onToggle: (index: Index) => void;
+    itemComponent: ItemComponent;
+    filterOptions: FilterOption[];
+}
 
-    const cssStyles = { "--hue": optionColorHue } as React.CSSProperties;
+// Selects between DataOptionList and FilterOptionList
+const Item = ({ index, style, data }: ListChildComponentProps<ItemData>) => {
+    const { filterOptions, selected, itemComponent, onChange, onToggle } = data;
 
-    const doOpen = useCallback(() => setOpen(true), []);
-    const doClose = useCallback(() => setOpen(false), []);
-    const openSelect = () => {
-        doOpen();
-        inputRef.current?.focus();
+    const isFilter = index < filterOptions.length;
+    let children: ReactElement;
+
+    if (isFilter) {
+        children = <span>{filterOptions[index].name}</span>;
+    } else {
+        children = (
+            <DataOptionList
+                index={index - filterOptions.length}
+                // TODO: if this is slow, make sure selected is always sorted and run binary search here
+                // for now, its not necessary
+                selected={selected.includes(index - filterOptions.length)}
+                itemComponent={itemComponent}
+            />
+        );
+    }
+
+    const onClick = () => {
+        if (isFilter) {
+            onChange(filterOptions[index].options);
+        } else {
+            onToggle(index - filterOptions.length);
+        }
     };
 
-    const onTrigger = useCallback(
-        (index: Index) => {
-            if (selected.includes(index)) {
-                onChange(selected.filter((i) => i !== index));
-            } else {
-                onChange([...selected, index]);
-            }
-        },
-        [selected, onChange]
+    return (
+        <div
+            className={["FilterSelect__item", isFilter ? "FilterSelect__item-filter" : ""].join(" ")}
+            style={{
+                ...style,
+                //top: `${parseFloat(style.top + "")}px`,
+                height: `${OPTION_HEIGHT}px`,
+            }}
+            children={children}
+            onClick={onClick}
+        />
     );
+};
 
-    // Selects between DataOptionList and FilterOptionList
-    const Item = useMemo(
-        () =>
-            ({ index, style }: ListChildComponentProps<any>) => {
-                const isFilter = index < filterOptions.length;
-                let children: ReactElement;
+const FilterSelect = ({
+    options,
+    selected,
+    filterOptions,
+    onChange,
+    itemComponent,
+    placeholder,
+    optionColorHue,
+}: Props) => {
+    const isDisabled = options.length < 2;
+    const cssStyles = { "--hue": optionColorHue } as React.CSSProperties;
 
-                if (isFilter) {
-                    children = <span>{filterOptions[index].name}</span>;
-                } else {
-                    children = (
-                        <DataOptionList
-                            index={index - filterOptions.length}
-                            // TODO: make sure selected is always sorted and run binary search here
-                            selected={selected.includes(index - filterOptions.length)}
-                            itemComponent={itemComponent}
-                        />
-                    );
-                }
+    const onToggle = (index: Index) => {
+        // this is fast enoguh for now
+        if (selected.includes(index)) {
+            onChange(selected.filter((i) => i !== index));
+        } else {
+            onChange([...selected, index]);
+        }
+    };
 
-                const onClick = () => {
-                    if (isFilter) {
-                        onChange(filterOptions[index].options);
-                    } else {
-                        onTrigger(index - filterOptions.length);
-                    }
-                };
+    // ==============================
+    // States
+    // ==============================
 
-                return (
-                    <div
-                        className={["FilterSelect__item", isFilter ? "FilterSelect__item-filter" : ""].join(" ")}
-                        style={{
-                            ...style,
-                            top: `${parseFloat(style.top + "")}px`,
-                            height: `${OPTION_HEIGHT}px`,
-                        }}
-                        children={children}
-                        onClick={onClick}
-                    />
-                );
-            },
-        [filterOptions, onChange, itemComponent, onTrigger]
-    );
+    const menuRef = useRef<HTMLDivElement>(null);
+    const menuListRef = useRef<FixedSizeList>(null);
+    const inputRef = useRef<HTMLInputElement>(null);
+    const [state, setState] = useState<{
+        isFocused: boolean;
+        menuIsOpen: boolean;
+        inputValue: string;
+    }>({
+        isFocused: false,
+        menuIsOpen: false,
+        inputValue: "",
+    });
+    const updateState = (newState: Partial<typeof state>) => {
+        console.log("updateState", newState);
+        setState((prevState) => ({ ...prevState, ...newState }));
+    };
+
+    // ==============================
+    // Mouse Handlers
+    // ==============================
+
+    const onMenuMouseDown = (event: React.MouseEvent<HTMLElement>) => {
+        if (event.button !== 0) {
+            return;
+        }
+        event.stopPropagation();
+        event.preventDefault();
+        inputRef.current?.focus();
+    };
+    const onControlMouseDown = (event: MouseOrTouchEvent) => {
+        console.log("onControlMouseDown");
+
+        if (!state.menuIsOpen) {
+            inputRef.current?.focus();
+            updateState({ menuIsOpen: true });
+        }
+        event.preventDefault();
+    };
+    const onDropdownIndicatorMouseDown = (event: MouseOrTouchEvent) => {
+        // ignore mouse events that weren't triggered by the primary button
+        // @ts-ignore
+        if (event && event.type === "mousedown" && event.button !== 0) {
+            return;
+        }
+        if (isDisabled) return;
+        inputRef.current?.focus();
+        updateState({ menuIsOpen: !state.menuIsOpen });
+        event.preventDefault();
+        event.stopPropagation();
+    };
+    const onClearIndicatorMouseDown = (event: MouseOrTouchEvent) => {
+        // ignore mouse events that weren't triggered by the primary button
+        // @ts-ignore
+        if (event && event.type === "mousedown" && event.button !== 0) {
+            return;
+        }
+        onChange([]);
+        event.preventDefault();
+        event.stopPropagation();
+        updateState({ menuIsOpen: true, inputValue: "" });
+        if (event.type === "touchend") {
+            inputRef.current?.focus();
+        } else {
+            setTimeout(() => inputRef.current?.focus());
+        }
+    };
+
+    // ==============================
+    // Focus Handlers
+    // ==============================
+
+    const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        console.log("handleInputChange");
+        updateState({
+            menuIsOpen: true,
+            inputValue: event.currentTarget.value,
+        });
+    };
+    const onInputFocus = (event: React.FocusEvent<HTMLInputElement>) => {
+        console.log("onInputFocus");
+        updateState({ isFocused: true });
+    };
+    const onInputBlur = (event: React.FocusEvent<HTMLInputElement>) => {
+        console.log("onInputBlur");
+
+        if (menuRef.current && menuRef.current.contains(document.activeElement)) {
+            console.log("was inside");
+            inputRef.current?.focus();
+            return;
+        }
+        updateState({ menuIsOpen: false, isFocused: false, inputValue: "" });
+    };
 
     return (
-        <div className={["FilterSelect", open ? "FilterSelect--open" : ""].join(" ")} style={cssStyles}>
-            <div className="FilterSelect__control" onClick={openSelect}>
+        <div className={["FilterSelect", state.menuIsOpen ? "FilterSelect--open" : ""].join(" ")} style={cssStyles}>
+            <div className="FilterSelect__control" onMouseDown={onControlMouseDown}>
                 <div className="FilterSelect__options">
                     {selected.slice(0, CHIPS_LIMIT).map((idx) => (
-                        <ValueOption key={idx} index={idx} itemComponent={itemComponent} onRemove={onTrigger} />
+                        <ValueOption key={idx} index={idx} itemComponent={itemComponent} onRemove={onToggle} />
                     ))}
+                    <div className="FilterSelect__options-shadow"></div>
                 </div>
                 {selected.length > CHIPS_LIMIT && (
                     <div className="FilterSelect__overflow">+{selected.length - CHIPS_LIMIT}</div>
                 )}
-                <div className="FilterSelect__input">
-                    <input
-                        ref={inputRef}
-                        type="text"
-                        autoCapitalize="none"
-                        autoComplete="off"
-                        autoCorrect="off"
-                        spellCheck="false"
-                        tabIndex={0}
-                        onFocus={doOpen}
-                    />
-                </div>
+                <input
+                    className="FilterSelect__input"
+                    ref={inputRef}
+                    type="text"
+                    autoCapitalize="none"
+                    autoComplete="off"
+                    autoCorrect="off"
+                    spellCheck="false"
+                    tabIndex={0}
+                    onFocus={onInputFocus}
+                    onBlur={onInputBlur}
+                    onChange={handleInputChange}
+                    value={state.inputValue}
+                    placeholder={selected.length === 0 ? placeholder : ""}
+                />
                 <div className="FilterSelect__buttons">
-                    <div className="FilterSelect__clear">
+                    <div className="FilterSelect__clear" onMouseDown={onClearIndicatorMouseDown}>
                         <TimesIcon size={20} />
                     </div>
                     <div className="FilterSelect__separator"></div>
-                    <div className="FilterSelect__open">
+                    <div className="FilterSelect__open" onMouseDown={onDropdownIndicatorMouseDown}>
                         <OpenIcon />
                     </div>
                 </div>
             </div>
-            {open && (
-                <div className="FilterSelect__menu">
-                    <FixedSizeList
+            {state.menuIsOpen && (
+                <div className="FilterSelect__menu" onMouseDown={onMenuMouseDown} ref={menuRef}>
+                    <FixedSizeList<ItemData>
+                        ref={menuListRef}
                         width="100%"
                         height={Math.min((options.length + filterOptions.length) * OPTION_HEIGHT, 300)}
                         itemCount={options.length + filterOptions.length}
                         itemSize={OPTION_HEIGHT}
                         initialScrollOffset={0}
                         children={Item}
+                        itemData={{ filterOptions, selected, itemComponent, onChange, onToggle }}
                     />
                 </div>
             )}
@@ -205,5 +312,4 @@ const OpenIcon = () => (
     </svg>
 );
 
-// export default memo(FilterSelect) as typeof FilterSelect;
-export default FilterSelect;
+export default memo(FilterSelect) as typeof FilterSelect;
