@@ -1,8 +1,4 @@
-import { FileInput, ProgressStep } from "@pipeline/Types";
-
 import clarinet, { CParser } from "clarinet";
-
-const CHUNK_SIZE = 1024 * 1024 * (2 * 2); // 4MB
 
 type CallbackFn<T> = (object: T) => void;
 type Event = "value" | "key" | "openobject" | "closeobject" | "openarray" | "closearray";
@@ -14,13 +10,16 @@ type Handler = (ev: Event, keyOrValue?: string | boolean | null) => void;
 
     It assumes the root is always an object
     Only keys on the root can be listened
+
+    Note: you can use onRoot OR (onArray and onObject) but not both at the same time
 */
 export default class JSONStream {
     private cparser: CParser;
+    private rootCallback: CallbackFn<any> | undefined;
     private fullCallbacks: Map<string, CallbackFn<any>> = new Map();
     private arrayCallbacks: Map<string, CallbackFn<any>> = new Map();
 
-    constructor(private readonly file: FileInput) {
+    constructor() {
         this.cparser = clarinet.parser();
         this.cparser.onerror = (e) => {
             throw new Error(`Make sure it is a valid JSON file.\nDetails: ${e?.message}`);
@@ -36,6 +35,20 @@ export default class JSONStream {
         this.cparser.onclosearray = () => this.activeHandler("closearray");
     }
 
+    public push(chunk: string, last: boolean) {
+        this.cparser.write(chunk);
+        if (last) {
+            this.cparser.close();
+            this.rootCallback?.(this.root);
+            console.log(this.test);
+        }
+    }
+
+    // Root object
+    public onRoot<T>(callback: CallbackFn<T>) {
+        this.rootCallback = callback;
+    }
+
     // Object from the root which match the key will be emitted completely
     public onFull<T>(key: string, callback: CallbackFn<T>) {
         this.fullCallbacks.set(key, callback);
@@ -46,21 +59,6 @@ export default class JSONStream {
         this.arrayCallbacks.set(key, callback);
     }
 
-    public async *parse(): AsyncGenerator<ProgressStep> {
-        const textDecoder = new TextDecoder("utf-8");
-
-        let receivedLength = 0;
-        while (receivedLength < this.file.size) {
-            const buffer = await this.file.slice(receivedLength, receivedLength + CHUNK_SIZE);
-            const str = textDecoder.decode(buffer, { stream: true });
-
-            receivedLength += buffer.byteLength;
-            this.cparser.write(str);
-            yield { type: "progress", format: "bytes", progress: [receivedLength, this.file.size] };
-        }
-        this.cparser.end();
-    }
-
     // Root object handler
     // Wether we are inside the root object
     private inRoot: boolean = false;
@@ -68,6 +66,8 @@ export default class JSONStream {
     private topKey?: string;
     // Wether we are inside an array
     private inArray: boolean = false;
+    // Constructed root (only used when using onRoot)
+    private root: any = {};
     private rootHandler: Handler = (ev, keyOrValue) => {
         switch (ev) {
             case "value":
@@ -79,7 +79,7 @@ export default class JSONStream {
                 const key = keyOrValue as string;
                 this.topKey = key;
 
-                if (this.fullCallbacks.has(key)) {
+                if (this.rootCallback || this.fullCallbacks.has(key)) {
                     this.activeHandler = this.fullHandler;
                 } else if (this.arrayCallbacks.has(key)) {
                     this.activeHandler = this.arrayHandler;
@@ -129,7 +129,9 @@ export default class JSONStream {
         if (this.topKey === undefined) throw new Error("No top key");
 
         // emit
-        if (this.fullCallbacks.has(this.topKey)) {
+        if (this.rootCallback) {
+            this.root[this.topKey] = x;
+        } else if (this.fullCallbacks.has(this.topKey)) {
             this.fullCallbacks.get(this.topKey)!(x);
         } else if (this.arrayCallbacks.has(this.topKey)) {
             this.arrayCallbacks.get(this.topKey)!(x);
@@ -142,7 +144,10 @@ export default class JSONStream {
             this.activeHandler = this.rootHandler;
         }
     }
+    private test: number = 0;
     private fullHandler: Handler = (ev, keyOrValue) => {
+        this.test = Math.max(this.test, this.stack.length);
+
         switch (ev) {
             case "key":
                 this.lastKey = keyOrValue as string;

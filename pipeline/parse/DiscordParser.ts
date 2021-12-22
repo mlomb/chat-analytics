@@ -1,9 +1,10 @@
 import { FileInput, ID } from "@pipeline/Types";
 import { Parser } from "@pipeline/parse/Parser";
 import { Author } from "@pipeline/parse/Database";
-import JSONStream from "@pipeline/parse/JSONStream";
-
 import { DiscordChannel, DiscordGuild, DiscordMessage } from "@pipeline/parse/DiscordParser.d";
+
+import { streamJSONFromFile } from "@pipeline/Utils";
+import JSONStream from "@pipeline/shared/JSONStream";
 
 export class DiscordParser extends Parser {
     private channelId?: ID;
@@ -13,13 +14,13 @@ export class DiscordParser extends Parser {
     }
 
     async *parse(file: FileInput) {
-        const stream = new JSONStream(file);
+        const stream = new JSONStream();
 
         stream.onFull<DiscordGuild>("guild", (guild) => this.updateTitle(guild.name));
         stream.onFull<DiscordChannel>("channel", this.parseChannel.bind(this));
         stream.onArray<DiscordMessage>("messages", this.parseMessage.bind(this));
 
-        yield* stream.parse();
+        yield* streamJSONFromFile(stream, file);
 
         this.channelId = undefined;
     }

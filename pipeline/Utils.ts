@@ -1,4 +1,5 @@
-import { StepInfo } from "@pipeline/Types";
+import { FileInput, StepInfo } from "@pipeline/Types";
+import JSONStream from "@pipeline/shared/JSONStream";
 
 // Taken from react-select/src/diacritics.js
 // prettier-ignore
@@ -118,4 +119,19 @@ export const downloadFile = async function* (filepath: string): AsyncGenerator<S
     const text = await req.text();
     yield { type: "done" };
     return text;
+};
+
+export const streamJSONFromFile = async function* (stream: JSONStream, file: FileInput): AsyncGenerator<StepInfo> {
+    const CHUNK_SIZE = 1024 * 1024 * (2 * 2); // 4MB
+    const textDecoder = new TextDecoder("utf-8");
+
+    let receivedLength = 0;
+    while (receivedLength < file.size) {
+        const buffer = await file.slice(receivedLength, receivedLength + CHUNK_SIZE);
+        const str = textDecoder.decode(buffer, { stream: true });
+        receivedLength += buffer.byteLength;
+        stream.push(str, receivedLength >= file.size);
+
+        yield { type: "progress", format: "bytes", progress: [receivedLength, file.size] };
+    }
 };
