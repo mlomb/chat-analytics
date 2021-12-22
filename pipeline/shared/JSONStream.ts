@@ -40,7 +40,6 @@ export default class JSONStream {
         if (last) {
             this.cparser.close();
             this.rootCallback?.(this.root);
-            console.log(this.test);
         }
     }
 
@@ -144,10 +143,7 @@ export default class JSONStream {
             this.activeHandler = this.rootHandler;
         }
     }
-    private test: number = 0;
     private fullHandler: Handler = (ev, keyOrValue) => {
-        this.test = Math.max(this.test, this.stack.length);
-
         switch (ev) {
             case "key":
                 this.lastKey = keyOrValue as string;
