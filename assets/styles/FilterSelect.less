@@ -31,7 +31,7 @@
 .FilterSelect__options {
     display: flex;
     align-items: center;
-    margin-left: 5px;
+    margin-left: 3px;
     position: relative;
     overflow: hidden;
     padding-right: 7px;
@@ -53,11 +53,14 @@
     border-radius: 2px;
     background-color: hsl(var(--hue), 100%, 65%);
     cursor: default;
+    height: 26px;
 }
 
 .FilterSelect__label {
     padding: 3px 3px 3px 6px;
     font-size: 12px;
+    display: flex;
+    align-items: center;
 }
 
 .FilterSelect__overflow {
@@ -147,6 +150,9 @@
         background-color: #e3e3e3;
     }
 }
+.FilterSelect__item--selected {
+    background-color: hsl(var(--hue), 100%, 95%);
+}
 
 .FilterSelect__option-list {
     background-color: #999999;
@@ -157,4 +163,10 @@
     &--selected {
         background-color: hsl(var(--hue), 100%, 65%);
     }
+}
+
+.FilterSelect__empty {
+    color: rgb(110, 110, 110);
+    padding: 8px;
+    text-align: center;
 }

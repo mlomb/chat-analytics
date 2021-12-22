@@ -1,6 +1,6 @@
 import "@assets/styles/Header.less";
 
-import { useLayoutEffect, useMemo, useState } from "react";
+import { useCallback, useLayoutEffect, useMemo, useState } from "react";
 
 import { ID } from "@pipeline/Types";
 import { DataProvider, useDataProvider } from "@report/DataProvider";
@@ -84,6 +84,15 @@ const Header = (props: Props) => {
     useLayoutEffect(() => dataProvider.updateAuthors(selectedAuthors), [selectedAuthors]);
     useLayoutEffect(() => dataProvider.updateChannels(selectedChannels), [selectedChannels]);
 
+    const filterChannels = useCallback(
+        (term: string) => dataProvider.basic.authors.filter((a) => a.name_searchable.includes(term)).map((a) => a.id),
+        [dataProvider]
+    );
+    const filterAuthors = useCallback(
+        (term: string) => dataProvider.basic.authors.filter((a) => a.name_searchable.includes(term)).map((a) => a.id),
+        [dataProvider]
+    );
+
     return (
         <div className="Header">
             <div className="Header__info">
@@ -108,6 +117,7 @@ const Header = (props: Props) => {
                         optionColorHue={266}
                         itemComponent={ChannelLabel}
                         filterOptions={channelsFilterOptions}
+                        filterSearch={filterChannels}
                     />
                 </div>
                 <div className="Filters__Filter">
@@ -120,6 +130,7 @@ const Header = (props: Props) => {
                         optionColorHue={240}
                         itemComponent={AuthorLabel}
                         filterOptions={authorsFilterOptions}
+                        filterSearch={filterAuthors}
                     />
                 </div>
                 <div className="Filters__Filter" style={{ minWidth: "100%" }}>
