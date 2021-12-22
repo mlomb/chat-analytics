@@ -13,6 +13,10 @@ const ChannelLabel = ({ id }: Props) => {
     const dp = useDataProvider();
     const channel = dp.basic.channels[id];
 
+    if (channel === undefined) {
+        return <span>invalid channel id {id}</span>;
+    }
+
     return (
         <div className="Label">
             {/* # icon */}

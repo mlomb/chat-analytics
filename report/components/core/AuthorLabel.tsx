@@ -20,6 +20,11 @@ const DiscordDefaultAvatars = [avatar_0, avatar_1, avatar_2, avatar_3, avatar_4]
 const AuthorLabel = ({ id }: Props) => {
     const dp = useDataProvider();
     const author = dp.basic.authors[id] as any; // TODO: fix
+
+    if (author === undefined) {
+        return <span>invalid author id {id}</span>;
+    }
+
     author.avatarUrl = "https://i.pinimg.com/474x/b5/35/12/b53512653d7aff159870fc2d96c703bf.jpg";
 
     const platform = "discord";

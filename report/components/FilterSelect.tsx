@@ -8,6 +8,8 @@
     Doing this, we lost a lot of accesibility :'(  (I don't know how to do it properly)
 
     Also this component was rushed in two days, it may not be pretty
+
+    react-select: https://github.com/JedWatson/react-select
 */
 
 import "@assets/styles/FilterSelect.less";
@@ -20,7 +22,7 @@ const CHIPS_LIMIT = 3;
 
 type Index = number;
 type ItemComponent = (props: { id: Index }) => JSX.Element;
-export type FocusDirection = "up" | "down" | "pageup" | "pagedown" | "first" | "last";
+type FocusDirection = "up" | "down" | "pageup" | "pagedown" | "first" | "last";
 
 export interface FilterOption {
     name: string;
@@ -28,22 +30,22 @@ export interface FilterOption {
 }
 
 interface Props {
-    options: Index[];
     selected: Index[];
+    placeholder: string;
+    options: Index[];
+    optionColorHue: number;
     onChange: (selected: Index[]) => void;
     itemComponent: ItemComponent;
+    isDisabled: boolean;
     filterSearch: (term: string) => Index[];
     filterOptions: FilterOption[];
-    placeholder: string;
-    optionColorHue: number;
-    isDisabled: boolean;
 }
 
 interface State {
-    isFocused: boolean;
-    menuIsOpen: boolean;
-    inputValue: string;
     selectedOffset: number;
+    menuIsOpen: boolean;
+    isFocused: boolean;
+    inputValue: string;
 }
 
 // Options displayed in the control
@@ -87,13 +89,13 @@ const DataOptionList = (props: { index: Index; selected: boolean; itemComponent:
 };
 
 interface ItemData {
-    options: Index[];
+    selectedOffset: number;
     selected: Index[];
-    onChange: (selected: Index[]) => void;
+    options: Index[];
     onToggle: (index: Index) => void;
+    onChange: (selected: Index[]) => void;
     itemComponent: ItemComponent;
     filterOptions: FilterOption[];
-    selectedOffset: number;
 }
 
 // Selects between DataOptionList and FilterOptionList
@@ -142,15 +144,21 @@ const Item = ({ index, style, data }: ListChildComponentProps<ItemData>) => {
 
 export default class FilterSelect extends Component<Props, State> {
     state = {
-        isFocused: false,
-        menuIsOpen: false,
-        inputValue: "",
         selectedOffset: -1,
+        menuIsOpen: false,
+        isFocused: false,
+        inputValue: "",
     };
 
     private menuRef: React.RefObject<HTMLDivElement>;
     private menuListRef: React.RefObject<FixedSizeList>;
     private inputRef: React.RefObject<HTMLInputElement>;
+
+    private activeOptions: Index[] = [];
+    private activeFilterOptions: FilterOption[] = [];
+    private totalFocusableOptions: number = 0;
+
+    private scrollToFocusedOptionOnUpdate: boolean = false;
 
     constructor(props: Props) {
         super(props);
@@ -160,16 +168,23 @@ export default class FilterSelect extends Component<Props, State> {
         this.inputRef = React.createRef();
     }
 
+    componentDidUpdate(prevProps: Props) {
+        if (this.scrollToFocusedOptionOnUpdate && this.menuListRef.current) {
+            this.menuListRef.current.scrollToItem(this.state.selectedOffset);
+            this.scrollToFocusedOptionOnUpdate = false;
+        }
+    }
+
     render(): React.ReactNode {
-        const { isFocused, menuIsOpen, inputValue, selectedOffset } = this.state;
-        const { options, selected, placeholder, optionColorHue, itemComponent, filterSearch, filterOptions, onChange } =
+        const { selectedOffset, menuIsOpen, isFocused, inputValue } = this.state;
+        const { selected, placeholder, options, optionColorHue, onChange, itemComponent, filterSearch, filterOptions } =
             this.props;
 
         const cssStyles = { "--hue": optionColorHue } as React.CSSProperties;
 
-        const activeOptions = inputValue.length === 0 ? options : filterSearch(inputValue);
-        const activeFilterOptions = inputValue.length === 0 ? filterOptions : [];
-        const totalFocusableOptions = activeOptions.length + activeFilterOptions.length;
+        this.activeOptions = inputValue.length === 0 ? options : filterSearch(inputValue);
+        this.activeFilterOptions = inputValue.length === 0 ? filterOptions : [];
+        this.totalFocusableOptions = this.activeOptions.length + this.activeFilterOptions.length;
 
         return (
             <div className={["FilterSelect", menuIsOpen ? "FilterSelect--open" : ""].join(" ")} style={cssStyles}>
@@ -211,18 +226,18 @@ export default class FilterSelect extends Component<Props, State> {
                 </div>
                 {menuIsOpen && (
                     <div className="FilterSelect__menu" onMouseDown={this.onMenuMouseDown} ref={this.menuRef}>
-                        {activeOptions.length > 0 ? (
+                        {this.activeOptions.length > 0 ? (
                             <FixedSizeList<ItemData>
                                 ref={this.menuListRef}
                                 width="100%"
-                                height={Math.min(totalFocusableOptions * OPTION_HEIGHT, 300)}
-                                itemCount={totalFocusableOptions}
+                                height={Math.min(this.totalFocusableOptions * OPTION_HEIGHT, 300)}
+                                itemCount={this.totalFocusableOptions}
                                 itemSize={OPTION_HEIGHT}
                                 initialScrollOffset={0}
                                 children={Item}
                                 itemData={{
-                                    filterOptions: activeFilterOptions,
-                                    options: activeOptions,
+                                    filterOptions: this.activeFilterOptions,
+                                    options: this.activeOptions,
                                     selected,
                                     itemComponent,
                                     onChange,
@@ -252,17 +267,25 @@ export default class FilterSelect extends Component<Props, State> {
             onChange([...selected, index]);
         }
     };
+    selectOption = (offset: number) => {
+        if (offset < 0) return;
+        const { onToggle, activeOptions, activeFilterOptions } = this;
+        const { onChange } = this.props;
+        if (offset < activeFilterOptions.length) {
+            onChange(activeFilterOptions[offset].options);
+        } else {
+            onToggle(activeOptions[offset - activeFilterOptions.length]);
+        }
+    };
     focusInput = () => {
         this.inputRef.current?.focus();
     };
     openMenu = (focusOption: "first" | "last") => {
-        /*
-        const { isFocused } = state;
-        let openAtIndex = focusOption === "first" ? 0 : totalFocusableOptions - 1;
+        const { isFocused } = this.state;
+        //let openAtIndex = focusOption === "first" ? 0 : this.totalFocusableOptions - 1;
 
         // only scroll if the menu isn't already open
-        let scrollToFocusedOptionOnUpdate = !(isFocused && menuListRef);
-        */
+        this.scrollToFocusedOptionOnUpdate = !(isFocused && this.menuListRef.current);
 
         this.setState({
             menuIsOpen: true,
@@ -270,28 +293,27 @@ export default class FilterSelect extends Component<Props, State> {
     };
     focusOption = (direction: FocusDirection = "first") => {
         const pageSize = 5;
-        const { options } = this.props;
+        const { totalFocusableOptions } = this;
         const { selectedOffset } = this.state;
 
-        if (!options.length) return;
+        if (totalFocusableOptions === 0) return;
         let nextFocus = 0; // handles 'first'
         let focusedIndex = selectedOffset;
 
         if (direction === "up") {
-            nextFocus = focusedIndex > 0 ? focusedIndex - 1 : options.length - 1;
+            nextFocus = focusedIndex > 0 ? focusedIndex - 1 : totalFocusableOptions - 1;
         } else if (direction === "down") {
-            nextFocus = (focusedIndex + 1) % options.length;
+            nextFocus = (focusedIndex + 1) % totalFocusableOptions;
         } else if (direction === "pageup") {
             nextFocus = focusedIndex - pageSize;
             if (nextFocus < 0) nextFocus = 0;
         } else if (direction === "pagedown") {
             nextFocus = focusedIndex + pageSize;
-            if (nextFocus > options.length - 1) nextFocus = options.length - 1;
+            if (nextFocus > totalFocusableOptions - 1) nextFocus = totalFocusableOptions - 1;
         } else if (direction === "last") {
-            nextFocus = options.length - 1;
+            nextFocus = totalFocusableOptions - 1;
         }
-        let scrollToFocusedOptionOnUpdate = true;
-
+        this.scrollToFocusedOptionOnUpdate = true;
         this.setState({ selectedOffset: nextFocus });
     };
 
@@ -326,7 +348,7 @@ export default class FilterSelect extends Component<Props, State> {
         if (this.props.isDisabled) return;
         this.focusInput();
         if (this.state.menuIsOpen) {
-            this.setState({ menuIsOpen: false, inputValue: "" });
+            this.setState({ menuIsOpen: false, inputValue: "", selectedOffset: -1 });
         } else {
             this.openMenu("first");
         }
@@ -353,6 +375,8 @@ export default class FilterSelect extends Component<Props, State> {
         this.setState({
             menuIsOpen: true,
             inputValue: event.currentTarget.value.toLocaleLowerCase(),
+            // reset, so the first option is focused
+            selectedOffset: -1,
         });
     };
     onInputFocus = (event: React.FocusEvent<HTMLInputElement>) => {
@@ -369,6 +393,7 @@ export default class FilterSelect extends Component<Props, State> {
             menuIsOpen: false,
             isFocused: false,
             inputValue: "",
+            selectedOffset: -1,
         });
     };
 
@@ -378,27 +403,16 @@ export default class FilterSelect extends Component<Props, State> {
 
     onKeyDown = (event: React.KeyboardEvent<HTMLElement>) => {
         if (this.props.isDisabled) return;
-        const { openMenu, focusOption } = this;
-        const { menuIsOpen } = this.state;
+        const { selectOption, openMenu, focusOption } = this;
+        const { menuIsOpen, selectedOffset } = this.state;
 
         switch (event.key) {
             case "Tab":
-                /*
-                if (isComposing) return;
-
-                if (
-                    event.shiftKey ||
-                    !menuIsOpen ||
-                    !tabSelectsValue ||
-                    !focusedOption ||
-                    // don't capture the event if the menu opens on focus and the focused
-                    // option is already selected; it breaks the flow of navigation
-                    (openMenuOnFocus && isOptionSelected(focusedOption, selectValue))
-                ) {
+                if (event.shiftKey || !menuIsOpen || selectedOffset === -1) {
                     return;
                 }
-                selectOption(focusedOption);
-                */
+                // select focused option
+                selectOption(selectedOffset);
                 break;
             case "Enter":
                 if (event.keyCode === 229) {
@@ -406,29 +420,22 @@ export default class FilterSelect extends Component<Props, State> {
                     // ref. https://www.w3.org/TR/uievents/#determine-keydown-keyup-keyCode
                     break;
                 }
-                //    if (menuIsOpen) {
-                //        if (!focusedOption) return;
-                //        if (isComposing) return;
-                //        selectOption(focusedOption);
-                //        break;
-                //    }
+                if (menuIsOpen) {
+                    selectOption(selectedOffset);
+                    break;
+                }
                 return;
             case "Escape":
                 if (menuIsOpen) {
-                    this.setState({ menuIsOpen: false, inputValue: "" });
+                    this.setState({ menuIsOpen: false, inputValue: "", selectedOffset: -1 });
                 }
                 break;
-            //case " ": // space
-            //    if (inputValue) {
-            //        return;
-            //    }
-            //    if (!menuIsOpen) {
-            //        openMenu("first");
-            //        break;
-            //    }
-            //    if (!focusedOption) return;
-            //    selectOption(focusedOption);
-            //    break;
+            case " ": // space
+                if (!menuIsOpen) {
+                    openMenu("first");
+                    break;
+                }
+                return;
             case "ArrowUp":
                 if (menuIsOpen) {
                     focusOption("up");

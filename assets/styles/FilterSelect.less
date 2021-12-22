@@ -140,18 +140,14 @@
     cursor: pointer;
     padding: 0 8px;
     box-sizing: border-box;
-
-    &:hover {
-        background-color: hsl(var(--hue), 100%, 88%);
-    }
 }
-.FilterSelect__item-filter {
-    &:hover {
-        background-color: #e3e3e3;
-    }
-}
+.FilterSelect__item:hover,
 .FilterSelect__item--selected {
-    background-color: hsl(var(--hue), 100%, 95%);
+    background-color: hsl(var(--hue), 100%, 88%);
+}
+.FilterSelect__item-filter:hover,
+.FilterSelect__item-filter.FilterSelect__item--selected {
+    background-color: #e3e3e3;
 }
 
 .FilterSelect__option-list {

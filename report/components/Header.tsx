@@ -85,7 +85,7 @@ const Header = (props: Props) => {
     useLayoutEffect(() => dataProvider.updateChannels(selectedChannels), [selectedChannels]);
 
     const filterChannels = useCallback(
-        (term: string) => dataProvider.basic.authors.filter((a) => a.name_searchable.includes(term)).map((a) => a.id),
+        (term: string) => dataProvider.basic.channels.filter((a) => a.name_searchable.includes(term)).map((a) => a.id),
         [dataProvider]
     );
     const filterAuthors = useCallback(
