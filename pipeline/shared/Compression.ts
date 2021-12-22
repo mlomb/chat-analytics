@@ -97,7 +97,7 @@ const decompress = (data: string): Promise<ProcessedData> =>
             const chunk = data.slice(offset, offset + CHUNK_SIZE);
             const last = chunk.length < CHUNK_SIZE;
             const decoded = base91.decode(chunk, last);
-            offset += CHUNK_SIZE;
+            offset += chunk.length;
 
             try {
                 gotChunk = false;

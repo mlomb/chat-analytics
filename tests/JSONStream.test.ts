@@ -43,12 +43,13 @@ describe("full object", () => {
     });
 
     it("emit correct single push", async () => {
-        stream.push(FULL_OBJECT);
+        stream.push(FULL_OBJECT, true);
         expect(missingKeys).toEqual(new Set());
     });
 
     it("emit correct streaming char by char", async () => {
-        for (const c of FULL_OBJECT) stream.push(c);
+        for (const c of FULL_OBJECT) stream.push(c, false);
+        stream.push("", true);
         expect(missingKeys).toEqual(new Set());
     });
 });
@@ -62,7 +63,8 @@ it("emit correct array objects", async () => {
     stream.onArray<number>("arrVals", (got) => nums.push(got));
     stream.onArray<{ a: number }>("arrObjs", (got) => objs.push(got));
 
-    stream.push(`
+    stream.push(
+        `
         {
             "a": "b",
             "arrVals": [1, 2, 3],
@@ -70,7 +72,9 @@ it("emit correct array objects", async () => {
             "arrObjs": [{ "a": 1 }, { "b": 2 }, { "c": 3 }],
             "e": "f"
         }
-    `);
+    `,
+        true
+    );
 
     expect(nums).toEqual([1, 2, 3]);
     expect(objs).toEqual([{ a: 1 }, { b: 2 }, { c: 3 }]);
@@ -79,7 +83,7 @@ it("emit correct array objects", async () => {
 async function expectCrash(input: string) {
     const stream = new JSONStream();
     try {
-        stream.push(input);
+        stream.push(input, true);
         // should have crashed
         expect(true).toBe(false);
     } catch (_) {
@@ -99,7 +103,7 @@ it("crash when using onArray on something other than an array", async () => {
     stream.onArray<any>("fakeArr", () => {});
 
     try {
-        stream.push(`{ "fakeArr": { "a": 5 } }`);
+        stream.push(`{ "fakeArr": { "a": 5 } }`, true);
         // should have crashed
         expect(true).toBe(false);
     } catch (_) {

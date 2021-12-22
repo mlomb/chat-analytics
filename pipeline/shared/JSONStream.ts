@@ -36,7 +36,9 @@ export default class JSONStream {
     }
 
     public push(chunk: string, last: boolean) {
-        this.cparser.write(chunk);
+        if (chunk.length > 0) {
+            this.cparser.write(chunk);
+        }
         if (last) {
             this.cparser.close();
             this.rootCallback?.(this.root);
