@@ -1,4 +1,5 @@
-import { FileInput, StepInfo } from "@pipeline/Types";
+import { FileInput } from "@pipeline/Types";
+import { StepMessage } from "@pipeline/Messages";
 import JSONStream from "@pipeline/shared/JSONStream";
 
 // Taken from react-select/src/diacritics.js
@@ -112,7 +113,7 @@ export const searchFormat = (str: string): string => {
 export const monthToString = (date: Date): string => date.getFullYear() + "-" + (date.getMonth() + 1);
 export const dateToString = (date: Date): string => monthToString(date) + "-" + date.getDate();
 
-export const downloadFile = async function* (filepath: string): AsyncGenerator<StepInfo, string> {
+export const downloadFile = async function* (filepath: string): AsyncGenerator<StepMessage, string> {
     yield { type: "new", title: "Downloading", subject: filepath };
     // TODO: progress
     const req = await fetch(filepath);
@@ -121,7 +122,7 @@ export const downloadFile = async function* (filepath: string): AsyncGenerator<S
     return text;
 };
 
-export const streamJSONFromFile = async function* (stream: JSONStream, file: FileInput): AsyncGenerator<StepInfo> {
+export const streamJSONFromFile = async function* (stream: JSONStream, file: FileInput): AsyncGenerator<StepMessage> {
     const CHUNK_SIZE = 1024 * 1024 * (2 * 2); // 4MB
     const textDecoder = new TextDecoder("utf-8");
 

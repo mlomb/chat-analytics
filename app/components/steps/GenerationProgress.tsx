@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
+import prettyBytes from "pretty-bytes";
 
-import { StepInfo } from "@pipeline/Types";
+import { StepMessage } from "@pipeline/Messages";
 
 import Tick from "@assets/images/tick.svg";
 import Spinner from "@assets/images/spinner.svg";
 import Times from "@assets/images/times.svg";
 import Refresh from "@assets/images/refresh.svg";
-import prettyBytes from "pretty-bytes";
 
 type Status = "pending" | "success" | "error";
 
@@ -66,7 +66,7 @@ const GenerationProgress = ({ worker }: Props) => {
         if (worker === null) return;
 
         const oldonmessage = worker.onmessage?.bind(worker);
-        worker.onmessage = (e: MessageEvent<StepInfo>) => {
+        worker.onmessage = (e: MessageEvent<StepMessage>) => {
             if (oldonmessage) oldonmessage(e);
 
             const data = e.data;

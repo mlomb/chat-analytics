@@ -1,5 +1,5 @@
-import { FileInput, ReportConfig, StepInfo } from "@pipeline/Types";
-
+import { StepMessage } from "@pipeline/Messages";
+import { FileInput, ReportConfig } from "@pipeline/Types";
 import { downloadFile } from "@pipeline/Utils";
 import { Parser } from "@pipeline/parse/Parser";
 import { DiscordParser } from "@pipeline/parse/DiscordParser";
@@ -8,10 +8,9 @@ import { TelegramParser } from "@pipeline/parse/TelegramParser";
 import { preprocess } from "@pipeline/preprocess/Preprocess";
 import { Database } from "@pipeline/parse/Database";
 import { ProcessedData } from "@pipeline/preprocess/ProcessedData";
-
 import { compress } from "@pipeline/shared/Compression";
 
-export async function* generateReport(files: FileInput[], config: ReportConfig): AsyncGenerator<StepInfo> {
+export async function* generateReport(files: FileInput[], config: ReportConfig): AsyncGenerator<StepMessage> {
     //
     // 1. Parse files
     //

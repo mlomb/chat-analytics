@@ -31,6 +31,7 @@ body {
     flex-direction: column;
     transition: opacity 0.15s;
     opacity: 1;
+    user-select: none;
 
     &.LoadingOverlay--hidden {
         opacity: 0;
@@ -51,6 +52,11 @@ body {
 
 .LoadingOverlay__logo img {
     height: 60px;
+}
+
+.LoadingOverlay__progress {
+    margin-top: 14px;
+    color: gray;
 }
 
 /* ImageSmooth */

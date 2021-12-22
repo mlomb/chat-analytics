@@ -99,7 +99,9 @@ const TimeSelector = () => {
             let start = xAxis.positionToDate(ev.start);
             let end = xAxis.positionToDate(ev.end);
             if (start > end) [start, end] = [end, start];
-            dataProvider.updateTimeRange(start, end);
+            if (!isNaN(start.getTime()) && !isNaN(end.getTime())) {
+                dataProvider.updateTimeRange(start, end);
+            }
         };
         scrollbarX.events.on("rangechanged", dateAxisChanged);
 

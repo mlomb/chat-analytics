@@ -1,8 +1,8 @@
+import { DecompressProgressMessage, StepMessage } from "@pipeline/Messages";
+import { ProcessedData } from "@pipeline/preprocess/ProcessedData";
+
 import { Gzip, Gunzip } from "fflate";
 import { Base91Decoder, Base91Encoder } from "@pipeline/shared/Base91";
-
-import { StepInfo } from "@pipeline/Types";
-import { ProcessedData } from "@pipeline/preprocess/ProcessedData";
 import JSONStream from "@pipeline/shared/JSONStream";
 
 /*
@@ -10,7 +10,7 @@ import JSONStream from "@pipeline/shared/JSONStream";
 */
 
 // POJO -> TextEncoder -> Gzip -> Base91 (as blob)
-async function* compress(data: ProcessedData): AsyncGenerator<StepInfo, Blob> {
+async function* compress(data: ProcessedData): AsyncGenerator<StepMessage, Blob> {
     // stats
     let rawJSONSize = 0;
     let compressedSize = 0;
@@ -113,9 +113,17 @@ const decompress = (data: string): Promise<ProcessedData> =>
             const decoded = textDecoder.decode(chunk, { stream: true });
             jsonStream.push(decoded, final);
 
-            // use setTimeout to avoid stack overflow,
-            // also fflate breaks if we don't (drove me nuts)
-            if (!final) setTimeout(nextChunk, 0);
+            if (!final) {
+                // notify the UI
+                self.postMessage(<DecompressProgressMessage>{
+                    type: "decompress",
+                    progress: [offset, data.length],
+                });
+
+                // use setTimeout to avoid stack overflow,
+                // also fflate breaks if we don't (drove me nuts)
+                setTimeout(nextChunk, 0);
+            }
         };
 
         // start

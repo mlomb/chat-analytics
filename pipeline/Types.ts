@@ -17,35 +17,3 @@ export interface FileInput {
     size: number;
     slice(start?: number, end?: number): Promise<ArrayBuffer>;
 }
-
-export interface NewStep {
-    type: "new";
-    title: string;
-    subject?: string;
-}
-export interface ProgressStep {
-    type: "progress";
-    progress: [number, number];
-    format: "number" | "bytes";
-}
-export interface DoneStep {
-    type: "done";
-}
-export interface ErrorStep {
-    type: "error";
-    error: string;
-}
-export interface ReportResult {
-    type: "result";
-    title: string;
-    dataBlob: Blob;
-    htmlBlob: Blob;
-    time: Timestamp;
-    counts: {
-        authors: number;
-        channels: number;
-        messages: number;
-    };
-}
-
-export type StepInfo = NewStep | ProgressStep | DoneStep | ErrorStep | ReportResult;

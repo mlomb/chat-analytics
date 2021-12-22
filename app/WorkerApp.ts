@@ -1,6 +1,7 @@
 export default null as any;
 
-import { ErrorStep, FileInput, Platform } from "@pipeline/Types";
+import { FileInput, Platform } from "@pipeline/Types";
+import { ErrorMessage } from "@pipeline/Messages";
 import { generateReport } from "@pipeline/preprocess/Generation";
 
 export interface InitMessage {
@@ -27,9 +28,9 @@ self.onmessage = async (ev: MessageEvent<InitMessage>) => {
     } catch (ex) {
         // handle exceptions
         if (ex instanceof Error) {
-            self.postMessage(<ErrorStep>{ type: "error", error: ex.message });
+            self.postMessage(<ErrorMessage>{ type: "error", error: ex.message });
         } else {
-            self.postMessage(<ErrorStep>{ type: "error", error: ex + "" });
+            self.postMessage(<ErrorMessage>{ type: "error", error: ex + "" });
         }
         console.log("Error ahead ↓");
         console.error(ex);

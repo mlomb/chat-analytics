@@ -1,16 +1,15 @@
 import { useEffect, useState } from "react";
 import prettyBytes from "pretty-bytes";
 
+import { ResultMessage } from "@pipeline/Messages";
 import Button from "@app/components/Button";
-
-import { ReportResult } from "@pipeline/Types";
 
 import LinkOut from "@assets/images/link-out.svg";
 import Download from "@assets/images/download.svg";
 import Refresh from "@assets/images/refresh.svg";
 
 interface Props {
-    result: ReportResult | null;
+    result: ResultMessage | null;
 }
 
 // trailing s

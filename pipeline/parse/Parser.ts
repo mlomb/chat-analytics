@@ -1,4 +1,5 @@
-import { Platform, FileInput, StepInfo, ID, RawID } from "@pipeline/Types";
+import { Platform, FileInput, ID, RawID } from "@pipeline/Types";
+import { StepMessage } from "@pipeline/Messages";
 import { Database, Author, Channel, Message } from "@pipeline/parse/Database";
 import IDMapper from "@pipeline/parse/IDMapper";
 
@@ -18,7 +19,7 @@ export abstract class Parser {
 
     constructor(private readonly platform: Platform) {}
 
-    abstract parse(file: FileInput): AsyncGenerator<StepInfo>;
+    abstract parse(file: FileInput): AsyncGenerator<StepMessage>;
 
     protected addChannel(rawId: RawID, channel: Channel): ID {
         const id = this.channelIDMapper.get(rawId);

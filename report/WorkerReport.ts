@@ -1,37 +1,10 @@
 export default null as any;
 
-import { BlockKey, BlocksDesc, BlocksProcessFn, BlockState, Filters } from "@pipeline/blocks/Blocks";
+import { BlockRequestMessage, BlockResultMessage, InitMessage, ReadyMessage } from "@pipeline/Messages";
+import { BlocksDesc, BlocksProcessFn, BlockState, Filters } from "@pipeline/blocks/Blocks";
 import { ProcessedData } from "@pipeline/preprocess/ProcessedData";
 import { decompress } from "@pipeline/shared/Compression";
-import { Basic, computeBasic } from "@report/Basic";
-
-// Receive compressed data
-export interface InitMessage {
-    type: "init";
-    dataStr: string;
-}
-
-// Send required data for the UI
-export interface ReadyMessage {
-    type: "ready";
-    basic: Basic;
-    blocksDesc: typeof BlocksDesc;
-}
-
-// Receive a request to compute a block
-export interface BlockRequestMessage {
-    type: "request";
-    blockKey: BlockKey;
-    filters: Partial<Filters>;
-}
-
-// Send the computed block back to the UI
-export interface BlockResult {
-    type: "result";
-    blockKey: BlockKey;
-    state: BlockState;
-    data: any | null;
-}
+import { computeBasic } from "@report/Basic";
 
 let processedData: ProcessedData | null = null;
 let fitlers: Filters = {
@@ -74,7 +47,7 @@ const request = async (msg: BlockRequestMessage) => {
 
         const data = BlocksProcessFn[br.blockKey](processedData, fitlers);
 
-        self.postMessage(<BlockResult>{
+        self.postMessage(<BlockResultMessage>{
             type: "result",
             blockKey: br.blockKey,
             state: "ready",
@@ -82,7 +55,7 @@ const request = async (msg: BlockRequestMessage) => {
         });
     } catch (err) {
         // console.error(err);
-        self.postMessage(<BlockResult>{
+        self.postMessage(<BlockResultMessage>{
             type: "result",
             blockKey: br.blockKey,
             state: "error",

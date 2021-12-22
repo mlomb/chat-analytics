@@ -1,11 +1,18 @@
 import EventEmitter from "events";
 
 import { ID } from "@pipeline/Types";
+import {
+    BlockRequestMessage,
+    BlockResultMessage,
+    DecompressProgressMessage,
+    InitMessage,
+    ReadyMessage,
+} from "@pipeline/Messages";
 import { BlockKey, BlocksDescMap, BlockState, Trigger } from "@pipeline/blocks/Blocks";
 import { dateToString } from "@pipeline/Utils";
-import { AuthorOption, Basic, ChannelOption } from "@report/Basic";
+import { Basic } from "@report/Basic";
 
-import Worker, { BlockRequestMessage, BlockResult, InitMessage, ReadyMessage } from "@report/WorkerReport";
+import Worker from "@report/WorkerReport";
 
 export class DataProvider extends EventEmitter {
     private worker: Worker;
@@ -40,7 +47,7 @@ export class DataProvider extends EventEmitter {
         this.worker.terminate();
     }
 
-    private onMessage(e: MessageEvent<ReadyMessage | BlockResult>) {
+    private onMessage(e: MessageEvent<ReadyMessage | DecompressProgressMessage | BlockResultMessage>) {
         const res = e.data;
         if (res.type === "ready") {
             this.basic = res.basic;
@@ -54,6 +61,8 @@ export class DataProvider extends EventEmitter {
             // worker is ready, dispatch work
             this.emit("ready");
             this.tryToDispatchWork();
+        } else if (res.type === "decompress") {
+            this.emit("decompress-progress", res.progress);
         } else if (res.type === "result") {
             this.onWorkDone(res.blockKey, res.state, res.data);
         }
@@ -86,10 +95,6 @@ export class DataProvider extends EventEmitter {
     }
 
     updateTimeRange(start: Date, end: Date) {
-        if (isNaN(start.getTime()) || isNaN(end.getTime())) {
-            console.warn("Invalid date");
-            return;
-        }
         this.activeStartDate = start;
         this.activeEndDate = end;
         this.invalidateBlocks("time");

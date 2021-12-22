@@ -1,12 +1,13 @@
-import { ReportConfig, StepInfo, Timestamp } from "@pipeline/Types";
-import { Database, Message } from "@pipeline/parse/Database";
+import { ReportConfig, Timestamp } from "@pipeline/Types";
+import { StepMessage } from "@pipeline/Messages";
+import { Database } from "@pipeline/parse/Database";
 import { Author, Channel, ID, ProcessedData } from "@pipeline/preprocess/ProcessedData";
 import { dateToString, searchFormat } from "@pipeline/Utils";
 
 export const preprocess = async function* (
     database: Database,
     config: ReportConfig
-): AsyncGenerator<StepInfo, ProcessedData> {
+): AsyncGenerator<StepMessage, ProcessedData> {
     const authors: Author[] = [];
     const channels: Channel[] = [];
 

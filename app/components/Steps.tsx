@@ -1,8 +1,9 @@
 import "@assets/styles/Steps.less";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
-import { Platform, ReportResult } from "@pipeline/Types";
+import { Platform } from "@pipeline/Types";
+import { ResultMessage } from "@pipeline/Messages";
 import WorkerApp from "@app/WorkerApp";
 
 import Stepper from "@app/components/Stepper";
@@ -33,7 +34,7 @@ const Steps = () => {
         platform: Platform | null;
         files: File[];
         worker: Worker | null;
-        result: ReportResult | null;
+        result: ResultMessage | null;
     }>({
         currentStep: 0,
         platform: null,
@@ -50,7 +51,7 @@ const Steps = () => {
             alert("An error ocurred creating the WebWorker.\n\n Error: " + e.message);
             if (env.isDev) throw e;
         };
-        worker.onmessage = (e: MessageEvent<ReportResult>) => {
+        worker.onmessage = (e: MessageEvent<ResultMessage>) => {
             const data = e.data;
             if (data.type === "result") {
                 // We cant terminate the browser since the Blobs live there
