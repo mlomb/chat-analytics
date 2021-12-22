@@ -111,6 +111,7 @@ const Header = (props: Props) => {
                     <label htmlFor="channels">Channels</label>
                     <FilterSelect
                         options={channelsFilterOptions[0].options}
+                        isDisabled={channelsFilterOptions[0].options.length < 2}
                         placeholder="Select channels..."
                         selected={selectedChannels}
                         onChange={setSelectedChannels}
@@ -124,6 +125,7 @@ const Header = (props: Props) => {
                     <label htmlFor="authors">Authors</label>
                     <FilterSelect
                         options={authorsFilterOptions[0].options}
+                        isDisabled={authorsFilterOptions[0].options.length < 2}
                         placeholder="Select authors..."
                         selected={selectedAuthors}
                         onChange={setSelectedAuthors}

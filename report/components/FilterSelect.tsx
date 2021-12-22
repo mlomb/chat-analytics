@@ -12,7 +12,7 @@
 
 import "@assets/styles/FilterSelect.less";
 
-import React, { memo, ReactElement, useRef, useState } from "react";
+import React, { Component, ElementRef, memo, ReactElement, useRef, useState } from "react";
 import { FixedSizeList, ListChildComponentProps } from "react-window";
 
 const OPTION_HEIGHT = 35;
@@ -36,6 +36,14 @@ interface Props {
     filterOptions: FilterOption[];
     placeholder: string;
     optionColorHue: number;
+    isDisabled: boolean;
+}
+
+interface State {
+    isFocused: boolean;
+    menuIsOpen: boolean;
+    inputValue: string;
+    selectedOffset: number;
 }
 
 // Options displayed in the control
@@ -132,50 +140,111 @@ const Item = ({ index, style, data }: ListChildComponentProps<ItemData>) => {
     );
 };
 
-const FilterSelect = ({
-    options,
-    selected,
-    filterSearch,
-    filterOptions,
-    onChange,
-    itemComponent,
-    placeholder,
-    optionColorHue,
-}: Props) => {
-    const isDisabled = options.length < 2;
-    const cssStyles = { "--hue": optionColorHue } as React.CSSProperties;
-
-    // ==============================
-    // States
-    // ==============================
-
-    const menuRef = useRef<HTMLDivElement>(null);
-    const menuListRef = useRef<FixedSizeList>(null);
-    const inputRef = useRef<HTMLInputElement>(null);
-    const [state, setState] = useState<{
-        isFocused: boolean;
-        menuIsOpen: boolean;
-        inputValue: string;
-        selectedOffset: number;
-    }>({
+export default class FilterSelect extends Component<Props, State> {
+    state = {
         isFocused: false,
         menuIsOpen: false,
         inputValue: "",
         selectedOffset: -1,
-    });
-    const updateState = (newState: Partial<typeof state>) => {
-        console.log("updateState", newState);
-        setState((prevState) => ({ ...prevState, ...newState }));
     };
-    const activeOptions = state.inputValue.length === 0 ? options : filterSearch(state.inputValue);
-    const activeFilterOptions = state.inputValue.length === 0 ? filterOptions : [];
-    const totalFocusableOptions = activeOptions.length + activeFilterOptions.length;
+
+    private menuRef: React.RefObject<HTMLDivElement>;
+    private menuListRef: React.RefObject<FixedSizeList>;
+    private inputRef: React.RefObject<HTMLInputElement>;
+
+    constructor(props: Props) {
+        super(props);
+
+        this.menuRef = React.createRef();
+        this.menuListRef = React.createRef();
+        this.inputRef = React.createRef();
+    }
+
+    render(): React.ReactNode {
+        const { isFocused, menuIsOpen, inputValue, selectedOffset } = this.state;
+        const { options, selected, placeholder, optionColorHue, itemComponent, filterSearch, filterOptions, onChange } =
+            this.props;
+
+        const cssStyles = { "--hue": optionColorHue } as React.CSSProperties;
+
+        const activeOptions = inputValue.length === 0 ? options : filterSearch(inputValue);
+        const activeFilterOptions = inputValue.length === 0 ? filterOptions : [];
+        const totalFocusableOptions = activeOptions.length + activeFilterOptions.length;
+
+        return (
+            <div className={["FilterSelect", menuIsOpen ? "FilterSelect--open" : ""].join(" ")} style={cssStyles}>
+                <div className="FilterSelect__control" onMouseDown={this.onControlMouseDown}>
+                    <div className="FilterSelect__options">
+                        {selected.slice(0, CHIPS_LIMIT).map((idx) => (
+                            <ValueOption key={idx} index={idx} itemComponent={itemComponent} onRemove={this.onToggle} />
+                        ))}
+                        <div className="FilterSelect__options-shadow"></div>
+                    </div>
+                    {selected.length > CHIPS_LIMIT && (
+                        <div className="FilterSelect__overflow">+{selected.length - CHIPS_LIMIT}</div>
+                    )}
+                    <input
+                        className="FilterSelect__input"
+                        ref={this.inputRef}
+                        type="text"
+                        autoCapitalize="none"
+                        autoComplete="off"
+                        autoCorrect="off"
+                        spellCheck="false"
+                        tabIndex={0}
+                        onFocus={this.onInputFocus}
+                        onBlur={this.onInputBlur}
+                        onKeyDown={this.onKeyDown}
+                        onChange={this.handleInputChange}
+                        value={inputValue}
+                        placeholder={selected.length === 0 ? placeholder : ""}
+                    />
+                    <div className="FilterSelect__buttons">
+                        <div className="FilterSelect__clear" onMouseDown={this.onClearIndicatorMouseDown}>
+                            <TimesIcon size={20} />
+                        </div>
+                        <div className="FilterSelect__separator"></div>
+                        <div className="FilterSelect__open" onMouseDown={this.onDropdownIndicatorMouseDown}>
+                            <OpenIcon />
+                        </div>
+                    </div>
+                </div>
+                {menuIsOpen && (
+                    <div className="FilterSelect__menu" onMouseDown={this.onMenuMouseDown} ref={this.menuRef}>
+                        {activeOptions.length > 0 ? (
+                            <FixedSizeList<ItemData>
+                                ref={this.menuListRef}
+                                width="100%"
+                                height={Math.min(totalFocusableOptions * OPTION_HEIGHT, 300)}
+                                itemCount={totalFocusableOptions}
+                                itemSize={OPTION_HEIGHT}
+                                initialScrollOffset={0}
+                                children={Item}
+                                itemData={{
+                                    filterOptions: activeFilterOptions,
+                                    options: activeOptions,
+                                    selected,
+                                    itemComponent,
+                                    onChange,
+                                    onToggle: this.onToggle,
+                                    selectedOffset: selectedOffset,
+                                }}
+                            />
+                        ) : (
+                            <div className="FilterSelect__empty">No options</div>
+                        )}
+                    </div>
+                )}
+            </div>
+        );
+    }
 
     // ==============================
-    // Handlers
+    // General Methods
     // ==============================
 
-    const onToggle = (index: Index) => {
+    onToggle = (index: Index) => {
+        const { selected, onChange } = this.props;
         // this is fast enoguh for now
         if (selected.includes(index)) {
             onChange(selected.filter((i) => i !== index));
@@ -183,21 +252,26 @@ const FilterSelect = ({
             onChange([...selected, index]);
         }
     };
-    const openMenu = (focusOption: "first" | "last") => {
+    focusInput = () => {
+        this.inputRef.current?.focus();
+    };
+    openMenu = (focusOption: "first" | "last") => {
+        /*
         const { isFocused } = state;
         let openAtIndex = focusOption === "first" ? 0 : totalFocusableOptions - 1;
 
         // only scroll if the menu isn't already open
         let scrollToFocusedOptionOnUpdate = !(isFocused && menuListRef);
+        */
 
-        updateState({
+        this.setState({
             menuIsOpen: true,
-            selectedOffset: openAtIndex,
         });
     };
-    const focusOption = (direction: FocusDirection = "first") => {
+    focusOption = (direction: FocusDirection = "first") => {
         const pageSize = 5;
-        const { selectedOffset } = state;
+        const { options } = this.props;
+        const { selectedOffset } = this.state;
 
         if (!options.length) return;
         let nextFocus = 0; // handles 'first'
@@ -218,27 +292,25 @@ const FilterSelect = ({
         }
         let scrollToFocusedOptionOnUpdate = true;
 
-        updateState({ selectedOffset: nextFocus });
+        this.setState({ selectedOffset: nextFocus });
     };
 
     // ==============================
     // Mouse Handlers
     // ==============================
 
-    const onMenuMouseDown = (event: React.MouseEvent<HTMLElement>) => {
+    onMenuMouseDown = (event: React.MouseEvent<HTMLElement>) => {
         if (event.button !== 0) {
             return;
         }
         event.stopPropagation();
         event.preventDefault();
-        inputRef.current?.focus();
+        this.focusInput();
     };
-    const onControlMouseDown = (event: React.MouseEvent<HTMLElement>) => {
-        console.log("onControlMouseDown");
-
-        if (!state.menuIsOpen) {
-            inputRef.current?.focus();
-            updateState({ menuIsOpen: true });
+    onControlMouseDown = (event: React.MouseEvent<HTMLElement>) => {
+        if (!this.state.menuIsOpen) {
+            this.focusInput();
+            this.openMenu("first");
         }
         // only prevent default if NOT clicked in the input
         // @ts-ignore
@@ -246,66 +318,68 @@ const FilterSelect = ({
             event.preventDefault();
         }
     };
-    const onDropdownIndicatorMouseDown = (event: React.MouseEvent) => {
+    onDropdownIndicatorMouseDown = (event: React.MouseEvent) => {
         // ignore mouse events that weren't triggered by the primary button
         if (event && event.type === "mousedown" && event.button !== 0) {
             return;
         }
-        if (isDisabled) return;
-        inputRef.current?.focus();
-        updateState({ menuIsOpen: !state.menuIsOpen });
+        if (this.props.isDisabled) return;
+        this.focusInput();
+        if (this.state.menuIsOpen) {
+            this.setState({ menuIsOpen: false, inputValue: "" });
+        } else {
+            this.openMenu("first");
+        }
         event.preventDefault();
         event.stopPropagation();
     };
-    const onClearIndicatorMouseDown = (event: React.MouseEvent) => {
+    onClearIndicatorMouseDown = (event: React.MouseEvent) => {
         // ignore mouse events that weren't triggered by the primary button
         if (event && event.type === "mousedown" && event.button !== 0) {
             return;
         }
-        onChange([]);
+        this.props.onChange([]);
         event.preventDefault();
         event.stopPropagation();
-        updateState({ menuIsOpen: true, inputValue: "" });
-        if (event.type === "touchend") {
-            inputRef.current?.focus();
-        } else {
-            setTimeout(() => inputRef.current?.focus());
-        }
+        this.setState({ menuIsOpen: true, inputValue: "" });
+        setTimeout(() => this.focusInput());
     };
 
     // ==============================
     // Focus Handlers
     // ==============================
 
-    const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        console.log("handleInputChange");
-        updateState({
+    handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        this.setState({
             menuIsOpen: true,
             inputValue: event.currentTarget.value.toLocaleLowerCase(),
         });
     };
-    const onInputFocus = (event: React.FocusEvent<HTMLInputElement>) => {
-        console.log("onInputFocus");
-        updateState({ isFocused: true });
+    onInputFocus = (event: React.FocusEvent<HTMLInputElement>) => {
+        this.setState({
+            isFocused: true,
+        });
     };
-    const onInputBlur = (event: React.FocusEvent<HTMLInputElement>) => {
-        console.log("onInputBlur");
-
-        if (menuRef.current && menuRef.current.contains(document.activeElement)) {
-            console.log("was inside");
-            inputRef.current?.focus();
+    onInputBlur = (event: React.FocusEvent<HTMLInputElement>) => {
+        if (this.menuRef.current && this.menuRef.current.contains(document.activeElement)) {
+            this.inputRef.current?.focus();
             return;
         }
-        updateState({ menuIsOpen: false, isFocused: false, inputValue: "" });
+        this.setState({
+            menuIsOpen: false,
+            isFocused: false,
+            inputValue: "",
+        });
     };
 
     // ==============================
     // Keyboard Handlers
     // ==============================
 
-    const onKeyDown = (event: React.KeyboardEvent<HTMLElement>) => {
-        if (isDisabled) return;
-        const { menuIsOpen } = state;
+    onKeyDown = (event: React.KeyboardEvent<HTMLElement>) => {
+        if (this.props.isDisabled) return;
+        const { openMenu, focusOption } = this;
+        const { menuIsOpen } = this.state;
 
         switch (event.key) {
             case "Tab":
@@ -341,7 +415,7 @@ const FilterSelect = ({
                 return;
             case "Escape":
                 if (menuIsOpen) {
-                    updateState({ menuIsOpen: false, inputValue: "" });
+                    this.setState({ menuIsOpen: false, inputValue: "" });
                 }
                 break;
             //case " ": // space
@@ -390,74 +464,7 @@ const FilterSelect = ({
         }
         event.preventDefault();
     };
-
-    return (
-        <div className={["FilterSelect", state.menuIsOpen ? "FilterSelect--open" : ""].join(" ")} style={cssStyles}>
-            <div className="FilterSelect__control" onMouseDown={onControlMouseDown}>
-                <div className="FilterSelect__options">
-                    {selected.slice(0, CHIPS_LIMIT).map((idx) => (
-                        <ValueOption key={idx} index={idx} itemComponent={itemComponent} onRemove={onToggle} />
-                    ))}
-                    <div className="FilterSelect__options-shadow"></div>
-                </div>
-                {selected.length > CHIPS_LIMIT && (
-                    <div className="FilterSelect__overflow">+{selected.length - CHIPS_LIMIT}</div>
-                )}
-                <input
-                    className="FilterSelect__input"
-                    ref={inputRef}
-                    type="text"
-                    autoCapitalize="none"
-                    autoComplete="off"
-                    autoCorrect="off"
-                    spellCheck="false"
-                    tabIndex={0}
-                    onFocus={onInputFocus}
-                    onBlur={onInputBlur}
-                    onKeyDown={onKeyDown}
-                    onChange={handleInputChange}
-                    value={state.inputValue}
-                    placeholder={selected.length === 0 ? placeholder : ""}
-                />
-                <div className="FilterSelect__buttons">
-                    <div className="FilterSelect__clear" onMouseDown={onClearIndicatorMouseDown}>
-                        <TimesIcon size={20} />
-                    </div>
-                    <div className="FilterSelect__separator"></div>
-                    <div className="FilterSelect__open" onMouseDown={onDropdownIndicatorMouseDown}>
-                        <OpenIcon />
-                    </div>
-                </div>
-            </div>
-            {state.menuIsOpen && (
-                <div className="FilterSelect__menu" onMouseDown={onMenuMouseDown} ref={menuRef}>
-                    {activeOptions.length > 0 ? (
-                        <FixedSizeList<ItemData>
-                            ref={menuListRef}
-                            width="100%"
-                            height={Math.min(totalFocusableOptions * OPTION_HEIGHT, 300)}
-                            itemCount={totalFocusableOptions}
-                            itemSize={OPTION_HEIGHT}
-                            initialScrollOffset={0}
-                            children={Item}
-                            itemData={{
-                                filterOptions: activeFilterOptions,
-                                options: activeOptions,
-                                selected,
-                                itemComponent,
-                                onChange,
-                                onToggle,
-                                selectedOffset: state.selectedOffset,
-                            }}
-                        />
-                    ) : (
-                        <div className="FilterSelect__empty">No options</div>
-                    )}
-                </div>
-            )}
-        </div>
-    );
-};
+}
 
 const TimesIcon = ({ size }: { size: number }) => (
     <svg height={size} width={size} viewBox="0 0 20 20">
@@ -470,5 +477,3 @@ const OpenIcon = () => (
         <path d="M4.516 7.548c0.436-0.446 1.043-0.481 1.576 0l3.908 3.747 3.908-3.747c0.533-0.481 1.141-0.446 1.574 0 0.436 0.445 0.408 1.197 0 1.615-0.406 0.418-4.695 4.502-4.695 4.502-0.217 0.223-0.502 0.335-0.787 0.335s-0.57-0.112-0.789-0.335c0 0-4.287-4.084-4.695-4.502s-0.436-1.17 0-1.615z"></path>
     </svg>
 );
-
-export default memo(FilterSelect) as typeof FilterSelect;
