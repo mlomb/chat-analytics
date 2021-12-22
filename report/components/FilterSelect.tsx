@@ -14,7 +14,7 @@
 
 import "@assets/styles/FilterSelect.less";
 
-import React, { Component, ElementRef, memo, ReactElement, useRef, useState } from "react";
+import React, { PureComponent, ReactElement } from "react";
 import { FixedSizeList, ListChildComponentProps } from "react-window";
 
 const OPTION_HEIGHT = 35;
@@ -30,31 +30,33 @@ export interface FilterOption {
 }
 
 interface Props {
-    selected: Index[];
-    placeholder: string;
-    options: Index[];
-    optionColorHue: number;
-    onChange: (selected: Index[]) => void;
-    itemComponent: ItemComponent;
-    isDisabled: boolean;
-    filterSearch: (term: string) => Index[];
     filterOptions: FilterOption[];
+    filterSearch: (term: string) => Index[];
+    isDisabled: boolean;
+    itemComponent: ItemComponent;
+    onChange: (selected: Index[]) => void;
+    optionColorHue: number;
+    options: Index[];
+    placeholder: string;
+    selected: Index[];
 }
 
 interface State {
-    selectedOffset: number;
-    menuIsOpen: boolean;
-    isFocused: boolean;
     inputValue: string;
+    isFocused: boolean;
+    menuIsOpen: boolean;
+    selectedOffset: number;
 }
 
 // Options displayed in the control
 const ValueOption = ({
     index,
+    isDisabled,
     itemComponent,
     onRemove,
 }: {
     index: Index;
+    isDisabled: boolean;
     itemComponent: ItemComponent;
     onRemove: (index: Index) => void;
 }) => {
@@ -65,9 +67,11 @@ const ValueOption = ({
             <div className="FilterSelect__label">
                 <Item id={index} />
             </div>
-            <div className="FilterSelect__remove" onClick={onClick}>
-                <TimesIcon size={14} />
-            </div>
+            {!isDisabled && (
+                <div className="FilterSelect__remove" onClick={onClick}>
+                    <TimesIcon size={14} />
+                </div>
+            )}
         </div>
     );
 };
@@ -89,18 +93,18 @@ const DataOptionList = (props: { index: Index; selected: boolean; itemComponent:
 };
 
 interface ItemData {
-    selectedOffset: number;
-    selected: Index[];
-    options: Index[];
-    onToggle: (index: Index) => void;
-    onChange: (selected: Index[]) => void;
-    itemComponent: ItemComponent;
     filterOptions: FilterOption[];
+    itemComponent: ItemComponent;
+    onChange: (selected: Index[]) => void;
+    onToggle: (index: Index) => void;
+    options: Index[];
+    selected: Index[];
+    selectedOffset: number;
 }
 
-// Selects between DataOptionList and FilterOptionList
+// Selects between DataOptionList and a filter option
 const Item = ({ index, style, data }: ListChildComponentProps<ItemData>) => {
-    const { options, filterOptions, selected, itemComponent, onChange, onToggle, selectedOffset } = data;
+    const { filterOptions, itemComponent, onChange, onToggle, options, selected, selectedOffset } = data;
 
     const isFilter = index < filterOptions.length;
     let children: ReactElement;
@@ -142,12 +146,12 @@ const Item = ({ index, style, data }: ListChildComponentProps<ItemData>) => {
     );
 };
 
-export default class FilterSelect extends Component<Props, State> {
+export default class FilterSelect extends PureComponent<Props, State> {
     state = {
-        selectedOffset: -1,
-        menuIsOpen: false,
-        isFocused: false,
         inputValue: "",
+        isFocused: false,
+        menuIsOpen: false,
+        selectedOffset: -1,
     };
 
     private menuRef: React.RefObject<HTMLDivElement>;
@@ -168,7 +172,7 @@ export default class FilterSelect extends Component<Props, State> {
         this.inputRef = React.createRef();
     }
 
-    componentDidUpdate(prevProps: Props) {
+    componentDidUpdate() {
         if (this.scrollToFocusedOptionOnUpdate && this.menuListRef.current) {
             this.menuListRef.current.scrollToItem(this.state.selectedOffset);
             this.scrollToFocusedOptionOnUpdate = false;
@@ -176,9 +180,18 @@ export default class FilterSelect extends Component<Props, State> {
     }
 
     render(): React.ReactNode {
-        const { selectedOffset, menuIsOpen, isFocused, inputValue } = this.state;
-        const { selected, placeholder, options, optionColorHue, onChange, itemComponent, filterSearch, filterOptions } =
-            this.props;
+        const { selectedOffset, menuIsOpen, inputValue } = this.state;
+        const {
+            filterOptions,
+            filterSearch,
+            isDisabled,
+            itemComponent,
+            onChange,
+            optionColorHue,
+            options,
+            placeholder,
+            selected,
+        } = this.props;
 
         const cssStyles = { "--hue": optionColorHue } as React.CSSProperties;
 
@@ -187,11 +200,24 @@ export default class FilterSelect extends Component<Props, State> {
         this.totalFocusableOptions = this.activeOptions.length + this.activeFilterOptions.length;
 
         return (
-            <div className={["FilterSelect", menuIsOpen ? "FilterSelect--open" : ""].join(" ")} style={cssStyles}>
+            <div
+                className={[
+                    "FilterSelect",
+                    menuIsOpen ? "FilterSelect--open" : "",
+                    isDisabled ? "FilterSelect--disabled" : "",
+                ].join(" ")}
+                style={cssStyles}
+            >
                 <div className="FilterSelect__control" onMouseDown={this.onControlMouseDown}>
                     <div className="FilterSelect__options">
                         {selected.slice(0, CHIPS_LIMIT).map((idx) => (
-                            <ValueOption key={idx} index={idx} itemComponent={itemComponent} onRemove={this.onToggle} />
+                            <ValueOption
+                                key={idx}
+                                index={idx}
+                                itemComponent={itemComponent}
+                                onRemove={this.onToggle}
+                                isDisabled={isDisabled}
+                            />
                         ))}
                         <div className="FilterSelect__options-shadow"></div>
                     </div>
@@ -199,51 +225,56 @@ export default class FilterSelect extends Component<Props, State> {
                         <div className="FilterSelect__overflow">+{selected.length - CHIPS_LIMIT}</div>
                     )}
                     <input
-                        className="FilterSelect__input"
-                        ref={this.inputRef}
-                        type="text"
                         autoCapitalize="none"
                         autoComplete="off"
                         autoCorrect="off"
+                        className="FilterSelect__input"
+                        disabled={isDisabled}
+                        onBlur={this.onInputBlur}
+                        onChange={this.handleInputChange}
+                        onFocus={this.onInputFocus}
+                        onKeyDown={this.onKeyDown}
+                        placeholder={selected.length === 0 ? placeholder : ""}
+                        ref={this.inputRef}
                         spellCheck="false"
                         tabIndex={0}
-                        onFocus={this.onInputFocus}
-                        onBlur={this.onInputBlur}
-                        onKeyDown={this.onKeyDown}
-                        onChange={this.handleInputChange}
+                        type="text"
                         value={inputValue}
-                        placeholder={selected.length === 0 ? placeholder : ""}
                     />
-                    <div className="FilterSelect__buttons">
-                        <div className="FilterSelect__clear" onMouseDown={this.onClearIndicatorMouseDown}>
-                            <TimesIcon size={20} />
+                    {!isDisabled && (
+                        <div className="FilterSelect__buttons">
+                            {selected.length > 0 && (
+                                <div className="FilterSelect__clear" onMouseDown={this.onClearIndicatorMouseDown}>
+                                    <TimesIcon size={20} />
+                                </div>
+                            )}
+                            <div className="FilterSelect__separator"></div>
+                            <div className="FilterSelect__open" onMouseDown={this.onDropdownIndicatorMouseDown}>
+                                <OpenIcon />
+                            </div>
                         </div>
-                        <div className="FilterSelect__separator"></div>
-                        <div className="FilterSelect__open" onMouseDown={this.onDropdownIndicatorMouseDown}>
-                            <OpenIcon />
-                        </div>
-                    </div>
+                    )}
                 </div>
                 {menuIsOpen && (
                     <div className="FilterSelect__menu" onMouseDown={this.onMenuMouseDown} ref={this.menuRef}>
                         {this.activeOptions.length > 0 ? (
                             <FixedSizeList<ItemData>
-                                ref={this.menuListRef}
-                                width="100%"
-                                height={Math.min(this.totalFocusableOptions * OPTION_HEIGHT, 300)}
-                                itemCount={this.totalFocusableOptions}
-                                itemSize={OPTION_HEIGHT}
-                                initialScrollOffset={0}
                                 children={Item}
+                                height={Math.min(this.totalFocusableOptions * OPTION_HEIGHT, 300)}
+                                initialScrollOffset={0}
+                                itemCount={this.totalFocusableOptions}
                                 itemData={{
                                     filterOptions: this.activeFilterOptions,
-                                    options: this.activeOptions,
-                                    selected,
                                     itemComponent,
                                     onChange,
                                     onToggle: this.onToggle,
+                                    options: this.activeOptions,
+                                    selected,
                                     selectedOffset: selectedOffset,
                                 }}
+                                itemSize={OPTION_HEIGHT}
+                                ref={this.menuListRef}
+                                width="100%"
                             />
                         ) : (
                             <div className="FilterSelect__empty">No options</div>
@@ -330,6 +361,7 @@ export default class FilterSelect extends Component<Props, State> {
         this.focusInput();
     };
     onControlMouseDown = (event: React.MouseEvent<HTMLElement>) => {
+        if (this.props.isDisabled) return;
         if (!this.state.menuIsOpen) {
             this.focusInput();
             this.openMenu("first");

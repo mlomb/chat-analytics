@@ -28,6 +28,11 @@
     box-shadow: hsl(var(--hue), 50%, 60%) 0px 0px 0px 1px;
 }
 
+.FilterSelect--disabled .FilterSelect__control {
+    background: #1b2125;
+    border-color: #363d43;
+}
+
 .FilterSelect__options {
     display: flex;
     align-items: center;
@@ -50,17 +55,18 @@
 .FilterSelect__option {
     display: flex;
     margin: 2px;
-    border-radius: 2px;
+    border-radius: 3px;
     background-color: hsl(var(--hue), 100%, 65%);
     cursor: default;
     height: 26px;
 }
 
 .FilterSelect__label {
-    padding: 3px 3px 3px 6px;
+    padding: 3px 6px;
     font-size: 12px;
     display: flex;
     align-items: center;
+    max-width: 140px;
 }
 
 .FilterSelect__overflow {
@@ -74,7 +80,7 @@
     cursor: pointer;
     padding-left: 4px;
     padding-right: 4px;
-    border-radius: 0px 2px 2px 0px;
+    border-radius: 0px 3px 3px 0px;
 
     &:hover {
         background-color: hsl(var(--hue), 100%, 75%);
@@ -104,8 +110,8 @@
 .FilterSelect__open {
     display: flex;
     padding: 8px;
-    cursor: pointer;
     transition: color 150ms ease;
+    cursor: pointer;
 
     &:hover {
         color: white;
@@ -152,9 +158,10 @@
 
 .FilterSelect__option-list {
     background-color: #999999;
-    border-radius: 2px;
+    border-radius: 3px;
     display: flex;
     padding: 3px 5px;
+    overflow: hidden;
 
     &--selected {
         background-color: hsl(var(--hue), 100%, 65%);

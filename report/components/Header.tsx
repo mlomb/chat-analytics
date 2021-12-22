@@ -56,20 +56,30 @@ const channelsFilterOptionsFn: (dp: DataProvider) => FilterOption[] = (dp) => [
     },
 ];
 
-const authorsFilterOptionsFn: (dp: DataProvider) => FilterOption[] = (dp) => [
-    {
-        name: "Select all authors (🧍➕🤖)",
-        options: dp.basic.authors.map((a) => a.id),
-    },
-    {
-        name: "Select all non-bot authors (🧍)",
-        options: dp.basic.authors.filter((o) => o.bot === false).map((a) => a.id),
-    },
-    {
-        name: "Select all bot authors (🤖)",
-        options: dp.basic.authors.filter((o) => o.bot === true).map((a) => a.id),
-    },
-];
+const authorsFilterOptionsFn: (dp: DataProvider) => FilterOption[] = (dp) => {
+    const allAuthors = dp.basic.authors.map((a) => a.id);
+    const nonBotAuthors = dp.basic.authors.filter((o) => o.bot === false).map((a) => a.id);
+    const botAuthors = dp.basic.authors.filter((o) => o.bot === true).map((a) => a.id);
+    const options: FilterOption[] = [
+        {
+            name: "Select all authors" + (botAuthors.length > 0 ? "  (🧍➕🤖)" : ""),
+            options: allAuthors,
+        },
+    ];
+    if (botAuthors.length > 0) {
+        options.push(
+            {
+                name: "Select all non-bot authors (🧍)",
+                options: nonBotAuthors,
+            },
+            {
+                name: "Select all bot authors (🤖)",
+                options: botAuthors,
+            }
+        );
+    }
+    return options;
+};
 
 const Header = (props: Props) => {
     const { tab, setTab } = props;
