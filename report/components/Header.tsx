@@ -52,12 +52,18 @@ const tabs = [
 const channelsFilterOptionsFn: (dp: DataProvider) => FilterOption[] = (dp) => [
     {
         name: "Select all channels",
-        options: dp.reportData.channels.map((c, i) => i),
+        options: dp.reportData.channels
+            .map((c, i) => [c.messagesCount, i])
+            .sort((a, b) => b[0] - a[0])
+            .map((c) => c[1]),
     },
 ];
 
 const authorsFilterOptionsFn: (dp: DataProvider) => FilterOption[] = (dp) => {
-    const allAuthors = dp.reportData.authors.map((a, i) => i);
+    const allAuthors = dp.reportData.authors
+        .map((a, i) => [a.messagesCount, i])
+        .sort((a, b) => b[0] - a[0])
+        .map((c) => c[1]);
     const nonBotAuthors = dp.reportData.authors.filter((o) => o.bot === false).map((a, i) => i);
     const botAuthors = dp.reportData.authors.filter((o) => o.bot === true).map((a, i) => i);
     const options: FilterOption[] = [

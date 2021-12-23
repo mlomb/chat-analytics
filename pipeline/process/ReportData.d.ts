@@ -28,12 +28,13 @@ export type SerializedData = Uint8Array;
 export interface Channel {
     name: string;
     name_searchable: string;
-    messagesStart: Address;
-    messagesEnd: Address;
+    messagesAddr: Address;
+    messagesCount: number;
 }
 
 export interface Author {
     name: string;
     name_searchable: string;
     bot: boolean;
+    messagesCount: number;
 }

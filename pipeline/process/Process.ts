@@ -19,6 +19,7 @@ export const processDatabase = async function* (
             name: author.name,
             name_searchable: searchFormat(author.name),
             bot: author.bot,
+            messagesCount: 0,
         });
     }
     yield { type: "done" };
@@ -34,8 +35,8 @@ export const processDatabase = async function* (
         const channel: Channel = {
             name: _channel.name,
             name_searchable: searchFormat(_channel.name),
-            messagesStart: -1,
-            messagesEnd: -1,
+            messagesAddr: -1,
+            messagesCount: 0,
         };
         channels.push(channel);
     }
@@ -48,7 +49,6 @@ export const processDatabase = async function* (
     const start = new Date(database.minDate);
     const end = new Date(database.maxDate);
     const startUTC = Date.UTC(start.getFullYear(), start.getMonth(), start.getDate());
-    const _MS_PER_DAY = 1000 * 60 * 60 * 24;
 
     const dayKeys: string[] = [];
     const monthKeys: string[] = [];
@@ -62,11 +62,16 @@ export const processDatabase = async function* (
     }
 
     for (let id: ID = 0; id < database.channels.length; id++) {
-        channels[id].messagesStart = serializer.currentOffset;
-        for (const msg of database.messages[id]) {
+        const msgs = database.messages[id];
+        channels[id].messagesAddr = serializer.currentOffset;
+        channels[id].messagesCount = msgs.length;
+
+        for (const msg of msgs) {
             const date = new Date(msg.timestamp);
             const tsUTC = Date.UTC(date.getFullYear(), date.getMonth(), date.getDate());
             const dateUTC = new Date(tsUTC);
+
+            authors[msg.authorId].messagesCount++;
 
             serializer.writeDate(
                 dayKeys.indexOf(dateToString(dateUTC)),
@@ -75,7 +80,6 @@ export const processDatabase = async function* (
             );
             serializer.writeUint32(msg.authorId);
         }
-        channels[id].messagesEnd = serializer.currentOffset;
     }
 
     const reportData: ReportData = {

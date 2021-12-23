@@ -40,8 +40,8 @@ export const process: BlockProcessFn<MessagesPerCycleBlock> = (source, deseriali
     for (let channelId = 0; channelId < source.channels.length; channelId++) {
         const channel = source.channels[channelId];
         if (filters.channelsSet.has(channelId)) {
-            deserializer.seek(channel.messagesStart);
-            while (deserializer.currentOffset < channel.messagesEnd) {
+            deserializer.seek(channel.messagesAddr);
+            for (let i = 0; i < channel.messagesCount; i++) {
                 const [dateIndex, monthIndex, hour] = deserializer.readDate();
                 const authorId = deserializer.readUint32();
 
