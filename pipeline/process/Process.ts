@@ -55,7 +55,8 @@ export const processDatabase = async function* (
             if (minDate === 0 || msg.timestamp < minDate) minDate = msg.timestamp;
             if (maxDate === 0 || msg.timestamp > maxDate) maxDate = msg.timestamp;
 
-            serializer.writeTimestamp(new Date(msg.timestamp).getTime()); // [date.getFullYear(), date.getMonth(), date.getDate()]
+            const d = new Date(msg.timestamp); // TODO: timezones and stuff
+            serializer.writeDate(d.getFullYear(), d.getMonth(), d.getDate(), d.getHours());
             serializer.writeUint32(id);
             serializer.writeUint32(msg.authorId);
         }

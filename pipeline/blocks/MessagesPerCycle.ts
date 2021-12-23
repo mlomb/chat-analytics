@@ -63,14 +63,14 @@ export const process: BlockProcessFn<MessagesPerCycleBlock> = (source, deseriali
         if (filters.channelsSet.has(channelId)) {
             deserializer.seek(channel.messagesStart);
             while (deserializer.currentOffset < channel.messagesEnd) {
-                const date = deserializer.readTimestamp();
+                const [y, m, d, h] = deserializer.readDate();
                 const _channelId = deserializer.readUint32();
                 const authorId = deserializer.readUint32();
 
                 console.assert(channelId === _channelId);
 
                 if (filters.authorsSet.has(authorId)) {
-                    const dateUTC = new Date(date).getTime(); // TODO: fix!! Date.UTC(message.date[0], message.date[1], message.date[2]);
+                    const dateUTC = Date.UTC(y, m, d);
 
                     const index = Math.floor((dateUTC - startUTC) / _MS_PER_DAY);
                     // console.log(index);

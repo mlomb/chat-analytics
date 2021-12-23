@@ -32,8 +32,13 @@ export class DataSerializer {
         this.tail = Math.max(this.tail, this.head);
     }
 
-    public writeTimestamp(timestamp: Timestamp) {
-        this.writeUint32(timestamp);
+    // year: 12 bits: 0-4095
+    // month: 4 bits: 0-15
+    // date: 5 bits: 0-31
+    // hour: 5 bits: 0-31
+    public writeDate(year: number, month: number, date: number, hour: number) {
+        const d: number = (year << 14) | (month << 10) | (date << 5) | hour;
+        this.writeUint32(d);
     }
 
     private grow() {
@@ -66,13 +71,14 @@ export class DataDeserializer {
         this.cursor = address;
     }
 
+    public readDate(): [number, number, number, number] {
+        const d = this.readUint32();
+        return [(d >> 14) & 0x3fff, (d >> 10) & 0xf, (d >> 5) & 0x1f, d & 0x1f];
+    }
+
     public readUint32(): number {
         const value = this.dv.getUint32(this.cursor);
         this.cursor += 4;
         return value;
-    }
-
-    public readTimestamp(): Timestamp {
-        return this.readUint32();
     }
 }
