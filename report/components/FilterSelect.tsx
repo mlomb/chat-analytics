@@ -362,11 +362,20 @@ export default class FilterSelect extends PureComponent<Props, State> {
     };
     onControlMouseDown = (event: React.MouseEvent<HTMLElement>) => {
         if (this.props.isDisabled) return;
+        // ignore if clicked on a remove button AND the menu was closed
+        if (
+            !this.state.menuIsOpen &&
+            event.target instanceof Element &&
+            event.target.closest &&
+            event.target.closest(".FilterSelect__remove") !== null
+        )
+            return;
         if (!this.state.menuIsOpen) {
             this.focusInput();
             this.openMenu("first");
         }
         // only prevent default if NOT clicked in the input
+        // (this allows moving the cursor with the mouse)
         // @ts-ignore
         if (event.target.tagName !== "INPUT") {
             event.preventDefault();
