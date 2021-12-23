@@ -5,9 +5,9 @@ import { Parser } from "@pipeline/parse/Parser";
 import { DiscordParser } from "@pipeline/parse/DiscordParser";
 import { WhatsAppParser } from "@pipeline/parse/WhatsAppParser";
 import { TelegramParser } from "@pipeline/parse/TelegramParser";
-import { preprocess } from "@pipeline/preprocess/Preprocess";
+import { processDatabase } from "@pipeline/process/Process";
 import { Database } from "@pipeline/parse/Database";
-import { ProcessedData } from "@pipeline/preprocess/ProcessedData";
+import { ReportData, SerializedData } from "@pipeline/process/ReportData";
 import { compress } from "@pipeline/shared/Compression";
 
 export async function* generateReport(files: FileInput[], config: ReportConfig): AsyncGenerator<StepMessage> {
@@ -42,11 +42,13 @@ export async function* generateReport(files: FileInput[], config: ReportConfig):
         yield { type: "done" };
     }
 
-    let database: Database | null = parser.database;
+    let database: Database = parser.database;
     // release other parser memory
     parser = null;
 
-    console.log(database);
+    if (env.isDev) {
+        console.log(database);
+    }
 
     //
     // TEMPORAL
@@ -71,19 +73,20 @@ export async function* generateReport(files: FileInput[], config: ReportConfig):
     };
 
     //
-    // 2. Preprocess database
+    // 2. Process database
     //
-    let preprocessed: ProcessedData | null = yield* preprocess(database, config);
+    let [reportData, serializedData]: [ReportData, SerializedData] = yield* processDatabase(database, config);
     // release db memory
-    database = null;
+    (database as any) = null;
 
     //
     // 3. Compress data
     //
     yield { type: "new", title: "Compress data" };
-    const dataBlob = yield* compress(preprocessed);
-    // release preprocessed memory
-    preprocessed = null;
+    const encodedData = compress(reportData, serializedData);
+    // release processed memory
+    (reportData as any) = null;
+    (serializedData as any) = null;
     yield { type: "done" };
 
     //
@@ -92,16 +95,13 @@ export async function* generateReport(files: FileInput[], config: ReportConfig):
     const html = yield* downloadFile("report.html");
     const template = "[[[DATA]]]";
     const dataTemplateLoc = html.indexOf(template);
-    const htmlBlob = new Blob(
-        [html.slice(0, dataTemplateLoc), dataBlob, html.slice(dataTemplateLoc + template.length)],
-        { type: "text/html" }
-    );
+    const finalHtml = html.slice(0, dataTemplateLoc) + encodedData + html.slice(dataTemplateLoc + template.length);
 
     yield {
         type: "result",
         title,
-        dataBlob,
-        htmlBlob,
+        data: encodedData,
+        html: finalHtml,
         time: Date.now(),
         counts,
     };

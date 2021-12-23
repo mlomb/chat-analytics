@@ -4,6 +4,9 @@ export type RawID = string | number;
 // Internal ID that is used in the pipeline (incremental)
 export type ID = number;
 
+// offset in bytes in the SerializedData buffer
+export type Address = number;
+
 export type Timestamp = number;
 
 export type Platform = "discord" | "telegram" | "whatsapp";

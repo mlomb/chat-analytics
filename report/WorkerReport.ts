@@ -2,11 +2,13 @@ export default null as any;
 
 import { BlockRequestMessage, BlockResultMessage, InitMessage, ReadyMessage } from "@pipeline/Messages";
 import { BlocksDesc, BlocksProcessFn, BlockState, Filters } from "@pipeline/blocks/Blocks";
-import { ProcessedData } from "@pipeline/preprocess/ProcessedData";
+import { ReportData } from "@pipeline/process/ReportData";
+import { DataDeserializer } from "@pipeline/shared/SerializedData";
 import { decompress } from "@pipeline/shared/Compression";
 import { computeBasic } from "@report/Basic";
 
-let processedData: ProcessedData | null = null;
+let reportData: ReportData | null = null;
+let dataDeserializer: DataDeserializer | null = null;
 let fitlers: Filters = {
     channels: [],
     channelsSet: new Set(),
@@ -17,14 +19,19 @@ let fitlers: Filters = {
 };
 
 const init = async (msg: InitMessage) => {
-    processedData = await decompress(msg.dataStr);
+    const [_reportData, serializedData] = await decompress(msg.dataStr);
+    reportData = _reportData;
+    dataDeserializer = new DataDeserializer(serializedData);
+
     self.postMessage(<ReadyMessage>{
         type: "ready",
-        basic: computeBasic(processedData),
+        basic: computeBasic(reportData),
         blocksDesc: BlocksDesc,
     });
 
-    console.log(processedData);
+    if (env.isDev) {
+        console.log(reportData, serializedData);
+    }
 };
 
 const request = async (msg: BlockRequestMessage) => {
@@ -42,10 +49,10 @@ const request = async (msg: BlockRequestMessage) => {
     if (br.filters.endDate) fitlers.endDate = br.filters.endDate;
 
     try {
-        if (!processedData) throw new Error("No processed data provided");
+        if (!reportData || !dataDeserializer) throw new Error("No data provided");
         if (!(br.blockKey in BlocksProcessFn)) throw new Error("BlockFn not found");
 
-        const data = BlocksProcessFn[br.blockKey](processedData, fitlers);
+        const data = BlocksProcessFn[br.blockKey](reportData, dataDeserializer, fitlers);
 
         self.postMessage(<BlockResultMessage>{
             type: "result",

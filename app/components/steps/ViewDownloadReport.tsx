@@ -16,12 +16,16 @@ interface Props {
 const ts = (n: number) => (n === 1 ? "" : "s");
 
 const ViewDownloadReport = ({ result }: Props) => {
-    const [file, setFile] = useState<{
+    const [files, setFiles] = useState<{
+        dataBlob: Blob | null;
         dataURL: string;
+        htmlBlob: Blob | null;
         htmlURL: string;
         filename: string;
     }>({
+        dataBlob: null,
         dataURL: "",
+        htmlBlob: null,
         htmlURL: "",
         filename: "",
     });
@@ -29,9 +33,13 @@ const ViewDownloadReport = ({ result }: Props) => {
     useEffect(() => {
         if (result) {
             const date = new Date();
-            setFile({
-                dataURL: URL.createObjectURL(result.dataBlob),
-                htmlURL: URL.createObjectURL(result.htmlBlob),
+            const dataBlob = new Blob([result.data || ""], { type: "text/plain" });
+            const htmlBlob = new Blob([result.html], { type: "text/html" });
+            setFiles({
+                dataBlob,
+                dataURL: URL.createObjectURL(dataBlob),
+                htmlBlob,
+                htmlURL: URL.createObjectURL(htmlBlob),
                 filename: `${result?.title}-${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}.html`,
             });
         }
@@ -49,17 +57,17 @@ const ViewDownloadReport = ({ result }: Props) => {
                 </div>
             )}
             <div className="ViewDownloadReport__buttons">
-                <Button hueColor={[258, 90, 61]} href={file.htmlURL} download={file.filename}>
+                <Button hueColor={[258, 90, 61]} href={files.htmlURL} download={files.filename}>
                     <img src={Download} alt="Download" />
-                    Download ({prettyBytes(result?.htmlBlob.size || 0)})
+                    Download ({prettyBytes(files.htmlBlob?.size || 0)})
                 </Button>
-                <Button hueColor={[244, 90, 61]} href={file.htmlURL} target="_blank">
+                <Button hueColor={[244, 90, 61]} href={files.htmlURL} target="_blank">
                     <img src={LinkOut} alt="Link out" />
                     View Locally
                 </Button>
                 {env.isDev && (
-                    <Button hueColor={[105, 70, 50]} href={file.dataURL} download="report_sample.data">
-                        🛠️ Download DATA (dev, {prettyBytes(result?.dataBlob.size || 0)})
+                    <Button hueColor={[115, 70, 50]} href={files.dataURL} download="report_sample.data">
+                        🛠️ Download DATA (dev, {prettyBytes(files.dataBlob?.size || 0)})
                     </Button>
                 )}
             </div>

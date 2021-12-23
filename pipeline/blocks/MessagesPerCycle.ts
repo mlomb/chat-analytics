@@ -11,7 +11,7 @@ export interface MessagesPerCycleBlock {
     perMonth: MessagesPerCycle[];
 }
 
-export const process: BlockProcessFn<MessagesPerCycleBlock> = (source, filters) => {
+export const process: BlockProcessFn<MessagesPerCycleBlock> = (source, deserializer, filters) => {
     const res: MessagesPerCycleBlock = {
         perDay: [],
         perMonth: [],
@@ -61,16 +61,25 @@ export const process: BlockProcessFn<MessagesPerCycleBlock> = (source, filters) 
     for (let channelId = 0; channelId < source.channels.length; channelId++) {
         const channel = source.channels[channelId];
         if (filters.channelsSet.has(channelId)) {
-            for (const message of channel.messages) {
-                if (filters.authorsSet.has(message.authorId)) {
-                    const dateUTC = Date.UTC(message.date[0], message.date[1], message.date[2]);
+            deserializer.seek(channel.messagesStart);
+            while (deserializer.currentOffset < channel.messagesEnd) {
+                const date = deserializer.readTimestamp();
+                const _channelId = deserializer.readUint32();
+                const authorId = deserializer.readUint32();
+
+                console.assert(channelId === _channelId);
+
+                if (filters.authorsSet.has(authorId)) {
+                    const dateUTC = new Date(date).getTime(); // TODO: fix!! Date.UTC(message.date[0], message.date[1], message.date[2]);
 
                     const index = Math.floor((dateUTC - startUTC) / _MS_PER_DAY);
-                    console.assert(index >= 0 && index < dates.length);
-
-                    const dateData = dates[index];
-                    dateData.dayData.messages++;
-                    dateData.monthData.messages++;
+                    // console.log(index);
+                    //console.assert(index >= 0 && index < dates.length);
+                    if (index >= 0 && index < dates.length) {
+                        const dateData = dates[index];
+                        dateData.dayData.messages++;
+                        dateData.monthData.messages++;
+                    }
                 }
             }
         }

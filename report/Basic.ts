@@ -1,5 +1,5 @@
 import { Platform } from "@pipeline/Types";
-import { ProcessedData } from "@pipeline/preprocess/ProcessedData";
+import { ReportData } from "@pipeline/process/ReportData";
 
 export interface AuthorOption {
     id: number;
@@ -23,8 +23,8 @@ export interface Basic {
     channels: ChannelOption[];
 }
 
-export const computeBasic = (pd: ProcessedData): Basic => ({
-    platform: pd.platform,
+export const computeBasic = (pd: ReportData): Basic => ({
+    platform: pd.config.platform,
     title: pd.title,
     minDate: pd.minDate,
     maxDate: pd.maxDate,

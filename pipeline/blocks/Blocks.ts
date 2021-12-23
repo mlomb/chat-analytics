@@ -1,4 +1,5 @@
-import { ID, DateStr, ProcessedData } from "@pipeline/preprocess/ProcessedData";
+import { ID, DateStr, ReportData } from "@pipeline/process/ReportData";
+import { DataDeserializer } from "@pipeline/shared/SerializedData";
 
 export interface Filters {
     channels: ID[];
@@ -15,7 +16,7 @@ export type Trigger = "authors" | "channels" | "time";
 
 export type BlockKey = string;
 
-export type BlockProcessFn<T> = (source: ProcessedData, filters: Filters) => T;
+export type BlockProcessFn<T> = (source: ReportData, deserializer: DataDeserializer, filters: Filters) => T;
 
 export interface BlockDesc {
     triggers: Trigger[];

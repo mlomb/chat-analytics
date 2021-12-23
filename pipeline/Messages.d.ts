@@ -22,8 +22,8 @@ export interface ErrorMessage {
 export interface ResultMessage {
     type: "result";
     title: string;
-    dataBlob: Blob;
-    htmlBlob: Blob;
+    data?: string;
+    html: string;
     time: Timestamp;
     counts: {
         authors: number;
@@ -42,11 +42,6 @@ export type StepMessage = NewMessage | ProgressMessage | DoneMessage | ErrorMess
 export interface InitMessage {
     type: "init";
     dataStr: string;
-}
-
-export interface DecompressProgressMessage {
-    type: "decompress";
-    progress: [number, number];
 }
 
 // Send required data for the UI

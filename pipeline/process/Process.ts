@@ -1,13 +1,14 @@
 import { ReportConfig, Timestamp } from "@pipeline/Types";
 import { StepMessage } from "@pipeline/Messages";
 import { Database } from "@pipeline/parse/Database";
-import { Author, Channel, ID, ProcessedData } from "@pipeline/preprocess/ProcessedData";
+import { Author, Channel, ID, ReportData, SerializedData } from "@pipeline/process/ReportData";
 import { dateToString, searchFormat } from "@pipeline/Utils";
+import { DataSerializer } from "@pipeline/shared/SerializedData";
 
-export const preprocess = async function* (
+export const processDatabase = async function* (
     database: Database,
     config: ReportConfig
-): AsyncGenerator<StepMessage, ProcessedData> {
+): AsyncGenerator<StepMessage, [ReportData, SerializedData]> {
     const authors: Author[] = [];
     const channels: Channel[] = [];
 
@@ -36,31 +37,33 @@ export const preprocess = async function* (
         const channel: Channel = {
             name: _channel.name,
             name_searchable: searchFormat(_channel.name),
-            messages: [],
+            messagesStart: -1,
+            messagesEnd: -1,
         };
         channels.push(channel);
+    }
+    yield { type: "done" };
 
+    // TOOD: sort by bots
+    // TODO: sort by number of messages
+
+    const serializer = new DataSerializer();
+
+    for (let id: ID = 0; id < database.channels.length; id++) {
+        channels[id].messagesStart = serializer.currentOffset;
         for (const msg of database.messages[id]) {
             if (minDate === 0 || msg.timestamp < minDate) minDate = msg.timestamp;
             if (maxDate === 0 || msg.timestamp > maxDate) maxDate = msg.timestamp;
 
-            const date = new Date(msg.timestamp);
-            //const dateStr = dateToString(date);
-            channel.messages.push({
-                authorId: msg.authorId,
-                channelId: id,
-                date: [date.getFullYear(), date.getMonth(), date.getDate()],
-            });
+            serializer.writeTimestamp(new Date(msg.timestamp).getTime()); // [date.getFullYear(), date.getMonth(), date.getDate()]
+            serializer.writeUint32(id);
+            serializer.writeUint32(msg.authorId);
         }
+        channels[id].messagesEnd = serializer.currentOffset;
     }
-    yield { type: "done" };
 
-    // TODO: filter members with no messages
-    // TOOD: sort by bots
-    // TODO: sort by number of messages
-
-    return {
-        platform: database.platform,
+    const reportData: ReportData = {
+        config,
         title: database.title,
         // TODO: timezones
         minDate: dateToString(new Date(minDate)),
@@ -69,4 +72,6 @@ export const preprocess = async function* (
         channels,
         authors,
     };
+
+    return [reportData, serializer.validBuffer];
 };

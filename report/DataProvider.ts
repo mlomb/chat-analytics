@@ -1,13 +1,7 @@
 import EventEmitter from "events";
 
 import { ID } from "@pipeline/Types";
-import {
-    BlockRequestMessage,
-    BlockResultMessage,
-    DecompressProgressMessage,
-    InitMessage,
-    ReadyMessage,
-} from "@pipeline/Messages";
+import { BlockRequestMessage, BlockResultMessage, InitMessage, ReadyMessage } from "@pipeline/Messages";
 import { BlockKey, BlocksDescMap, BlockState, Trigger } from "@pipeline/blocks/Blocks";
 import { dateToString } from "@pipeline/Utils";
 import { Basic } from "@report/Basic";
@@ -47,7 +41,7 @@ export class DataProvider extends EventEmitter {
         this.worker.terminate();
     }
 
-    private onMessage(e: MessageEvent<ReadyMessage | DecompressProgressMessage | BlockResultMessage>) {
+    private onMessage(e: MessageEvent<ReadyMessage | BlockResultMessage>) {
         const res = e.data;
         if (res.type === "ready") {
             this.basic = res.basic;
@@ -61,8 +55,6 @@ export class DataProvider extends EventEmitter {
             // worker is ready, dispatch work
             this.emit("ready");
             this.tryToDispatchWork();
-        } else if (res.type === "decompress") {
-            this.emit("decompress-progress", res.progress);
         } else if (res.type === "result") {
             this.onWorkDone(res.blockKey, res.state, res.data);
         }

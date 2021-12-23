@@ -1,133 +1,51 @@
-import { DecompressProgressMessage, StepMessage } from "@pipeline/Messages";
-import { ProcessedData } from "@pipeline/preprocess/ProcessedData";
+import { ReportData, SerializedData } from "@pipeline/process/ReportData";
 
-import { Gzip, Gunzip } from "fflate";
+import { gzipSync, gunzipSync } from "fflate";
 import { Base91Decoder, Base91Encoder } from "@pipeline/shared/Base91";
-import JSONStream from "@pipeline/shared/JSONStream";
 
 /*
-    Compression and decompression of the ProcessedData object
+    Compression and decompression of the ReportData object and SerializedData buffer
+
+    
+    Data format: <json buffer length> <serialized data length> <json buffer> <serialized data buffer>
 */
 
-// POJO -> TextEncoder -> Gzip -> Base91 (as blob)
-async function* compress(data: ProcessedData): AsyncGenerator<StepMessage, Blob> {
-    // stats
-    let rawJSONSize = 0;
-    let compressedSize = 0;
-    let encodedSize = 0;
+// ((POJO -> TextEncoder) + Binary) -> Gzip -> Base91
+function compress(reportData: ReportData, serializedData: SerializedData): string {
+    const json = JSON.stringify(reportData);
+    const jsonBuffer = new TextEncoder().encode(json);
 
-    const base91 = new Base91Encoder();
-    const gzipStream = new Gzip();
+    const rawBuffer = new Uint8Array(4 * 2 + jsonBuffer.length + serializedData.byteLength);
+    const rawView = new DataView(rawBuffer.buffer);
 
-    const blobParts: string[] = [];
-    gzipStream.ondata = (chunk, final) => {
-        compressedSize += chunk.length;
-        const encoded = base91.encode(chunk, final);
-        encodedSize += encoded.length;
-        blobParts.push(encoded);
-    };
+    rawView.setUint32(0, jsonBuffer.length);
+    rawView.setUint32(4, serializedData.byteLength);
+    rawBuffer.set(jsonBuffer, 8);
+    rawBuffer.set(serializedData, 8 + jsonBuffer.length);
 
-    // For the love of god, find a better way to do this
-    /* ============================= */
-    /* =============💩============= */
-    /* ============================= */
-    const MAX_PART_SIZE = 1024 * 1024 * 8; // in chars
-    const object = data as any;
-    const keys = Object.keys(object);
-    const te = new TextEncoder();
+    const zippedBuffer = gzipSync(rawBuffer);
+    const encoded = new Base91Encoder().encode(zippedBuffer, true);
 
-    let buffer = "";
-    const flush = (last: boolean = false) => {
-        gzipStream.push(te.encode(buffer), last);
-        buffer = "";
-    };
-    const append = (chunk: string) => {
-        rawJSONSize += chunk.length;
-        buffer += chunk;
-        if (buffer.length > MAX_PART_SIZE) flush();
-    };
-
-    append("{");
-    for (let i = 0; i < keys.length; i++) {
-        const key = keys[i];
-        const value = object[key];
-
-        if (i) append(",");
-        append(`"${key}":`);
-
-        if (Array.isArray(value)) {
-            append("[");
-            for (let j = 0; j < value.length; j++) {
-                if (j) append(",");
-                append(JSON.stringify(value[j]));
-                // release
-                value[j] = undefined;
-            }
-            append("]");
-        } else {
-            append(JSON.stringify(value));
-        }
-        // release
-        object[key] = undefined;
-    }
-    append(`}`);
-    flush(true);
-    /* ============================= */
-    /* ============================= */
-    /* ============================= */
-
-    console.log("rawJSONSize", rawJSONSize, "compressedSize", compressedSize, "encodedSize", encodedSize);
-
-    return new Blob(blobParts, { type: "text/plain" });
+    return encoded;
 }
 
-// Base91 -> Gunzip -> TextDecoder -> JSON.parse
-const decompress = (data: string): Promise<ProcessedData> =>
-    new Promise((resolve, reject) => {
-        const CHUNK_SIZE = 1024 * 128; // 128K of base91 chars (~3-4MB of JSON)
-        const base91 = new Base91Decoder();
-        const textDecoder = new TextDecoder("utf-8");
-        const gunzipStream = new Gunzip();
-        const jsonStream = new JSONStream();
-        jsonStream.onRoot<ProcessedData>((data) => resolve(data));
+// Base91 -> Gunzip -> ((TextDecoder -> JSON.parse) + Binary)
+function decompress(data: string): [ReportData, SerializedData] {
+    const decoded = new Base91Decoder().decode(data, true);
+    const rawBuffer = gunzipSync(decoded);
+    const rawView = new DataView(rawBuffer.buffer);
 
-        let offset = 0;
-        let gotChunk = false;
-        function nextChunk() {
-            const chunk = data.slice(offset, offset + CHUNK_SIZE);
-            const last = chunk.length < CHUNK_SIZE;
-            const decoded = base91.decode(chunk, last);
-            offset += chunk.length;
+    const jsonBufferLength = rawView.getUint32(0);
+    const serializedDataLength = rawView.getUint32(4);
 
-            try {
-                gotChunk = false;
-                gunzipStream.push(decoded, last);
-                if (!gotChunk) nextChunk();
-            } catch (e) {
-                reject(e);
-            }
-        }
+    const jsonBuffer = rawBuffer.slice(8, 8 + jsonBufferLength);
+    const serializedData = rawBuffer.slice(8 + jsonBufferLength, 8 + jsonBufferLength + serializedDataLength);
 
-        gunzipStream.ondata = (chunk, final) => {
-            gotChunk = true;
-            const decoded = textDecoder.decode(chunk, { stream: true });
-            jsonStream.push(decoded, final);
+    const textDecoder = new TextDecoder();
+    const jsonString = textDecoder.decode(jsonBuffer);
+    const reportData = JSON.parse(jsonString) as ReportData;
 
-            if (!final) {
-                // notify the UI
-                self.postMessage(<DecompressProgressMessage>{
-                    type: "decompress",
-                    progress: [offset, data.length],
-                });
-
-                // use setTimeout to avoid stack overflow,
-                // also fflate breaks if we don't (drove me nuts)
-                setTimeout(nextChunk, 0);
-            }
-        };
-
-        // start
-        nextChunk();
-    });
+    return [reportData, serializedData];
+}
 
 export { compress, decompress };
