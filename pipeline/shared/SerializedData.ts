@@ -1,4 +1,4 @@
-import { Address, Timestamp } from "@pipeline/Types";
+import { Address } from "@pipeline/Types";
 
 export class DataSerializer {
     private buffer: Uint8Array;

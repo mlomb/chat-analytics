@@ -1,5 +1,5 @@
 import "@assets/styles/Stepper.less";
-import React, { useLayoutEffect, useRef } from "react";
+import React from "react";
 
 import Tick from "@assets/images/tick.svg";
 

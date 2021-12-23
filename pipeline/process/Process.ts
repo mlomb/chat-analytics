@@ -1,4 +1,4 @@
-import { ReportConfig, Timestamp } from "@pipeline/Types";
+import { ReportConfig } from "@pipeline/Types";
 import { StepMessage } from "@pipeline/Messages";
 import { Database } from "@pipeline/parse/Database";
 import { Author, Channel, ID, ReportData, SerializedData } from "@pipeline/process/ReportData";
