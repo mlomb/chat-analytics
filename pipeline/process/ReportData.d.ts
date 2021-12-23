@@ -12,8 +12,12 @@ type DateStr = string; // YYYY-MM-DD
 export interface ReportData {
     config: ReportConfig;
     title: string;
-    minDate: DateStr;
-    maxDate: DateStr;
+    time: {
+        minDate: DateStr;
+        maxDate: DateStr;
+        numDays: number;
+        numMonths: number;
+    };
 
     channels: Channel[];
     authors: Author[];

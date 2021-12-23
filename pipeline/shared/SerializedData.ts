@@ -32,12 +32,11 @@ export class DataSerializer {
         this.tail = Math.max(this.tail, this.head);
     }
 
-    // year: 12 bits: 0-4095
-    // month: 4 bits: 0-15
-    // date: 5 bits: 0-31
-    // hour: 5 bits: 0-31
-    public writeDate(year: number, month: number, date: number, hour: number) {
-        const d: number = (year << 14) | (month << 10) | (date << 5) | hour;
+    // dateIndex: 16 bits 0-65535 (~179 years)
+    // monthIndex: 11 bits: 0-2047 (~170 years)
+    // hour: 5 bits: 0-31 (we only use 0-24)
+    public writeDate(dateIndex: number, monthIndex: number, hour: number) {
+        const d: number = (dateIndex << 16) | (monthIndex << 5) | hour;
         this.writeUint32(d);
     }
 
@@ -71,9 +70,10 @@ export class DataDeserializer {
         this.cursor = address;
     }
 
-    public readDate(): [number, number, number, number] {
+    // TODO: returning an array is slow
+    public readDate(): [number, number, number] {
         const d = this.readUint32();
-        return [(d >> 14) & 0x3fff, (d >> 10) & 0xf, (d >> 5) & 0x1f, d & 0x1f];
+        return [(d >> 16) & 0xffff, (d >> 5) & 0x7ff, d & 0x1f];
     }
 
     public readUint32(): number {

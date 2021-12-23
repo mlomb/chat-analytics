@@ -2,7 +2,7 @@ import { ReportConfig, Timestamp } from "@pipeline/Types";
 import { StepMessage } from "@pipeline/Messages";
 import { Database } from "@pipeline/parse/Database";
 import { Author, Channel, ID, ReportData, SerializedData } from "@pipeline/process/ReportData";
-import { dateToString, searchFormat } from "@pipeline/Utils";
+import { dateToString, monthToString, searchFormat } from "@pipeline/Utils";
 import { DataSerializer } from "@pipeline/shared/SerializedData";
 
 export const processDatabase = async function* (
@@ -11,9 +11,6 @@ export const processDatabase = async function* (
 ): AsyncGenerator<StepMessage, [ReportData, SerializedData]> {
     const authors: Author[] = [];
     const channels: Channel[] = [];
-
-    let minDate: Timestamp = 0;
-    let maxDate: Timestamp = 0;
 
     yield { type: "new", title: "Processing authors" };
     for (let id: ID = 0; id < database.authors.length; id++) {
@@ -48,16 +45,34 @@ export const processDatabase = async function* (
     // TODO: sort by number of messages
 
     const serializer = new DataSerializer();
+    const start = new Date(database.minDate);
+    const end = new Date(database.maxDate);
+    const startUTC = Date.UTC(start.getFullYear(), start.getMonth(), start.getDate());
+    const _MS_PER_DAY = 1000 * 60 * 60 * 24;
+
+    const dayKeys: string[] = [];
+    const monthKeys: string[] = [];
+
+    for (let day = new Date(startUTC); day <= end; day.setDate(day.getDate() + 1)) {
+        const dayKey = dateToString(day);
+        const monthKey = monthToString(day);
+
+        dayKeys.push(dayKey);
+        if (monthKeys.length === 0 || monthKeys[monthKeys.length - 1] !== monthKey) monthKeys.push(monthKey);
+    }
 
     for (let id: ID = 0; id < database.channels.length; id++) {
         channels[id].messagesStart = serializer.currentOffset;
         for (const msg of database.messages[id]) {
-            if (minDate === 0 || msg.timestamp < minDate) minDate = msg.timestamp;
-            if (maxDate === 0 || msg.timestamp > maxDate) maxDate = msg.timestamp;
+            const date = new Date(msg.timestamp);
+            const tsUTC = Date.UTC(date.getFullYear(), date.getMonth(), date.getDate());
+            const dateUTC = new Date(tsUTC);
 
-            const d = new Date(msg.timestamp); // TODO: timezones and stuff
-            serializer.writeDate(d.getFullYear(), d.getMonth(), d.getDate(), d.getHours());
-            serializer.writeUint32(id);
+            serializer.writeDate(
+                dayKeys.indexOf(dateToString(dateUTC)),
+                monthKeys.indexOf(monthToString(dateUTC)),
+                dateUTC.getHours() // TODO: timezones and stuff
+            );
             serializer.writeUint32(msg.authorId);
         }
         channels[id].messagesEnd = serializer.currentOffset;
@@ -66,9 +81,13 @@ export const processDatabase = async function* (
     const reportData: ReportData = {
         config,
         title: database.title,
-        // TODO: timezones
-        minDate: dateToString(new Date(minDate)),
-        maxDate: dateToString(new Date(maxDate)),
+        time: {
+            // TODO: timezones
+            minDate: dateToString(start),
+            maxDate: dateToString(end),
+            numDays: dayKeys.length,
+            numMonths: monthKeys.length,
+        },
 
         channels,
         authors,

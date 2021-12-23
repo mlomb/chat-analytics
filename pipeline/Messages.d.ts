@@ -47,7 +47,7 @@ export interface InitMessage {
 // Send required data for the UI
 export interface ReadyMessage {
     type: "ready";
-    basic: Basic;
+    reportData: ReportData;
     blocksDesc: typeof BlocksDesc;
 }
 

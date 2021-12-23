@@ -19,7 +19,7 @@ const DiscordDefaultAvatars = [avatar_0, avatar_1, avatar_2, avatar_3, avatar_4]
 
 const AuthorLabel = ({ id }: Props) => {
     const dp = useDataProvider();
-    const author = dp.basic.authors[id] as any; // TODO: fix
+    const author = dp.reportData.authors[id] as any; // TODO: fix
 
     if (author === undefined) {
         return <span>invalid author id {id}</span>;

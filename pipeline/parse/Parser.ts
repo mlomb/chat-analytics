@@ -10,6 +10,8 @@ export abstract class Parser {
         authors: [],
         channels: [],
         messages: {},
+        minDate: 0,
+        maxDate: 0,
     };
 
     protected authorIDMapper = new IDMapper();
@@ -41,6 +43,12 @@ export abstract class Parser {
         } else {
             this.database.messages[channelId] = [message];
         }
+
+        if (this.database.minDate === 0 || message.timestamp < this.database.minDate)
+            this.database.minDate = message.timestamp;
+        if (this.database.maxDate === 0 || message.timestamp > this.database.maxDate)
+            this.database.maxDate = message.timestamp;
+
         return id;
     }
 

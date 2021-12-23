@@ -3,8 +3,8 @@ import EventEmitter from "events";
 import { ID } from "@pipeline/Types";
 import { BlockRequestMessage, BlockResultMessage, InitMessage, ReadyMessage } from "@pipeline/Messages";
 import { BlockKey, BlocksDescMap, BlockState, Trigger } from "@pipeline/blocks/Blocks";
+import { ReportData } from "@pipeline/process/ReportData";
 import { dateToString } from "@pipeline/Utils";
-import { Basic } from "@report/Basic";
 
 import Worker from "@report/WorkerReport";
 
@@ -23,7 +23,7 @@ export class DataProvider extends EventEmitter {
     private activeEndDate: Date = new Date();
 
     // Updated by this class and the Worker
-    public basic!: Basic;
+    public reportData!: ReportData;
     private blocksDescs?: BlocksDescMap;
     private readyBlocks: Map<BlockKey, any | null> = new Map();
 
@@ -44,11 +44,11 @@ export class DataProvider extends EventEmitter {
     private onMessage(e: MessageEvent<ReadyMessage | BlockResultMessage>) {
         const res = e.data;
         if (res.type === "ready") {
-            this.basic = res.basic;
+            this.reportData = res.reportData;
             this.blocksDescs = res.blocksDesc;
             // set default time range
-            this.activeStartDate = new Date(res.basic.minDate);
-            this.activeEndDate = new Date(res.basic.maxDate);
+            this.activeStartDate = new Date(res.reportData.time.minDate);
+            this.activeEndDate = new Date(res.reportData.time.maxDate);
 
             console.log("Worker is ready");
 

@@ -14,6 +14,8 @@ export interface Database {
     messages: {
         [channelId: ID]: Message[];
     };
+    minDate: Timestamp;
+    maxDate: Timestamp;
 }
 
 export interface DiscordAuthor {

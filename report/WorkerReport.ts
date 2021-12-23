@@ -5,7 +5,6 @@ import { BlocksDesc, BlocksProcessFn, BlockState, Filters } from "@pipeline/bloc
 import { ReportData } from "@pipeline/process/ReportData";
 import { DataDeserializer } from "@pipeline/shared/SerializedData";
 import { decompress } from "@pipeline/shared/Compression";
-import { computeBasic } from "@report/Basic";
 
 let reportData: ReportData | null = null;
 let dataDeserializer: DataDeserializer | null = null;
@@ -25,7 +24,7 @@ const init = async (msg: InitMessage) => {
 
     self.postMessage(<ReadyMessage>{
         type: "ready",
-        basic: computeBasic(reportData),
+        reportData,
         blocksDesc: BlocksDesc,
     });
 
@@ -61,7 +60,7 @@ const request = async (msg: BlockRequestMessage) => {
             data,
         });
     } catch (err) {
-        // console.error(err);
+        console.error(err);
         self.postMessage(<BlockResultMessage>{
             type: "result",
             blockKey: br.blockKey,

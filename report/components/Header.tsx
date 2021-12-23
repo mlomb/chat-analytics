@@ -52,14 +52,14 @@ const tabs = [
 const channelsFilterOptionsFn: (dp: DataProvider) => FilterOption[] = (dp) => [
     {
         name: "Select all channels",
-        options: dp.basic.channels.map((c) => c.id),
+        options: dp.reportData.channels.map((c, i) => i),
     },
 ];
 
 const authorsFilterOptionsFn: (dp: DataProvider) => FilterOption[] = (dp) => {
-    const allAuthors = dp.basic.authors.map((a) => a.id);
-    const nonBotAuthors = dp.basic.authors.filter((o) => o.bot === false).map((a) => a.id);
-    const botAuthors = dp.basic.authors.filter((o) => o.bot === true).map((a) => a.id);
+    const allAuthors = dp.reportData.authors.map((a, i) => i);
+    const nonBotAuthors = dp.reportData.authors.filter((o) => o.bot === false).map((a, i) => i);
+    const botAuthors = dp.reportData.authors.filter((o) => o.bot === true).map((a, i) => i);
     const options: FilterOption[] = [
         {
             name: "Select all authors" + (botAuthors.length > 0 ? "  (🧍➕🤖)" : ""),
@@ -95,11 +95,13 @@ const Header = (props: Props) => {
     useLayoutEffect(() => dataProvider.updateChannels(selectedChannels), [selectedChannels]);
 
     const filterChannels = useCallback(
-        (term: string) => dataProvider.basic.channels.filter((a) => a.name_searchable.includes(term)).map((a) => a.id),
+        (term: string) =>
+            dataProvider.reportData.channels.filter((a) => a.name_searchable.includes(term)).map((a, i) => i),
         [dataProvider]
     );
     const filterAuthors = useCallback(
-        (term: string) => dataProvider.basic.authors.filter((a) => a.name_searchable.includes(term)).map((a) => a.id),
+        (term: string) =>
+            dataProvider.reportData.authors.filter((a) => a.name_searchable.includes(term)).map((a, i) => i),
         [dataProvider]
     );
 
@@ -107,7 +109,7 @@ const Header = (props: Props) => {
         <div className="Header">
             <div className="Header__info">
                 <span className="Header__title">
-                    <h1>{dataProvider.basic.title}</h1>
+                    <h1>{dataProvider.reportData.title}</h1>
                     <h2>chat analysis report</h2>
                 </span>
                 <div className="Header__link">
