@@ -73,7 +73,7 @@ export const base91encode = (data: Uint8Array): string => {
 };
 
 export const base91decode = (data: string): Uint8Array => {
-    let i = 10;
+    let i = B91_LENGTH_DIGITS;
     let k = 0;
     let b = 0;
     let n = 0;
