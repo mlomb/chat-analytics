@@ -1,20 +1,19 @@
 import { ReportData, SerializedData } from "@pipeline/process/ReportData";
 
 import { gzipSync, gunzipSync } from "fflate";
-import { Base91Decoder, Base91Encoder } from "@pipeline/shared/Base91";
+import { base91decode, base91encode } from "@pipeline/shared/Base91";
 
 /*
     Compression and decompression of the ReportData object and SerializedData buffer
-
-    
-    Data format: <json buffer length> <serialized data length> <json buffer> <serialized data buffer>
 */
 
 // ((POJO -> TextEncoder) + Binary) -> Gzip -> Base91
 function compress(reportData: ReportData, serializedData: SerializedData): string {
     const json = JSON.stringify(reportData);
+    (reportData as any) = undefined;
     const jsonBuffer = new TextEncoder().encode(json);
 
+    // Raw buffer format: <json buffer length> <serialized data length> <json buffer> <serialized data buffer>
     const rawBuffer = new Uint8Array(4 * 2 + jsonBuffer.length + serializedData.byteLength);
     const rawView = new DataView(rawBuffer.buffer);
 
@@ -22,16 +21,21 @@ function compress(reportData: ReportData, serializedData: SerializedData): strin
     rawView.setUint32(4, serializedData.byteLength);
     rawBuffer.set(jsonBuffer, 8);
     rawBuffer.set(serializedData, 8 + jsonBuffer.length);
+    (jsonBuffer as any) = undefined;
+    (serializedData as any) = undefined;
 
     const zippedBuffer = gzipSync(rawBuffer);
-    const encoded = new Base91Encoder().encode(zippedBuffer, true);
+    (rawBuffer as any) = undefined;
+    const encoded = base91encode(zippedBuffer);
+    (zippedBuffer as any) = undefined;
 
     return encoded;
 }
 
 // Base91 -> Gunzip -> ((TextDecoder -> JSON.parse) + Binary)
 function decompress(data: string): [ReportData, SerializedData] {
-    const decoded = new Base91Decoder().decode(data, true);
+    const decoded = base91decode(data);
+    (data as any) = undefined;
     const rawBuffer = gunzipSync(decoded);
     const rawView = new DataView(rawBuffer.buffer);
 

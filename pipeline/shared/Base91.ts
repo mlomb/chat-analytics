@@ -35,86 +35,76 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // NOTE: the character "<" was replaced by "-" to avoid problems embedding in HTML         ↓
 const table = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!#$%&()*+,./:;-=>?@[]^_`{|}~"';
 
-export class Base91Encoder {
-    private n = 0;
-    private b = 0;
+const B91_LENGTH_DIGITS = 12;
 
-    encode(chunk: Uint8Array, last: boolean): string {
-        let ret = "";
-        const len = chunk.length;
+export const base91encode = (data: Uint8Array): string => {
+    let ret = (data.length + "").padStart(B91_LENGTH_DIGITS, "0");
+    const len = data.length;
 
-        let n = this.n;
-        let b = this.b;
+    let i = 0;
+    let n = 0;
+    let b = 0;
 
-        for (let i = 0; i < len; i++) {
-            b |= chunk[i] << n;
-            n += 8;
+    while (i < len) {
+        b |= data[i] << n;
+        n += 8;
 
-            if (n > 13) {
-                let v = b & 8191;
-                if (v > 88) {
-                    b >>= 13;
-                    n -= 13;
-                } else {
-                    v = b & 16383;
-                    b >>= 14;
-                    n -= 14;
-                }
-                ret += table[v % 91] + table[(v / 91) | 0];
-            }
-        }
-
-        if (last && n) {
-            ret += table[b % 91];
-            if (n > 7 || b > 90) ret += table[(b / 91) | 0];
-        }
-
-        this.n = n;
-        this.b = b;
-
-        return ret;
-    }
-}
-
-export class Base91Decoder {
-    private b = 0;
-    private n = 0;
-    private v = -1;
-
-    decode(chunk: string, last: boolean): Uint8Array {
-        const len = chunk.length;
-        const ret = [];
-
-        let b = this.b;
-        let n = this.n;
-        let v = this.v;
-
-        for (let i = 0; i < len; i++) {
-            const p = table.indexOf(chunk[i]);
-            if (p === -1) continue;
-            if (v < 0) {
-                v = p;
+        if (n > 13) {
+            let v = b & 8191;
+            if (v > 88) {
+                b >>= 13;
+                n -= 13;
             } else {
-                v += p * 91;
-                b |= v << n;
-                n += (v & 8191) > 88 ? 13 : 14;
-                do {
-                    ret.push(b & 0xff);
-                    b >>= 8;
-                    n -= 8;
-                } while (n > 7);
-                v = -1;
+                v = b & 16383;
+                b >>= 14;
+                n -= 14;
             }
+            ret += table[v % 91] + table[(v / 91) | 0];
         }
-
-        if (last && v > -1) {
-            ret.push((b | (v << n)) & 0xff);
-        }
-
-        this.b = b;
-        this.n = n;
-        this.v = v;
-
-        return new Uint8Array(ret);
+        i++;
     }
-}
+
+    if (n) {
+        ret += table[b % 91];
+        if (n > 7 || b > 90) ret += table[(b / 91) | 0];
+    }
+
+    return ret;
+};
+
+export const base91decode = (data: string): Uint8Array => {
+    let i = 10;
+    let k = 0;
+    let b = 0;
+    let n = 0;
+    let v = -1;
+
+    const len = data.length;
+    const outputLength = parseInt(data.slice(0, B91_LENGTH_DIGITS));
+    const ret = new Uint8Array(outputLength);
+
+    while (i < len) {
+        const p = table.indexOf(data[i]);
+        if (p === -1) continue;
+        if (v < 0) {
+            v = p;
+        } else {
+            v += p * 91;
+            b |= v << n;
+            n += (v & 8191) > 88 ? 13 : 14;
+            do {
+                ret[k++] = b & 0xff;
+                b >>= 8;
+                n -= 8;
+            } while (n > 7);
+            v = -1;
+        }
+        i++;
+    }
+
+    if (v > -1) {
+        ret[k++] = (b | (v << n)) & 0xff;
+    }
+
+    return ret;
+};
