@@ -19,6 +19,8 @@ export class DataProvider extends EventEmitter {
     private activeIds: Set<number> = new Set();
     private activeChannels: ID[] = [];
     private activeAuthors: ID[] = [];
+    private channelsSet: boolean = false;
+    private authorsSet: boolean = false;
     private activeStartDate: Date = new Date();
     private activeEndDate: Date = new Date();
 
@@ -50,11 +52,9 @@ export class DataProvider extends EventEmitter {
             this.activeStartDate = new Date(res.reportData.time.minDate);
             this.activeEndDate = new Date(res.reportData.time.maxDate);
 
+            // worker is ready
             console.log("Worker is ready");
-
-            // worker is ready, dispatch work
             this.emit("ready");
-            this.tryToDispatchWork();
         } else if (res.type === "result") {
             this.onWorkDone(res.blockKey, res.state, res.data);
         }
@@ -79,11 +79,13 @@ export class DataProvider extends EventEmitter {
     updateChannels(channels: ID[]) {
         this.activeChannels = channels;
         this.invalidateBlocks("channels");
+        this.channelsSet = true;
     }
 
     updateAuthors(authors: ID[]) {
         this.activeAuthors = authors;
         this.invalidateBlocks("authors");
+        this.authorsSet = true;
     }
 
     updateTimeRange(start: Date, end: Date) {
@@ -95,6 +97,10 @@ export class DataProvider extends EventEmitter {
     private tryToDispatchWork() {
         if (this.blocksDescs === undefined) {
             // worker is not ready yet
+            return;
+        }
+        if (!this.authorsSet || !this.channelsSet) {
+            // we need to wait for the UI to set the filters
             return;
         }
 
