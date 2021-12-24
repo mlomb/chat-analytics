@@ -20,7 +20,6 @@ interface ItemInfo {
     subject?: string;
     progress?: [number, number];
     format?: "number" | "bytes";
-    error?: string;
 }
 
 const StatusItem = ({ info }: { info: ItemInfo }) => {
@@ -58,7 +57,7 @@ const ErrorBox = ({ error }: { error: string }) => {
 const GenerationProgress = ({ worker }: Props) => {
     const [items, setItems] = useState<ItemInfo[]>([
         {
-            status: "success",
+            status: "pending",
             title: "Start WebWorker",
         },
     ]);
@@ -66,6 +65,20 @@ const GenerationProgress = ({ worker }: Props) => {
 
     useEffect(() => {
         if (worker === null) return;
+
+        const oldonerror = worker.onerror?.bind(worker);
+        worker.onerror = (e) => {
+            setError("An error ocurred inside the WebWorker.\n\n" + e.message);
+            if (items.length === 1) {
+                setItems([
+                    {
+                        status: "error",
+                        title: "Start WebWorker",
+                    },
+                ]);
+            }
+            if (oldonerror) oldonerror(e);
+        };
 
         const oldonmessage = worker.onmessage?.bind(worker);
         worker.onmessage = (e: MessageEvent<StepMessage>) => {
@@ -76,6 +89,10 @@ const GenerationProgress = ({ worker }: Props) => {
 
             setItems((prevState: ItemInfo[]) => {
                 const newItems = [...prevState];
+                if (newItems.length === 1) {
+                    // mark web worker as started
+                    newItems[0].status = "success";
+                }
                 if (data.type === "new") {
                     newItems.push({
                         status: "pending",

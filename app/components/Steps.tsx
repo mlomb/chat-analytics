@@ -48,14 +48,15 @@ const Steps = () => {
         worker.onerror = (e) => {
             console.log(e);
             worker.terminate();
-            alert("An error ocurred creating the WebWorker.\n\n Error: " + e.message);
             if (env.isDev) throw e;
         };
         worker.onmessage = (e: MessageEvent<ResultMessage>) => {
             const data = e.data;
             if (data.type === "result") {
-                // We cant terminate the browser since the Blobs live there
-                // worker.terminate();
+                if (env.isProd) {
+                    // terminate worker since we don't need it anymore
+                    worker.terminate();
+                }
                 // give a small delay
                 setTimeout(() => {
                     setState({
