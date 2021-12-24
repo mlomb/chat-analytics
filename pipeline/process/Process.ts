@@ -20,10 +20,11 @@ export const processDatabase = async function* (
     for (let id: ID = 0; id < database.channels.length; id++) {
         const channel = database.channels[id];
         channels.push({
-            name: channel.name,
-            name_searchable: searchFormat(channel.name),
-            messagesAddr: -1,
-            messagesCount: database.messages[id].length,
+            n: channel.name,
+            ns: searchFormat(channel.name),
+            // filled later
+            msgAddr: 0,
+            msgCount: 0,
         });
         totalMessages += database.messages[id].length;
         // there arent that many channels, so we can afford not to throttle
@@ -39,9 +40,9 @@ export const processDatabase = async function* (
     for (let id: ID = 0; id < database.authors.length; id++) {
         const author = database.authors[id];
         authors.push({
-            name: author.name,
-            name_searchable: searchFormat(author.name),
-            bot: author.bot,
+            n: author.name,
+            ns: searchFormat(author.name),
+            b: author.bot,
         });
         if (authorsThrottler(id))
             yield { type: "progress", format: "number", progress: [id + 1, database.authors.length] };
@@ -73,8 +74,8 @@ export const processDatabase = async function* (
     let messagesProcessed = 0;
     for (let id: ID = 0; id < database.channels.length; id++) {
         const msgs = database.messages[id];
-        channels[id].messagesAddr = serializer.currentOffset;
-        channels[id].messagesCount = msgs.length;
+        channels[id].msgAddr = serializer.currentOffset;
+        channels[id].msgCount = msgs.length;
 
         for (const msg of msgs) {
             const date = new Date(msg.timestamp);
@@ -101,11 +102,9 @@ export const processDatabase = async function* (
     const authorsOrder: ID[] = Array.from({ length: authors.length }, (_, i) => i);
     authorsOrder.sort((a, b) =>
         // first non-bots, then by messages count
-        authors[a].bot === authors[b].bot
-            ? authorMessagesCount[b] - authorMessagesCount[a]
-            : +authors[a].bot - +authors[b].bot
+        authors[a].b === authors[b].b ? authorMessagesCount[b] - authorMessagesCount[a] : +authors[a].b - +authors[b].b
     );
-    const authorsBotCutoff: number = authorsOrder.findIndex((i) => authors[i].bot);
+    const authorsBotCutoff: number = authorsOrder.findIndex((i) => authors[i].b);
     yield { type: "done" };
 
     const reportData: ReportData = {

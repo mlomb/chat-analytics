@@ -30,7 +30,7 @@ const ChannelLabel = ({ id }: Props) => {
                     ></path>
                 </svg>
             )}
-            <span>{channel.name}</span>
+            <span>{channel.n}</span>
         </div>
     );
 };

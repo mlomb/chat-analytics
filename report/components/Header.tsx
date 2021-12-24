@@ -53,7 +53,7 @@ const channelsFilterOptionsFn: (dp: DataProvider) => FilterOption[] = (dp) => [
     {
         name: "Select all channels",
         options: dp.reportData.channels
-            .map((c, i) => [c.messagesCount, i])
+            .map((c, i) => [c.msgCount, i])
             .sort((a, b) => b[0] - a[0])
             .map((c) => c[1]),
     },
@@ -97,12 +97,12 @@ const Header = (props: Props) => {
 
     const filterChannels = useCallback(
         (term: string) =>
-            channelsFilterOptions[0].options.filter((i) => dataProvider.reportData.channels[i].name.includes(term)),
+            channelsFilterOptions[0].options.filter((i) => dataProvider.reportData.channels[i].ns.includes(term)),
         [dataProvider]
     );
     const filterAuthors = useCallback(
         (term: string) =>
-            authorsFilterOptions[0].options.filter((i) => dataProvider.reportData.authors[i].name.includes(term)),
+            authorsFilterOptions[0].options.filter((i) => dataProvider.reportData.authors[i].ns.includes(term)),
         [dataProvider]
     );
 

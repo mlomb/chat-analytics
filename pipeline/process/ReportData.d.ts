@@ -27,15 +27,25 @@ export interface ReportData {
 
 export type SerializedData = Uint8Array;
 
+/*
+    Names are minified to reduce the size when it's transferred from the Worker to the main thread
+    It does not help with compression
+*/
+
 export interface Channel {
-    name: string;
-    name_searchable: string;
-    messagesAddr: Address;
-    messagesCount: number;
+    // name
+    n: string;
+    // name searchable
+    ns: string;
+    msgAddr: Address;
+    msgCount: number;
 }
 
 export interface Author {
-    name: string;
-    name_searchable: string;
-    bot: boolean;
+    // name
+    n: string;
+    // name searchable
+    ns: string;
+    // bot
+    b: boolean;
 }

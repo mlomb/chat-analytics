@@ -50,7 +50,7 @@ const AuthorLabel = ({ id }: Props) => {
     return (
         <div className="Label">
             <div className="Label__Avatar">{avatar}</div>
-            <span>{author.name}</span>
+            <span>{author.n}</span>
         </div>
     );
 };
