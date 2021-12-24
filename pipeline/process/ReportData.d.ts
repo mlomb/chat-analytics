@@ -21,6 +21,8 @@ export interface ReportData {
 
     channels: Channel[];
     authors: Author[];
+    authorsOrder: ID[];
+    authorsBotCutoff: number;
 }
 
 export type SerializedData = Uint8Array;
@@ -36,5 +38,4 @@ export interface Author {
     name: string;
     name_searchable: string;
     bot: boolean;
-    messagesCount: number;
 }

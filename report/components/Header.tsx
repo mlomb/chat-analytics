@@ -60,27 +60,22 @@ const channelsFilterOptionsFn: (dp: DataProvider) => FilterOption[] = (dp) => [
 ];
 
 const authorsFilterOptionsFn: (dp: DataProvider) => FilterOption[] = (dp) => {
-    const allAuthors = dp.reportData.authors
-        .map((a, i) => [a.messagesCount, i])
-        .sort((a, b) => b[0] - a[0])
-        .map((c) => c[1]);
-    const nonBotAuthors = dp.reportData.authors.filter((o) => o.bot === false).map((a, i) => i);
-    const botAuthors = dp.reportData.authors.filter((o) => o.bot === true).map((a, i) => i);
+    const botsPresent = dp.reportData.authorsBotCutoff >= 0;
     const options: FilterOption[] = [
         {
-            name: "Select all authors" + (botAuthors.length > 0 ? "  (🧍➕🤖)" : ""),
-            options: allAuthors,
+            name: "Select all authors" + (botsPresent ? "  (🧍➕🤖)" : ""),
+            options: dp.reportData.authorsOrder,
         },
     ];
-    if (botAuthors.length > 0) {
+    if (botsPresent) {
         options.push(
             {
                 name: "Select all non-bot authors (🧍)",
-                options: nonBotAuthors,
+                options: dp.reportData.authorsOrder.slice(0, dp.reportData.authorsBotCutoff),
             },
             {
                 name: "Select all bot authors (🤖)",
-                options: botAuthors,
+                options: dp.reportData.authorsOrder.slice(dp.reportData.authorsBotCutoff),
             }
         );
     }
