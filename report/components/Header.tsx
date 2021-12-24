@@ -97,12 +97,12 @@ const Header = (props: Props) => {
 
     const filterChannels = useCallback(
         (term: string) =>
-            dataProvider.reportData.channels.filter((a) => a.name_searchable.includes(term)).map((a, i) => i),
+            channelsFilterOptions[0].options.filter((i) => dataProvider.reportData.channels[i].name.includes(term)),
         [dataProvider]
     );
     const filterAuthors = useCallback(
         (term: string) =>
-            dataProvider.reportData.authors.filter((a) => a.name_searchable.includes(term)).map((a, i) => i),
+            authorsFilterOptions[0].options.filter((i) => dataProvider.reportData.authors[i].name.includes(term)),
         [dataProvider]
     );
 
