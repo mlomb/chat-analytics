@@ -30,11 +30,13 @@ const StatusItem = ({ info }: { info: ItemInfo }) => {
                 <img src={info.status === "pending" ? Spinner : info.status === "success" ? Tick : Times} />
             </div>
             <span className="StatusItem__title">{info.title}</span>
-            <span className="StatusItem__subject">{info.subject}</span>
+            <span className="StatusItem__subject" title={info.subject}>
+                {info.subject}
+            </span>
             {info.progress && (
                 <span className="StatusItem__progress">
-                    {info.format === "number" && `${info.progress[0]} / ${info.progress[1]}`}
-                    {info.format === "bytes" && `${prettyBytes(info.progress[0])} / ${prettyBytes(info.progress[1])}`}
+                    {info.format === "number" && `${info.progress[0]}/${info.progress[1]}`}
+                    {info.format === "bytes" && `${prettyBytes(info.progress[0])}/${prettyBytes(info.progress[1])}`}
                 </span>
             )}
         </div>
