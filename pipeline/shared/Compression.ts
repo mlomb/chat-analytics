@@ -11,10 +11,10 @@ import { base91decode, base91encode } from "@pipeline/shared/Base91";
 function compress(reportData: ReportData, serializedData: SerializedData): string {
     const json = JSON.stringify(reportData);
     (reportData as any) = undefined;
-    const jsonBuffer = new TextEncoder().encode(json);
+    let jsonBuffer = new TextEncoder().encode(json);
 
     // Raw buffer format: <json buffer length> <serialized data length> <json buffer> <serialized data buffer>
-    const rawBuffer = new Uint8Array(4 * 2 + jsonBuffer.length + serializedData.byteLength);
+    let rawBuffer = new Uint8Array(4 * 2 + jsonBuffer.length + serializedData.byteLength);
     const rawView = new DataView(rawBuffer.buffer);
 
     rawView.setUint32(0, jsonBuffer.length);
@@ -24,7 +24,7 @@ function compress(reportData: ReportData, serializedData: SerializedData): strin
     (jsonBuffer as any) = undefined;
     (serializedData as any) = undefined;
 
-    const zippedBuffer = gzipSync(rawBuffer);
+    let zippedBuffer = gzipSync(rawBuffer);
     (rawBuffer as any) = undefined;
     const encoded = base91encode(zippedBuffer);
     (zippedBuffer as any) = undefined;
@@ -47,6 +47,7 @@ function decompress(data: string): [ReportData, SerializedData] {
 
     const textDecoder = new TextDecoder();
     const jsonString = textDecoder.decode(jsonBuffer);
+    console.log("JSON string length", jsonString.length);
     const reportData = JSON.parse(jsonString) as ReportData;
 
     return [reportData, serializedData];

@@ -1,4 +1,4 @@
-import { Address } from "@pipeline/Types";
+import { Address, ID } from "@pipeline/Types";
 
 export class DataSerializer {
     private buffer: Uint8Array;
@@ -70,15 +70,23 @@ export class DataDeserializer {
         this.cursor = address;
     }
 
-    // TODO: returning an array is slow
-    public readDate(): [number, number, number] {
-        const d = this.readUint32();
-        return [(d >> 16) & 0xffff, (d >> 5) & 0x7ff, d & 0x1f];
-    }
-
     public readUint32(): number {
         const value = this.dv.getUint32(this.cursor);
         this.cursor += 4;
         return value;
+    }
+
+    public readMessages(
+        start: Address,
+        count: number,
+        fn: (dateIndex: number, monthIndex: number, hour: number, authorId: ID) => void
+    ) {
+        this.seek(start);
+        for (let i = 0; i < count; i++) {
+            const d = this.readUint32();
+            const authorId = this.readUint32();
+
+            fn((d >> 16) & 0xffff, (d >> 5) & 0x7ff, d & 0x1f, authorId);
+        }
     }
 }

@@ -1,14 +1,6 @@
-import { ID, DateStr, ReportData } from "@pipeline/process/ReportData";
+import { ReportData } from "@pipeline/process/ReportData";
 import { DataDeserializer } from "@pipeline/shared/SerializedData";
-
-export interface Filters {
-    channels: ID[];
-    channelsSet: Set<ID>;
-    authors: ID[];
-    authorsSet: Set<ID>;
-    startDate: DateStr;
-    endDate: DateStr;
-}
+import { Filters } from "@pipeline/blocks/Filters";
 
 export type BlockState = "no-data" | "ready" | "stale" | "loading" | "error";
 

@@ -55,7 +55,12 @@ export interface ReadyMessage {
 export interface BlockRequestMessage {
     type: "request";
     blockKey: BlockKey;
-    filters: Partial<Filters>;
+    filters: Partial<{
+        authors: ID[];
+        channels: ID[];
+        startDate: DateStr;
+        endDate: DateStr;
+    }>;
 }
 
 // Send the computed block back to the UI

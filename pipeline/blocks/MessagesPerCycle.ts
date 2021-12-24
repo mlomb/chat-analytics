@@ -1,3 +1,4 @@
+import { ID } from "@pipeline/Types";
 import { BlockProcessFn, BlocksDesc, BlocksProcessFn } from "@pipeline/blocks/Blocks";
 
 type MessagesPerCycle = {
@@ -34,23 +35,19 @@ export const process: BlockProcessFn<MessagesPerCycleBlock> = (source, deseriali
         });
     }
 
-    console.time("MPC");
+    const processMessage = (dateIndex: number, monthIndex: number, hour: number, authorId: ID) => {
+        if (filters.hasAuthor(authorId)) {
+            res.perDay[dateIndex].messages++;
+            res.perMonth[monthIndex].messages++;
+        }
+    };
+
     for (let channelId = 0; channelId < source.channels.length; channelId++) {
         const channel = source.channels[channelId];
-        if (filters.channelsSet.has(channelId)) {
-            deserializer.seek(channel.messagesAddr);
-            for (let i = 0; i < channel.messagesCount; i++) {
-                const [dateIndex, monthIndex, hour] = deserializer.readDate();
-                const authorId = deserializer.readUint32();
-
-                if (filters.authorsSet.has(authorId)) {
-                    res.perDay[dateIndex].messages++;
-                    res.perMonth[monthIndex].messages++;
-                }
-            }
+        if (filters.hasChannel(channelId)) {
+            deserializer.readMessages(channel.messagesAddr, channel.messagesCount, processMessage);
         }
     }
-    console.timeEnd("MPC");
 
     return res;
 };
