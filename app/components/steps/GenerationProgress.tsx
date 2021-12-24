@@ -94,6 +94,8 @@ const GenerationProgress = ({ worker }: Props) => {
                     newItems.push({
                         ...last,
                         status: data.type === "done" ? "success" : "error",
+                        // max out progress
+                        progress: last.progress ? [last.progress[1], last.progress[1]] : undefined,
                     });
                 }
 

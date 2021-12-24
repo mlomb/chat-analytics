@@ -17,7 +17,7 @@ const wrapFile = (file: File): FileInput => ({
 
 self.onmessage = async (ev: MessageEvent<InitMessage>) => {
     // Sort files by lastModified
-    // Very important so we always keep the most recent information last (since we overwrite it)
+    // ***Very important*** so we always keep the most recent information last (since we overwrite it)
     const files = ev.data.files.sort((a, b) => (a.lastModified || 0) - (b.lastModified || 0));
 
     try {

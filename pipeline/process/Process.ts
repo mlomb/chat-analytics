@@ -9,11 +9,33 @@ export const processDatabase = async function* (
     database: Database,
     config: ReportConfig
 ): AsyncGenerator<StepMessage, [ReportData, SerializedData]> {
-    const authors: Author[] = [];
     const channels: Channel[] = [];
+    const authors: Author[] = [];
     let totalMessages = 0;
 
+    ///
+    /// CHANNELS
+    ///
+    yield { type: "new", title: "Processing channels" };
+    for (let id: ID = 0; id < database.channels.length; id++) {
+        const channel = database.channels[id];
+        channels.push({
+            name: channel.name,
+            name_searchable: searchFormat(channel.name),
+            messagesAddr: -1,
+            messagesCount: database.messages[id].length,
+        });
+        totalMessages += database.messages[id].length;
+        // there arent that many channels, so we can afford not to throttle
+        yield { type: "progress", format: "number", progress: [id + 1, database.channels.length] };
+    }
+    yield { type: "done" };
+
+    ///
+    /// AUTHORS
+    ///
     yield { type: "new", title: "Processing authors" };
+    const authorsThrottler = createThrottler(database.authors.length);
     for (let id: ID = 0; id < database.authors.length; id++) {
         const author = database.authors[id];
         authors.push({
@@ -21,28 +43,14 @@ export const processDatabase = async function* (
             name_searchable: searchFormat(author.name),
             bot: author.bot,
         });
+        if (authorsThrottler(id))
+            yield { type: "progress", format: "number", progress: [id + 1, database.authors.length] };
     }
     yield { type: "done" };
 
-    yield { type: "new", title: "Processing channels" };
-    for (let id: ID = 0; id < database.channels.length; id++) {
-        const _channel = database.channels[id];
-        if (!(id in database.messages)) {
-            // no messages in this channel, skip
-            continue;
-        }
-
-        const channel: Channel = {
-            name: _channel.name,
-            name_searchable: searchFormat(_channel.name),
-            messagesAddr: -1,
-            messagesCount: database.messages[id].length,
-        };
-        totalMessages += channel.messagesCount;
-        channels.push(channel);
-    }
-    yield { type: "done" };
-
+    ///
+    /// MESSAGES
+    ///
     const start = new Date(database.minDate);
     const end = new Date(database.maxDate);
     const startUTC = Date.UTC(start.getFullYear(), start.getMonth(), start.getDate());
@@ -61,6 +69,7 @@ export const processDatabase = async function* (
     }
 
     yield { type: "new", title: "Processing messages" };
+    const messagesThrottler = createThrottler(totalMessages);
     let messagesProcessed = 0;
     for (let id: ID = 0; id < database.channels.length; id++) {
         const msgs = database.messages[id];
@@ -80,8 +89,10 @@ export const processDatabase = async function* (
                 dateUTC.getHours() // TODO: timezones and stuff
             );
             serializer.writeUint32(msg.authorId);
-            // TODO: debounce this
-            //yield { type: "progress", format: "number", progress: [messagesProcessed++, totalMessages] };
+
+            messagesProcessed++;
+            if (messagesThrottler(messagesProcessed))
+                yield { type: "progress", format: "number", progress: [messagesProcessed, totalMessages] };
         }
     }
     yield { type: "done" };
@@ -115,4 +126,27 @@ export const processDatabase = async function* (
     };
 
     return [reportData, serializer.validBuffer];
+};
+
+// throttle without using setTimeout (the last call is not guaranteed)
+// 1% of processed items or 15ms
+const createThrottler = (total: number): ((it: number) => boolean) => {
+    const dateThrottle = 100; // check time only every 100 items
+    const onePercent = Math.ceil(total * 0.01);
+
+    let lastCount = 0;
+    let lastTs = 0;
+    return (it: number) => {
+        let now = 0;
+        let ok = it - lastCount > onePercent;
+        if (it - lastCount > dateThrottle) {
+            now = Date.now();
+            ok = ok || now - lastTs > 15;
+        }
+        if (ok) {
+            lastTs = now || Date.now();
+            lastCount = it;
+        }
+        return ok;
+    };
 };
