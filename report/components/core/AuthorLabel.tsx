@@ -17,6 +17,8 @@ import avatar_3 from "@assets/images/discord_avatars/avatar_3.png";
 import avatar_4 from "@assets/images/discord_avatars/avatar_4.png";
 const DiscordDefaultAvatars = [avatar_0, avatar_1, avatar_2, avatar_3, avatar_4];
 
+import wpp_avatar from "@assets/images/whatsapp_avatar.png";
+
 const AuthorLabel = ({ id }: Props) => {
     const dp = useDataProvider();
     const platform = dp.reportData.config.platform;
@@ -42,6 +44,16 @@ const AuthorLabel = ({ id }: Props) => {
             // https://cdn.discordapp.com/avatars/user_id/user_avatar.png
             avatarUrl = `https://cdn.discordapp.com/avatars/${author.da}.png?size=32`;
         }
+    } else if (platform === "whatsapp") {
+        placeholder = (
+            <img
+                src={wpp_avatar}
+                style={{
+                    width: "100%",
+                    height: "100%",
+                }}
+            />
+        );
     } else if (platform === "telegram") {
         placeholder = <div>A</div>; // TODO: telegram avatars
     } else {
