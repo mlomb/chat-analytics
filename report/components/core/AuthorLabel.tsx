@@ -17,6 +17,16 @@ import avatar_3 from "@assets/images/discord_avatars/avatar_3.png";
 import avatar_4 from "@assets/images/discord_avatars/avatar_4.png";
 const DiscordDefaultAvatars = [avatar_0, avatar_1, avatar_2, avatar_3, avatar_4];
 
+const TelegramBubbleColors = [
+    ["ff885e", "ff516a"],
+    ["ffcd6a", "ffa85c"],
+    ["82b1ff", "665fff"],
+    ["a0de7e", "54cb68"],
+    ["53edd6", "28c9b7"],
+    ["72d5fd", "2a9ef1"],
+    ["e0a2f3", "d669ed"],
+];
+
 import wpp_avatar from "@assets/images/whatsapp_avatar.png";
 
 const AuthorLabel = ({ id }: Props) => {
@@ -55,7 +65,27 @@ const AuthorLabel = ({ id }: Props) => {
             />
         );
     } else if (platform === "telegram") {
-        placeholder = <div>A</div>; // TODO: telegram avatars
+        // TODO: two letters
+        let letter: string = "";
+        // iterate UTF-8 codepoints
+        for (const symbol of author.n) {
+            letter = symbol;
+            break;
+        }
+        const colors = TelegramBubbleColors[(1779033703 ^ id) % TelegramBubbleColors.length];
+        placeholder = (
+            <div
+                style={{
+                    background: `linear-gradient(#${colors[0]}, #${colors[1]})`,
+                    textAlign: "center",
+                    lineHeight: "20px",
+                    color: "#fff",
+                    fontSize: 10,
+                }}
+            >
+                {letter}
+            </div>
+        );
     } else {
         placeholder = null;
     }
