@@ -8,23 +8,30 @@
         height: 16px;
     }
 
-    span {
-        color: white;
-        white-space: nowrap;
-        text-overflow: ellipsis;
-        overflow: hidden;
-    }
-
     * + span {
         margin-left: 3px;
     }
 }
 
-.Label__Avatar {
+.Label__avatar {
     position: relative;
     width: 20px;
     height: 20px;
     overflow: hidden;
     border-radius: 50%;
     flex-shrink: 0;
+}
+
+.Label__name {
+    color: white;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    font-weight: 600;
+}
+
+.Label__discriminator {
+    font-weight: normal;
+    color: rgb(255 255 255 / 65%);
+    font-family: monospace;
 }

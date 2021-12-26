@@ -7,8 +7,10 @@ export type ID = number;
 // offset in bytes in the SerializedData buffer
 export type Address = number;
 
+// UTC timestamp
 export type Timestamp = number;
 
+// available platforms
 export type Platform = "discord" | "telegram" | "whatsapp";
 
 export interface ReportConfig {

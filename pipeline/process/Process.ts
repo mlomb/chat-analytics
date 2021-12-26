@@ -39,11 +39,13 @@ export const processDatabase = async function* (
     const authorsThrottler = createThrottler(database.authors.length);
     for (let id: ID = 0; id < database.authors.length; id++) {
         const author = database.authors[id];
-        authors.push({
+        const newAuthor: Author = {
             n: author.name,
             ns: searchFormat(author.name),
             b: author.bot,
-        });
+        };
+        if (author.discord?.discriminator) newAuthor.d = author.discord.discriminator;
+        authors.push(newAuthor);
         if (authorsThrottler(id))
             yield { type: "progress", format: "number", progress: [id + 1, database.authors.length] };
     }
@@ -106,6 +108,15 @@ export const processDatabase = async function* (
     );
     const authorsBotCutoff: number = authorsOrder.findIndex((i) => authors[i].b);
     yield { type: "done" };
+
+    // store avatars but only for the most active 1000 authors
+    // storing all avatars takes too much space
+    const maxAuthorsWithAvatars = Math.min(authors.length, 1000);
+    for (let i = 0; i < maxAuthorsWithAvatars; i++) {
+        const authorId = authorsOrder[i];
+        if (database.authors[authorId].discord?.avatar)
+            authors[authorId].da = database.authors[authorId].discord?.avatar;
+    }
 
     const reportData: ReportData = {
         config,

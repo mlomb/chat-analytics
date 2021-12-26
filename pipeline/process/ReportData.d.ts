@@ -48,4 +48,8 @@ export interface Author {
     ns: string;
     // bot
     b: boolean;
+    // discriminant (#XXXX)
+    d?: number;
+    // Discord avatar (user_id/user_avatar)
+    da?: string;
 }

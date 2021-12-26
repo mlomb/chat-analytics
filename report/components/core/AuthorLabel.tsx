@@ -19,38 +19,42 @@ const DiscordDefaultAvatars = [avatar_0, avatar_1, avatar_2, avatar_3, avatar_4]
 
 const AuthorLabel = ({ id }: Props) => {
     const dp = useDataProvider();
-    const author = dp.reportData.authors[id] as any; // TODO: fix
+    const platform = dp.reportData.config.platform;
+    const author = dp.reportData.authors[id];
 
     if (author === undefined) {
         return <span>invalid author id {id}</span>;
     }
 
-    author.avatarUrl = "https://i.pinimg.com/474x/b5/35/12/b53512653d7aff159870fc2d96c703bf.jpg";
-
-    const platform = "discord";
+    let avatarUrl: string | undefined;
     let placeholder: JSX.Element | null;
     if (platform === "discord") {
         placeholder = (
             <img
-                src={DiscordDefaultAvatars[author.discord?.discriminator]}
+                src={DiscordDefaultAvatars[(author.d || 0) % 5]}
                 style={{
                     width: "100%",
                     height: "100%",
                 }}
             />
         );
+        if (author.da) {
+            // https://cdn.discordapp.com/avatars/user_id/user_avatar.png
+            avatarUrl = `https://cdn.discordapp.com/avatars/${author.da}.png?size=32`;
+        }
     } else if (platform === "telegram") {
         placeholder = <div>A</div>; // TODO: telegram avatars
     } else {
         placeholder = null;
     }
 
-    const avatar = author.avatarUrl ? <ImageSmooth src={author.avatarUrl} children={placeholder} /> : placeholder;
+    const avatar = avatarUrl ? <ImageSmooth src={avatarUrl} children={placeholder} /> : placeholder;
 
     return (
-        <div className="Label">
-            <div className="Label__Avatar">{avatar}</div>
-            <span>{author.n}</span>
+        <div className="Label" title={author.n}>
+            <div className="Label__avatar">{avatar}</div>
+            <span className="Label__name">{author.n}</span>
+            {author.d && <span className="Label__discriminator">#{author.d}</span>}
         </div>
     );
 };

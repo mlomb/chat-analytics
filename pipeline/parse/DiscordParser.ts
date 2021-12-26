@@ -34,20 +34,19 @@ export class DiscordParser extends Parser {
 
         const timestamp = Date.parse(message.timestamp);
 
-        let author: Author = {
+        const author: Author = {
             name: message.author.nickname,
             bot: message.author.isBot,
             discord: {
-                // @ts-ignore (modulo)
-                discriminator: parseInt(message.author.discriminator) % 5,
+                discriminator: parseInt(message.author.discriminator),
             },
         };
-        if (message.author.avatarUrl) {
-            // TODO: make sure size is 32px
-            author.avatarUrl = message.author.avatarUrl;
-        }
-        if (message.author.color) {
-            author.color = message.author.color;
+
+        // See: https://discord.com/developers/docs/reference#image-formatting-cdn-endpoints
+        // Reference: https://cdn.discordapp.com/avatars/user_id/user_avatar.png
+        // "https://cdn.discordapp.com/avatars/".length === 35
+        if (message.author.avatarUrl && message.author.avatarUrl.length > 35) {
+            author.discord!.avatar = message.author.avatarUrl.slice(35).split(".")[0];
         }
 
         // store author

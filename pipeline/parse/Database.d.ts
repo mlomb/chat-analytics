@@ -4,7 +4,7 @@ This is the common interface generated after parsing
 It doesnt need to be trivally serializable because it will be consumed by the preprocess step
 */
 
-import { ID, Timestamp } from "@pipeline/Types";
+import { ID, Platform, Timestamp } from "@pipeline/Types";
 
 export interface Database {
     platform: Platform;
@@ -18,17 +18,13 @@ export interface Database {
     maxDate: Timestamp;
 }
 
-export interface DiscordAuthor {
-    discriminator: 0 | 1 | 2 | 3 | 4;
-}
-
 export interface Author {
     name: string;
     bot: boolean;
-    avatarUrl?: string;
-    color?: string;
-
-    discord?: DiscordAuthor;
+    discord?: {
+        discriminator: number;
+        avatar?: string; // (user_id/user_avatar)
+    };
 }
 
 export interface Channel {
