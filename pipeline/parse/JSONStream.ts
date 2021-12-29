@@ -4,6 +4,7 @@ export type CallbackFn<T> = (object: T) => void;
 
 type Event = "value" | "key" | "openobject" | "closeobject" | "openarray" | "closearray";
 type Handler = (ev: Event, keyOrValue?: string | boolean | null) => void;
+type Callbacks = { [key: string]: CallbackFn<any> };
 
 /*
     Allows streaming big JSON files
@@ -17,8 +18,8 @@ type Handler = (ev: Event, keyOrValue?: string | boolean | null) => void;
 export class JSONStream {
     private cparser: CParser;
     private rootCallback: CallbackFn<any> | undefined;
-    private objectCallbacks: Map<string, CallbackFn<any>> = new Map();
-    private arrayCallbacks: Map<string, CallbackFn<any>> = new Map();
+    private objectCallbacks: Callbacks = {};
+    private arrayCallbacks: Callbacks = {};
 
     constructor() {
         this.cparser = clarinet.parser();
@@ -53,12 +54,12 @@ export class JSONStream {
 
     // Object from the root which match the key will be emitted completely
     public onObject<T>(key: string, callback: CallbackFn<T>) {
-        this.objectCallbacks.set(key, callback);
+        this.objectCallbacks[key] = callback;
     }
 
     // Arrays from the root which match the key will be emitted element by element
     public onArrayItem<T>(key: string, callback: CallbackFn<T>) {
-        this.arrayCallbacks.set(key, callback);
+        this.arrayCallbacks[key] = callback;
     }
 
     // Root object handler
@@ -81,9 +82,9 @@ export class JSONStream {
                 const key = keyOrValue as string;
                 this.topKey = key;
 
-                if (this.rootCallback || this.objectCallbacks.has(key)) {
+                if (this.rootCallback || this.objectCallbacks[key]) {
                     this.activeHandler = this.fullHandler;
-                } else if (this.arrayCallbacks.has(key)) {
+                } else if (this.arrayCallbacks[key]) {
                     this.activeHandler = this.arrayHandler;
                     this.inArray = true;
                 } else {
@@ -111,12 +112,10 @@ export class JSONStream {
                 // push to array
                 last.push(x);
             } else {
-                // set as key in object
                 if (typeof x === "string") {
                     // Avoid leaking with big strings
                     // See https://stackoverflow.com/questions/31712808/how-to-force-javascript-to-deep-copy-a-string
                     // See https://bugs.chromium.org/p/v8/issues/detail?id=2869
-                    // TODO: move this out of here, only clone when needed (only nicknames, no content)
                     last[this.lastKey] = (" " + x).substring(1);
                 } else {
                     last[this.lastKey] = x;
@@ -130,14 +129,15 @@ export class JSONStream {
     }
     private emit(x: any) {
         if (this.topKey === undefined) throw new Error("No top key");
+        let cb: CallbackFn<any> | undefined;
 
         // emit
         if (this.rootCallback) {
             this.root[this.topKey] = x;
-        } else if (this.objectCallbacks.has(this.topKey)) {
-            this.objectCallbacks.get(this.topKey)!(x);
-        } else if (this.arrayCallbacks.has(this.topKey)) {
-            this.arrayCallbacks.get(this.topKey)!(x);
+        } else if ((cb = this.objectCallbacks[this.topKey])) {
+            cb(x);
+        } else if ((cb = this.arrayCallbacks[this.topKey])) {
+            cb(x);
         } else {
             throw new Error("No handler for " + this.topKey);
         }
