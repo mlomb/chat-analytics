@@ -59,10 +59,11 @@ const Timer = (props: { active: boolean }) => {
     const ref = useRef<HTMLSpanElement>(null);
 
     useEffect(() => {
-        let seconds = 0;
+        let start = Date.now();
         if (props.active) {
             const id = setInterval(() => {
-                let s = ++seconds % 60;
+                let seconds = Math.floor((Date.now() - start) / 1000);
+                let s = seconds % 60;
                 let m = Math.floor(seconds / 60);
                 if (ref.current) ref.current.innerText = (m + "").padStart(2, "0") + ":" + (s + "").padStart(2, "0");
             }, 1000);
@@ -80,15 +81,15 @@ const GenerationProgress = (props: Props) => {
             <div className="GenerationProgress__stats">
                 <div className="GenerationProgress__stat" title="# of channels">
                     <img src={Hashtag} />
-                    {props.keys["channels"] || 0}
+                    {(props.keys["channels"] || 0).toLocaleString()}
                 </div>
                 <div className="GenerationProgress__stat" title="# of authors">
                     <img src={User} />
-                    {props.keys["authors"] || 0}
+                    {(props.keys["authors"] || 0).toLocaleString()}
                 </div>
                 <div className="GenerationProgress__stat" title="# of messages">
                     <img src={Bubble} />
-                    {props.keys["messages"] || 0}
+                    {(props.keys["messages"] || 0).toLocaleString()}
                 </div>
                 <div className="GenerationProgress__stat" title="time">
                     <img src={Clock} />
