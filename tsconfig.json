@@ -1,13 +1,12 @@
 {
   "compilerOptions": {
-    "target": "ES5",
+    "target": "ES2015",
     "module": "CommonJS",
     "sourceMap": true,
     "jsx": "react-jsx",
     "strict": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
-    "downlevelIteration": true,
     "baseUrl": "./",
     "paths": {
       "@app/*": ["app/*"],
