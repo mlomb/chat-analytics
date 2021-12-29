@@ -72,7 +72,7 @@ export interface IAuthor {
     da?: string;
 }
 
-export interface Author {
+export interface Author extends IAuthor {
     // name searchable
     ns: string;
 }
