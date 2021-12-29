@@ -1,9 +1,24 @@
+// @ts-nocheck
 import { FileInput, ID, RawID } from "@pipeline/Types";
 import { Parser } from "@pipeline/parse/Parser";
-import { TelegramMessage, TextArray } from "@pipeline/parse/TelegramParser.d";
 
 import JSONStream from "@pipeline/shared/JSONStream";
 import { streamJSONFromFile } from "@pipeline/Utils";
+
+interface TelegramMessage {
+    id: number;
+    type: "message" | "service" | unknown;
+    date: string;
+    from: string;
+    from_id: number;
+    reply_to_message_id?: number;
+    text: string | TextArray[];
+}
+
+interface TextArray {
+    type: "bot_command" | "link" | unknown;
+    text: string;
+}
 
 export class TelegramParser extends Parser {
     private channelName?: string;
@@ -16,14 +31,14 @@ export class TelegramParser extends Parser {
     async *parse(file: FileInput) {
         const stream = new JSONStream();
 
-        stream.onFull<string>("name", (channelName) => {
+        stream.onObject<string>("name", (channelName) => {
             this.channelName = channelName;
             this.updateTitle(channelName);
         });
-        stream.onFull<string>("id", (rawChannelId) => {
+        stream.onObject<string>("id", (rawChannelId) => {
             this.channelId = this.addChannel(rawChannelId, { name: this.channelName || this.database.title });
         });
-        stream.onArray<TelegramMessage>("messages", this.parseMessage.bind(this));
+        stream.onArrayItem<TelegramMessage>("messages", this.parseMessage.bind(this));
 
         yield* streamJSONFromFile(stream, file);
 

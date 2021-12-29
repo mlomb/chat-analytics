@@ -1,28 +1,25 @@
 /*
     Types for chat dumps from https://github.com/Tyrrrz/DiscordChatExporter
-
-    Types here are not remotely complete, but try to keep here what is in use
-
     See https://github.com/Tyrrrz/DiscordChatExporter/blob/master/DiscordChatExporter.Core/Exporting/Writers/JsonMessageWriter.cs
 */
 
 type Snowflake = string;
 
-export interface DiscordGuild {
+interface DiscordGuild {
     id: Snowflake;
     name: string;
     iconUrl: string;
 }
 
-export interface DiscordChannel {
+interface DiscordChannel {
     id: Snowflake;
     type: "GuildTextChat" | unknown;
     name: string;
 }
 
-export interface DiscordMessage {
+interface DiscordMessage {
     id: Snowflake;
-    type: "Default" | unknown;
+    type: "Default" | "Reply" | "ChannelPinnedMessage" | unknown;
     timestamp: string;
     timestampEdited: string;
     callEndedTimestamp: string;
@@ -31,7 +28,7 @@ export interface DiscordMessage {
     author: DiscordAuthor;
 }
 
-export interface DiscordAuthor {
+interface DiscordAuthor {
     id: Snowflake;
     name: string;
     discriminator: string;

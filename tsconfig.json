@@ -15,5 +15,8 @@
       "@pipeline/*": ["pipeline/*"],
       "@report/*": ["report/*"]
     }
-  }
+  },
+  "exclude": [
+    "node_modules",
+  ]
 }

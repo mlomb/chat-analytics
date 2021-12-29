@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { FileInput } from "@pipeline/Types";
 import { Parser } from "@pipeline/parse/Parser";
 

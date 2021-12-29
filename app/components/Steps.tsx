@@ -3,8 +3,8 @@ import "@assets/styles/Steps.less";
 import { useState } from "react";
 
 import { Platform } from "@pipeline/Types";
-import { ResultMessage } from "@pipeline/Messages";
-import WorkerApp from "@app/WorkerApp";
+import { ProgressMessage, TaskInfo } from "@pipeline/Progress";
+import WorkerApp, { InitMessage, ResultMessage } from "@app/WorkerApp";
 
 import Stepper from "@app/components/Stepper";
 import Button from "@app/components/Button";
@@ -35,12 +35,19 @@ const Steps = () => {
         files: File[];
         worker: Worker | null;
         result: ResultMessage | null;
+        tasks: TaskInfo[];
     }>({
         currentStep: 0,
         platform: null,
         files: [],
         worker: null,
         result: null,
+        tasks: [
+            {
+                status: "processing",
+                title: "Start WebWorker",
+            },
+        ],
     });
 
     const startGeneration = () => {
@@ -50,9 +57,20 @@ const Steps = () => {
             worker.terminate();
             if (env.isDev) throw e;
         };
-        worker.onmessage = (e: MessageEvent<ResultMessage>) => {
+        worker.onmessage = (e: MessageEvent<ProgressMessage | ResultMessage>) => {
             const data = e.data;
-            if (data.type === "result") {
+            if (data.type === "progress") {
+                setState((state) => ({
+                    ...state,
+                    tasks: [
+                        {
+                            status: "success",
+                            title: "Start WebWorker",
+                        },
+                        ...data.tasks,
+                    ],
+                }));
+            } else if (data.type === "result") {
                 if (env.isProd) {
                     // terminate worker since we don't need it anymore
                     worker.terminate();
@@ -69,10 +87,13 @@ const Steps = () => {
             }
         };
         // <InitMessage>
-        worker.postMessage({
-            platform: state.platform,
+        const init: InitMessage = {
             files: state.files,
-        });
+            config: {
+                platform: state.platform as Platform,
+            },
+        };
+        worker.postMessage(init);
         setState({
             ...state,
             currentStep: 3,
@@ -121,7 +142,7 @@ const Steps = () => {
                         </Button>
                     </div>
                 </div>
-                <GenerationProgress worker={state.worker} />
+                <GenerationProgress tasks={state.tasks} />
                 <ViewDownloadReport result={state.result} />
             </Stepper>
         </div>

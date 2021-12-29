@@ -1,41 +1,35 @@
-import { useState, useEffect } from "react";
 import prettyBytes from "pretty-bytes";
 
-import { StepMessage } from "@pipeline/Messages";
+import { TaskInfo } from "@pipeline/Progress";
 
 import Tick from "@assets/images/tick.svg";
 import Spinner from "@assets/images/spinner.svg";
 import Times from "@assets/images/times.svg";
 import Refresh from "@assets/images/refresh.svg";
 
-type Status = "pending" | "success" | "error";
-
 interface Props {
-    worker: Worker | null;
+    tasks: TaskInfo[];
 }
 
-interface ItemInfo {
-    status: Status;
-    title: string;
-    subject?: string;
-    progress?: [number, number];
-    format?: "number" | "bytes";
-}
-
-const StatusItem = ({ info }: { info: ItemInfo }) => {
+const StatusItem = ({ info }: { info: TaskInfo }) => {
+    const progress = info.progress;
     return (
         <div className={`StatusItem StatusItem--status-${info.status}`}>
             <div className="StatusItem__icon">
-                <img src={info.status === "pending" ? Spinner : info.status === "success" ? Tick : Times} />
+                <img src={info.status === "processing" ? Spinner : info.status === "success" ? Tick : Times} />
             </div>
             <span className="StatusItem__title">{info.title}</span>
             <span className="StatusItem__subject" title={info.subject}>
                 {info.subject}
             </span>
-            {info.progress && (
+            {progress && (
                 <span className="StatusItem__progress">
-                    {info.format === "number" && `${info.progress[0]}/${info.progress[1]}`}
-                    {info.format === "bytes" && `${prettyBytes(info.progress[0])}/${prettyBytes(info.progress[1])}`}
+                    {progress.format === "number" &&
+                        `${progress.actual}${progress.total !== undefined ? `/${progress.total}` : ""}`}
+                    {progress.format === "bytes" &&
+                        `${prettyBytes(progress.actual)}${
+                            progress.total !== undefined ? `/${prettyBytes(progress.total)}` : ""
+                        }`}
                 </span>
             )}
         </div>
@@ -54,85 +48,15 @@ const ErrorBox = ({ error }: { error: string }) => {
     );
 };
 
-const GenerationProgress = ({ worker }: Props) => {
-    const [items, setItems] = useState<ItemInfo[]>([
-        {
-            status: "pending",
-            title: "Start WebWorker",
-        },
-    ]);
-    const [error, setError] = useState<string | null>(null);
-
-    useEffect(() => {
-        if (worker === null) return;
-
-        const oldonerror = worker.onerror?.bind(worker);
-        worker.onerror = (e) => {
-            setError("An error ocurred inside the WebWorker.\n\n" + e.message);
-            if (items.length === 1) {
-                setItems([
-                    {
-                        status: "error",
-                        title: "Start WebWorker",
-                    },
-                ]);
-            }
-            if (oldonerror) oldonerror(e);
-        };
-
-        const oldonmessage = worker.onmessage?.bind(worker);
-        worker.onmessage = (e: MessageEvent<StepMessage>) => {
-            if (oldonmessage) oldonmessage(e);
-
-            const data = e.data;
-            if (!["new", "progress", "done", "error"].includes(data.type)) return;
-
-            setItems((prevState: ItemInfo[]) => {
-                const newItems = [...prevState];
-                if (newItems.length === 1) {
-                    // mark web worker as started
-                    newItems[0].status = "success";
-                }
-                if (data.type === "new") {
-                    newItems.push({
-                        status: "pending",
-                        title: data.title,
-                        subject: data.subject,
-                    });
-                } else if (data.type === "progress") {
-                    const last = prevState[prevState.length - 1];
-                    newItems.splice(-1);
-                    newItems.push({
-                        ...last,
-                        progress: data.progress,
-                        format: data.format,
-                    });
-                } else if (data.type === "done" || data.type === "error") {
-                    const last = prevState[prevState.length - 1];
-                    newItems.splice(-1);
-                    newItems.push({
-                        ...last,
-                        status: data.type === "done" ? "success" : "error",
-                        // max out progress
-                        progress: last.progress ? [last.progress[1], last.progress[1]] : undefined,
-                    });
-                }
-
-                if (data.type === "error") {
-                    setError(data.error);
-                }
-                return newItems;
-            });
-        };
-    }, [worker]);
-
+const GenerationProgress = (props: Props) => {
+    const error = props.tasks[props.tasks.length - 1].error;
     return (
         <>
             <div className="GenerationProgress">
-                {items.slice(-6).map((item, index) => (
+                {props.tasks.slice(-6).map((item, index) => (
                     <StatusItem key={index} info={item} />
                 ))}
-                {items.length > 6 && <div className="GenerationProgress__shadow"></div>}
+                {props.tasks.length > 6 && <div className="GenerationProgress__shadow"></div>}
             </div>
             {error && <ErrorBox error={error} />}
         </>

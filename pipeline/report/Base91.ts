@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 // NOTE: the character "<" was replaced by "-" to avoid problems embedding in HTML         ↓
-const table = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!#$%&()*+,./:;-=>?@[]^_`{|}~"';
+const TABLE = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!#$%&()*+,./:;-=>?@[]^_`{|}~"';
 
 const B91_LENGTH_DIGITS = 12;
 
@@ -59,14 +59,14 @@ export const base91encode = (data: Uint8Array): string => {
                 b >>= 14;
                 n -= 14;
             }
-            ret += table[v % 91] + table[(v / 91) | 0];
+            ret += TABLE[v % 91] + TABLE[(v / 91) | 0];
         }
         i++;
     }
 
     if (n) {
-        ret += table[b % 91];
-        if (n > 7 || b > 90) ret += table[(b / 91) | 0];
+        ret += TABLE[b % 91];
+        if (n > 7 || b > 90) ret += TABLE[(b / 91) | 0];
     }
 
     return ret;
@@ -84,7 +84,7 @@ export const base91decode = (data: string): Uint8Array => {
     const ret = new Uint8Array(outputLength);
 
     while (i < len) {
-        const p = table.indexOf(data[i]);
+        const p = TABLE.indexOf(data[i]);
         if (p === -1) continue;
         if (v < 0) {
             v = p;

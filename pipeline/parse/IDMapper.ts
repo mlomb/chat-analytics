@@ -1,8 +1,6 @@
 import { ID, RawID } from "@pipeline/Types";
 
-/*
-    Maps between RawIDs and (internal) sequential IDs.
-*/
+// Maps between RawIDs and (internal) sequential IDs.
 export default class IDMapper {
     private id: ID = 0;
     private mappings: Map<RawID, ID> = new Map();

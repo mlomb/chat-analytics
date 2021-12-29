@@ -1,39 +1,48 @@
-import { ReportData, SerializedData } from "@pipeline/process/ReportData";
-
 import { gzipSync, gunzipSync } from "fflate";
-import { base91decode, base91encode } from "@pipeline/shared/Base91";
+import { base91decode, base91encode } from "@pipeline/report/Base91";
+
+import { Database } from "@pipeline/Types";
 
 /*
-    Compression and decompression of the ReportData object and SerializedData buffer
+    Compression and decompression of the Database
 */
 
 // ((POJO -> TextEncoder) + Binary) -> Gzip -> Base91
-function compress(reportData: ReportData, serializedData: SerializedData): string {
-    const json = JSON.stringify(reportData);
-    (reportData as any) = undefined;
+function compress(database: Database): string {
+    let serializedBuffer = database.serialized;
+    if (serializedBuffer === undefined) throw new Error("Serialized data is undefined");
+
+    let json = JSON.stringify({
+        ...database,
+        serialized: undefined,
+    });
+
     let jsonBuffer = new TextEncoder().encode(json);
+    (json as any) = undefined;
 
     // Raw buffer format: <json buffer length> <serialized data length> <json buffer> <serialized data buffer>
-    let rawBuffer = new Uint8Array(4 * 2 + jsonBuffer.length + serializedData.byteLength);
-    const rawView = new DataView(rawBuffer.buffer);
+    let rawBuffer = new Uint8Array(4 * 2 + jsonBuffer.length + serializedBuffer.byteLength);
+    let rawView = new DataView(rawBuffer.buffer);
 
     rawView.setUint32(0, jsonBuffer.length);
-    rawView.setUint32(4, serializedData.byteLength);
+    rawView.setUint32(4, serializedBuffer.byteLength);
     rawBuffer.set(jsonBuffer, 8);
-    rawBuffer.set(serializedData, 8 + jsonBuffer.length);
+    rawBuffer.set(serializedBuffer, 8 + jsonBuffer.length);
+
+    // release buffers
     (jsonBuffer as any) = undefined;
-    (serializedData as any) = undefined;
+    (serializedBuffer as any) = undefined;
 
     let zippedBuffer = gzipSync(rawBuffer);
     (rawBuffer as any) = undefined;
-    const encoded = base91encode(zippedBuffer);
+    let encoded = base91encode(zippedBuffer);
     (zippedBuffer as any) = undefined;
 
     return encoded;
 }
 
 // Base91 -> Gunzip -> ((TextDecoder -> JSON.parse) + Binary)
-function decompress(data: string): [ReportData, SerializedData] {
+function decompress(data: string): Database {
     const decoded = base91decode(data);
     (data as any) = undefined;
     const rawBuffer = gunzipSync(decoded);
@@ -48,9 +57,10 @@ function decompress(data: string): [ReportData, SerializedData] {
     const textDecoder = new TextDecoder();
     const jsonString = textDecoder.decode(jsonBuffer);
     console.log("JSON string length", jsonString.length);
-    const reportData = JSON.parse(jsonString) as ReportData;
+    const database = JSON.parse(jsonString) as Database;
+    database.serialized = serializedData;
 
-    return [reportData, serializedData];
+    return database;
 }
 
 export { compress, decompress };

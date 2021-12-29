@@ -28,7 +28,7 @@ describe("full object", () => {
         missingKeys = new Set(["string", "number", "boolean", "null", "array", "object"]);
 
         function register<T>(key: string, expected: T) {
-            stream.onFull<T>(key, (got) => {
+            stream.onObject<T>(key, (got) => {
                 missingKeys.delete(key);
                 expect(got).toEqual(expected);
             });
@@ -60,8 +60,8 @@ it("emit correct array objects", async () => {
     let nums: number[] = [],
         objs: { a: number }[] = [];
 
-    stream.onArray<number>("arrVals", (got) => nums.push(got));
-    stream.onArray<{ a: number }>("arrObjs", (got) => objs.push(got));
+    stream.onArrayItem<number>("arrVals", (got) => nums.push(got));
+    stream.onArrayItem<{ a: number }>("arrObjs", (got) => objs.push(got));
 
     stream.push(
         `
@@ -100,7 +100,7 @@ it("crash when the input is a string", async () => expectCrash(`"foo"`));
 
 it("crash when using onArray on something other than an array", async () => {
     const stream = new JSONStream();
-    stream.onArray<any>("fakeArr", () => {});
+    stream.onArrayItem<any>("fakeArr", () => {});
 
     try {
         stream.push(`{ "fakeArr": { "a": 5 } }`, true);

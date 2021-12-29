@@ -1,12 +1,25 @@
 export default null as any;
 
-import { FileInput, Platform } from "@pipeline/Types";
-import { ErrorMessage } from "@pipeline/Messages";
-import { generateReport } from "@pipeline/process/Generation";
+import { ReportConfig } from "@pipeline/Types";
+import { generateDatabase, generateReportSite } from "@pipeline/report/Generate";
+import { progress } from "@pipeline/Progress";
+import { FileInput } from "@pipeline/File";
 
 export interface InitMessage {
-    platform: Platform;
     files: File[];
+    config: ReportConfig;
+}
+
+export interface ResultMessage {
+    type: "result";
+    data?: string;
+    html: string;
+    title: string;
+    counts: {
+        authors: number;
+        channels: number;
+        messages: number;
+    };
 }
 
 const wrapFile = (file: File): FileInput => ({
@@ -20,17 +33,29 @@ self.onmessage = async (ev: MessageEvent<InitMessage>) => {
     // ***Very important*** so we always keep the most recent information last (since we overwrite it)
     const files = ev.data.files.sort((a, b) => (a.lastModified || 0) - (b.lastModified || 0));
 
+    progress.reset();
+    progress.on("update", (msg) => self.postMessage(msg));
+
     try {
-        const gen = generateReport(files.map(wrapFile), { platform: ev.data.platform });
-        for await (const packet of gen) {
-            self.postMessage(packet);
-        }
+        const database = await generateDatabase(files.map(wrapFile), ev.data.config);
+        const result = await generateReportSite(database);
+        self.postMessage(<ResultMessage>{
+            type: "result",
+            data: env.isDev ? result.data : "",
+            html: result.html,
+            title: database.title,
+            counts: {
+                authors: database.authors.length,
+                channels: database.channels.length,
+                messages: Object.values(database.channels).reduce((acc, val) => acc + val.msgCount, 0),
+            },
+        });
     } catch (ex) {
         // handle exceptions
         if (ex instanceof Error) {
-            self.postMessage(<ErrorMessage>{ type: "error", error: ex.message });
+            progress.error(ex.message);
         } else {
-            self.postMessage(<ErrorMessage>{ type: "error", error: ex + "" });
+            progress.error(ex + "");
         }
         console.log("Error ahead ↓");
         console.error(ex);

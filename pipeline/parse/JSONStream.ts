@@ -1,6 +1,7 @@
 import clarinet, { CParser } from "clarinet";
 
-type CallbackFn<T> = (object: T) => void;
+export type CallbackFn<T> = (object: T) => void;
+
 type Event = "value" | "key" | "openobject" | "closeobject" | "openarray" | "closearray";
 type Handler = (ev: Event, keyOrValue?: string | boolean | null) => void;
 
@@ -11,12 +12,12 @@ type Handler = (ev: Event, keyOrValue?: string | boolean | null) => void;
     It assumes the root is always an object
     Only keys on the root can be listened
 
-    Note: you can use onRoot OR (onArray and onObject) but not both at the same time
+    Note: you can use onRoot OR (onArrayItem and onObject) but not both at the same time
 */
-export default class JSONStream {
+export class JSONStream {
     private cparser: CParser;
     private rootCallback: CallbackFn<any> | undefined;
-    private fullCallbacks: Map<string, CallbackFn<any>> = new Map();
+    private objectCallbacks: Map<string, CallbackFn<any>> = new Map();
     private arrayCallbacks: Map<string, CallbackFn<any>> = new Map();
 
     constructor() {
@@ -51,12 +52,12 @@ export default class JSONStream {
     }
 
     // Object from the root which match the key will be emitted completely
-    public onFull<T>(key: string, callback: CallbackFn<T>) {
-        this.fullCallbacks.set(key, callback);
+    public onObject<T>(key: string, callback: CallbackFn<T>) {
+        this.objectCallbacks.set(key, callback);
     }
 
     // Arrays from the root which match the key will be emitted element by element
-    public onArray<T>(key: string, callback: CallbackFn<T>) {
+    public onArrayItem<T>(key: string, callback: CallbackFn<T>) {
         this.arrayCallbacks.set(key, callback);
     }
 
@@ -80,7 +81,7 @@ export default class JSONStream {
                 const key = keyOrValue as string;
                 this.topKey = key;
 
-                if (this.rootCallback || this.fullCallbacks.has(key)) {
+                if (this.rootCallback || this.objectCallbacks.has(key)) {
                     this.activeHandler = this.fullHandler;
                 } else if (this.arrayCallbacks.has(key)) {
                     this.activeHandler = this.arrayHandler;
@@ -132,8 +133,8 @@ export default class JSONStream {
         // emit
         if (this.rootCallback) {
             this.root[this.topKey] = x;
-        } else if (this.fullCallbacks.has(this.topKey)) {
-            this.fullCallbacks.get(this.topKey)!(x);
+        } else if (this.objectCallbacks.has(this.topKey)) {
+            this.objectCallbacks.get(this.topKey)!(x);
         } else if (this.arrayCallbacks.has(this.topKey)) {
             this.arrayCallbacks.get(this.topKey)!(x);
         } else {

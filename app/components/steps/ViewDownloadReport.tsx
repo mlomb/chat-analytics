@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import prettyBytes from "pretty-bytes";
 
-import { ResultMessage } from "@pipeline/Messages";
+import { ResultMessage } from "@app/WorkerApp";
 import Button from "@app/components/Button";
 
 import LinkOut from "@assets/images/link-out.svg";
