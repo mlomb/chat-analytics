@@ -1,7 +1,7 @@
 import "@assets/styles/Stepper.less";
 import React from "react";
 
-import Tick from "@assets/images/tick.svg";
+import Tick from "@assets/images/icons/tick.svg";
 
 interface Props {
     step: number;

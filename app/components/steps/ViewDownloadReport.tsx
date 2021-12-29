@@ -4,9 +4,9 @@ import prettyBytes from "pretty-bytes";
 import { ResultMessage } from "@app/WorkerApp";
 import Button from "@app/components/Button";
 
-import LinkOut from "@assets/images/link-out.svg";
-import Download from "@assets/images/download.svg";
-import Refresh from "@assets/images/refresh.svg";
+import LinkOut from "@assets/images/icons/link-out.svg";
+import Download from "@assets/images/icons/download.svg";
+import Refresh from "@assets/images/icons/refresh.svg";
 
 interface Props {
     result: ResultMessage | null;

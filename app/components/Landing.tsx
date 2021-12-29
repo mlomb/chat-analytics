@@ -4,7 +4,7 @@ import { Platforms } from "@app/Platforms";
 
 import Button from "@app/components/Button";
 
-import Lock from "@assets/images/lock.svg";
+import Lock from "@assets/images/icons/lock.svg";
 import GitHub from "@assets/images/logos/github.svg";
 
 interface Props {
