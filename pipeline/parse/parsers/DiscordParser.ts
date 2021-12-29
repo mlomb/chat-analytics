@@ -3,7 +3,6 @@ import { Parser } from "@pipeline/parse/Parser";
 
 import { JSONStream } from "@pipeline/parse/JSONStream";
 import { FileInput, streamJSONFromFile } from "@pipeline/File";
-import { DatabaseBuilder } from "@pipeline/process/DatabaseBuilder";
 
 export class DiscordParser extends Parser {
     private channelId?: ID;

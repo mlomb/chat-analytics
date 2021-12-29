@@ -15,9 +15,14 @@ export interface TaskInfo {
     error?: string;
 }
 
+export interface ProgressKeys {
+    [key: string]: number;
+}
+
 export interface ProgressMessage {
     type: "progress";
     tasks: TaskInfo[];
+    keys: ProgressKeys;
 }
 
 declare interface Progress {
@@ -31,6 +36,8 @@ class Progress extends EventEmitter {
     private active?: TaskInfo;
     // you can't invoke progress after an error
     private errored: boolean = false;
+    // keys
+    private keys: ProgressKeys = {};
 
     // removes all tasks
     reset() {
@@ -91,14 +98,19 @@ class Progress extends EventEmitter {
 
     // marks the last task as failed and crashes
     error(info: string) {
-        if (!this.active) {
-            console.assert(false, "No active task");
-            return;
-        }
-        this.active.status = "error";
-        this.active.error = info;
+        if (!this.active) this.new("Error");
+        this.active!.status = "error";
+        this.active!.error = info;
         this.errored = true;
         this.update(true);
+    }
+
+    // set a stat key
+    stat(key: string, value: number) {
+        if (this.keys[key] !== value) {
+            this.keys[key] = value;
+            this.update(false);
+        }
     }
 
     private lastCount: number = 0;
@@ -125,9 +137,10 @@ class Progress extends EventEmitter {
         }
 
         if (emit) {
-            this.emit("update", {
+            this.emit("update", <ProgressMessage>{
                 type: "progress",
                 tasks: this.tasks,
+                keys: this.keys,
             });
             this.lastCount = this.active?.progress?.actual || 0;
             this.lastTs = ts || Date.now();

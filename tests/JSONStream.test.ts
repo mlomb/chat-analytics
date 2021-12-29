@@ -1,4 +1,4 @@
-import JSONStream from "@pipeline/shared/JSONStream";
+import { JSONStream } from "@pipeline/parse/JSONStream";
 
 describe("full object", () => {
     let stream: JSONStream;

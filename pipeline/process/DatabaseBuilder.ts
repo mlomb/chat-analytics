@@ -1,5 +1,6 @@
 import { Database, IAuthor, IChannel, ID, IMessage, Platform, RawID, ReportConfig } from "@pipeline/Types";
 import IDMapper from "@pipeline/parse/IDMapper";
+import { progress } from "@pipeline/Progress";
 
 // TODO: !
 const searchFormat = (x: string) => x;
@@ -31,6 +32,7 @@ export class DatabaseBuilder {
             msgAddr: 0,
             msgCount: 0,
         };
+        progress.stat("channels", this.db.channels.length);
         return id;
     }
 
@@ -40,12 +42,17 @@ export class DatabaseBuilder {
             ...author,
             ns: searchFormat(author.n),
         };
+        progress.stat("authors", this.db.authors.length);
         return id;
     }
 
     public addMessage(rawId: RawID, message: IMessage): ID {
         const channel = this.db.channels[message.channelId];
         channel.msgCount += 1;
+        progress.stat(
+            "messages",
+            this.db.channels.reduce((sum, c) => sum + c.msgCount, 0)
+        );
         return 0;
     }
 

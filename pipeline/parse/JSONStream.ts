@@ -116,6 +116,7 @@ export class JSONStream {
                     // Avoid leaking with big strings
                     // See https://stackoverflow.com/questions/31712808/how-to-force-javascript-to-deep-copy-a-string
                     // See https://bugs.chromium.org/p/v8/issues/detail?id=2869
+                    // TODO: move this out of here, only clone when needed (only nicknames, no content)
                     last[this.lastKey] = (" " + x).substring(1);
                 } else {
                     last[this.lastKey] = x;

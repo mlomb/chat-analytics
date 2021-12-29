@@ -3,7 +3,7 @@ import "@assets/styles/Steps.less";
 import { useState } from "react";
 
 import { Platform } from "@pipeline/Types";
-import { ProgressMessage, TaskInfo } from "@pipeline/Progress";
+import { ProgressKeys, ProgressMessage, TaskInfo } from "@pipeline/Progress";
 import WorkerApp, { InitMessage, ResultMessage } from "@app/WorkerApp";
 
 import Stepper from "@app/components/Stepper";
@@ -36,6 +36,7 @@ const Steps = () => {
         worker: Worker | null;
         result: ResultMessage | null;
         tasks: TaskInfo[];
+        progressKeys: ProgressKeys;
     }>({
         currentStep: 0,
         platform: null,
@@ -48,6 +49,7 @@ const Steps = () => {
                 title: "Start WebWorker",
             },
         ],
+        progressKeys: {},
     });
 
     const startGeneration = () => {
@@ -69,6 +71,7 @@ const Steps = () => {
                         },
                         ...data.tasks,
                     ],
+                    progressKeys: data.keys,
                 }));
             } else if (data.type === "result") {
                 if (env.isProd) {
@@ -77,12 +80,12 @@ const Steps = () => {
                 }
                 // give a small delay
                 setTimeout(() => {
-                    setState({
+                    setState((state) => ({
                         ...state,
                         currentStep: 4,
                         worker: null,
                         result: data,
-                    });
+                    }));
                 }, 1000);
             }
         };
@@ -94,11 +97,11 @@ const Steps = () => {
             },
         };
         worker.postMessage(init);
-        setState({
+        setState((state) => ({
             ...state,
             currentStep: 3,
             worker,
-        });
+        }));
 
         // show usaved progress before leaving
         if (env.isProd) {
@@ -142,7 +145,7 @@ const Steps = () => {
                         </Button>
                     </div>
                 </div>
-                <GenerationProgress tasks={state.tasks} />
+                <GenerationProgress tasks={state.tasks} keys={state.progressKeys} active={state.worker !== null} />
                 <ViewDownloadReport result={state.result} />
             </Stepper>
         </div>

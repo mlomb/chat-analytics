@@ -139,6 +139,36 @@
     top: 0;
 }
 
+.GenerationProgress__stats {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    font-family: monospace;
+    font-size: 14px;
+    user-select: none;
+}
+
+.GenerationProgress__stat {
+    display: flex;
+    align-items: center;
+    padding: 0 10px;
+
+    img {
+        height: 16px;
+        margin-right: 4px;
+    }
+
+    &:first-child {
+        padding-left: 0;
+    }
+    &:last-child {
+        flex: 1;
+        justify-content: right;
+        padding-right: 0;
+    }
+}
+
 .ErrorBox {
     max-height: 160px;
     overflow: auto;
