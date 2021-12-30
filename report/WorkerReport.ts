@@ -1,16 +1,21 @@
 export default null as any;
 
+/*
 import { BlockRequestMessage, BlockResultMessage, InitMessage, ReadyMessage } from "@pipeline/Messages";
 import { BlocksDesc, BlocksProcessFn } from "@pipeline/blocks/Blocks";
 import { ReportData } from "@pipeline/process/ReportData";
 import { DataDeserializer } from "@pipeline/shared/SerializedData";
 import { Filters } from "@pipeline/blocks/Filters";
-import { decompress } from "@pipeline/shared/Compression";
+*/
+import { decompress } from "@pipeline/report/Compression";
 
+/*
 let reportData: ReportData | null = null;
 let dataDeserializer: DataDeserializer | null = null;
 let filters: Filters | null = null;
+*/
 
+/*
 const init = async (msg: InitMessage) => {
     const [_reportData, serializedData] = await decompress(msg.dataStr);
     reportData = _reportData;
@@ -69,6 +74,26 @@ self.onmessage = async (ev: MessageEvent<InitMessage | BlockRequestMessage>) => 
             break;
         case "request":
             request(ev.data);
+            break;
+    }
+};
+
+*/
+
+export interface InitMessage {
+    type: "init";
+    dataStr: string;
+}
+
+const init = (msg: InitMessage) => {
+    const database = decompress(msg.dataStr);
+    console.log(database);
+};
+
+self.onmessage = (ev: MessageEvent<InitMessage>) => {
+    switch (ev.data.type) {
+        case "init":
+            init(ev.data);
             break;
     }
 };

@@ -4,7 +4,7 @@ import { memo } from "react";
 
 import { ID } from "@pipeline/Types";
 import { useDataProvider } from "@report/DataProvider";
-import Hashtag from "@assets/images/hashtag.svg";
+import Hashtag from "@assets/images/icons/hashtag.svg";
 
 interface Props {
     id: ID;

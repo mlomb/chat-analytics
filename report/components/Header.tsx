@@ -2,7 +2,7 @@ import "@assets/styles/Header.less";
 
 import { useCallback, useLayoutEffect, useMemo, useState } from "react";
 
-import { ID } from "@pipeline/Types";
+import { Database, ID } from "@pipeline/Types";
 import { DataProvider, useDataProvider } from "@report/DataProvider";
 
 import AuthorLabel from "@report/components/core/AuthorLabel";
@@ -11,7 +11,7 @@ import { TabSwitch } from "@report/components/Tabs";
 import TimeSelector from "@report/components/TimeSelector";
 import FilterSelect, { FilterOption } from "@report/components/FilterSelect";
 
-import Logo from "@assets/images/logo.svg";
+import Logo from "@assets/images/logos/app.svg";
 
 interface Props {
     tab: string;
@@ -49,7 +49,7 @@ const tabs = [
     },
 ];
 
-const channelsFilterOptionsFn: (dp: DataProvider) => FilterOption[] = (dp) => [
+const channelsFilterOptionsFn: (dp: Database) => FilterOption[] = (dp) => [
     {
         name: "Select all channels",
         options: dp.reportData.channels
@@ -59,7 +59,7 @@ const channelsFilterOptionsFn: (dp: DataProvider) => FilterOption[] = (dp) => [
     },
 ];
 
-const authorsFilterOptionsFn: (dp: DataProvider) => FilterOption[] = (dp) => {
+const authorsFilterOptionsFn: (dp: Database) => FilterOption[] = (dp) => {
     const botsPresent = dp.reportData.authorsBotCutoff >= 0;
     const options: FilterOption[] = [
         {

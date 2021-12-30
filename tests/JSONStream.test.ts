@@ -43,13 +43,12 @@ describe("full object", () => {
     });
 
     it("emit correct single push", async () => {
-        stream.push(FULL_OBJECT, true);
+        await stream.push(FULL_OBJECT);
         expect(missingKeys).toEqual(new Set());
     });
 
     it("emit correct streaming char by char", async () => {
-        for (const c of FULL_OBJECT) stream.push(c, false);
-        stream.push("", true);
+        for (const c of FULL_OBJECT) await stream.push(c);
         expect(missingKeys).toEqual(new Set());
     });
 });
@@ -60,10 +59,10 @@ it("emit correct array objects", async () => {
     let nums: number[] = [],
         objs: { a: number }[] = [];
 
-    stream.onArrayItem<number>("arrVals", (got) => nums.push(got));
-    stream.onArrayItem<{ a: number }>("arrObjs", (got) => objs.push(got));
+    stream.onArrayItem<number>("arrVals", (got) => void nums.push(got));
+    stream.onArrayItem<{ a: number }>("arrObjs", (got) => void objs.push(got));
 
-    stream.push(
+    await stream.push(
         `
         {
             "a": "b",
@@ -72,18 +71,29 @@ it("emit correct array objects", async () => {
             "arrObjs": [{ "a": 1 }, { "b": 2 }, { "c": 3 }],
             "e": "f"
         }
-    `,
-        true
+    `
     );
 
     expect(nums).toEqual([1, 2, 3]);
     expect(objs).toEqual([{ a: 1 }, { b: 2 }, { c: 3 }]);
 });
 
+describe("escaping", () => {
+    test.each([`\\\\`, `\\n`, `\\"`, `\\u00f8`])("escape with %p", async (esc) => {
+        await new JSONStream().push(`{ "a${esc}b": "c" }`);
+        await new JSONStream().push(`{ "a": "b${esc}c" }`);
+        await new JSONStream().push(`{ "a": { "c": "d${esc}e" } }`);
+    });
+});
+
+it("string with brackets", async () => {
+    await new JSONStream().push(`{ "a": "c{}{[][}{[!}{}[<}{]\\n][]]]}[>[][" }`);
+});
+
 async function expectCrash(input: string) {
     const stream = new JSONStream();
     try {
-        stream.push(input, true);
+        await stream.push(input);
         // should have crashed
         expect(true).toBe(false);
     } catch (_) {
@@ -103,7 +113,7 @@ it("crash when using onArray on something other than an array", async () => {
     stream.onArrayItem<any>("fakeArr", () => {});
 
     try {
-        stream.push(`{ "fakeArr": { "a": 5 } }`, true);
+        await stream.push(`{ "fakeArr": { "a": 5 } }`);
         // should have crashed
         expect(true).toBe(false);
     } catch (_) {

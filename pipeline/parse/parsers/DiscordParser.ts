@@ -23,7 +23,7 @@ export class DiscordParser extends Parser {
         this.channelId = this.builder.addChannel(channel.id, { n: channel.name });
     }
 
-    private parseMessage(message: DiscordMessage) {
+    private async parseMessage(message: DiscordMessage) {
         if (this.channelId === undefined) throw new Error("Missing channel ID");
 
         const timestamp = Date.parse(message.timestamp);
@@ -40,6 +40,7 @@ export class DiscordParser extends Parser {
         if (message.author.avatarUrl && message.author.avatarUrl.length > 35) {
             const avatar = message.author.avatarUrl.slice(35).split(".")[0];
             author.da = (" " + avatar).substring(1); // avoid leak
+            // TODO: check for default avatars
         }
 
         // store author
@@ -47,11 +48,11 @@ export class DiscordParser extends Parser {
 
         // :)
         if (message.type == "Default") {
-            this.builder.addMessage(message.id, {
+            await this.builder.addMessage(message.id, {
                 authorId,
                 channelId: this.channelId,
                 timestamp,
-                content: "", //message.content,
+                content: message.content,
             });
         } else if (message.type == "Reply") {
         } else if (message.type == "ChannelPinnedMessage") {

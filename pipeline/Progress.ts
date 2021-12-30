@@ -92,7 +92,7 @@ class Progress extends EventEmitter {
         this.active = this.tasks
             .slice()
             .reverse()
-            .find((t) => t.status === "processing");
+            .find((t) => t.status === "waiting");
         this.update(true);
     }
 

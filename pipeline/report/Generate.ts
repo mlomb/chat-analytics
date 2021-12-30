@@ -1,4 +1,4 @@
-import { downloadFile, FileInput } from "@pipeline/File";
+import { downloadTextFile, FileInput } from "@pipeline/File";
 import { progress } from "@pipeline/Progress";
 import { Database, ReportConfig, Timestamp } from "@pipeline/Types";
 
@@ -64,7 +64,7 @@ export const generateReportSite = async (
     progress.done();
 
     progress.new("Downloading", "report HTML");
-    const html = await downloadFile("report.html");
+    const html = await downloadTextFile("report.html");
     progress.done();
 
     const template = "[[[DATA]]]";

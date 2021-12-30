@@ -1,7 +1,7 @@
 import { StrictMode } from "react";
 import ReactDOM from "react-dom";
 
-import ReportPage from "@report/ReportPage";
+// import ReportPage from "@report/ReportPage";
 
 import { initDataProvider } from "@report/DataProvider";
 
@@ -23,7 +23,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     initDataProvider(dataStr);
     ReactDOM.render(
         <StrictMode>
-            <ReportPage />
+            {/*<ReportPage />*/}
+            <div>PAGE</div>
         </StrictMode>,
         document.getElementById("app")
     );

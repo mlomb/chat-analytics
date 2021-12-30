@@ -2,8 +2,10 @@ import { Database, IAuthor, IChannel, ID, IMessage, Platform, RawID, ReportConfi
 import IDMapper from "@pipeline/parse/IDMapper";
 import { progress } from "@pipeline/Progress";
 
+import { processMessage } from "@pipeline/process/MessageProcessor";
+
 // TODO: !
-const searchFormat = (x: string) => x;
+const searchFormat = (x: string) => x.toLocaleLowerCase();
 
 export class DatabaseBuilder {
     private db: Database = {
@@ -46,9 +48,10 @@ export class DatabaseBuilder {
         return id;
     }
 
-    public addMessage(rawId: RawID, message: IMessage): ID {
+    public async addMessage(rawId: RawID, message: IMessage): Promise<ID> {
         const channel = this.db.channels[message.channelId];
         channel.msgCount += 1;
+        await processMessage(message);
         progress.stat(
             "messages",
             this.db.channels.reduce((sum, c) => sum + c.msgCount, 0)

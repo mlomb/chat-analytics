@@ -1,10 +1,51 @@
-import clarinet, { CParser } from "clarinet";
+export type CallbackFn<T> = (object: T) => Promise<void> | void;
 
-export type CallbackFn<T> = (object: T) => void;
-
-type Event = "value" | "key" | "openobject" | "closeobject" | "openarray" | "closearray";
-type Handler = (ev: Event, keyOrValue?: string | boolean | null) => void;
 type Callbacks = { [key: string]: CallbackFn<any> };
+
+// prettier-ignore
+const Char = {
+    tab                 : 0x09,     // \t
+    lineFeed            : 0x0A,     // \\n
+    carriageReturn      : 0x0D,     // \r
+    space               : 0x20,     // " "
+
+    doubleQuote         : 0x22,     // "
+    comma               : 0x2C,     // ,
+    colon               : 0x3A,     // :
+
+    openBracket         : 0x5B,     // [
+    backslash           : 0x5C,     // \
+    closeBracket        : 0x5D,     // ]
+
+    openBrace           : 0x7B,     // {
+    closeBrace          : 0x7D,     // }
+};
+
+enum State {
+    INVALID,
+    // read {
+    ROOT,
+    // read , } or check for "
+    NEXT_KEY,
+    // read , or check for ]
+    NEXT_ARRAY_ITEM,
+    // read [
+    START_ARRAY,
+    // read ]
+    END_ARRAY,
+    // strings, objects, arrays
+    VALUE,
+    // read :
+    END_VALUE_KEY,
+    // read ,
+    END_VALUE_ROOT,
+    // read ,
+    END_VALUE_ARRAY,
+}
+
+const isPrimitiveTerminator = (c: number) => c === Char.comma || c === Char.closeBrace || c === Char.closeBracket;
+const isWhitespace = (c: number) =>
+    c === Char.carriageReturn || c === Char.lineFeed || c === Char.space || c === Char.tab;
 
 /*
     Allows streaming big JSON files
@@ -13,43 +54,171 @@ type Callbacks = { [key: string]: CallbackFn<any> };
     It assumes the root is always an object
     Only keys on the root can be listened
 
-    Note: you can use onRoot OR (onArrayItem and onObject) but not both at the same time
+    This class expects well formed JSONs
 */
 export class JSONStream {
-    private cparser: CParser;
-    private rootCallback: CallbackFn<any> | undefined;
     private objectCallbacks: Callbacks = {};
     private arrayCallbacks: Callbacks = {};
 
-    constructor() {
-        this.cparser = clarinet.parser();
-        this.cparser.onerror = (e) => {
-            throw new Error(`Make sure it is a valid JSON file.\nDetails: ${e?.message}`);
-        };
-        this.cparser.onvalue = (value) => this.activeHandler("value", value);
-        this.cparser.onkey = (key) => this.activeHandler("key", key);
-        this.cparser.onopenobject = (key: string) => {
-            this.activeHandler("openobject");
-            this.activeHandler("key", key);
-        };
-        this.cparser.oncloseobject = () => this.activeHandler("closeobject");
-        this.cparser.onopenarray = () => this.activeHandler("openarray");
-        this.cparser.onclosearray = () => this.activeHandler("closearray");
-    }
+    private state: State = State.ROOT;
+    private next: State = State.INVALID;
+    private buffer = "";
+    private key: string | undefined;
 
-    public push(chunk: string, last: boolean) {
-        if (chunk.length > 0) {
-            this.cparser.write(chunk);
-        }
-        if (last) {
-            this.cparser.close();
-            this.rootCallback?.(this.root);
-        }
-    }
+    private slashed = false;
+    private quotes = false;
+    private brackets = 0;
+    private braces = 0;
+    private primitive = true;
 
-    // Root object
-    public onRoot<T>(callback: CallbackFn<T>) {
-        this.rootCallback = callback;
+    public async push(chunk: string) {
+        const len = chunk.length;
+        let i = 0;
+
+        while (i < len) {
+            const c = chunk.charCodeAt(i);
+            // console.log(c, String.fromCharCode(c), chunk.substring(i - 5, i + 5), this.state);
+
+            switch (this.state) {
+                case State.ROOT:
+                    if (c === Char.openBrace) this.state = State.NEXT_KEY;
+                    else if (!isWhitespace(c)) throw new Error("Expected {");
+                    break;
+
+                case State.NEXT_KEY:
+                    if (c === Char.doubleQuote || c === Char.comma) {
+                        // read key
+                        this.state = State.VALUE;
+                        this.next = State.END_VALUE_KEY;
+
+                        if (c === Char.doubleQuote) {
+                            // let VALUE consume the quote
+                            continue; // (don't i++)
+                        }
+                    } else if (c === Char.closeBrace) this.state = State.ROOT;
+                    else if (!isWhitespace(c)) throw new Error('Expected ", comma or }');
+                    break;
+
+                case State.NEXT_ARRAY_ITEM:
+                    if (c === Char.comma) {
+                        // read next item
+                        this.state = State.VALUE;
+                        this.next = State.END_VALUE_ARRAY;
+                    } else if (c === Char.closeBracket) {
+                        this.state = State.END_ARRAY;
+                        this.next = State.INVALID;
+                        // dont consume ], let END_ARRAY handle it
+                        continue; // (don't i++)
+                    } else if (!isWhitespace(c)) throw new Error("Expected , or ]");
+                    break;
+
+                case State.START_ARRAY:
+                    if (c === Char.openBracket) {
+                        // read first item
+                        this.state = State.VALUE;
+                        this.next = State.END_VALUE_ARRAY;
+                    } else if (!isWhitespace(c)) throw new Error("Expected [");
+                    break;
+
+                case State.END_ARRAY:
+                    if (c === Char.closeBracket) this.state = State.NEXT_KEY;
+                    else if (!isWhitespace(c)) throw new Error("Expected ]");
+                    break;
+
+                case State.VALUE:
+                    if (
+                        this.primitive &&
+                        this.brackets === 0 &&
+                        this.braces === 0 &&
+                        this.quotes === false &&
+                        isPrimitiveTerminator(c)
+                    ) {
+                        // console.log("key", this.key, "value", JSON.parse(this.buffer));
+                        this.state = this.next;
+                        this.next = State.INVALID;
+                        // dont consume the terminator, let the next state handle it
+                        continue; // (don't i++)
+                    }
+                    this.buffer += String.fromCharCode(c);
+                    if (isWhitespace(c)) break;
+                    else if (c === Char.backslash) {
+                        this.slashed = !this.slashed;
+                        break;
+                    } else if (c === Char.doubleQuote) {
+                        this.primitive = false;
+                        if (this.slashed) {
+                            this.slashed = false;
+                            break;
+                        }
+                        this.quotes = !this.quotes;
+                    }
+
+                    // anything else is not escaped
+                    this.slashed = false;
+
+                    if (this.quotes) break;
+
+                    if (c === Char.openBracket) this.brackets++;
+                    else if (c === Char.openBrace) this.braces++;
+                    else if (c === Char.closeBracket) this.brackets--;
+                    else if (c === Char.closeBrace) this.braces--;
+
+                    const sameLevel = this.brackets === 0 && this.braces === 0 && this.quotes === false;
+                    this.primitive = this.primitive && sameLevel;
+
+                    if (!this.primitive && sameLevel) {
+                        // console.log("key", this.key, "value", JSON.parse(this.buffer));
+                        this.primitive = true;
+                        this.state = this.next;
+                        this.next = State.INVALID;
+                    }
+                    break;
+
+                case State.END_VALUE_ROOT:
+                    if (this.key! in this.objectCallbacks) {
+                        // emit in root
+                        // console.log("EMITTING IN ROOT", this.key, JSON.parse(this.buffer));
+                        await this.objectCallbacks[this.key!](JSON.parse(this.buffer));
+                    }
+                    this.buffer = "";
+                    this.key = undefined;
+                    // read next key
+                    this.state = State.NEXT_KEY;
+                    continue;
+
+                case State.END_VALUE_KEY:
+                    if (c === Char.colon) {
+                        this.key = JSON.parse(this.buffer);
+                        this.buffer = "";
+                        if (typeof this.key !== "string") throw new Error("Expected string on key");
+
+                        if (this.key in this.arrayCallbacks) {
+                            // start array
+                            this.state = State.START_ARRAY;
+                            this.next = State.INVALID;
+                        } else {
+                            // read value directly
+                            this.state = State.VALUE;
+                            this.next = State.END_VALUE_ROOT;
+                        }
+                    } else if (!isWhitespace(c)) throw new Error("Expected :");
+                    break;
+
+                case State.END_VALUE_ARRAY:
+                    // console.log("EMITTING ARRAY", this.key, JSON.parse(this.buffer));
+                    await this.arrayCallbacks[this.key!](JSON.parse(this.buffer));
+
+                    this.buffer = "";
+                    // read next item
+                    this.state = State.NEXT_ARRAY_ITEM;
+                    continue;
+
+                default:
+                    throw new Error("Invalid JSON state: " + this.state);
+            }
+
+            i++;
+        }
     }
 
     // Object from the root which match the key will be emitted completely
@@ -61,168 +230,4 @@ export class JSONStream {
     public onArrayItem<T>(key: string, callback: CallbackFn<T>) {
         this.arrayCallbacks[key] = callback;
     }
-
-    // Root object handler
-    // Wether we are inside the root object
-    private inRoot: boolean = false;
-    // Root key currently being processed
-    private topKey?: string;
-    // Wether we are inside an array
-    private inArray: boolean = false;
-    // Constructed root (only used when using onRoot)
-    private root: any = {};
-    private rootHandler: Handler = (ev, keyOrValue) => {
-        switch (ev) {
-            case "value":
-            case "openarray":
-            case "closearray":
-                throw new Error("Root must be an object");
-            case "key":
-                if (!this.inRoot) throw new Error("Key not in root");
-                const key = keyOrValue as string;
-                this.topKey = key;
-
-                if (this.rootCallback || this.objectCallbacks[key]) {
-                    this.activeHandler = this.fullHandler;
-                } else if (this.arrayCallbacks[key]) {
-                    this.activeHandler = this.arrayHandler;
-                    this.inArray = true;
-                } else {
-                    this.activeHandler = this.ignoreHandler;
-                }
-                break;
-            case "openobject":
-                this.inRoot = true;
-                break;
-            case "closeobject":
-                this.inRoot = false;
-                break;
-        }
-    };
-
-    // Parse everything
-    // The last key visited
-    private lastKey: string = "";
-    // The stack of objects and arrays
-    private stack: any[] = [];
-    private pushToStack(x: {} | [] | string | boolean | null) {
-        if (this.stack.length > 0) {
-            const last = this.stack[this.stack.length - 1];
-            if (last instanceof Array) {
-                // push to array
-                last.push(x);
-            } else {
-                if (typeof x === "string") {
-                    // Avoid leaking with big strings
-                    // See https://stackoverflow.com/questions/31712808/how-to-force-javascript-to-deep-copy-a-string
-                    // See https://bugs.chromium.org/p/v8/issues/detail?id=2869
-                    last[this.lastKey] = (" " + x).substring(1);
-                } else {
-                    last[this.lastKey] = x;
-                }
-            }
-        }
-        if (x instanceof Array || x instanceof Object) {
-            // push to stack if its not a value
-            this.stack.push(x);
-        }
-    }
-    private emit(x: any) {
-        if (this.topKey === undefined) throw new Error("No top key");
-        let cb: CallbackFn<any> | undefined;
-
-        // emit
-        if (this.rootCallback) {
-            this.root[this.topKey] = x;
-        } else if ((cb = this.objectCallbacks[this.topKey])) {
-            cb(x);
-        } else if ((cb = this.arrayCallbacks[this.topKey])) {
-            cb(x);
-        } else {
-            throw new Error("No handler for " + this.topKey);
-        }
-
-        if (this.inArray === false) {
-            // go back to the root
-            this.activeHandler = this.rootHandler;
-        }
-    }
-    private fullHandler: Handler = (ev, keyOrValue) => {
-        switch (ev) {
-            case "key":
-                this.lastKey = keyOrValue as string;
-                break;
-            case "value":
-                const val = keyOrValue as string | boolean | null;
-                this.pushToStack(val);
-                if (this.stack.length === 0) this.emit(val);
-                break;
-            case "openobject":
-                this.pushToStack({});
-                break;
-            case "closeobject":
-                if (this.stack.length === 1) this.emit(this.stack[0]);
-                this.stack.pop();
-                break;
-            case "openarray":
-                this.pushToStack([]);
-                break;
-            case "closearray":
-                if (this.stack.length === 0) {
-                    // close array
-                    console.assert(this.inArray, "Should be inside array");
-                    this.activeHandler = this.arrayHandler;
-                    this.arrayHandler(ev, keyOrValue); // forward
-                    break;
-                }
-                if (this.stack.length === 1) this.emit(this.stack[0]);
-                this.stack.pop();
-                break;
-        }
-    };
-
-    // Parse every element from an array
-    private arrayHandler: Handler = (ev, keyOrValue) => {
-        switch (ev) {
-            case "key":
-            case "value":
-            case "openobject":
-            case "closeobject":
-                throw new Error("Expected array on key " + this.topKey);
-            case "openarray":
-                this.activeHandler = this.fullHandler;
-                break;
-            case "closearray":
-                this.activeHandler = this.rootHandler;
-                this.inArray = false;
-                break;
-        }
-    };
-
-    // Skip everything
-    private objectCount: number = 0;
-    private arrayCount: number = 0;
-    private ignoreHandler: Handler = (ev) => {
-        switch (ev) {
-            case "key":
-                return;
-            case "openobject":
-                this.objectCount++;
-                break;
-            case "closeobject":
-                this.objectCount--;
-                break;
-            case "openarray":
-                this.arrayCount++;
-                break;
-            case "closearray":
-                this.arrayCount--;
-                break;
-        }
-        if (this.objectCount === 0 && this.arrayCount === 0) {
-            this.activeHandler = this.rootHandler;
-        }
-    };
-
-    private activeHandler: Handler = this.rootHandler;
 }

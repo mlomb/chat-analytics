@@ -1,7 +1,5 @@
-import { useDataProvider } from "@report/DataProvider";
-
-import Logo from "@assets/images/logo.svg";
-import Spinner from "@assets/images/spinner.svg";
+import Logo from "@assets/images/logos/app.svg";
+import Spinner from "@assets/images/icons/spinner.svg";
 
 interface Props {
     loading: boolean;

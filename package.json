@@ -2,7 +2,7 @@
   "name": "chats-analyzer",
   "version": "0.1.0",
   "scripts": {
-    "build": "webpack build --env production --progress",
+    "build": "webpack build --env production --progress --stats-children",
     "dev": "webpack serve --progress",
     "test": "jest --verbose --coverage",
     "test:watch": "jest --watchAll",
@@ -20,7 +20,6 @@
     "@types/react-window": "^1.8.5",
     "@types/webpack-env": "^1.16.3",
     "autoprefixer": "^10.4.0",
-    "clarinet": "^0.12.4",
     "copy-webpack-plugin": "^10.2.0",
     "css-loader": "^6.5.1",
     "cssnano": "^5.0.14",

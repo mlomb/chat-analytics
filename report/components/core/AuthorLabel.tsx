@@ -10,11 +10,11 @@ interface Props {
     id: ID;
 }
 
-import avatar_0 from "@assets/images/discord_avatars/avatar_0.png";
-import avatar_1 from "@assets/images/discord_avatars/avatar_1.png";
-import avatar_2 from "@assets/images/discord_avatars/avatar_2.png";
-import avatar_3 from "@assets/images/discord_avatars/avatar_3.png";
-import avatar_4 from "@assets/images/discord_avatars/avatar_4.png";
+import avatar_0 from "@assets/images/platforms/discord/avatars/avatar_0.png";
+import avatar_1 from "@assets/images/platforms/discord/avatars/avatar_1.png";
+import avatar_2 from "@assets/images/platforms/discord/avatars/avatar_2.png";
+import avatar_3 from "@assets/images/platforms/discord/avatars/avatar_3.png";
+import avatar_4 from "@assets/images/platforms/discord/avatars/avatar_4.png";
 const DiscordDefaultAvatars = [avatar_0, avatar_1, avatar_2, avatar_3, avatar_4];
 
 const TelegramBubbleColors = [
@@ -27,7 +27,7 @@ const TelegramBubbleColors = [
     ["e0a2f3", "d669ed"],
 ];
 
-import wpp_avatar from "@assets/images/whatsapp_avatar.png";
+import wpp_avatar from "@assets/images/platforms/whatsapp/default_avatar.png";
 
 const AuthorLabel = ({ id }: Props) => {
     const dp = useDataProvider();
