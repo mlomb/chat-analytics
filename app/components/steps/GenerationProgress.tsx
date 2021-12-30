@@ -11,6 +11,7 @@ import Hashtag from "@assets/images/icons/hashtag.svg";
 import User from "@assets/images/icons/user.svg";
 import Bubble from "@assets/images/icons/bubble.svg";
 import Clock from "@assets/images/icons/clock.svg";
+import Pause from "@assets/images/icons/pause.svg";
 
 interface Props {
     active: boolean;
@@ -23,7 +24,17 @@ const StatusItem = ({ info }: { info: TaskInfo }) => {
     return (
         <div className={`StatusItem StatusItem--status-${info.status}`}>
             <div className="StatusItem__icon">
-                <img src={info.status === "processing" ? Spinner : info.status === "success" ? Tick : Times} />
+                <img
+                    src={
+                        info.status === "processing"
+                            ? Spinner
+                            : info.status === "success"
+                            ? Tick
+                            : info.status === "waiting"
+                            ? Pause
+                            : Times
+                    }
+                />
             </div>
             <span className="StatusItem__title">{info.title}</span>
             <span className="StatusItem__subject" title={info.subject}>

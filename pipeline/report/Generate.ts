@@ -11,6 +11,7 @@ import { compress } from "@pipeline/report/Compression";
 
 export const generateDatabase = async (files: FileInput[], config: ReportConfig): Promise<Database> => {
     let builder: DatabaseBuilder = new DatabaseBuilder(config);
+    await builder.init();
 
     // create parser
     let parser: Parser | null = null;
@@ -32,7 +33,9 @@ export const generateDatabase = async (files: FileInput[], config: ReportConfig)
     for (let i = 0; i < files.length; i++) {
         progress.new("Parsing", files[i].name);
         try {
-            await parser.parse(files[i]);
+            const gen = parser.parse(files[i]);
+            for await (const _ of gen) await builder.process();
+            await builder.process(true);
         } catch (err) {
             if (err instanceof Error) {
                 const newErr = new Error(`Error parsing file "${files[i].name}":\n\n${err.message}`);

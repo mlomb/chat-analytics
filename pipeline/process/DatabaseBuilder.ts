@@ -2,7 +2,7 @@ import { Database, IAuthor, IChannel, ID, IMessage, Platform, RawID, ReportConfi
 import IDMapper from "@pipeline/parse/IDMapper";
 import { progress } from "@pipeline/Progress";
 
-import { processMessage } from "@pipeline/process/MessageProcessor";
+import { FastTextModel, loadFastTextModel } from "@pipeline/process/FastText";
 
 // TODO: !
 const searchFormat = (x: string) => x.toLocaleLowerCase();
@@ -23,8 +23,17 @@ export class DatabaseBuilder {
 
     constructor(private readonly config: ReportConfig) {}
 
-    protected authorIDMapper = new IDMapper();
-    protected channelIDMapper = new IDMapper();
+    private languageDetectorModel: FastTextModel | undefined;
+
+    public async init() {
+        if (this.languageDetectorModel === undefined) {
+            this.languageDetectorModel = await loadFastTextModel("lid.176");
+        }
+    }
+
+    private authorIDMapper = new IDMapper();
+    private channelIDMapper = new IDMapper();
+    private messageQueue: IMessage[] = [];
 
     public addChannel(rawId: RawID, channel: IChannel): ID {
         const id = this.channelIDMapper.get(rawId);
@@ -48,15 +57,37 @@ export class DatabaseBuilder {
         return id;
     }
 
-    public addMessage(rawId: RawID, message: IMessage) {
+    public addMessage(message: IMessage) {
+        this.messageQueue.push(message);
+        /*
         const channel = this.db.channels[message.channelId];
+
         channel.msgCount += 1;
         const p = processMessage(message);
         progress.stat(
             "messages",
             this.db.channels.reduce((sum, c) => sum + c.msgCount, 0)
         );
-        return p || 0;
+        */
+    }
+
+    private labels: any = {};
+
+    // Process messages in the queue
+    public async process(force: boolean = false) {
+        if (!this.languageDetectorModel) throw new Error("Language detector model not loaded");
+
+        for (const message of this.messageQueue) {
+            const pred: [number, string][] = this.languageDetectorModel.predict(message.content, 1, 0.0);
+            console.assert(pred.length === 1);
+            this.labels[pred[0][1]] = (this.labels[pred[0][1]] || 0) + 1;
+        }
+        this.messageQueue = [];
+        console.log("AAA");
+        if (force) {
+            // @ts-ignore
+            console.log(Object.entries(this.labels).sort((a, b) => b[1] - a[1]));
+        }
     }
 
     public setTitle(title: string) {

@@ -66,6 +66,16 @@ class Progress extends EventEmitter {
     // updates the progress of the current task
     progress(format: FormatProgress, actual: number, total?: number) {
         if (!this.active) {
+            const prevTask = this.tasks
+                .slice()
+                .reverse()
+                .find((t) => t.status === "waiting");
+            const prevTaskCopy = JSON.parse(JSON.stringify(prevTask));
+            prevTaskCopy.status = "processing";
+            this.tasks.push(prevTaskCopy);
+            this.active = prevTaskCopy;
+        }
+        if (!this.active) {
             console.assert(false, "No active task");
             return;
         }
@@ -89,10 +99,7 @@ class Progress extends EventEmitter {
             // make sure to top out the progress
             this.active.progress.actual = this.active.progress.total;
         }
-        this.active = this.tasks
-            .slice()
-            .reverse()
-            .find((t) => t.status === "waiting");
+        this.active = undefined;
         this.update(true);
     }
 
