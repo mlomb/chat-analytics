@@ -23,7 +23,7 @@ export class DiscordParser extends Parser {
         this.channelId = this.builder.addChannel(channel.id, { n: channel.name });
     }
 
-    private async parseMessage(message: DiscordMessage) {
+    private parseMessage(message: DiscordMessage) {
         if (this.channelId === undefined) throw new Error("Missing channel ID");
 
         const timestamp = Date.parse(message.timestamp);
@@ -48,7 +48,7 @@ export class DiscordParser extends Parser {
 
         // :)
         if (message.type == "Default") {
-            await this.builder.addMessage(message.id, {
+            this.builder.addMessage(message.id, {
                 authorId,
                 channelId: this.channelId,
                 timestamp,

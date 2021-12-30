@@ -48,15 +48,15 @@ export class DatabaseBuilder {
         return id;
     }
 
-    public async addMessage(rawId: RawID, message: IMessage): Promise<ID> {
+    public addMessage(rawId: RawID, message: IMessage) {
         const channel = this.db.channels[message.channelId];
         channel.msgCount += 1;
-        await processMessage(message);
+        const p = processMessage(message);
         progress.stat(
             "messages",
             this.db.channels.reduce((sum, c) => sum + c.msgCount, 0)
         );
-        return 0;
+        return p || 0;
     }
 
     public setTitle(title: string) {

@@ -60,14 +60,18 @@ const Timer = (props: { active: boolean }) => {
 
     useEffect(() => {
         let start = Date.now();
+        const formatDiff = () => {
+            let seconds = Math.floor((Date.now() - start) / 1000);
+            let s = seconds % 60;
+            let m = Math.floor(seconds / 60);
+            return (m + "").padStart(2, "0") + ":" + (s + "").padStart(2, "0");
+        };
         if (props.active) {
-            const id = setInterval(() => {
-                let seconds = Math.floor((Date.now() - start) / 1000);
-                let s = seconds % 60;
-                let m = Math.floor(seconds / 60);
-                if (ref.current) ref.current.innerText = (m + "").padStart(2, "0") + ":" + (s + "").padStart(2, "0");
-            }, 1000);
-            return () => clearInterval(id);
+            const id = setInterval(() => (ref.current ? (ref.current.innerText = formatDiff()) : undefined), 1000);
+            return () => {
+                clearInterval(id);
+                console.log("Stopped timer at", formatDiff());
+            };
         }
     }, [props.active]);
 
