@@ -57,6 +57,16 @@ const Steps = () => {
         worker.onerror = (e) => {
             console.log(e);
             worker.terminate();
+            setState((prevState) => {
+                const tasks = prevState.tasks;
+                const last = tasks[tasks.length - 1];
+                last.status = "error";
+                last.error = e.message;
+                return {
+                    ...prevState,
+                    tasks,
+                };
+            });
             if (env.isDev) throw e;
         };
         worker.onmessage = (e: MessageEvent<ProgressMessage | ResultMessage>) => {
@@ -80,8 +90,8 @@ const Steps = () => {
                 }
                 // give a small delay
                 setTimeout(() => {
-                    setState((state) => ({
-                        ...state,
+                    setState((prevState) => ({
+                        ...prevState,
                         currentStep: 4,
                         worker: null,
                         result: data,
@@ -97,8 +107,8 @@ const Steps = () => {
             },
         };
         worker.postMessage(init);
-        setState((state) => ({
-            ...state,
+        setState((prevState) => ({
+            ...prevState,
             currentStep: 3,
             worker,
         }));

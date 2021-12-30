@@ -1,6 +1,6 @@
 import { downloadTextFile, FileInput } from "@pipeline/File";
 import { progress } from "@pipeline/Progress";
-import { Database, ReportConfig, Timestamp } from "@pipeline/Types";
+import { Database, ReportConfig } from "@pipeline/Types";
 
 import { Parser } from "@pipeline/parse/Parser";
 import { DiscordParser } from "@pipeline/parse/parsers/DiscordParser";
@@ -19,12 +19,12 @@ export const generateDatabase = async (files: FileInput[], config: ReportConfig)
         case "discord":
             parser = new DiscordParser(builder);
             break;
-        /*case "whatsapp":
+        case "whatsapp":
             parser = new WhatsAppParser(builder);
             break;
         case "telegram":
             parser = new TelegramParser(builder);
-            break;*/
+            break;
         default:
             throw new Error(`Unknown platform: ${config.platform}`);
     }

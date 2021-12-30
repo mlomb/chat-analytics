@@ -1,43 +1,18 @@
-// @ts-nocheck
-import { FileInput, ID, RawID } from "@pipeline/Types";
+import { ID, RawID } from "@pipeline/Types";
 import { Parser } from "@pipeline/parse/Parser";
 
-import JSONStream from "@pipeline/shared/JSONStream";
-import { streamJSONFromFile } from "@pipeline/Utils";
-
-interface TelegramMessage {
-    id: number;
-    type: "message" | "service" | unknown;
-    date: string;
-    from: string;
-    from_id: number;
-    reply_to_message_id?: number;
-    text: string | TextArray[];
-}
-
-interface TextArray {
-    type: "bot_command" | "link" | unknown;
-    text: string;
-}
+import { JSONStream } from "@pipeline/parse/JSONStream";
+import { FileInput, streamJSONFromFile } from "@pipeline/File";
 
 export class TelegramParser extends Parser {
     private channelName?: string;
     private channelId?: ID;
 
-    constructor() {
-        super("telegram");
-    }
-
     async *parse(file: FileInput) {
         const stream = new JSONStream();
 
-        stream.onObject<string>("name", (channelName) => {
-            this.channelName = channelName;
-            this.updateTitle(channelName);
-        });
-        stream.onObject<string>("id", (rawChannelId) => {
-            this.channelId = this.addChannel(rawChannelId, { name: this.channelName || this.database.title });
-        });
+        stream.onObject<string>("name", this.onChannelName.bind(this));
+        stream.onObject<string>("id", this.onChannelId.bind(this));
         stream.onArrayItem<TelegramMessage>("messages", this.parseMessage.bind(this));
 
         yield* streamJSONFromFile(stream, file);
@@ -46,22 +21,32 @@ export class TelegramParser extends Parser {
         this.channelId = undefined;
     }
 
+    private onChannelName(channelName: string) {
+        this.channelName = channelName;
+        this.builder.setTitle(channelName);
+    }
+
+    private onChannelId(rawChannelId: string) {
+        this.channelId = this.builder.addChannel(rawChannelId, { n: this.channelName || "default" });
+    }
+
     private parseMessage(message: TelegramMessage) {
-        if (this.channelId === undefined) throw new Error("Missing channel ID (2)");
+        if (this.channelId === undefined) throw new Error("Missing channel ID");
 
         const rawAuthorId: RawID = message.from_id + "";
         const timestamp = Date.parse(message.date);
 
         if (!message.from) return; // TODO: fix
 
-        const authorId = this.addAuthor(rawAuthorId, {
-            name: message.from,
-            bot: false, // TODO: mark all bot_command's as bot
+        const authorId = this.builder.addAuthor(rawAuthorId, {
+            n: message.from,
+            b: false, // TODO: mark all bot_command's as bot
         });
 
         if (message.type === "message") {
-            this.addMessage(message.id, this.channelId, {
+            this.builder.addMessage({
                 authorId,
+                channelId: this.channelId,
                 content: this.parseTextArray(message.text),
                 timestamp,
             });

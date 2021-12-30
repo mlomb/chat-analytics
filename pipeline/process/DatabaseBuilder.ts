@@ -36,39 +36,33 @@ export class DatabaseBuilder {
     private messageQueue: IMessage[] = [];
 
     public addChannel(rawId: RawID, channel: IChannel): ID {
-        const id = this.channelIDMapper.get(rawId);
-        this.db.channels[id] = {
-            ...channel,
-            ns: searchFormat(channel.n),
-            msgAddr: 0,
-            msgCount: 0,
-        };
-        progress.stat("channels", this.db.channels.length);
+        const [id, _new] = this.channelIDMapper.get(rawId);
+        if (_new) {
+            this.db.channels[id] = {
+                ...channel,
+                ns: searchFormat(channel.n),
+                msgAddr: 0,
+                msgCount: 0,
+            };
+            progress.stat("channels", this.db.channels.length);
+        }
         return id;
     }
 
     public addAuthor(rawId: RawID, author: IAuthor): ID {
-        const id = this.authorIDMapper.get(rawId);
-        this.db.authors[id] = {
-            ...author,
-            ns: searchFormat(author.n),
-        };
-        progress.stat("authors", this.db.authors.length);
+        const [id, _new] = this.authorIDMapper.get(rawId);
+        if (_new) {
+            this.db.authors[id] = {
+                ...author,
+                ns: searchFormat(author.n),
+            };
+            progress.stat("authors", this.db.authors.length);
+        }
         return id;
     }
 
     public addMessage(message: IMessage) {
         this.messageQueue.push(message);
-        /*
-        const channel = this.db.channels[message.channelId];
-
-        channel.msgCount += 1;
-        const p = processMessage(message);
-        progress.stat(
-            "messages",
-            this.db.channels.reduce((sum, c) => sum + c.msgCount, 0)
-        );
-        */
     }
 
     private labels: any = {};
@@ -83,7 +77,16 @@ export class DatabaseBuilder {
             this.labels[pred[0][1]] = (this.labels[pred[0][1]] || 0) + 1;
         }
         this.messageQueue = [];
-        console.log("AAA");
+        /*
+        const channel = this.db.channels[message.channelId];
+
+        channel.msgCount += 1;
+        const p = processMessage(message);
+        progress.stat(
+            "messages",
+            this.db.channels.reduce((sum, c) => sum + c.msgCount, 0)
+        );
+        */
         if (force) {
             // @ts-ignore
             console.log(Object.entries(this.labels).sort((a, b) => b[1] - a[1]));

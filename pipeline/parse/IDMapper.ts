@@ -9,12 +9,13 @@ export default class IDMapper {
         return this.mappings.has(input);
     }
 
-    public get(input: RawID): ID {
+    public get(input: RawID): [ID, boolean] {
         let id = this.mappings.get(input);
         if (id === undefined) {
             id = this.id++;
             this.mappings.set(input, id);
+            return [id, true];
         }
-        return id;
+        return [id, false];
     }
 }

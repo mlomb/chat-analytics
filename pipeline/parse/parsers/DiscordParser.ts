@@ -7,7 +7,7 @@ import { FileInput, streamJSONFromFile } from "@pipeline/File";
 export class DiscordParser extends Parser {
     private channelId?: ID;
 
-    async *parse(file: FileInput): AsyncGenerator<void> {
+    async *parse(file: FileInput) {
         const stream = new JSONStream();
 
         stream.onObject<DiscordGuild>("guild", (guild) => this.builder.setTitle(guild.name));
@@ -35,15 +35,14 @@ export class DiscordParser extends Parser {
         };
 
         // See: https://discord.com/developers/docs/reference#image-formatting-cdn-endpoints
-        // Reference: https://cdn.discordapp.com/avatars/user_id/user_avatar.png
-        // "https://cdn.discordapp.com/avatars/".length === 35
-        if (message.author.avatarUrl && message.author.avatarUrl.length > 35) {
+        // Can be:
+        // - https://cdn.discordapp.com/avatars/user_id/user_avatar.png
+        // - https://cdn.discordapp.com/embed/avatars/discriminator.png (must not set avatar, length is < 50)
+        if (message.author.avatarUrl && message.author.avatarUrl.length > 50) {
             const avatar = message.author.avatarUrl.slice(35).split(".")[0];
             author.da = (" " + avatar).substring(1); // avoid leak
-            // TODO: check for default avatars
         }
 
-        // store author
         const authorId = this.builder.addAuthor(message.author.id, author);
 
         // :)
