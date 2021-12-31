@@ -75,18 +75,16 @@ export class DatabaseBuilder {
             const pred: [number, string][] = this.languageDetectorModel.predict(message.content, 1, 0.0);
             console.assert(pred.length === 1);
             this.labels[pred[0][1]] = (this.labels[pred[0][1]] || 0) + 1;
+
+            const channel = this.db.channels[message.channelId];
+            channel.msgCount += 1;
         }
         this.messageQueue = [];
-        /*
-        const channel = this.db.channels[message.channelId];
 
-        channel.msgCount += 1;
-        const p = processMessage(message);
         progress.stat(
             "messages",
             this.db.channels.reduce((sum, c) => sum + c.msgCount, 0)
         );
-        */
         if (force) {
             // @ts-ignore
             console.log(Object.entries(this.labels).sort((a, b) => b[1] - a[1]));

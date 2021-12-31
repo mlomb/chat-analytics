@@ -254,8 +254,11 @@
         height: 40px;
         margin-right: 15px;
         img {
-            height: 24px;
-            width: 24px;
+            @sz: 1.5rem;
+            height: @sz;
+            width: @sz;
+            min-width: @sz;
+            min-height: @sz;
         }
     }
 }
