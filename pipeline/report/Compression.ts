@@ -21,6 +21,7 @@ function compress(database: Database): string {
     (json as any) = undefined;
 
     // Raw buffer format: <json buffer length> <serialized data length> <json buffer> <serialized data buffer>
+    // TODO: avoid generating a new buffer, instead use streaming
     let rawBuffer = new Uint8Array(4 * 2 + jsonBuffer.length + serializedBuffer.byteLength);
     let rawView = new DataView(rawBuffer.buffer);
 

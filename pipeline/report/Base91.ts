@@ -37,6 +37,7 @@ const TABLE = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!#$
 
 const B91_LENGTH_DIGITS = 12;
 
+// TODO: use buffers
 export const base91encode = (data: Uint8Array): string => {
     let ret = (data.length + "").padStart(B91_LENGTH_DIGITS, "0");
     const len = data.length;

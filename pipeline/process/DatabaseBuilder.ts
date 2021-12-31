@@ -9,11 +9,14 @@ import {
     RawID,
     ReportConfig,
     Timestamp,
+    Word,
 } from "@pipeline/Types";
 import IDMapper from "@pipeline/parse/IDMapper";
 import { progress } from "@pipeline/Progress";
 import { LanguageDetector } from "@pipeline/process/LanguageDetection";
+import { stripDiacritics } from "@pipeline/process/Diacritics";
 import { Serializer } from "@pipeline/report/Serializer";
+import Tokenizer from "wink-tokenizer";
 
 // TODO: !
 const searchFormat = (x: string) => x.toLocaleLowerCase();
@@ -25,6 +28,8 @@ export class DatabaseBuilder {
     private channelIDMapper = new IDMapper();
     private messageQueue: IMessage[] = [];
     private title: string = "Chat";
+    private words: Word[] = [];
+    private wordsIDs: Map<Word, ID> = new Map();
     private authors: Author[] = [];
     private authorMessagesCount: number[] = [];
     private channels: Channel[] = [];
@@ -39,13 +44,23 @@ export class DatabaseBuilder {
     } = {};
 
     private languageDetector: LanguageDetector;
+    private tokenizer: Tokenizer;
 
     constructor(private readonly config: ReportConfig) {
         this.languageDetector = new LanguageDetector();
+        this.tokenizer = new Tokenizer();
+        this.tokenizer.defineConfig({
+            quoted_phrase: false,
+            time: false,
+        });
     }
 
     public async init() {
         await this.languageDetector.init();
+    }
+
+    public setTitle(title: string) {
+        this.title = title;
     }
 
     public addChannel(rawId: RawID, channel: IChannel): ID {
@@ -79,7 +94,62 @@ export class DatabaseBuilder {
         this.messageQueue.push(message);
     }
 
-    public getChannelSerializer(channelId: ID, ts: Timestamp): Serializer | undefined {
+    // Process messages in the queue
+    public async process(force: boolean = false) {
+        for (const msg of this.messageQueue) {
+            const serializer = this.getChannelSerializer(msg.channelId, msg.timestamp);
+            if (!serializer) continue; // already processed (by time bounds)
+
+            if (this.minDate === 0 || msg.timestamp < this.minDate) this.minDate = msg.timestamp;
+            if (this.maxDate === 0 || msg.timestamp > this.maxDate) this.maxDate = msg.timestamp;
+            this.authorMessagesCount[msg.authorId] += 1;
+            this.channels[msg.channelId].msgCount += 1;
+
+            const langIdx = Math.floor(Math.random() * 176); //this.languageDetector.detect(msg.content);
+            const sentiment = Math.floor(Math.random() * 176);
+            // TODO: use different tokenizers depending on language
+            // TODO: https://github.com/marcellobarile/multilang-sentiment
+            const tokens = this.tokenizer.tokenize(msg.content);
+            // console.log(msg.content, langIdx, tokens);
+
+            const wordsCount: { [word: Word]: number } = {};
+            for (const token of tokens) {
+                let word: Word | undefined = undefined;
+                if (token.tag === "word") {
+                    const tagClean = stripDiacritics(token.value.toLocaleLowerCase());
+                    if (tagClean.length > 1 && tagClean.length < 25) {
+                        // MAX 25 chars per word
+                        word = tagClean;
+                    }
+                } else if (token.tag === "emoji") {
+                    word = token.value;
+                }
+                if (word) {
+                    wordsCount[word] = (wordsCount[word] || 0) + 1;
+                }
+            }
+
+            serializer.writeUint32(msg.timestamp);
+            serializer.writeUint24(msg.authorId);
+            serializer.writeUint8(langIdx);
+            serializer.writeUint8(sentiment);
+            let words = Object.keys(wordsCount);
+            let numWords = Math.min(words.length, 255); // MAX 256 words per message
+            serializer.writeUint8(numWords);
+            for (const word of words) {
+                const wordIdx = this.getWord(word);
+                serializer.writeUint24((wordIdx << 4) | wordsCount[word]);
+            }
+        }
+        this.messageQueue = [];
+
+        progress.stat(
+            "messages",
+            this.channels.reduce((sum, c) => sum + c.msgCount, 0)
+        );
+    }
+
+    private getChannelSerializer(channelId: ID, ts: Timestamp): Serializer | undefined {
         // TODO: !
         if (!(channelId in this.channelBuffers)) this.channelBuffers[channelId] = [];
         const arr = this.channelBuffers[channelId];
@@ -93,33 +163,12 @@ export class DatabaseBuilder {
         return arr[0].data;
     }
 
-    // Process messages in the queue
-    public async process(force: boolean = false) {
-        for (const msg of this.messageQueue) {
-            const serializer = this.getChannelSerializer(msg.channelId, msg.timestamp);
-            if (!serializer) continue; // already processed (by time bounds)
-
-            if (this.minDate === 0 || msg.timestamp < this.minDate) this.minDate = msg.timestamp;
-            if (this.maxDate === 0 || msg.timestamp > this.maxDate) this.maxDate = msg.timestamp;
-            this.authorMessagesCount[msg.authorId] += 1;
-            this.channels[msg.channelId].msgCount += 1;
-
-            const langIdx = this.languageDetector.detect(msg.content);
-
-            serializer.writeUint24(msg.authorId);
-            serializer.writeUint32(msg.timestamp);
-            serializer.writeUint8(langIdx);
-        }
-        this.messageQueue = [];
-
-        progress.stat(
-            "messages",
-            this.channels.reduce((sum, c) => sum + c.msgCount, 0)
-        );
-    }
-
-    public setTitle(title: string) {
-        this.title = title;
+    private getWord(word: Word): ID {
+        const id = this.wordsIDs.get(word);
+        if (id) return id;
+        this.wordsIDs.set(word, this.words.length);
+        this.words.push(word);
+        return this.words.length - 1;
     }
 
     public getDatabase(): Database {
@@ -177,6 +226,7 @@ export class DatabaseBuilder {
                 numDays: dayKeys.length,
                 numMonths: monthKeys.length,
             },
+            words: this.words,
             channels: this.channels,
             authors: this.authors,
             authorsOrder,

@@ -56,7 +56,7 @@ export class DiscordParser extends Parser {
         } else if (message.type == "Reply") {
         } else if (message.type == "ChannelPinnedMessage") {
         } else {
-            console.warn("Unhandled message type", message.type, message);
+            // console.warn("Unhandled message type", message.type, message);
         }
     }
 }

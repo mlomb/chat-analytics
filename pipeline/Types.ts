@@ -16,6 +16,8 @@ export type DateStr = string;
 // available platforms
 export type Platform = "discord" | "telegram" | "whatsapp";
 
+export type Word = string;
+
 // configuration, set in the UI
 export interface ReportConfig {
     platform: Platform;
@@ -32,6 +34,7 @@ export interface Database {
         numMonths: number;
     };
 
+    words: Word[];
     channels: Channel[];
     authors: Author[];
 
