@@ -2,3 +2,4 @@ node_modules/
 dist/
 coverage/
 report_sample*.data
+stats.json

@@ -18,7 +18,7 @@ try {
 
 module.exports = (env) => {
     const isProd = env.production == true;
-    console.log("isProd:", isProd);
+    if (!isProd) console.log("DEV BUILD");
 
     return {
         target: "web",
@@ -88,6 +88,11 @@ module.exports = (env) => {
                 "@assets": resolve("assets/"),
                 "@pipeline": resolve("pipeline/"),
                 "@report": resolve("report/"),
+            },
+            fallback: {
+                fs: false,
+                path: false,
+                crypto: false,
             },
         },
         plugins: [
