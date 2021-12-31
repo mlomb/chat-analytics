@@ -1,7 +1,7 @@
 import { StrictMode } from "react";
 import ReactDOM from "react-dom";
 
-// import ReportPage from "@report/ReportPage";
+import ReportPage from "@report/ReportPage";
 
 import { initDataProvider } from "@report/DataProvider";
 
@@ -10,9 +10,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     let dataStr: string = dataElem.textContent || "";
     dataElem.remove();
 
-    if (env.isDev) {
-        //  load from public/ folder
-        dataStr = await fetch("report_sample.data").then((res) => res.text());
+    if (dataStr === "[[[DATA]]]") {
+        try {
+            // load from public/ folder
+            dataStr = await fetch("report_sample.data").then((res) => res.text());
+        } catch (err) {}
     }
 
     if (dataStr.length === 0 || dataStr === "[[[DATA]]]") {
@@ -23,8 +25,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     initDataProvider(dataStr);
     ReactDOM.render(
         <StrictMode>
-            {/*<ReportPage />*/}
-            <div>PAGE</div>
+            <ReportPage />
         </StrictMode>,
         document.getElementById("app")
     );

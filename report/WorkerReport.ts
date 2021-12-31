@@ -7,6 +7,8 @@ import { ReportData } from "@pipeline/process/ReportData";
 import { DataDeserializer } from "@pipeline/shared/SerializedData";
 import { Filters } from "@pipeline/blocks/Filters";
 */
+import { Database } from "@pipeline/Types";
+
 import { decompress } from "@pipeline/report/Compression";
 
 /*
@@ -85,9 +87,20 @@ export interface InitMessage {
     dataStr: string;
 }
 
+export interface ReadyMessage {
+    type: "ready";
+    database: Database;
+}
+
 const init = (msg: InitMessage) => {
     const database = decompress(msg.dataStr);
-    console.log(database);
+
+    self.postMessage(<ReadyMessage>{
+        type: "ready",
+        database,
+    });
+
+    if (env.isDev) console.log(database);
 };
 
 self.onmessage = (ev: MessageEvent<InitMessage>) => {

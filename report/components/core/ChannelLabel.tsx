@@ -12,8 +12,8 @@ interface Props {
 
 const ChannelLabel = ({ id }: Props) => {
     const dp = useDataProvider();
-    const platform = dp.reportData.config.platform;
-    const channel = dp.reportData.channels[id];
+    const platform = dp.database.config.platform;
+    const channel = dp.database.channels[id];
 
     if (channel === undefined) {
         return <span>invalid channel id {id}</span>;

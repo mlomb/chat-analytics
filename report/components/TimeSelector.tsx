@@ -14,9 +14,6 @@ import {
 
 import { useDataProvider } from "@report/DataProvider";
 
-import { BlockState } from "@pipeline/blocks/Blocks";
-import { MessagesPerCycleBlock } from "@pipeline/blocks/MessagesPerCycle";
-
 const SB_HEIGHT = 50;
 const RESETS = {
     paddingBottom: 0,
@@ -105,6 +102,7 @@ const TimeSelector = () => {
         };
         scrollbarX.events.on("rangechanged", dateAxisChanged);
 
+        /*
         const blockKey = "MessagesPerCycle";
         const onDataUpdated = (state: BlockState, data?: MessagesPerCycleBlock) => {
             if (state === "ready") {
@@ -114,10 +112,13 @@ const TimeSelector = () => {
         };
         dataProvider.on(blockKey, onDataUpdated);
         dataProvider.toggleBlock(blockKey, 0, true);
+        */
 
         return () => {
+            /*
             dataProvider.off(blockKey, onDataUpdated);
             dataProvider.toggleBlock(blockKey, 0, false);
+            */
             root.dispose();
         };
     }, []);

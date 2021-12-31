@@ -1,10 +1,10 @@
+// @ts-nocheck
 import "@assets/styles/Card.less";
 
 import { useEffect, useState } from "react";
 import { InView } from "react-intersection-observer";
 
 import Spinner from "@assets/images/icons/spinner.svg";
-import { BlockKey, BlockState } from "@pipeline/blocks/Blocks";
 import { useDataProvider } from "@report/DataProvider";
 
 interface Props {

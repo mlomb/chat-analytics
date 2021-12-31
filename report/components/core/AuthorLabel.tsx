@@ -31,8 +31,8 @@ import wpp_avatar from "@assets/images/platforms/whatsapp/default_avatar.png";
 
 const AuthorLabel = ({ id }: Props) => {
     const dp = useDataProvider();
-    const platform = dp.reportData.config.platform;
-    const author = dp.reportData.authors[id];
+    const platform = dp.database.config.platform;
+    const author = dp.database.authors[id];
 
     if (author === undefined) {
         return <span>invalid author id {id}</span>;

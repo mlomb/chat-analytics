@@ -49,33 +49,33 @@ const tabs = [
     },
 ];
 
-const channelsFilterOptionsFn: (dp: Database) => FilterOption[] = (dp) => [
+const channelsFilterOptionsFn: (db: Database) => FilterOption[] = (db) => [
     {
         name: "Select all channels",
-        options: dp.reportData.channels
+        options: db.channels
             .map((c, i) => [c.msgCount, i])
             .sort((a, b) => b[0] - a[0])
             .map((c) => c[1]),
     },
 ];
 
-const authorsFilterOptionsFn: (dp: Database) => FilterOption[] = (dp) => {
-    const botsPresent = dp.reportData.authorsBotCutoff >= 0;
+const authorsFilterOptionsFn: (db: Database) => FilterOption[] = (db) => {
+    const botsPresent = db.authorsBotCutoff >= 0;
     const options: FilterOption[] = [
         {
             name: "Select all authors" + (botsPresent ? "  (🧍➕🤖)" : ""),
-            options: dp.reportData.authorsOrder,
+            options: db.authorsOrder,
         },
     ];
     if (botsPresent) {
         options.push(
             {
                 name: "Select all non-bot authors (🧍)",
-                options: dp.reportData.authorsOrder.slice(0, dp.reportData.authorsBotCutoff),
+                options: db.authorsOrder.slice(0, db.authorsBotCutoff),
             },
             {
                 name: "Select all bot authors (🤖)",
-                options: dp.reportData.authorsOrder.slice(dp.reportData.authorsBotCutoff),
+                options: db.authorsOrder.slice(db.authorsBotCutoff),
             }
         );
     }
@@ -86,8 +86,8 @@ const Header = (props: Props) => {
     const { tab, setTab } = props;
     const dataProvider = useDataProvider();
 
-    const channelsFilterOptions = useMemo(() => channelsFilterOptionsFn(dataProvider), [dataProvider]);
-    const authorsFilterOptions = useMemo(() => authorsFilterOptionsFn(dataProvider), [dataProvider]);
+    const channelsFilterOptions = useMemo(() => channelsFilterOptionsFn(dataProvider.database), [dataProvider]);
+    const authorsFilterOptions = useMemo(() => authorsFilterOptionsFn(dataProvider.database), [dataProvider]);
 
     const [selectedChannels, setSelectedChannels] = useState<ID[]>(channelsFilterOptions[0].options);
     const [selectedAuthors, setSelectedAuthors] = useState<ID[]>(authorsFilterOptions[0].options);
@@ -97,12 +97,12 @@ const Header = (props: Props) => {
 
     const filterChannels = useCallback(
         (term: string) =>
-            channelsFilterOptions[0].options.filter((i) => dataProvider.reportData.channels[i].ns.includes(term)),
+            channelsFilterOptions[0].options.filter((i) => dataProvider.database.channels[i].ns.includes(term)),
         [dataProvider]
     );
     const filterAuthors = useCallback(
         (term: string) =>
-            authorsFilterOptions[0].options.filter((i) => dataProvider.reportData.authors[i].ns.includes(term)),
+            authorsFilterOptions[0].options.filter((i) => dataProvider.database.authors[i].ns.includes(term)),
         [dataProvider]
     );
 
@@ -110,7 +110,7 @@ const Header = (props: Props) => {
         <div className="Header">
             <div className="Header__info">
                 <span className="Header__title">
-                    <h1>{dataProvider.reportData.title}</h1>
+                    <h1>{dataProvider.database.title}</h1>
                     <h2>chat analysis report</h2>
                 </span>
                 <div className="Header__link">

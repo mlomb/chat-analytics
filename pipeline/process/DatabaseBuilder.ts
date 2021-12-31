@@ -1,4 +1,15 @@
-import { Database, IAuthor, IChannel, ID, IMessage, Platform, RawID, ReportConfig } from "@pipeline/Types";
+import {
+    Author,
+    Channel,
+    Database,
+    IAuthor,
+    IChannel,
+    ID,
+    IMessage,
+    RawID,
+    ReportConfig,
+    Timestamp,
+} from "@pipeline/Types";
 import IDMapper from "@pipeline/parse/IDMapper";
 import { progress } from "@pipeline/Progress";
 
@@ -6,20 +17,18 @@ import { FastTextModel, loadFastTextModel } from "@pipeline/process/FastText";
 
 // TODO: !
 const searchFormat = (x: string) => x.toLocaleLowerCase();
+const monthToString = (date: Date): string => date.getFullYear() + "-" + (date.getMonth() + 1);
+const dateToString = (date: Date): string => monthToString(date) + "-" + date.getDate();
 
 export class DatabaseBuilder {
-    private db: Database = {
-        config: this.config,
-        title: "Chat",
-        time: {
-            minDate: "",
-            maxDate: "",
-            numDays: 0,
-            numMonths: 0,
-        },
-        channels: [],
-        authors: [],
-    };
+    private authorIDMapper = new IDMapper();
+    private channelIDMapper = new IDMapper();
+    private messageQueue: IMessage[] = [];
+    private title: string = "Chat";
+    private authors: Author[] = [];
+    private channels: Channel[] = [];
+    private minDate: Timestamp = 0;
+    private maxDate: Timestamp = 0;
 
     constructor(private readonly config: ReportConfig) {}
 
@@ -31,20 +40,16 @@ export class DatabaseBuilder {
         }
     }
 
-    private authorIDMapper = new IDMapper();
-    private channelIDMapper = new IDMapper();
-    private messageQueue: IMessage[] = [];
-
     public addChannel(rawId: RawID, channel: IChannel): ID {
         const [id, _new] = this.channelIDMapper.get(rawId);
         if (_new) {
-            this.db.channels[id] = {
+            this.channels[id] = {
                 ...channel,
                 ns: searchFormat(channel.n),
                 msgAddr: 0,
                 msgCount: 0,
             };
-            progress.stat("channels", this.db.channels.length);
+            progress.stat("channels", this.channels.length);
         }
         return id;
     }
@@ -52,11 +57,11 @@ export class DatabaseBuilder {
     public addAuthor(rawId: RawID, author: IAuthor): ID {
         const [id, _new] = this.authorIDMapper.get(rawId);
         if (_new) {
-            this.db.authors[id] = {
+            this.authors[id] = {
                 ...author,
                 ns: searchFormat(author.n),
             };
-            progress.stat("authors", this.db.authors.length);
+            progress.stat("authors", this.authors.length);
         }
         return id;
     }
@@ -71,19 +76,22 @@ export class DatabaseBuilder {
     public async process(force: boolean = false) {
         if (!this.languageDetectorModel) throw new Error("Language detector model not loaded");
 
-        for (const message of this.messageQueue) {
-            const pred: [number, string][] = this.languageDetectorModel.predict(message.content, 1, 0.0);
+        for (const msg of this.messageQueue) {
+            const pred: [number, string][] = this.languageDetectorModel.predict(msg.content, 1, 0.0);
             console.assert(pred.length === 1);
             this.labels[pred[0][1]] = (this.labels[pred[0][1]] || 0) + 1;
 
-            const channel = this.db.channels[message.channelId];
+            const channel = this.channels[msg.channelId];
             channel.msgCount += 1;
+
+            if (this.minDate === 0 || msg.timestamp < this.minDate) this.minDate = msg.timestamp;
+            if (this.maxDate === 0 || msg.timestamp > this.maxDate) this.maxDate = msg.timestamp;
         }
         this.messageQueue = [];
 
         progress.stat(
             "messages",
-            this.db.channels.reduce((sum, c) => sum + c.msgCount, 0)
+            this.channels.reduce((sum, c) => sum + c.msgCount, 0)
         );
         if (force) {
             // @ts-ignore
@@ -92,11 +100,39 @@ export class DatabaseBuilder {
     }
 
     public setTitle(title: string) {
-        this.db.title = title;
+        this.title = title;
     }
 
     public getDatabase(): Database {
-        this.db.serialized = new Uint8Array(16);
-        return this.db;
+        const start = new Date(this.minDate);
+        const end = new Date(this.maxDate);
+        const startUTC = Date.UTC(start.getFullYear(), start.getMonth(), start.getDate());
+
+        const dayKeys: string[] = [];
+        const monthKeys: string[] = [];
+
+        for (let day = new Date(startUTC); day <= end; day.setDate(day.getDate() + 1)) {
+            const dayKey = dateToString(day);
+            const monthKey = monthToString(day);
+
+            dayKeys.push(dayKey);
+            if (monthKeys.length === 0 || monthKeys[monthKeys.length - 1] !== monthKey) monthKeys.push(monthKey);
+        }
+
+        return {
+            config: this.config,
+            title: this.title,
+            time: {
+                minDate: dateToString(start),
+                maxDate: dateToString(end),
+                numDays: dayKeys.length,
+                numMonths: monthKeys.length,
+            },
+            channels: this.channels,
+            authors: this.authors,
+            authorsOrder: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
+            authorsBotCutoff: 0,
+            serialized: new Uint8Array(16),
+        };
     }
 }

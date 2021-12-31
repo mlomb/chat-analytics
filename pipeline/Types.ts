@@ -35,6 +35,9 @@ export interface Database {
     channels: Channel[];
     authors: Author[];
 
+    authorsOrder: number[];
+    authorsBotCutoff: number;
+
     serialized?: SerializedData;
 }
 

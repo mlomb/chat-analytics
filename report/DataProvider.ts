@@ -24,7 +24,7 @@ export class DataProvider extends EventEmitter {
     private activeEndDate: Date = new Date();
 
     // Updated by this class and the Worker
-    public reportData!: ReportData;
+    public database!: Database;
     private blocksDescs?: BlocksDescMap;
     private readyBlocks: Map<BlockKey, any | null> = new Map();
 
@@ -45,11 +45,11 @@ export class DataProvider extends EventEmitter {
     private onMessage(e: MessageEvent<ReadyMessage | BlockResultMessage>) {
         const res = e.data;
         if (res.type === "ready") {
-            this.reportData = res.reportData;
+            this.database = res.database;
             this.blocksDescs = res.blocksDesc;
             // set default time range
-            this.activeStartDate = new Date(res.reportData.time.minDate);
-            this.activeEndDate = new Date(res.reportData.time.maxDate);
+            this.activeStartDate = new Date(res.database.time.minDate);
+            this.activeEndDate = new Date(res.database.time.maxDate);
 
             // worker is ready
             console.log("Worker is ready");
