@@ -15,6 +15,10 @@ export class Serializer {
         this.tail = 0;
     }
 
+    public get length(): number {
+        return this.tail;
+    }
+
     public get validBuffer(): Uint8Array {
         return this.buffer.slice(0, this.tail);
     }
@@ -27,6 +31,13 @@ export class Serializer {
         this.need(1);
         this.dv.setUint8(this.head, value);
         this.push(1);
+    }
+
+    public writeUint24(value: number) {
+        this.need(3);
+        this.dv.setUint8(this.head, value & 0xff);
+        this.dv.setUint16(this.head + 1, (value >> 8) & 0xffff);
+        this.push(3);
     }
 
     public writeUint32(value: number) {

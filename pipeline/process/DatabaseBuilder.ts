@@ -12,8 +12,8 @@ import {
 } from "@pipeline/Types";
 import IDMapper from "@pipeline/parse/IDMapper";
 import { progress } from "@pipeline/Progress";
-
-import { FastTextModel, loadFastTextModel } from "@pipeline/process/FastText";
+import { LanguageDetector } from "@pipeline/process/LanguageDetection";
+import { Serializer } from "@pipeline/report/Serializer";
 
 // TODO: !
 const searchFormat = (x: string) => x.toLocaleLowerCase();
@@ -30,15 +30,22 @@ export class DatabaseBuilder {
     private channels: Channel[] = [];
     private minDate: Timestamp = 0;
     private maxDate: Timestamp = 0;
+    private channelBuffers: {
+        [id: ID]: {
+            start: Timestamp;
+            end: Timestamp;
+            data: Serializer;
+        }[];
+    } = {};
 
-    constructor(private readonly config: ReportConfig) {}
+    private languageDetector: LanguageDetector;
 
-    private languageDetectorModel: FastTextModel | undefined;
+    constructor(private readonly config: ReportConfig) {
+        this.languageDetector = new LanguageDetector();
+    }
 
     public async init() {
-        if (this.languageDetectorModel === undefined) {
-            this.languageDetectorModel = await loadFastTextModel("lid.176");
-        }
+        await this.languageDetector.init();
     }
 
     public addChannel(rawId: RawID, channel: IChannel): ID {
@@ -72,24 +79,36 @@ export class DatabaseBuilder {
         this.messageQueue.push(message);
     }
 
-    private labels: any = {};
+    public getChannelSerializer(channelId: ID, ts: Timestamp): Serializer | undefined {
+        // TODO: !
+        if (!(channelId in this.channelBuffers)) this.channelBuffers[channelId] = [];
+        const arr = this.channelBuffers[channelId];
+        if (arr.length === 0) {
+            arr.push({
+                start: ts,
+                end: ts,
+                data: new Serializer(),
+            });
+        }
+        return arr[0].data;
+    }
 
     // Process messages in the queue
     public async process(force: boolean = false) {
-        if (!this.languageDetectorModel) throw new Error("Language detector model not loaded");
-
         for (const msg of this.messageQueue) {
-            const pred: [number, string][] = this.languageDetectorModel.predict(msg.content, 1, 0.0);
-            console.assert(pred.length === 1);
-            this.labels[pred[0][1]] = (this.labels[pred[0][1]] || 0) + 1;
-
-            const channel = this.channels[msg.channelId];
-            channel.msgCount += 1;
-
-            this.authorMessagesCount[msg.authorId] += 1;
+            const serializer = this.getChannelSerializer(msg.channelId, msg.timestamp);
+            if (!serializer) continue; // already processed (by time bounds)
 
             if (this.minDate === 0 || msg.timestamp < this.minDate) this.minDate = msg.timestamp;
             if (this.maxDate === 0 || msg.timestamp > this.maxDate) this.maxDate = msg.timestamp;
+            this.authorMessagesCount[msg.authorId] += 1;
+            this.channels[msg.channelId].msgCount += 1;
+
+            const langIdx = this.languageDetector.detect(msg.content);
+
+            serializer.writeUint24(msg.authorId);
+            serializer.writeUint32(msg.timestamp);
+            serializer.writeUint8(langIdx);
         }
         this.messageQueue = [];
 
@@ -97,10 +116,6 @@ export class DatabaseBuilder {
             "messages",
             this.channels.reduce((sum, c) => sum + c.msgCount, 0)
         );
-        if (force) {
-            // @ts-ignore
-            console.log(Object.entries(this.labels).sort((a, b) => b[1] - a[1]));
-        }
     }
 
     public setTitle(title: string) {
@@ -134,6 +149,25 @@ export class DatabaseBuilder {
         const authorsBotCutoff: number = authorsOrder.findIndex((i) => this.authors[i].b);
         progress.done();
 
+        progress.new("Merging channel buffers");
+        let totalSize = 0;
+        for (const channelId in this.channelBuffers) {
+            for (const buffer of this.channelBuffers[channelId]) {
+                totalSize += buffer.data.length;
+            }
+        }
+        const serialized = new Uint8Array(totalSize);
+        let offset = 0;
+        for (const channelId in this.channelBuffers) {
+            this.channels[channelId].msgAddr = offset;
+            for (const buffer of this.channelBuffers[channelId]) {
+                serialized.set(buffer.data.validBuffer, offset);
+                offset += buffer.data.length;
+            }
+        }
+        console.assert(offset === totalSize);
+        progress.done();
+
         return {
             config: this.config,
             title: this.title,
@@ -147,7 +181,7 @@ export class DatabaseBuilder {
             authors: this.authors,
             authorsOrder,
             authorsBotCutoff,
-            serialized: new Uint8Array(16),
+            serialized,
         };
     }
 }
