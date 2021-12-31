@@ -26,6 +26,7 @@ export class DatabaseBuilder {
     private messageQueue: IMessage[] = [];
     private title: string = "Chat";
     private authors: Author[] = [];
+    private authorMessagesCount: number[] = [];
     private channels: Channel[] = [];
     private minDate: Timestamp = 0;
     private maxDate: Timestamp = 0;
@@ -61,6 +62,7 @@ export class DatabaseBuilder {
                 ...author,
                 ns: searchFormat(author.n),
             };
+            this.authorMessagesCount[id] = 0;
             progress.stat("authors", this.authors.length);
         }
         return id;
@@ -83,6 +85,8 @@ export class DatabaseBuilder {
 
             const channel = this.channels[msg.channelId];
             channel.msgCount += 1;
+
+            this.authorMessagesCount[msg.authorId] += 1;
 
             if (this.minDate === 0 || msg.timestamp < this.minDate) this.minDate = msg.timestamp;
             if (this.maxDate === 0 || msg.timestamp > this.maxDate) this.maxDate = msg.timestamp;
@@ -119,6 +123,17 @@ export class DatabaseBuilder {
             if (monthKeys.length === 0 || monthKeys[monthKeys.length - 1] !== monthKey) monthKeys.push(monthKey);
         }
 
+        progress.new("Sorting authors");
+        const authorsOrder: ID[] = Array.from({ length: this.authors.length }, (_, i) => i);
+        authorsOrder.sort((a, b) =>
+            // first non-bots, then by messages count
+            this.authors[a].b === this.authors[b].b
+                ? this.authorMessagesCount[b] - this.authorMessagesCount[a]
+                : +this.authors[a].b - +this.authors[b].b
+        );
+        const authorsBotCutoff: number = authorsOrder.findIndex((i) => this.authors[i].b);
+        progress.done();
+
         return {
             config: this.config,
             title: this.title,
@@ -130,8 +145,8 @@ export class DatabaseBuilder {
             },
             channels: this.channels,
             authors: this.authors,
-            authorsOrder: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
-            authorsBotCutoff: 0,
+            authorsOrder,
+            authorsBotCutoff,
             serialized: new Uint8Array(16),
         };
     }
