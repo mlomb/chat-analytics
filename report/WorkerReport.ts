@@ -97,7 +97,11 @@ const init = (msg: InitMessage) => {
 
     self.postMessage(<ReadyMessage>{
         type: "ready",
-        database,
+        database: {
+            ...database,
+            // no needed in the UI
+            serialized: undefined,
+        },
     });
 
     if (env.isDev) console.log(database);
