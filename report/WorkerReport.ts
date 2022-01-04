@@ -1,86 +1,9 @@
 export default null as any;
 
-/*
-import { BlockRequestMessage, BlockResultMessage, InitMessage, ReadyMessage } from "@pipeline/Messages";
-import { BlocksDesc, BlocksProcessFn } from "@pipeline/blocks/Blocks";
-import { ReportData } from "@pipeline/process/ReportData";
-import { DataDeserializer } from "@pipeline/shared/SerializedData";
-import { Filters } from "@pipeline/blocks/Filters";
-*/
-import { Database } from "@pipeline/Types";
-
+import { Database, DateStr, ID } from "@pipeline/Types";
+import { Blocks, BlockDescriptions, BlockKey, BlockInfo } from "@pipeline/aggregate/Blocks";
+import { Filters } from "@pipeline/aggregate/Filters";
 import { decompress } from "@pipeline/report/Compression";
-
-/*
-let reportData: ReportData | null = null;
-let dataDeserializer: DataDeserializer | null = null;
-let filters: Filters | null = null;
-*/
-
-/*
-const init = async (msg: InitMessage) => {
-    const [_reportData, serializedData] = await decompress(msg.dataStr);
-    reportData = _reportData;
-    dataDeserializer = new DataDeserializer(serializedData);
-    filters = new Filters(reportData.authors.length);
-
-    self.postMessage(<ReadyMessage>{
-        type: "ready",
-        reportData,
-        blocksDesc: BlocksDesc,
-    });
-
-    if (env.isDev) {
-        console.log(reportData, serializedData);
-    }
-};
-
-const request = async (msg: BlockRequestMessage) => {
-    if (!filters || !reportData || !dataDeserializer) throw new Error("No data provided");
-
-    const br = msg;
-    // update active data if provided
-    if (br.filters.channels) filters.updateChannels(br.filters.channels);
-    if (br.filters.authors) filters.updateAuthors(br.filters.authors);
-    if (br.filters.startDate) filters.updateStartDate(br.filters.startDate);
-    if (br.filters.endDate) filters.updateEndDate(br.filters.endDate);
-
-    try {
-        if (!(br.blockKey in BlocksProcessFn)) throw new Error("BlockFn not found");
-
-        console.time(br.blockKey);
-        const data = BlocksProcessFn[br.blockKey](reportData, dataDeserializer, filters);
-        console.timeEnd(br.blockKey);
-
-        self.postMessage(<BlockResultMessage>{
-            type: "result",
-            blockKey: br.blockKey,
-            state: "ready",
-            data,
-        });
-    } catch (err) {
-        console.error(err);
-        self.postMessage(<BlockResultMessage>{
-            type: "result",
-            blockKey: br.blockKey,
-            state: "error",
-            data: null,
-        });
-    }
-};
-
-self.onmessage = async (ev: MessageEvent<InitMessage | BlockRequestMessage>) => {
-    switch (ev.data.type) {
-        case "init":
-            init(ev.data);
-            break;
-        case "request":
-            request(ev.data);
-            break;
-    }
-};
-
-*/
 
 export interface InitMessage {
     type: "init";
@@ -90,10 +13,32 @@ export interface InitMessage {
 export interface ReadyMessage {
     type: "ready";
     database: Database;
+    blocksDescs: BlockDescriptions;
 }
 
+export interface BlockRequestMessage {
+    type: "request";
+    blockKey: BlockKey;
+    filters: Partial<{
+        authors: ID[];
+        channels: ID[];
+        startDate: DateStr;
+        endDate: DateStr;
+    }>;
+}
+
+export interface BlockResultMessage<K extends BlockKey> {
+    type: "result";
+    blockKey: K;
+    blockInfo: BlockInfo<K>;
+}
+
+let database: Database | null = null;
+let filters: Filters | null = null;
+
 const init = (msg: InitMessage) => {
-    const database = decompress(msg.dataStr);
+    database = decompress(msg.dataStr);
+    filters = new Filters(database);
 
     self.postMessage(<ReadyMessage>{
         type: "ready",
@@ -102,16 +47,59 @@ const init = (msg: InitMessage) => {
             // no needed in the UI
             serialized: undefined,
         },
+        // remove functions
+        blocksDescs: JSON.parse(JSON.stringify(Blocks)),
     });
 
     if (env.isDev) console.log(database);
 };
 
-self.onmessage = (ev: MessageEvent<InitMessage>) => {
+const request = async (msg: BlockRequestMessage) => {
+    if (!database || !filters) throw new Error("No data provided");
+
+    // update active data if provided
+    if (msg.filters.channels) filters.updateChannels(msg.filters.channels);
+    if (msg.filters.authors) filters.updateAuthors(msg.filters.authors);
+    if (msg.filters.startDate) filters.updateStartDate(msg.filters.startDate);
+    if (msg.filters.endDate) filters.updateEndDate(msg.filters.endDate);
+
+    const result: BlockResultMessage<any> = {
+        type: "result",
+        blockKey: msg.blockKey,
+        blockInfo: {
+            state: "error",
+            data: null,
+        },
+    };
+
+    try {
+        if (!(msg.blockKey in Blocks)) throw new Error("BlockFn not found");
+
+        console.time(msg.blockKey);
+        const data = Blocks[msg.blockKey].fn(database, filters);
+        console.timeEnd(msg.blockKey);
+
+        result.blockInfo = {
+            state: "ready",
+            data,
+        };
+    } catch (err) {
+        console.error(err);
+    }
+
+    self.postMessage(result);
+};
+
+self.onmessage = (ev: MessageEvent<InitMessage | BlockRequestMessage>) => {
     switch (ev.data.type) {
         case "init":
             init(ev.data);
             break;
+        case "request":
+            request(ev.data);
+            break;
+        default:
+            console.log("Unknown message", ev.data);
     }
 };
 

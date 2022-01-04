@@ -1,21 +1,31 @@
-// @ts-nocheck
 import EventEmitter from "events";
 
-import { ID } from "@pipeline/Types";
+import { Database, ID } from "@pipeline/Types";
+import { BlockDescriptions, BlockInfo, BlockKey, BlockState, BlockTrigger } from "@pipeline/aggregate/Blocks";
+import { dateToString } from "@pipeline/Util";
 
-// import { BlockKey, BlocksDescMap, BlockState, Trigger } from "@pipeline/blocks/Blocks";
+import Worker, { BlockRequestMessage, BlockResultMessage, InitMessage, ReadyMessage } from "@report/WorkerReport";
 
-import Worker from "@report/WorkerReport";
+export declare interface DataProvider {
+    emit<K extends BlockKey>(event: K, info: BlockInfo<K>): boolean;
+    emit(event: "ready" | `trigger-${BlockTrigger}`): boolean;
+
+    on<K extends BlockKey>(event: K, listener: (info: BlockInfo<K>) => void): this;
+    on(event: "ready" | `trigger-${BlockTrigger}`, listener: () => void): this;
+}
 
 export class DataProvider extends EventEmitter {
     private worker: Worker;
-    private validRequestData: Set<Trigger> = new Set();
+    private validRequestData: Set<BlockTrigger> = new Set();
     private currentBlock?: BlockKey; // if currentBlock===undefined, the worker is available
     private currentBlockInvalidated: boolean = false;
 
-    // Updated by the UI
+    // active blocks
+    // we track keys and ids because there can be multiple instances of the same block key (with different IDs)
     private activeBlocks: Set<BlockKey> = new Set();
-    private activeIds: Set<number> = new Set();
+    private activeBlockIds: Set<number> = new Set();
+
+    // active filters
     private activeChannels: ID[] = [];
     private activeAuthors: ID[] = [];
     private channelsSet: boolean = false;
@@ -25,8 +35,8 @@ export class DataProvider extends EventEmitter {
 
     // Updated by this class and the Worker
     public database!: Database;
-    private blocksDescs?: BlocksDescMap;
-    private readyBlocks: Map<BlockKey, any | null> = new Map();
+    private blocksDescs?: BlockDescriptions;
+    private readyBlocks: Set<BlockKey> = new Set();
 
     constructor(dataStr: string) {
         super();
@@ -42,11 +52,11 @@ export class DataProvider extends EventEmitter {
         this.worker.terminate();
     }
 
-    private onMessage(e: MessageEvent<ReadyMessage | BlockResultMessage>) {
+    private onMessage<K extends BlockKey>(e: MessageEvent<ReadyMessage | BlockResultMessage<K>>) {
         const res = e.data;
         if (res.type === "ready") {
             this.database = res.database;
-            this.blocksDescs = res.blocksDesc;
+            this.blocksDescs = res.blocksDescs;
             // set default time range
             this.activeStartDate = new Date(res.database.time.minDate);
             this.activeEndDate = new Date(res.database.time.maxDate);
@@ -55,24 +65,24 @@ export class DataProvider extends EventEmitter {
             console.log("Worker is ready");
             this.emit("ready");
         } else if (res.type === "result") {
-            this.onWorkDone(res.blockKey, res.state, res.data);
+            this.onWorkDone(res.blockKey, res.blockInfo);
         }
     }
 
     toggleBlock(blockKey: BlockKey, id: number, active: boolean) {
         if (active) {
-            this.activeIds.add(id);
+            this.activeBlockIds.add(id);
             this.activeBlocks.add(blockKey);
 
             // try to dispatch right away
             this.tryToDispatchWork();
         } else {
-            if (this.activeIds.has(id)) {
+            if (this.activeBlockIds.has(id)) {
                 this.activeBlocks.delete(blockKey);
-                this.activeIds.delete(id);
+                this.activeBlockIds.delete(id);
             }
         }
-        // console.log(this.activeBlocks, this.activeIds);
+        console.log(this.activeBlocks, this.activeBlockIds);
     }
 
     updateChannels(channels: ID[]) {
@@ -119,7 +129,10 @@ export class DataProvider extends EventEmitter {
         this.currentBlockInvalidated = false;
 
         // notify that this block is loading
-        this.emit(blockKey, "loading", undefined);
+        this.emit(blockKey, {
+            state: "loading",
+            data: null,
+        });
 
         // dispatch work
         const br: BlockRequestMessage = {
@@ -143,18 +156,22 @@ export class DataProvider extends EventEmitter {
         this.worker.postMessage(br);
     }
 
-    private onWorkDone(blockKey: BlockKey, state: BlockState, data: any | null) {
+    private onWorkDone<K extends BlockKey>(blockKey: K, blockInfo: BlockInfo<K>) {
         console.assert(this.currentBlock === blockKey);
 
         // make sure the block we were working hasnt been invalidated
         if (this.currentBlockInvalidated) {
             // notify the UI
-            this.emit(blockKey, "stale", undefined);
+            this.emit(blockKey, {
+                state: "stale",
+                data: null,
+            });
         } else {
             // store block result in case it is needed later
             // and notify the UI
-            this.readyBlocks.set(blockKey, data);
-            this.emit(blockKey, state, data);
+            // TODO: store it
+            this.readyBlocks.add(blockKey);
+            this.emit(blockKey, blockInfo);
         }
 
         // make worker available again and try to dispatch more work
@@ -163,9 +180,9 @@ export class DataProvider extends EventEmitter {
         this.tryToDispatchWork();
     }
 
-    private invalidateBlocks(trigger: Trigger) {
+    private invalidateBlocks(trigger: BlockTrigger) {
         this.validRequestData.delete(trigger);
-        this.emit("trigger-" + trigger);
+        this.emit(`trigger-${trigger}`);
 
         if (this.blocksDescs === undefined) {
             // worker is not ready yet
@@ -178,7 +195,10 @@ export class DataProvider extends EventEmitter {
                 // must invalidate
                 // remove from ready blocks and notify UI of stale data
                 this.readyBlocks.delete(blockKey);
-                this.emit(blockKey, "stale", undefined);
+                this.emit(blockKey, {
+                    state: "stale",
+                    data: null,
+                });
             }
         }
         // if we are currently working on a block, mark to invalidate

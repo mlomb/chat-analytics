@@ -16,12 +16,12 @@ import { progress } from "@pipeline/Progress";
 import { LanguageDetector } from "@pipeline/process/LanguageDetection";
 import { stripDiacritics } from "@pipeline/process/Diacritics";
 import { Serializer } from "@pipeline/report/Serializer";
+import { dateToString, monthToString } from "@pipeline/Util";
+
 import Tokenizer from "wink-tokenizer";
 
 // TODO: !
 const searchFormat = (x: string) => x.toLocaleLowerCase();
-const monthToString = (date: Date): string => date.getFullYear() + "-" + (date.getMonth() + 1);
-const dateToString = (date: Date): string => monthToString(date) + "-" + date.getDate();
 
 export class DatabaseBuilder {
     private authorIDMapper = new IDMapper();
@@ -30,6 +30,7 @@ export class DatabaseBuilder {
     private title: string = "Chat";
     private words: Word[] = [];
     private wordsIDs: Map<Word, ID> = new Map();
+    private wordsCount: number[] = [];
     private authors: Author[] = [];
     private authorMessagesCount: number[] = [];
     private channels: Channel[] = [];
@@ -94,6 +95,16 @@ export class DatabaseBuilder {
         this.messageQueue.push(message);
     }
 
+    private test: {
+        [day: string]: {
+            [authorId: ID]: {
+                [word: number]: number;
+            };
+        };
+    } = {};
+
+    private c: number = 0;
+
     // Process messages in the queue
     public async process(force: boolean = false) {
         for (const msg of this.messageQueue) {
@@ -129,6 +140,24 @@ export class DatabaseBuilder {
                 }
             }
 
+            const d = dateToString(new Date(msg.timestamp));
+            if (!(d in this.test)) this.test[d] = {};
+            const day = this.test[d];
+            if (!(msg.authorId in day)) day[msg.authorId] = {};
+            const author = day[msg.authorId];
+            for (const [word, count] of Object.entries(wordsCount)) {
+                const wordIdx = this.getWord(word);
+                if (!(wordIdx in author)) author[wordIdx] = 0;
+                author[wordIdx] += count;
+                this.wordsCount[wordIdx] = (this.wordsCount[wordIdx] || 0) + count;
+            }
+
+            this.c += 32;
+            this.c += 24;
+            this.c += 8;
+            this.c += 8;
+            this.c += Object.keys(wordsCount).length * 24;
+
             serializer.writeUint32(msg.timestamp);
             serializer.writeUint24(msg.authorId);
             serializer.writeUint8(langIdx);
@@ -137,8 +166,10 @@ export class DatabaseBuilder {
             let numWords = Math.min(words.length, 255); // MAX 256 words per message
             serializer.writeUint8(numWords);
             for (const word of words) {
-                const wordIdx = this.getWord(word);
-                serializer.writeUint24((wordIdx << 4) | wordsCount[word]);
+                if (Math.random() > 0.5) {
+                    const wordIdx = this.getWord(word);
+                    serializer.writeUint24((wordIdx << 4) | wordsCount[word]);
+                }
             }
         }
         this.messageQueue = [];
@@ -187,6 +218,8 @@ export class DatabaseBuilder {
             if (monthKeys.length === 0 || monthKeys[monthKeys.length - 1] !== monthKey) monthKeys.push(monthKey);
         }
 
+        console.log(this.test);
+
         progress.new("Sorting authors");
         const authorsOrder: ID[] = Array.from({ length: this.authors.length }, (_, i) => i);
         authorsOrder.sort((a, b) =>
@@ -217,6 +250,30 @@ export class DatabaseBuilder {
         console.assert(offset === totalSize);
         progress.done();
 
+        console.log(this.wordsCount);
+
+        let sz = 0;
+        for (const day in this.test) {
+            sz += 16;
+            for (const author in this.test[day]) {
+                if (Object.keys(this.test[day][author]).length > 0) {
+                    sz += 24; // author id
+                    sz += 8; // lang
+                    sz += 8; // sentiment
+                    for (const word in this.test[day][author]) {
+                        if (this.wordsCount[word] > 1) {
+                            sz += 24;
+                        }
+                    }
+                }
+            }
+        }
+        console.log("sz", sz / 8);
+        console.log("new sz", this.c / 8);
+        debugger;
+        console.log("szJSON", JSON.stringify(this.test).length);
+
+        debugger;
         return {
             config: this.config,
             title: this.title,

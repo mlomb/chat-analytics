@@ -13,10 +13,10 @@ import {
 } from "@amcharts/amcharts5/xy";
 
 import { useDataProvider } from "@report/DataProvider";
-import { MessagesPerCycleBlock } from "@pipeline/blocks/MessagesPerCycle";
+import { MessagesPerCycle } from "@pipeline/aggregate/MessagesPerCycle";
 import { Themes } from "./AmCharts5";
 
-const MessagesGraph = ({ data }: { data: MessagesPerCycleBlock }) => {
+const MessagesGraph = ({ data }: { data: MessagesPerCycle }) => {
     const dataProvider = useDataProvider();
     const chartDiv = useRef<HTMLDivElement>(null);
     const [charts, setCharts] = useState<{
