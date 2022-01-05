@@ -1,4 +1,6 @@
 import { BitAddress } from "@pipeline/Types";
+
+// TODO: maybe create our own BitStream, faster?
 import { BitView } from "bit-buffer";
 
 export class BitStream {
