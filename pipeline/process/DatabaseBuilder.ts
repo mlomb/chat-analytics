@@ -191,7 +191,9 @@ export class DatabaseBuilder {
             const numWords = Math.min(words.length, 255); // MAX 255 words per message
             for (let i = 0; i < numWords; i++) {
                 const wordIdx = this.getWord(words[i]);
-                imsg.words.push([wordIdx, Math.min(wordsCount[words[i]], 15)]); // MAX 15 occurrences per word
+                const count = Math.min(wordsCount[words[i]], 15);
+                this.wordsCount[wordIdx] = (this.wordsCount[wordIdx] || 0) + count;
+                imsg.words.push([wordIdx, count]); // MAX 15 occurrences per word
             }
 
             // store message
@@ -244,8 +246,12 @@ export class DatabaseBuilder {
         const authorsBotCutoff: number = authorsOrder.findIndex((i) => this.authors[i].b);
         progress.done();
 
-        console.log("original", Math.ceil(this.stream.offset / 8));
+        progress.new("Computing words cutoff");
+        const wordsCutoff = this.computeWordsCutoff();
+        console.log("Words cutoff", wordsCutoff);
+        progress.done();
 
+        console.log("original", Math.ceil(this.stream.offset / 8));
         console.time("buff");
         progress.new("Generating final messages data");
         const bitConfig: MessageBitConfig = {
@@ -269,11 +275,21 @@ export class DatabaseBuilder {
                         authorId: imsg.authorId,
                         langIdx: imsg.langIdx,
                         sentiment: imsg.sentiment,
-                        words: imsg.words,
+                        words: [],
                     };
+
+                    // filter words
+                    for (let i = 0; i < imsg.words.length; i++) {
+                        const pair = imsg.words[i];
+                        if (this.wordsCount[pair[0]] >= wordsCutoff) {
+                            msg.words.push(pair);
+                        }
+                    }
+
+                    // write message
                     writeMessage(msg, finalStream, bitConfig);
                     this.channels[channelId].msgCount++;
-                    progress.progress("number", messagesWritten, this.totalMessages);
+                    progress.progress("number", messagesWritten++, this.totalMessages);
                 }
             }
         }
@@ -298,5 +314,21 @@ export class DatabaseBuilder {
             authorsBotCutoff,
             serialized: finalStream.buffer.slice(0, Math.ceil(finalStream.offset / 8)),
         };
+    }
+
+    computeWordsCutoff(): number {
+        const sortedCounts = this.wordsCount.slice(0).sort((a, b) => b - a);
+        const total = sortedCounts.reduce((sum, c) => sum + c, 0);
+        const threshold = total * 0.95;
+        const len = sortedCounts.length;
+        let i = 0,
+            acc = 0;
+        for (; i < len; i++) {
+            acc += sortedCounts[i];
+            if (acc >= threshold) break;
+            progress.progress("number", i, len);
+        }
+        // at least two occurrences
+        return Math.max(2, sortedCounts[i] || 0);
     }
 }
