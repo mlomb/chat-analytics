@@ -7,11 +7,13 @@ import {
     IChannel,
     ID,
     IMessage,
+    IntermediateMessage,
     Message,
     RawID,
     ReportConfig,
     Timestamp,
     Word,
+    WordIndex,
 } from "@pipeline/Types";
 import IDMapper from "@pipeline/parse/IDMapper";
 import { progress } from "@pipeline/Progress";
@@ -19,8 +21,6 @@ import { LanguageDetector } from "@pipeline/process/LanguageDetection";
 import { stripDiacritics } from "@pipeline/process/Diacritics";
 import { BitStream } from "@pipeline/report/BitStream";
 import { dateToString, monthToString } from "@pipeline/Util";
-
-import Tokenizer from "wink-tokenizer";
 import {
     MessageBitConfig,
     readIntermediateMessage,
@@ -28,8 +28,14 @@ import {
     writeMessage,
 } from "@pipeline/report/Serialization";
 
+import Tokenizer from "wink-tokenizer";
+
 // TODO: !
 const searchFormat = (x: string) => x.toLocaleLowerCase();
+
+// how many bits are needed to store n
+// n > 0
+const nextPOTBits = (n: number) => 32 - Math.clz32(n);
 
 // section in the bitstream
 type ChannelSection = {
@@ -53,6 +59,7 @@ export class DatabaseBuilder {
     private maxDate: Timestamp = 0;
     private stream: BitStream;
     private channelSections: { [id: ID]: ChannelSection[] } = {};
+    private totalMessages = 0;
 
     private languageDetector: LanguageDetector;
     private tokenizer: Tokenizer;
@@ -136,8 +143,12 @@ export class DatabaseBuilder {
         const section = this.getChannelSection(this.messageQueue[0].channelId, this.messageQueue[0].timestamp);
 
         for (const msg of this.messageQueue) {
-            if (this.minDate === 0 || msg.timestamp < this.minDate) this.minDate = msg.timestamp;
-            if (this.maxDate === 0 || msg.timestamp > this.maxDate) this.maxDate = msg.timestamp;
+            const rawDate = new Date(msg.timestamp);
+            const tsUTC = Date.UTC(rawDate.getFullYear(), rawDate.getMonth(), rawDate.getDate());
+            const dateUTC = new Date(tsUTC);
+
+            if (this.minDate === 0 || tsUTC < this.minDate) this.minDate = tsUTC;
+            if (this.maxDate === 0 || tsUTC > this.maxDate) this.maxDate = tsUTC;
             this.authorMessagesCount[msg.authorId] += 1;
             this.channels[msg.channelId].msgCount += 1;
 
@@ -165,27 +176,30 @@ export class DatabaseBuilder {
                 }
             }
 
-            writeIntermediateMessage(
-                {
-                    timestamp: msg.timestamp,
-                    authorId: msg.authorId,
-                    langIdx,
-                    sentiment,
-                    words: [],
-                },
-                this.stream
-            );
+            const imsg: IntermediateMessage = {
+                year: dateUTC.getFullYear(),
+                month: dateUTC.getMonth(),
+                day: dateUTC.getDate(),
+                hour: dateUTC.getHours(),
+                authorId: msg.authorId,
+                langIdx,
+                sentiment,
+                words: [],
+            };
+
+            const words = Object.keys(wordsCount);
+            const numWords = Math.min(words.length, 255); // MAX 255 words per message
+            for (let i = 0; i < numWords; i++) {
+                const wordIdx = this.getWord(words[i]);
+                imsg.words.push([wordIdx, Math.min(wordsCount[words[i]], 15)]); // MAX 15 occurrences per word
+            }
+
+            // store message
+            writeIntermediateMessage(imsg, this.stream);
+            this.totalMessages += 1;
+
             // register in section
             section.end = this.stream.offset;
-
-            /*
-            let words = Object.keys(wordsCount);
-            let numWords = Math.min(words.length, 255); // MAX 256 words per message
-            for (const word of words) {
-                const wordIdx = this.getWord(word);
-                serializer.writeUint24((wordIdx << 4) | wordsCount[word]);
-            }
-            */
         }
         this.messageQueue = [];
 
@@ -230,11 +244,17 @@ export class DatabaseBuilder {
         const authorsBotCutoff: number = authorsOrder.findIndex((i) => this.authors[i].b);
         progress.done();
 
+        console.log("original", Math.ceil(this.stream.offset / 8));
+
+        console.time("buff");
         progress.new("Generating final messages data");
         const bitConfig: MessageBitConfig = {
-            dayIndex: 5,
+            dayIndexBits: Math.max(1, nextPOTBits(dayKeys.length)),
+            authorIdBits: Math.max(1, nextPOTBits(this.authors.length)),
+            wordIdxBits: Math.max(1, nextPOTBits(this.words.length)),
         };
         const finalStream = new BitStream();
+        let messagesWritten = 0;
         for (const channelId in this.channelSections) {
             this.channels[channelId].msgAddr = finalStream.offset;
             for (const section of this.channelSections[channelId]) {
@@ -242,10 +262,10 @@ export class DatabaseBuilder {
                 this.stream.offset = section.start;
                 while (this.stream.offset < section.end) {
                     const imsg = readIntermediateMessage(this.stream);
+
                     const msg: Message = {
-                        dayIndex: 1,
-                        monthIndex: 0,
-                        hour: 0,
+                        dayIndex: dayKeys.indexOf(`${imsg.year}-${imsg.month}-${imsg.day}`),
+                        hour: imsg.hour,
                         authorId: imsg.authorId,
                         langIdx: imsg.langIdx,
                         sentiment: imsg.sentiment,
@@ -253,15 +273,17 @@ export class DatabaseBuilder {
                     };
                     writeMessage(msg, finalStream, bitConfig);
                     this.channels[channelId].msgCount++;
+                    progress.progress("number", messagesWritten, this.totalMessages);
                 }
             }
         }
         progress.done();
-
-        console.log(finalStream);
-
+        console.timeEnd("buff");
+        console.log("final", Math.ceil(finalStream.offset / 8));
+        debugger;
         return {
             config: this.config,
+            bitConfig,
             title: this.title,
             time: {
                 minDate: dateToString(start),
@@ -274,7 +296,7 @@ export class DatabaseBuilder {
             authors: this.authors,
             authorsOrder,
             authorsBotCutoff,
-            serialized: finalStream.buffer,
+            serialized: finalStream.buffer.slice(0, Math.ceil(finalStream.offset / 8)),
         };
     }
 }

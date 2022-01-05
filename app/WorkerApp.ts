@@ -38,6 +38,7 @@ self.onmessage = async (ev: MessageEvent<InitMessage>) => {
 
     try {
         const database = await generateDatabase(files.map(wrapFile), ev.data.config);
+        if (env.isDev) console.log(database);
         const result = await generateReportSite(database);
         self.postMessage(<ResultMessage>{
             type: "result",

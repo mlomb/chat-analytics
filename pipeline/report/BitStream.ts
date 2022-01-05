@@ -19,7 +19,7 @@ export class BitStream {
     }
 
     setBits(bits: number, value: number): void {
-        if ((this.offset + bits) >>> 3 > this._buffer.length) {
+        if ((this.offset + bits) / 8 > this._buffer.length) {
             // grow
             // TODO: maybe double is too much
             const newBuffer = new Uint8Array(this._buffer.length * 2);

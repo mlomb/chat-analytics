@@ -1,3 +1,5 @@
+import { MessageBitConfig } from "@pipeline/report/Serialization";
+
 // raw ID that comes from the platform (e.g 9876554321)
 export type RawID = string | number;
 
@@ -30,6 +32,7 @@ export interface ReportConfig {
 // the generated object after processing
 export interface Database {
     config: ReportConfig;
+    bitConfig: MessageBitConfig;
     title: string;
     time: {
         minDate: DateStr;
@@ -99,7 +102,10 @@ export interface IMessage {
 
 // stored serialized during generation
 export interface IntermediateMessage {
-    timestamp: Timestamp;
+    year: number;
+    month: number;
+    day: number;
+    hour: number;
     authorId: ID;
     langIdx: number;
     sentiment: number;
@@ -110,7 +116,6 @@ export interface IntermediateMessage {
 // (and what aggregators use)
 export interface Message {
     dayIndex: number;
-    monthIndex: number;
     hour: number;
     authorId: ID;
     langIdx: number;
