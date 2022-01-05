@@ -48,7 +48,7 @@ const init = (msg: InitMessage) => {
             serialized: undefined,
         },
         // remove functions
-        blocksDescs: JSON.parse(JSON.stringify(Blocks)),
+        blocksDescs: JSON.parse(JSON.stringify(Blocks)) as BlockDescriptions,
     });
 
     if (env.isDev) console.log(database);

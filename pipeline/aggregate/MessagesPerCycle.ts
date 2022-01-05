@@ -11,11 +11,23 @@ export interface MessagesPerCycle {
 }
 
 const fn: BlockFn<MessagesPerCycle> = (database, filters) => {
-    console.log(database, filters);
-    return {
+    const res: MessagesPerCycle = {
         perDay: [],
         perMonth: [],
     };
+    console.log(database, filters);
+
+    var date = new Date(database.time.minDate);
+    date.setHours(0, 0, 0, 0);
+    for (let i = 0; i < 1000; i++) {
+        date.setDate(date.getDate() + 1);
+        res.perDay.push({
+            d: date.getTime(),
+            m: Math.round(Math.random() * 100) + 3,
+        });
+    }
+
+    return res;
 };
 
 export default {

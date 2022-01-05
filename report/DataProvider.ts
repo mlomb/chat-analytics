@@ -82,7 +82,6 @@ export class DataProvider extends EventEmitter {
                 this.activeBlockIds.delete(id);
             }
         }
-        console.log(this.activeBlocks, this.activeBlockIds);
     }
 
     updateChannels(channels: ID[]) {

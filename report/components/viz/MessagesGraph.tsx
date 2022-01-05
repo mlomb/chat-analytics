@@ -73,8 +73,8 @@ const MessagesGraph = ({ data }: { data: MessagesPerCycle }) => {
 
         const stepSeries = chartStep.series.push(
             StepLineSeries.new(root, {
-                valueXField: "date",
-                valueYField: "messages",
+                valueXField: "d",
+                valueYField: "m",
                 xAxis: createDateAxis(chartStep, "day"),
                 yAxis: createValueAxis(chartStep),
                 noRisers: true,
@@ -118,8 +118,8 @@ const MessagesGraph = ({ data }: { data: MessagesPerCycle }) => {
 
         const columnSeries = chartColumn.series.push(
             ColumnSeries.new(root, {
-                valueXField: "date",
-                valueYField: "messages",
+                valueXField: "d",
+                valueYField: "m",
                 xAxis: createDateAxis(chartColumn, "month"),
                 yAxis: createValueAxis(chartColumn),
                 fill: Color.fromHex(0x479adb),

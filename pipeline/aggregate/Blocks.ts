@@ -1,7 +1,7 @@
 import { Database } from "@pipeline/Types";
 import { Filters } from "@pipeline/aggregate/Filters";
 
-export type BlockState = "loading" | "stale" | "ready" | "error" | "nodata";
+export type BlockState = "loading" | "stale" | "ready" | "error";
 export type BlockTrigger = "authors" | "channels" | "time";
 export type BlockFn<T> = (database: Database, filters: Filters) => T;
 export type BlockDescription<K, T> = {

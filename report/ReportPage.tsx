@@ -17,16 +17,9 @@ import AnimatedBars from "@report/components/viz/AnimatedBars";
 import MessagesStats from "@report/components/viz/MessagesStats";
 import Block from "@report/components/Block";
 import { BlockInfo, BlockState } from "@pipeline/aggregate/Blocks";
+import { MessagesPerCycle } from "@pipeline/aggregate/MessagesPerCycle";
 
 const CardContainer = (props: { children: React.ReactNode }) => <div className="CardContainer">{props.children}</div>;
-
-const Test = (props: { info: BlockInfo<"messages-per-cycle"> }) => {
-    return (
-        <div>
-            state: {props.info.state} data: {JSON.stringify(props.info.data)}
-        </div>
-    );
-};
 
 const ReportDashboard = () => {
     const [tab, setTab] = useState("messages");
@@ -37,7 +30,12 @@ const ReportDashboard = () => {
 
             <TabContainer currentValue={tab} value="messages">
                 <CardContainer>
-                    <Block blockKey="messages-per-cycle" children={Test} />
+                    <Card
+                        num={2}
+                        title="Messages sent per day &amp; month"
+                        blockKey="messages-per-cycle"
+                        children={MessagesGraph}
+                    />
                 </CardContainer>
             </TabContainer>
         </>

@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef } from "react";
+import { useEffect, useLayoutEffect, useRef } from "react";
 
 import { Themes } from "./viz/AmCharts5";
 import { Root, Color } from "@amcharts/amcharts5";
@@ -13,6 +13,8 @@ import {
 } from "@amcharts/amcharts5/xy";
 
 import { useDataProvider } from "@report/DataProvider";
+import { BlockInfo } from "@pipeline/aggregate/Blocks";
+import Block from "@report/components/Block";
 
 const SB_HEIGHT = 50;
 const RESETS = {
@@ -26,9 +28,10 @@ const RESETS = {
     marginRight: 0,
 };
 
-const TimeSelector = () => {
+const TimeSelector = (props: { info: BlockInfo<"messages-per-cycle"> }) => {
     const dataProvider = useDataProvider();
     const chartDiv = useRef<HTMLDivElement>(null);
+    const seriesRef = useRef<StepLineSeries | null>(null);
 
     useLayoutEffect(() => {
         const root = Root.new(chartDiv.current!);
@@ -77,8 +80,8 @@ const TimeSelector = () => {
             StepLineSeries.new(root, {
                 xAxis: xAxis,
                 yAxis: yAxis,
-                valueYField: "messages",
-                valueXField: "date",
+                valueYField: "m",
+                valueXField: "d",
                 noRisers: true,
             })
         );
@@ -91,6 +94,7 @@ const TimeSelector = () => {
             fillOpacity: 0.2,
             visible: true,
         });
+        seriesRef.current = series;
 
         const dateAxisChanged = (ev: { start: number; end: number }) => {
             let start = xAxis.positionToDate(ev.start);
@@ -102,26 +106,17 @@ const TimeSelector = () => {
         };
         scrollbarX.events.on("rangechanged", dateAxisChanged);
 
-        /*
-        const blockKey = "MessagesPerCycle";
-        const onDataUpdated = (state: BlockState, data?: MessagesPerCycleBlock) => {
-            if (state === "ready") {
-                // TODO: update efficient
-                series.data.setAll(data!.perDay);
-            }
-        };
-        dataProvider.on(blockKey, onDataUpdated);
-        dataProvider.toggleBlock(blockKey, 0, true);
-        */
-
         return () => {
-            /*
-            dataProvider.off(blockKey, onDataUpdated);
-            dataProvider.toggleBlock(blockKey, 0, false);
-            */
             root.dispose();
         };
     }, []);
+
+    useEffect(() => {
+        if (props.info.state === "ready") {
+            // TODO: update efficient
+            seriesRef.current?.data.setAll(props.info.data!.perDay);
+        }
+    }, [props.info, seriesRef]);
 
     return (
         <div
@@ -134,4 +129,4 @@ const TimeSelector = () => {
     );
 };
 
-export default TimeSelector;
+export default () => <Block blockKey="messages-per-cycle" children={TimeSelector} />;
