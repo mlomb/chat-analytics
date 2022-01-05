@@ -21,6 +21,7 @@
     "@types/webpack-env": "^1.16.3",
     "@types/wink-tokenizer": "^4.0.3",
     "autoprefixer": "^10.4.0",
+    "bit-buffer": "^0.2.5",
     "copy-webpack-plugin": "^10.2.0",
     "css-loader": "^6.5.1",
     "cssnano": "^5.0.14",

@@ -1,27 +1,41 @@
-import { Serializer, Deserializer } from "@pipeline/report/Serializer";
+import { IntermediateMessage, Message } from "@pipeline/Types";
+import { BitStream } from "@pipeline/report/BitStream";
 
-/*
-// dateIndex: 16 bits 0-65535 (~179 years)
-// monthIndex: 11 bits: 0-2047 (~170 years)
-// hour: 5 bits: 0-31 (we only use 0-24)
-public writeDate(dateIndex: number, monthIndex: number, hour: number) {
-    const d: number = (dateIndex << 16) | (monthIndex << 5) | hour;
-    this.writeUint32(d);
-}
-
-public readMessages(
-    start: Address,
-    count: number,
-    fn: (dateIndex: number, monthIndex: number, hour: number, authorId: ID) => void
-) {
-    this.seek(start);
-    for (let i = 0; i < count; i++) {
-        const d = this.readUint32();
-        const authorId = this.readUint32();
-
-        fn((d >> 16) & 0xffff, (d >> 5) & 0x7ff, d & 0x1f, authorId);
+export const writeIntermediateMessage = (message: IntermediateMessage, stream: BitStream) => {
+    stream.setBits(32, Math.floor(message.timestamp / 1000));
+    stream.setBits(32, message.authorId);
+    stream.setBits(8, message.langIdx);
+    stream.setBits(8, message.sentiment);
+    stream.setBits(8, message.words.length);
+    for (const [word, count] of message.words) {
+        stream.setBits(16, word);
+        stream.setBits(8, count);
     }
-}
-*/
+};
 
-// TODO: messages binary serialization
+export const readIntermediateMessage = (stream: BitStream): IntermediateMessage => {
+    const imsg: IntermediateMessage = {
+        timestamp: stream.getBits(32) * 1000,
+        authorId: stream.getBits(32),
+        langIdx: stream.getBits(8),
+        sentiment: stream.getBits(8),
+        words: [],
+    };
+    const numWords = stream.getBits(8);
+    for (let i = 0; i < numWords; i++) {
+        imsg.words.push([stream.getBits(16), stream.getBits(8)]);
+    }
+    return imsg;
+};
+
+export interface MessageBitConfig {
+    dayIndex: number;
+}
+
+export const writeMessage = (message: Message, stream: BitStream, config: MessageBitConfig) => {
+    stream.setBits(message.dayIndex, config.dayIndex);
+};
+
+export const readMessage = (stream: BitStream, config: MessageBitConfig): Message => {
+    return {} as Message;
+};

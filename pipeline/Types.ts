@@ -7,6 +7,9 @@ export type ID = number;
 // offset in bytes in a Uint8Array buffer
 export type Address = number;
 
+// offset in BITS in a BitBuffer
+export type BitAddress = number;
+
 // UTC timestamp
 export type Timestamp = number;
 
@@ -17,6 +20,7 @@ export type DateStr = string;
 export type Platform = "discord" | "telegram" | "whatsapp";
 
 export type Word = string;
+export type WordIndex = number;
 
 // configuration, set in the UI
 export interface ReportConfig {
@@ -88,4 +92,22 @@ export interface IMessage {
     channelId: ID;
     timestamp: Timestamp;
     content: string;
+}
+
+export interface IntermediateMessage {
+    timestamp: Timestamp;
+    authorId: ID;
+    langIdx: number;
+    sentiment: number;
+    words: [WordIndex, number][];
+}
+
+export interface Message {
+    dayIndex: number;
+    monthIndex: number;
+    hour: number;
+    authorId: ID;
+    langIdx: number;
+    sentiment: number;
+    words: [WordIndex, number][];
 }

@@ -1,11 +1,13 @@
 import {
     Author,
+    BitAddress,
     Channel,
     Database,
     IAuthor,
     IChannel,
     ID,
     IMessage,
+    Message,
     RawID,
     ReportConfig,
     Timestamp,
@@ -15,13 +17,26 @@ import IDMapper from "@pipeline/parse/IDMapper";
 import { progress } from "@pipeline/Progress";
 import { LanguageDetector } from "@pipeline/process/LanguageDetection";
 import { stripDiacritics } from "@pipeline/process/Diacritics";
-import { Serializer } from "@pipeline/report/Serializer";
+import { BitStream } from "@pipeline/report/BitStream";
 import { dateToString, monthToString } from "@pipeline/Util";
 
 import Tokenizer from "wink-tokenizer";
+import {
+    MessageBitConfig,
+    readIntermediateMessage,
+    writeIntermediateMessage,
+    writeMessage,
+} from "@pipeline/report/Serialization";
 
 // TODO: !
 const searchFormat = (x: string) => x.toLocaleLowerCase();
+
+// section in the bitstream
+type ChannelSection = {
+    ts: Timestamp;
+    start: BitAddress;
+    end: BitAddress;
+};
 
 export class DatabaseBuilder {
     private authorIDMapper = new IDMapper();
@@ -36,18 +51,14 @@ export class DatabaseBuilder {
     private channels: Channel[] = [];
     private minDate: Timestamp = 0;
     private maxDate: Timestamp = 0;
-    private channelBuffers: {
-        [id: ID]: {
-            start: Timestamp;
-            end: Timestamp;
-            data: Serializer;
-        }[];
-    } = {};
+    private stream: BitStream;
+    private channelSections: { [id: ID]: ChannelSection[] } = {};
 
     private languageDetector: LanguageDetector;
     private tokenizer: Tokenizer;
 
     constructor(private readonly config: ReportConfig) {
+        this.stream = new BitStream();
         this.languageDetector = new LanguageDetector();
         this.tokenizer = new Tokenizer();
         this.tokenizer.defineConfig({
@@ -95,22 +106,36 @@ export class DatabaseBuilder {
         this.messageQueue.push(message);
     }
 
-    private test: {
-        [day: string]: {
-            [authorId: ID]: {
-                [word: number]: number;
-            };
-        };
-    } = {};
-
-    private c: number = 0;
+    private getChannelSection(channelId: ID, timestamp: Timestamp): ChannelSection {
+        if (!(channelId in this.channelSections)) {
+            this.channelSections[channelId] = [
+                {
+                    ts: timestamp,
+                    start: this.stream.offset,
+                    end: this.stream.offset,
+                },
+            ];
+        }
+        const sections = this.channelSections[channelId];
+        const lastSection = sections[sections.length - 1];
+        if (lastSection.end === this.stream.offset) return lastSection;
+        else {
+            // create new section (non-contiguous)
+            sections.push({
+                ts: timestamp,
+                start: this.stream.offset,
+                end: this.stream.offset,
+            });
+            return sections[sections.length - 1];
+        }
+    }
 
     // Process messages in the queue
     public async process(force: boolean = false) {
-        for (const msg of this.messageQueue) {
-            const serializer = this.getChannelSerializer(msg.channelId, msg.timestamp);
-            if (!serializer) continue; // already processed (by time bounds)
+        if (this.messageQueue.length === 0) return;
+        const section = this.getChannelSection(this.messageQueue[0].channelId, this.messageQueue[0].timestamp);
 
+        for (const msg of this.messageQueue) {
             if (this.minDate === 0 || msg.timestamp < this.minDate) this.minDate = msg.timestamp;
             if (this.maxDate === 0 || msg.timestamp > this.maxDate) this.maxDate = msg.timestamp;
             this.authorMessagesCount[msg.authorId] += 1;
@@ -140,37 +165,27 @@ export class DatabaseBuilder {
                 }
             }
 
-            const d = dateToString(new Date(msg.timestamp));
-            if (!(d in this.test)) this.test[d] = {};
-            const day = this.test[d];
-            if (!(msg.authorId in day)) day[msg.authorId] = {};
-            const author = day[msg.authorId];
-            for (const [word, count] of Object.entries(wordsCount)) {
-                const wordIdx = this.getWord(word);
-                if (!(wordIdx in author)) author[wordIdx] = 0;
-                author[wordIdx] += count;
-                this.wordsCount[wordIdx] = (this.wordsCount[wordIdx] || 0) + count;
-            }
+            writeIntermediateMessage(
+                {
+                    timestamp: msg.timestamp,
+                    authorId: msg.authorId,
+                    langIdx,
+                    sentiment,
+                    words: [],
+                },
+                this.stream
+            );
+            // register in section
+            section.end = this.stream.offset;
 
-            this.c += 32;
-            this.c += 24;
-            this.c += 8;
-            this.c += 8;
-            this.c += Object.keys(wordsCount).length * 24;
-
-            serializer.writeUint32(msg.timestamp);
-            serializer.writeUint24(msg.authorId);
-            serializer.writeUint8(langIdx);
-            serializer.writeUint8(sentiment);
+            /*
             let words = Object.keys(wordsCount);
             let numWords = Math.min(words.length, 255); // MAX 256 words per message
-            serializer.writeUint8(numWords);
             for (const word of words) {
-                if (Math.random() > 0.5) {
-                    const wordIdx = this.getWord(word);
-                    serializer.writeUint24((wordIdx << 4) | wordsCount[word]);
-                }
+                const wordIdx = this.getWord(word);
+                serializer.writeUint24((wordIdx << 4) | wordsCount[word]);
             }
+            */
         }
         this.messageQueue = [];
 
@@ -178,20 +193,6 @@ export class DatabaseBuilder {
             "messages",
             this.channels.reduce((sum, c) => sum + c.msgCount, 0)
         );
-    }
-
-    private getChannelSerializer(channelId: ID, ts: Timestamp): Serializer | undefined {
-        // TODO: !
-        if (!(channelId in this.channelBuffers)) this.channelBuffers[channelId] = [];
-        const arr = this.channelBuffers[channelId];
-        if (arr.length === 0) {
-            arr.push({
-                start: ts,
-                end: ts,
-                data: new Serializer(),
-            });
-        }
-        return arr[0].data;
     }
 
     private getWord(word: Word): ID {
@@ -218,8 +219,6 @@ export class DatabaseBuilder {
             if (monthKeys.length === 0 || monthKeys[monthKeys.length - 1] !== monthKey) monthKeys.push(monthKey);
         }
 
-        console.log(this.test);
-
         progress.new("Sorting authors");
         const authorsOrder: ID[] = Array.from({ length: this.authors.length }, (_, i) => i);
         authorsOrder.sort((a, b) =>
@@ -231,49 +230,36 @@ export class DatabaseBuilder {
         const authorsBotCutoff: number = authorsOrder.findIndex((i) => this.authors[i].b);
         progress.done();
 
-        progress.new("Merging channel buffers");
-        let totalSize = 0;
-        for (const channelId in this.channelBuffers) {
-            for (const buffer of this.channelBuffers[channelId]) {
-                totalSize += buffer.data.length;
-            }
-        }
-        const serialized = new Uint8Array(totalSize);
-        let offset = 0;
-        for (const channelId in this.channelBuffers) {
-            this.channels[channelId].msgAddr = offset;
-            for (const buffer of this.channelBuffers[channelId]) {
-                serialized.set(buffer.data.validBuffer, offset);
-                offset += buffer.data.length;
-            }
-        }
-        console.assert(offset === totalSize);
-        progress.done();
-
-        console.log(this.wordsCount);
-
-        let sz = 0;
-        for (const day in this.test) {
-            sz += 16;
-            for (const author in this.test[day]) {
-                if (Object.keys(this.test[day][author]).length > 0) {
-                    sz += 24; // author id
-                    sz += 8; // lang
-                    sz += 8; // sentiment
-                    for (const word in this.test[day][author]) {
-                        if (this.wordsCount[word] > 1) {
-                            sz += 24;
-                        }
-                    }
+        progress.new("Generating final messages data");
+        const bitConfig: MessageBitConfig = {
+            dayIndex: 5,
+        };
+        const finalStream = new BitStream();
+        for (const channelId in this.channelSections) {
+            this.channels[channelId].msgAddr = finalStream.offset;
+            for (const section of this.channelSections[channelId]) {
+                // seek
+                this.stream.offset = section.start;
+                while (this.stream.offset < section.end) {
+                    const imsg = readIntermediateMessage(this.stream);
+                    const msg: Message = {
+                        dayIndex: 1,
+                        monthIndex: 0,
+                        hour: 0,
+                        authorId: imsg.authorId,
+                        langIdx: imsg.langIdx,
+                        sentiment: imsg.sentiment,
+                        words: imsg.words,
+                    };
+                    writeMessage(msg, finalStream, bitConfig);
+                    this.channels[channelId].msgCount++;
                 }
             }
         }
-        console.log("sz", sz / 8);
-        console.log("new sz", this.c / 8);
-        debugger;
-        console.log("szJSON", JSON.stringify(this.test).length);
+        progress.done();
 
-        debugger;
+        console.log(finalStream);
+
         return {
             config: this.config,
             title: this.title,
@@ -288,7 +274,7 @@ export class DatabaseBuilder {
             authors: this.authors,
             authorsOrder,
             authorsBotCutoff,
-            serialized,
+            serialized: finalStream.buffer,
         };
     }
 }

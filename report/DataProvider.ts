@@ -1,7 +1,7 @@
 import EventEmitter from "events";
 
 import { Database, ID } from "@pipeline/Types";
-import { BlockDescriptions, BlockInfo, BlockKey, BlockState, BlockTrigger } from "@pipeline/aggregate/Blocks";
+import { BlockDescriptions, BlockInfo, BlockKey, BlockTrigger } from "@pipeline/aggregate/Blocks";
 import { dateToString } from "@pipeline/Util";
 
 import Worker, { BlockRequestMessage, BlockResultMessage, InitMessage, ReadyMessage } from "@report/WorkerReport";
