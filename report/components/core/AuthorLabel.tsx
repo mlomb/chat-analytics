@@ -96,7 +96,7 @@ const AuthorLabel = ({ id }: Props) => {
         <div className="Label" title={author.n}>
             <div className="Label__avatar">{avatar}</div>
             <span className="Label__name">{author.n}</span>
-            {author.d && <span className="Label__discriminator">#{author.d}</span>}
+            {author.d !== undefined && <span className="Label__discriminator">#{author.d}</span>}
         </div>
     );
 };
