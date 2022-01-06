@@ -1,4 +1,6 @@
 import { BlockDescription, BlockFn } from "@pipeline/aggregate/Blocks";
+import { BitStream } from "@pipeline/report/BitStream";
+import { readMessage } from "@pipeline/report/Serialization";
 
 type MessagesInDate = {
     d: number; // date, as timestamp
@@ -17,15 +19,36 @@ const fn: BlockFn<MessagesPerCycle> = (database, filters) => {
     };
     console.log(database, filters);
 
-    var date = new Date(database.time.minDate);
-    date.setHours(0, 0, 0, 0);
-    for (let i = 0; i < 1000; i++) {
-        date.setDate(date.getDate() + 1);
+    // fill empty
+    for (let i = 0; i < database.time.numDays; i++) {
+        const d = new Date(database.time.minDate);
+        d.setDate(d.getDate() + i);
         res.perDay.push({
-            d: date.getTime(),
-            m: Math.round(Math.random() * 100) + 3,
+            d: d.getTime(),
+            m: 0,
         });
     }
+    for (let i = 0; i < database.time.numMonths; i++) {
+        const d = new Date(database.time.minDate);
+        d.setMonth(d.getMonth() + i);
+        res.perMonth.push({
+            d: new Date(d.getFullYear(), d.getMonth(), 1).getTime(),
+            m: 0,
+        });
+    }
+
+    const stream = new BitStream(database.serialized);
+    for (const channel of database.channels) {
+        // seek
+        stream.offset = channel.msgAddr;
+
+        // read messages
+        for (let read = 0; read < channel.msgCount; read++) {
+            const message = readMessage(stream, database.bitConfig);
+            res.perDay[message.dayIndex].m++;
+        }
+    }
+    readMessage;
 
     return res;
 };

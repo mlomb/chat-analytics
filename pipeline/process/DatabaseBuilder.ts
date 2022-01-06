@@ -181,7 +181,7 @@ export class DatabaseBuilder {
 
             const imsg: IntermediateMessage = {
                 year: dateUTC.getFullYear(),
-                month: dateUTC.getMonth(),
+                month: dateUTC.getMonth() + 1,
                 day: dateUTC.getDate(),
                 hour: dateUTC.getHours(),
                 authorId: msg.authorId,
@@ -257,6 +257,9 @@ export class DatabaseBuilder {
         console.log("Words cutoff", wordsCutoff);
         progress.done();
 
+        // @ts-ignore
+        console.log(this.words.map((w, i) => [w, this.wordsCount[i]]).sort((a, b) => b[1] - a[1]));
+
         console.log("original", Math.ceil(this.stream.offset / 8));
         console.time("buff");
         progress.new("Generating final messages data");
@@ -294,7 +297,6 @@ export class DatabaseBuilder {
 
                     // write message
                     writeMessage(msg, finalStream, bitConfig);
-                    this.channels[channelId].msgCount++;
                     progress.progress("number", messagesWritten++, this.totalMessages);
                 }
             }
@@ -322,7 +324,7 @@ export class DatabaseBuilder {
             authors: this.authors,
             authorsOrder,
             authorsBotCutoff,
-            serialized: finalStream.buffer.slice(0, Math.ceil(finalStream.offset / 8)),
+            serialized: finalStream.buffer.slice(0, Math.ceil(finalStream.offset / 8) + 1),
         };
     }
 

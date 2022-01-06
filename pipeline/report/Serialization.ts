@@ -29,7 +29,7 @@ export const readIntermediateMessage = (stream: BitStream): IntermediateMessage 
     };
     const numWords = stream.getBits(8);
     for (let i = 0; i < numWords; i++) {
-        imsg.words.push([stream.getBits(16), stream.getBits(8)]);
+        imsg.words.push([stream.getBits(16), stream.getBits(4)]);
     }
     return imsg;
 };
