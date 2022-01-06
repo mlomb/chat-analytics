@@ -6,13 +6,7 @@ export const Languages = ["af","als","am","an","ar","arz","as","ast","av","az","
 const LABEL_PREFIX_LENGTH = "__label__".length;
 
 export class LanguageDetector {
-    private model: FastTextModel | undefined;
-
-    public async init() {
-        if (this.model === undefined) {
-            this.model = await loadFastTextModel("lid.176");
-        }
-    }
+    constructor(private readonly model: FastTextModel) {}
 
     public detect(text: string): number | -1 {
         if (this.model === undefined) throw new Error("Language Model not initialized");
@@ -22,3 +16,8 @@ export class LanguageDetector {
         return -1;
     }
 }
+
+export const loadLanguageDetector = async (): Promise<LanguageDetector> => {
+    const model = await loadFastTextModel("lid.176");
+    return new LanguageDetector(model);
+};
