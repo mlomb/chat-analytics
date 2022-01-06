@@ -159,7 +159,10 @@ export class DatabaseBuilder {
             const tokens = this.tokenizer.tokenize(msg.content);
             // console.log(msg.content, langIdx, tokens);
 
-            const wordsCount: { [word: Word]: number } = {};
+            // NOTE: we can't use an object because of this:
+            // 'constructor' in {} === true
+            //  ({})["constructor"] === fn
+            const wordsCount: Map<Word, number> = new Map();
             for (const token of tokens) {
                 let word: Word | undefined = undefined;
                 if (token.tag === "word") {
@@ -172,7 +175,7 @@ export class DatabaseBuilder {
                     word = token.value;
                 }
                 if (word) {
-                    wordsCount[word] = (wordsCount[word] || 0) + 1;
+                    wordsCount.set(word, (wordsCount.get(word) || 0) + 1);
                 }
             }
 
@@ -187,11 +190,14 @@ export class DatabaseBuilder {
                 words: [],
             };
 
-            const words = Object.keys(wordsCount);
+            const words = Array.from(wordsCount.keys());
             const numWords = Math.min(words.length, 255); // MAX 255 words per message
             for (let i = 0; i < numWords; i++) {
                 const wordIdx = this.getWord(words[i]);
-                const count = Math.min(wordsCount[words[i]], 15);
+                const count = Math.min(wordsCount.get(words[i])!, 15);
+                if (isNaN(wordIdx) || isNaN(count)) {
+                    debugger;
+                }
                 this.wordsCount[wordIdx] = (this.wordsCount[wordIdx] || 0) + count;
                 imsg.words.push([wordIdx, count]); // MAX 15 occurrences per word
             }
@@ -296,6 +302,10 @@ export class DatabaseBuilder {
         progress.done();
         console.timeEnd("buff");
         console.log("final", Math.ceil(finalStream.offset / 8));
+
+        // TODO: sort words, reindex
+        // TODO: filter words more efficiently
+
         debugger;
         return {
             config: this.config,
@@ -319,7 +329,7 @@ export class DatabaseBuilder {
     computeWordsCutoff(): number {
         const sortedCounts = this.wordsCount.slice(0).sort((a, b) => b - a);
         const total = sortedCounts.reduce((sum, c) => sum + c, 0);
-        const threshold = total * 0.95;
+        const threshold = Math.ceil(total * 0.95);
         const len = sortedCounts.length;
         let i = 0,
             acc = 0;
