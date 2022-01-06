@@ -326,7 +326,7 @@ export class DatabaseBuilder {
         for (; i < len; i++) {
             acc += sortedCounts[i];
             if (acc >= threshold) break;
-            progress.progress("number", i, len);
+            progress.progress("number", acc, threshold);
         }
         // at least two occurrences
         return Math.max(2, sortedCounts[i] || 0);
