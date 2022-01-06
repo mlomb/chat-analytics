@@ -13,7 +13,7 @@ import {
 } from "@amcharts/amcharts5/xy";
 
 import { useDataProvider } from "@report/DataProvider";
-import { MessagesPerCycle } from "@pipeline/aggregate/MessagesPerCycle";
+import { MessagesPerCycle } from "@pipeline/aggregate/blocks/MessagesPerCycle";
 import { Themes } from "./AmCharts5";
 
 const MessagesGraph = ({ data }: { data: MessagesPerCycle }) => {

@@ -11,11 +11,12 @@ export type BlockDescription<K, T> = {
 };
 
 // register blocks
-import MessagesPerCycle from "@pipeline/aggregate/MessagesPerCycle";
-// TODO: ...
+import MessagesPerCycle from "@pipeline/aggregate/blocks/MessagesPerCycle";
+import MessagesStats from "@pipeline/aggregate/blocks/MessagesStats";
 
 export const Blocks = {
     [MessagesPerCycle.key]: MessagesPerCycle,
+    [MessagesStats.key]: MessagesStats,
 };
 
 export type BlockKey = keyof typeof Blocks;
