@@ -17,7 +17,8 @@ import {
 } from "@pipeline/Types";
 import IDMapper from "@pipeline/parse/IDMapper";
 import { progress } from "@pipeline/Progress";
-import { LanguageDetector } from "@pipeline/process/LanguageDetection";
+import { LanguageDetector, loadLanguageDetector } from "@pipeline/process/LanguageDetection";
+import { Stopwords, loadStopwords } from "@pipeline/process/Stopwords";
 import { stripDiacritics } from "@pipeline/process/Diacritics";
 import { BitStream } from "@pipeline/report/BitStream";
 import { dateToString, monthToString } from "@pipeline/Util";
@@ -61,21 +62,18 @@ export class DatabaseBuilder {
     private channelSections: { [id: ID]: ChannelSection[] } = {};
     private totalMessages = 0;
 
-    private languageDetector: LanguageDetector;
+    private languageDetector?: LanguageDetector;
+    private stopwords?: Stopwords;
     private tokenizer: Tokenizer;
 
     constructor(private readonly config: ReportConfig) {
         this.stream = new BitStream();
-        this.languageDetector = new LanguageDetector();
         this.tokenizer = new Tokenizer();
-        this.tokenizer.defineConfig({
-            quoted_phrase: false,
-            time: false,
-        });
     }
 
     public async init() {
-        await this.languageDetector.init();
+        this.stopwords = await loadStopwords();
+        this.languageDetector = await loadLanguageDetector();
     }
 
     public setTitle(title: string) {
@@ -139,6 +137,9 @@ export class DatabaseBuilder {
 
     // Process messages in the queue
     public async process(force: boolean = false) {
+        if (!this.languageDetector) throw new Error("Language detector not initialized");
+        if (!this.stopwords) throw new Error("Stopwords not initialized");
+
         if (this.messageQueue.length === 0) return;
         const section = this.getChannelSection(this.messageQueue[0].channelId, this.messageQueue[0].timestamp);
 
@@ -168,8 +169,10 @@ export class DatabaseBuilder {
                 if (token.tag === "word") {
                     const tagClean = stripDiacritics(token.value.toLocaleLowerCase());
                     if (tagClean.length > 1 && tagClean.length < 25) {
-                        // MAX 25 chars per word
-                        word = tagClean;
+                        if (!this.stopwords.isStopword("en", tagClean)) {
+                            // MAX 25 chars per word
+                            word = tagClean;
+                        }
                     }
                 } else if (token.tag === "emoji") {
                     word = token.value;
