@@ -1,6 +1,6 @@
+import { Message } from "@pipeline/Types";
 import { BlockDescription, BlockFn } from "@pipeline/aggregate/Blocks";
-import { BitStream } from "@pipeline/report/BitStream";
-import { readMessage } from "@pipeline/report/Serialization";
+import { parseAndFilterMessages } from "@pipeline/aggregate/Helpers";
 
 type MessagesInDate = {
     d: number; // date, as timestamp
@@ -17,38 +17,39 @@ const fn: BlockFn<MessagesPerCycle> = (database, filters) => {
         perDay: [],
         perMonth: [],
     };
-    console.log(database, filters);
 
     // fill empty
+    const dayToMonth: MessagesInDate[] = [];
     for (let i = 0; i < database.time.numDays; i++) {
         const d = new Date(database.time.minDate);
         d.setDate(d.getDate() + i);
+
         res.perDay.push({
             d: d.getTime(),
             m: 0,
         });
-    }
-    for (let i = 0; i < database.time.numMonths; i++) {
-        const d = new Date(database.time.minDate);
-        d.setMonth(d.getMonth() + i);
-        res.perMonth.push({
+
+        let monthObj: MessagesInDate = {
             d: new Date(d.getFullYear(), d.getMonth(), 1).getTime(),
             m: 0,
-        });
-    }
-
-    const stream = new BitStream(database.serialized);
-    for (const channel of database.channels) {
-        // seek
-        stream.offset = channel.msgAddr;
-
-        // read messages
-        for (let read = 0; read < channel.msgCount; read++) {
-            const message = readMessage(stream, database.bitConfig);
-            res.perDay[message.dayIndex].m++;
+        };
+        if (res.perMonth.length === 0 || res.perMonth[res.perMonth.length - 1].d !== monthObj.d) {
+            // push new month
+            res.perMonth.push(monthObj);
+        } else {
+            // reference to the last month object
+            monthObj = res.perMonth[res.perMonth.length - 1];
         }
+
+        dayToMonth.push(monthObj);
     }
-    readMessage;
+
+    const processMessage = (msg: Message) => {
+        res.perDay[msg.dayIndex].m++;
+        dayToMonth[msg.dayIndex].m++;
+    };
+
+    parseAndFilterMessages(processMessage, database, filters);
 
     return res;
 };

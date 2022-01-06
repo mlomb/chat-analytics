@@ -17,7 +17,7 @@ import AnimatedBars from "@report/components/viz/AnimatedBars";
 import MessagesStats from "@report/components/viz/MessagesStats";
 import Block from "@report/components/Block";
 import { BlockInfo, BlockState } from "@pipeline/aggregate/Blocks";
-import { MessagesPerCycle } from "@pipeline/aggregate/MessagesPerCycle";
+import { MessagesPerCycle } from "@pipeline/aggregate/blocks/MessagesPerCycle";
 
 const CardContainer = (props: { children: React.ReactNode }) => <div className="CardContainer">{props.children}</div>;
 
