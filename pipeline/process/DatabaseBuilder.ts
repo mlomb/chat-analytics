@@ -320,7 +320,8 @@ export class DatabaseBuilder {
             authors: this.authors,
             authorsOrder,
             authorsBotCutoff,
-            serialized: finalStream.buffer.slice(0, Math.ceil(finalStream.offset / 8) + 1),
+            // round to the nearest multiple of 4
+            serialized: finalStream.buffer8.slice(0, ((Math.ceil(finalStream.offset / 8) + 3) & ~0x03) + 4),
         };
     }
 

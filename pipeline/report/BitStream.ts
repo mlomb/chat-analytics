@@ -1,39 +1,93 @@
 import { BitAddress } from "@pipeline/Types";
 
-// TODO: maybe create our own BitStream, faster?
-import { BitView } from "bit-buffer";
+/*
+Support:
+    - Signed integers
+    - Reads and writes up to 32bits
+    - Works in multiples of 32bits
+        
+cross boundary
+|--------------------------------| |---------------------------------|
+|           value1               | |            value2               |
+↓ aligned32                      | ↓ aligned32 + 1                   |
+[00000000000000000000000000000000] [00000000000000000000000000000000]
+            ↑ offset                         ↑ offset + bits
+            |            VALUE               |
+            |--------------------------------|
+|- delta -|------------- bits -------------|
 
+only left boundary
+[00000000000000000000000000000000] [00000000000000000000000000000000]
+            ↑ offset     ↑ offset + bits
+            |   VALUE    |
+            |------------|
+|- delta -|--- bits ---|
+*/
 export class BitStream {
-    private view: BitView;
-    private _buffer: Uint8Array;
+    public buffer: Uint32Array;
     public offset: BitAddress;
 
-    get buffer(): Uint8Array {
-        return this._buffer;
-    }
-
-    constructor(buffer?: Uint8Array) {
-        this._buffer = buffer || new Uint8Array(1024); // 1024 bytes by default
-        this.view = new BitView(this._buffer.buffer);
+    constructor(buffer?: ArrayBuffer) {
+        if (buffer) console.assert(buffer instanceof ArrayBuffer);
+        this.buffer = buffer ? new Uint32Array(buffer) : new Uint32Array(1024); // 1024 bytes by default
         this.offset = 0;
     }
 
-    setBits(bits: number, value: number): void {
-        if ((this.offset + bits) / 8 > this._buffer.length) {
-            // grow
-            // TODO: maybe double is too much
-            const newBuffer = new Uint8Array(this._buffer.length * 2);
-            newBuffer.set(this._buffer);
-            this._buffer = newBuffer;
-            this.view = new BitView(this._buffer.buffer);
-        }
-        this.view.setBits(this.offset, value, bits);
-        this.offset += bits;
+    get buffer8(): Uint8Array {
+        return new Uint8Array(this.buffer.buffer);
     }
 
-    getBits(bits: number, signed: boolean = false): number {
-        const val = this.view.getBits(this.offset, bits, signed);
+    private grow(): void {
+        // TODO: maybe double is too much
+        const newBuffer = new Uint32Array(this.buffer.length * 2);
+        newBuffer.set(this.buffer);
+        this.buffer = newBuffer;
+    }
+
+    setBits(bits: number, value: number): void {
+        const buffer = this.buffer;
+        const offset = this.offset;
         this.offset += bits;
-        return val;
+
+        // check if we must grow the buffer
+        if ((offset + bits) / 8 > buffer.byteLength - 4) this.grow();
+
+        // only keep the bits we need
+        const mask = bits === 32 ? 0b11111111111111111111111111111111 : (1 << bits) - 1;
+        const valueMasked = value & mask;
+
+        const aligned32 = offset >>> 5;
+        const delta = offset - (aligned32 << 5);
+
+        // TODO: try to do it branchless
+        if (delta + bits > 32) {
+            const corr = bits - (32 - delta);
+            buffer[aligned32] = (buffer[aligned32] & ~(mask >> corr)) | (valueMasked >> corr);
+            buffer[aligned32 + 1] = (buffer[aligned32 + 1] & ~(mask << (32 - corr))) | (valueMasked << (32 - corr));
+        } else {
+            const corr = 32 - delta - bits;
+            buffer[aligned32] = (buffer[aligned32] & ~(mask << corr)) | (valueMasked << corr);
+        }
+    }
+
+    getBits(bits: number): number {
+        const buffer = this.buffer;
+        const offset = this.offset;
+        this.offset += bits;
+
+        const aligned32 = offset >>> 5;
+        const delta = offset - (aligned32 << 5);
+        const value1 = buffer[aligned32];
+        const value2 = buffer[aligned32 + 1];
+
+        // TODO: try to do it branchless
+        let value = 0;
+        if (delta + bits > 32) {
+            const aligned = (value1 << delta) | (value2 >>> (32 - delta));
+            value = aligned >>> (32 - bits);
+        } else {
+            value = (value1 << delta) >>> (32 - bits);
+        }
+        return value >>> 0;
     }
 }

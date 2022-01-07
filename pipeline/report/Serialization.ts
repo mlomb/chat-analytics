@@ -63,8 +63,9 @@ export const readMessage = (stream: BitStream, config: MessageBitConfig): Messag
         words: [],
     };
     const numWords = stream.getBits(8);
-    for (let i = 0; i < numWords; i++) {
+    stream.offset += numWords * (config.wordIdxBits + 4);
+    /*for (let i = 0; i < numWords; i++) {
         message.words.push([stream.getBits(config.wordIdxBits), stream.getBits(4)]);
-    }
+    }*/
     return message;
 };
