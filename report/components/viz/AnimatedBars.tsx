@@ -3,29 +3,31 @@ import "@assets/styles/AnimatedBars.less";
 import CountUp from "react-countup";
 
 const ITEM_STRIDE = 40;
+const formattingFn = (n: number) => n.toLocaleString();
+
+type Index = number;
+type ItemComponent = (props: { id: Index }) => JSX.Element;
 
 export interface AnimatedBarEntry {
-    data: {
-        id: string | number;
-    };
+    id: Index;
     value: number;
 }
 
 interface Props {
-    what: string;
-    unit: string;
-    data: AnimatedBarEntry[];
-    maxItems: number;
-    itemComponent: (props: { data: any }) => JSX.Element;
     colorHue?: number;
+    data: AnimatedBarEntry[];
+    itemComponent: ItemComponent;
+    maxItems: number;
+    unit: string;
+    what: string;
 }
 
 const Item = (props: {
-    itemComponent: (props: { data: any }) => JSX.Element;
     colorHue?: number;
     entry: AnimatedBarEntry;
-    rank: number;
+    itemComponent: ItemComponent;
     percent: number;
+    rank: number;
 }) => {
     return (
         <div className="AnimatedBars__item" style={{ top: props.rank * ITEM_STRIDE + "px" }}>
@@ -38,15 +40,22 @@ const Item = (props: {
                 }}
             ></div>
             <div className="AnimatedBars__value">
-                <props.itemComponent data={props.entry.data} />
+                <props.itemComponent id={props.entry.id} />
             </div>
-            <CountUp className="AnimatedBars__unit" preserveValue delay={0} duration={0.5} end={props.entry.value} />
+            <CountUp
+                className="AnimatedBars__unit"
+                preserveValue
+                delay={0}
+                duration={0.5}
+                end={props.entry.value}
+                formattingFn={formattingFn}
+            />
         </div>
     );
 };
 
 const AnimatedBars = (props: Props) => {
-    const sortedById = props.data.slice().sort((a, b) => (a.data.id > b.data.id ? 1 : -1));
+    const sortedById = props.data.slice().sort((a, b) => (a.id > b.id ? 1 : -1));
     const sortedByValue = props.data.slice().sort((a, b) => b.value - a.value);
     const maxValue = sortedByValue.length ? sortedByValue[0].value : 0;
 
@@ -60,7 +69,7 @@ const AnimatedBars = (props: Props) => {
                 {sortedById.map((entry) => (
                     <Item
                         entry={entry}
-                        key={entry.data.id}
+                        key={entry.id}
                         rank={sortedByValue.indexOf(entry)}
                         percent={(entry.value / maxValue) * 100}
                         itemComponent={props.itemComponent}
