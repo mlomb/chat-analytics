@@ -9,7 +9,7 @@ export const parseAndFilterMessages = (
     filters: Filters,
     activeFilters = { channels: true, authors: true, time: true }
 ) => {
-    const stream = new BitStream(database.serialized);
+    const stream = new BitStream(database.serialized?.buffer);
     for (let i = 0; i < database.channels.length; i++) {
         // filter channel
         if (activeFilters.channels && !filters.hasChannel(i)) continue;
