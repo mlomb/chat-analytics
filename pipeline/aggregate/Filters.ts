@@ -1,16 +1,22 @@
-import { Database, ID } from "@pipeline/Types";
+import { Database, DateStr, ID } from "@pipeline/Types";
+import { genTimeKeys } from "@pipeline/Util";
 
 export class Filters {
     channels: ID[];
     authors: Uint8Array;
-    startDate: string; // TODO: date string
-    endDate: string;
+    startDayIndex: number; // inclusive
+    endDayIndex: number; // inclusive
+    dayKeys: string[];
 
     constructor(database: Database) {
         this.channels = [];
         this.authors = new Uint8Array(database.authors.length);
-        this.startDate = "";
-        this.endDate = "";
+        this.startDayIndex = 0;
+        this.endDayIndex = 0;
+
+        // fill date keys
+        const { dayKeys } = genTimeKeys(database.time.minDate, database.time.maxDate);
+        this.dayKeys = dayKeys;
     }
 
     hasChannel(channelId: number): boolean {
@@ -21,19 +27,23 @@ export class Filters {
     hasAuthor(authorId: number): boolean {
         return this.authors[authorId] > 0;
     }
-    // TODO: date index check
+    inTime(dayIndex: number): boolean {
+        return this.startDayIndex <= dayIndex && dayIndex <= this.endDayIndex;
+    }
 
-    updateEndDate(endDate: any) {
-        this.endDate = endDate;
-    }
-    updateStartDate(startDate: any) {
-        this.startDate = startDate;
-    }
     updateChannels(channels: ID[]) {
         this.channels = channels;
     }
     updateAuthors(authors: ID[]) {
         this.authors.fill(0);
         for (const authorId of authors) this.authors[authorId] = 1;
+    }
+    updateStartDate(startDate: DateStr) {
+        this.startDayIndex = this.dayKeys.indexOf(startDate);
+        console.assert(this.startDayIndex >= 0);
+    }
+    updateEndDate(endDate: DateStr) {
+        this.endDayIndex = this.dayKeys.indexOf(endDate);
+        console.assert(this.endDayIndex >= 0);
     }
 }

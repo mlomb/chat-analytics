@@ -49,7 +49,12 @@ const fn: BlockFn<MessagesPerCycle> = (database, filters) => {
         dayToMonth[msg.dayIndex].m++;
     };
 
-    parseAndFilterMessages(processMessage, database, filters);
+    parseAndFilterMessages(processMessage, database, filters, {
+        authors: true,
+        channels: true,
+        // do not filter by time
+        time: false,
+    });
 
     return res;
 };

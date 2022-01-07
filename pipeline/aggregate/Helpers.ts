@@ -22,10 +22,11 @@ export const parseAndFilterMessages = (
         for (let read = 0; read < channel.msgCount; read++) {
             const message = readMessage(stream, database.bitConfig);
             // filter author
-            if (activeFilters.authors && filters.hasAuthor(message.authorId)) {
+            if (!activeFilters.authors || filters.hasAuthor(message.authorId)) {
                 // filter time
-                // TODO: !
-                fn(message);
+                if (!activeFilters.time || filters.inTime(message.dayIndex)) {
+                    fn(message);
+                }
             }
         }
     }
