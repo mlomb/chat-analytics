@@ -36,6 +36,7 @@ const ReportDashboard = () => {
                         blockKey="messages-per-cycle"
                         children={MessagesGraph}
                     />
+                    <Card num={1} title="Messages stats" blockKey="messages-stats" children={MessagesStats} />
                 </CardContainer>
             </TabContainer>
         </>

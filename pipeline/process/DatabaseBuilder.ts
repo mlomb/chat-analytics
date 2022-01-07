@@ -21,7 +21,7 @@ import { LanguageDetector, loadLanguageDetector } from "@pipeline/process/Langua
 import { Stopwords, loadStopwords } from "@pipeline/process/Stopwords";
 import { stripDiacritics } from "@pipeline/process/Diacritics";
 import { BitStream } from "@pipeline/report/BitStream";
-import { dateToString, monthToString } from "@pipeline/Util";
+import { dateToString, genTimeKeys, monthToString, normalizeDate } from "@pipeline/Util";
 import {
     MessageBitConfig,
     readIntermediateMessage,
@@ -56,8 +56,8 @@ export class DatabaseBuilder {
     private authors: Author[] = [];
     private authorMessagesCount: number[] = [];
     private channels: Channel[] = [];
-    private minDate: Timestamp = 0;
-    private maxDate: Timestamp = 0;
+    private minDate: Date | undefined;
+    private maxDate: Date | undefined;
     private stream: BitStream;
     private channelSections: { [id: ID]: ChannelSection[] } = {};
     private totalMessages = 0;
@@ -144,12 +144,10 @@ export class DatabaseBuilder {
         const section = this.getChannelSection(this.messageQueue[0].channelId, this.messageQueue[0].timestamp);
 
         for (const msg of this.messageQueue) {
-            const rawDate = new Date(msg.timestamp);
-            const tsUTC = Date.UTC(rawDate.getFullYear(), rawDate.getMonth(), rawDate.getDate());
-            const dateUTC = new Date(tsUTC);
+            const date = normalizeDate(new Date(msg.timestamp));
 
-            if (this.minDate === 0 || tsUTC < this.minDate) this.minDate = tsUTC;
-            if (this.maxDate === 0 || tsUTC > this.maxDate) this.maxDate = tsUTC;
+            if (this.minDate === undefined || date < this.minDate) this.minDate = date;
+            if (this.maxDate === undefined || date > this.maxDate) this.maxDate = date;
             this.authorMessagesCount[msg.authorId] += 1;
             this.channels[msg.channelId].msgCount += 1;
 
@@ -183,10 +181,10 @@ export class DatabaseBuilder {
             }
 
             const imsg: IntermediateMessage = {
-                year: dateUTC.getFullYear(),
-                month: dateUTC.getMonth() + 1,
-                day: dateUTC.getDate(),
-                hour: dateUTC.getHours(),
+                year: date.getFullYear(),
+                month: date.getMonth() + 1,
+                day: date.getDate(),
+                hour: date.getHours(),
                 authorId: msg.authorId,
                 langIdx,
                 sentiment,
@@ -229,20 +227,9 @@ export class DatabaseBuilder {
     }
 
     public getDatabase(): Database {
-        const start = new Date(this.minDate);
-        const end = new Date(this.maxDate);
-        const startUTC = Date.UTC(start.getFullYear(), start.getMonth(), start.getDate());
+        if (this.minDate === undefined || this.maxDate === undefined) throw new Error("No messages processed");
 
-        const dayKeys: string[] = [];
-        const monthKeys: string[] = [];
-
-        for (let day = new Date(startUTC); day <= end; day.setDate(day.getDate() + 1)) {
-            const dayKey = dateToString(day);
-            const monthKey = monthToString(day);
-
-            dayKeys.push(dayKey);
-            if (monthKeys.length === 0 || monthKeys[monthKeys.length - 1] !== monthKey) monthKeys.push(monthKey);
-        }
+        const { dayKeys, monthKeys } = genTimeKeys(this.minDate, this.maxDate);
 
         progress.new("Sorting authors");
         const authorsOrder: ID[] = Array.from({ length: this.authors.length }, (_, i) => i);
@@ -317,8 +304,8 @@ export class DatabaseBuilder {
             bitConfig,
             title: this.title,
             time: {
-                minDate: dateToString(start),
-                maxDate: dateToString(end),
+                minDate: dayKeys[0],
+                maxDate: dayKeys[dayKeys.length - 1],
                 numDays: dayKeys.length,
                 numMonths: monthKeys.length,
             },
