@@ -21,8 +21,6 @@ const fn: BlockFn<MessagesStats> = (database, filters) => {
 
     res.avgDay = res.total / filters.numActiveDays;
 
-    console.log(filters);
-
     return res;
 };
 
