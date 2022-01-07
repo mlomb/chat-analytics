@@ -3,6 +3,7 @@ import {
     BitAddress,
     Channel,
     Database,
+    DateArr,
     IAuthor,
     IChannel,
     ID,
@@ -21,7 +22,7 @@ import { LanguageDetector, loadLanguageDetector } from "@pipeline/process/Langua
 import { Stopwords, loadStopwords } from "@pipeline/process/Stopwords";
 import { stripDiacritics } from "@pipeline/process/Diacritics";
 import { BitStream } from "@pipeline/report/BitStream";
-import { dateToString, genTimeKeys, monthToString, normalizeDate } from "@pipeline/Util";
+import { genTimeKeys, gtDateArr, ltDateArr, toDateArr } from "@pipeline/Util";
 import {
     MessageBitConfig,
     readIntermediateMessage,
@@ -56,8 +57,8 @@ export class DatabaseBuilder {
     private authors: Author[] = [];
     private authorMessagesCount: number[] = [];
     private channels: Channel[] = [];
-    private minDate: Date | undefined;
-    private maxDate: Date | undefined;
+    private minDate: DateArr | undefined;
+    private maxDate: DateArr | undefined;
     private stream: BitStream;
     private channelSections: { [id: ID]: ChannelSection[] } = {};
     private totalMessages = 0;
@@ -74,6 +75,7 @@ export class DatabaseBuilder {
     public async init() {
         this.stopwords = await loadStopwords();
         this.languageDetector = await loadLanguageDetector();
+        // console.log(this.tokenizer.tokenize(`abc won't don't has test not word i'm don't abc`));
     }
 
     public setTitle(title: string) {
@@ -144,10 +146,12 @@ export class DatabaseBuilder {
         const section = this.getChannelSection(this.messageQueue[0].channelId, this.messageQueue[0].timestamp);
 
         for (const msg of this.messageQueue) {
-            const date = normalizeDate(new Date(msg.timestamp));
+            // TODO: timezones
+            const date = new Date(msg.timestamp);
+            const dateArr = toDateArr(date);
 
-            if (this.minDate === undefined || date < this.minDate) this.minDate = date;
-            if (this.maxDate === undefined || date > this.maxDate) this.maxDate = date;
+            if (this.minDate === undefined || ltDateArr(dateArr, this.minDate)) this.minDate = dateArr;
+            if (this.maxDate === undefined || gtDateArr(dateArr, this.maxDate)) this.maxDate = dateArr;
             this.authorMessagesCount[msg.authorId] += 1;
             this.channels[msg.channelId].msgCount += 1;
 
@@ -181,9 +185,10 @@ export class DatabaseBuilder {
             }
 
             const imsg: IntermediateMessage = {
-                year: date.getFullYear(),
-                month: date.getMonth() + 1,
-                day: date.getDate(),
+                year: dateArr[0],
+                month: dateArr[1],
+                day: dateArr[2],
+                // TODO: timezones
                 hour: date.getHours(),
                 authorId: msg.authorId,
                 langIdx,
@@ -230,6 +235,7 @@ export class DatabaseBuilder {
         if (this.minDate === undefined || this.maxDate === undefined) throw new Error("No messages processed");
 
         const { dayKeys, monthKeys } = genTimeKeys(this.minDate, this.maxDate);
+        console.log(this.minDate, this.maxDate, dayKeys);
 
         progress.new("Sorting authors");
         const authorsOrder: ID[] = Array.from({ length: this.authors.length }, (_, i) => i);
@@ -304,8 +310,8 @@ export class DatabaseBuilder {
             bitConfig,
             title: this.title,
             time: {
-                minDate: dayKeys[0],
-                maxDate: dayKeys[dayKeys.length - 1],
+                minDate: this.minDate,
+                maxDate: this.maxDate,
                 numDays: dayKeys.length,
                 numMonths: monthKeys.length,
             },

@@ -17,6 +17,8 @@ export type Timestamp = number;
 
 // date with format "YYYY-MM-DD"
 export type DateStr = string;
+// date with format [year, month (1-based), day]
+export type DateArr = [number, number, number];
 
 // available platforms
 export type Platform = "discord" | "telegram" | "whatsapp";
@@ -35,8 +37,8 @@ export interface Database {
     bitConfig: MessageBitConfig;
     title: string;
     time: {
-        minDate: DateStr;
-        maxDate: DateStr;
+        minDate: DateArr;
+        maxDate: DateArr;
         numDays: number;
         numMonths: number;
     };

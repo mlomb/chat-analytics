@@ -1,8 +1,8 @@
 import EventEmitter from "events";
 
-import { Database, ID } from "@pipeline/Types";
+import { Database, DateArr, ID } from "@pipeline/Types";
 import { BlockDescriptions, BlockInfo, BlockKey, BlockTrigger } from "@pipeline/aggregate/Blocks";
-import { dateToString } from "@pipeline/Util";
+import { dateToString, fromDateArr, maxDateArr, minDateArr, toDateArr } from "@pipeline/Util";
 
 import Worker, { BlockRequestMessage, BlockResultMessage, InitMessage, ReadyMessage } from "@report/WorkerReport";
 
@@ -30,8 +30,8 @@ export class DataProvider extends EventEmitter {
     private activeAuthors: ID[] = [];
     private channelsSet: boolean = false;
     private authorsSet: boolean = false;
-    private activeStartDate: Date = new Date();
-    private activeEndDate: Date = new Date();
+    private activeStartDate: DateArr = [0, 0, 0];
+    private activeEndDate: DateArr = [0, 0, 0];
 
     // Updated by this class and the Worker
     public database!: Database;
@@ -58,8 +58,8 @@ export class DataProvider extends EventEmitter {
             this.database = res.database;
             this.blocksDescs = res.blocksDescs;
             // set default time range
-            this.activeStartDate = new Date(res.database.time.minDate);
-            this.activeEndDate = new Date(res.database.time.maxDate);
+            this.activeStartDate = res.database.time.minDate;
+            this.activeEndDate = res.database.time.maxDate;
 
             // worker is ready
             console.log("Worker is ready");
@@ -97,8 +97,11 @@ export class DataProvider extends EventEmitter {
     }
 
     updateTimeRange(start: Date, end: Date) {
-        this.activeStartDate = start;
-        this.activeEndDate = end;
+        const clampDate = (date: DateArr) =>
+            maxDateArr(minDateArr(date, this.database.time.maxDate), this.database.time.minDate);
+
+        this.activeStartDate = clampDate(toDateArr(start));
+        this.activeEndDate = clampDate(toDateArr(end));
         this.invalidateBlocks("time");
     }
 
@@ -213,11 +216,11 @@ export class DataProvider extends EventEmitter {
     }
 
     public getActiveStartDate(): Date {
-        return this.activeStartDate;
+        return fromDateArr(this.activeStartDate);
     }
 
     public getActiveEndDate(): Date {
-        return this.activeEndDate;
+        return fromDateArr(this.activeEndDate);
     }
 }
 

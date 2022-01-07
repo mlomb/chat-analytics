@@ -31,6 +31,10 @@ export class Filters {
         return this.startDayIndex <= dayIndex && dayIndex <= this.endDayIndex;
     }
 
+    get numActiveDays(): number {
+        return this.endDayIndex - this.startDayIndex + 1;
+    }
+
     updateChannels(channels: ID[]) {
         this.channels = channels;
     }

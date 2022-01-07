@@ -4,11 +4,13 @@ import { parseAndFilterMessages } from "@pipeline/aggregate/Helpers";
 
 export interface MessagesStats {
     total: number;
+    avgDay: number;
 }
 
 const fn: BlockFn<MessagesStats> = (database, filters) => {
     const res: MessagesStats = {
         total: 0,
+        avgDay: 0,
     };
 
     const processMessage = (msg: Message) => {
@@ -16,6 +18,10 @@ const fn: BlockFn<MessagesStats> = (database, filters) => {
     };
 
     parseAndFilterMessages(processMessage, database, filters);
+
+    res.avgDay = res.total / filters.numActiveDays;
+
+    console.log(filters);
 
     return res;
 };

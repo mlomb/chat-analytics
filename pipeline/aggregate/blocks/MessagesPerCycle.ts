@@ -1,6 +1,7 @@
 import { Message } from "@pipeline/Types";
 import { BlockDescription, BlockFn } from "@pipeline/aggregate/Blocks";
 import { parseAndFilterMessages } from "@pipeline/aggregate/Helpers";
+import { genTimeKeys } from "@pipeline/Util";
 
 type MessagesInDate = {
     d: number; // date, as timestamp
@@ -18,35 +19,25 @@ const fn: BlockFn<MessagesPerCycle> = (database, filters) => {
         perMonth: [],
     };
 
-    // fill empty
-    const dayToMonth: MessagesInDate[] = [];
-    for (let i = 0; i < database.time.numDays; i++) {
-        const d = new Date(database.time.minDate);
-        d.setDate(d.getDate() + i);
+    const { dayKeys, monthKeys, dayToMonthIndex } = genTimeKeys(database.time.minDate, database.time.maxDate);
 
+    // fill empty
+    for (const dayKey of dayKeys) {
         res.perDay.push({
-            d: d.getTime(),
+            d: new Date(dayKey).getTime(),
             m: 0,
         });
-
-        let monthObj: MessagesInDate = {
-            d: new Date(d.getFullYear(), d.getMonth(), 1).getTime(),
+    }
+    for (const monthKey of monthKeys) {
+        res.perMonth.push({
+            d: new Date(monthKey).getTime(),
             m: 0,
-        };
-        if (res.perMonth.length === 0 || res.perMonth[res.perMonth.length - 1].d !== monthObj.d) {
-            // push new month
-            res.perMonth.push(monthObj);
-        } else {
-            // reference to the last month object
-            monthObj = res.perMonth[res.perMonth.length - 1];
-        }
-
-        dayToMonth.push(monthObj);
+        });
     }
 
     const processMessage = (msg: Message) => {
         res.perDay[msg.dayIndex].m++;
-        dayToMonth[msg.dayIndex].m++;
+        res.perMonth[dayToMonthIndex[msg.dayIndex]].m++;
     };
 
     parseAndFilterMessages(processMessage, database, filters, {
