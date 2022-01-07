@@ -1,10 +1,10 @@
-import { Database, Message } from "@pipeline/Types";
+import { Database, ID, Message } from "@pipeline/Types";
 import { BitStream } from "@pipeline/report/BitStream";
 import { readMessage } from "@pipeline/report/Serialization";
 import { Filters } from "@pipeline/aggregate/Filters";
 
 export const parseAndFilterMessages = (
-    fn: (msg: Message) => void,
+    fn: (msg: Message, channelId: ID) => void,
     database: Database,
     filters: Filters,
     activeFilters = { channels: true, authors: true, time: true }
@@ -25,7 +25,7 @@ export const parseAndFilterMessages = (
             if (!activeFilters.authors || filters.hasAuthor(message.authorId)) {
                 // filter time
                 if (!activeFilters.time || filters.inTime(message.dayIndex)) {
-                    fn(message);
+                    fn(message, i);
                 }
             }
         }

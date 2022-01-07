@@ -1,10 +1,6 @@
 import "@assets/styles/Card.less";
 
-import { useEffect, useState } from "react";
-import { InView } from "react-intersection-observer";
-
 import { BlockDataType, BlockInfo, BlockKey, BlockState } from "@pipeline/aggregate/Blocks";
-import { useDataProvider } from "@report/DataProvider";
 import Block from "@report/components/Block";
 
 import Spinner from "@assets/images/icons/spinner.svg";
