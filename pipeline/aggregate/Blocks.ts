@@ -17,7 +17,7 @@ import MessagesStats from "@pipeline/aggregate/blocks/MessagesStats";
 export const Blocks = {
     [MessagesPerCycle.key]: MessagesPerCycle,
     [MessagesStats.key]: MessagesStats,
-};
+} as const;
 
 export type BlockKey = keyof typeof Blocks;
 export type BlockDataType<K extends BlockKey> = ReturnType<typeof Blocks[K]["fn"]>;

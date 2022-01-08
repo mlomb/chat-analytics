@@ -23,6 +23,29 @@ export type DateArr = [number, number, number];
 // available platforms
 export type Platform = "discord" | "telegram" | "whatsapp";
 
+// available message information
+// prettier-ignore
+export enum MessageFlags {
+    None,
+    Reply       = 1 << 0,
+    Edited      = 1 << 1,
+    Text        = 1 << 2,
+    Attachments = 1 << 3,
+    Reactions   = 1 << 4,
+    Mentions    = 1 << 5,
+    
+    Last        = 1 << 6,
+}
+
+export enum AttachmentType {
+    Image,
+    Video,
+    Audio,
+    Document,
+    Other,
+    Last,
+}
+
 export type Word = string;
 export type WordIndex = number;
 
@@ -82,7 +105,7 @@ export interface IAuthor {
     // name
     n: string;
     // bot
-    b: boolean;
+    b?: undefined | true;
     // Discord discriminant (#XXXX)
     d?: number;
     // Discord avatar (user_id/user_avatar)
@@ -94,12 +117,31 @@ export interface Author extends IAuthor {
     ns: string;
 }
 
+export interface Emoji {
+    // Discord emoji ID (if custom)
+    id?: RawID;
+    // name (🔥 or "custom_emoji")
+    n: string;
+}
+
+export interface Mention {
+    // if possible to connect with an actual author
+    id?: ID;
+    // mention text ("@user")
+    n: string;
+}
+
 // emitted by parsers
 export interface IMessage {
+    id: RawID;
+    replyTo?: RawID;
     authorId: ID;
     channelId: ID;
     timestamp: Timestamp;
-    content: string;
+    timestampEdit?: Timestamp;
+    content?: string;
+    attachment?: AttachmentType;
+    reactions?: [Emoji, number][];
 }
 
 // stored serialized during generation

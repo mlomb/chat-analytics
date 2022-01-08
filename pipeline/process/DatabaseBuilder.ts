@@ -303,8 +303,8 @@ export class DatabaseBuilder {
 
         // TODO: sort words, reindex
         // TODO: filter words more efficiently
+        // debugger;
 
-        debugger;
         return {
             config: this.config,
             bitConfig,
