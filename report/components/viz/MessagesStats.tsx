@@ -12,7 +12,6 @@ const MessagesStats = ({ data }: { data: MessagesStats }) => {
                     ["Average message length", 0, false],
                 ]}
             />
-            <PieChart />
         </div>
     );
 };

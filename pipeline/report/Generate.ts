@@ -29,9 +29,9 @@ export const generateDatabase = async (files: FileInput[], config: ReportConfig)
             throw new Error(`Unknown platform: ${config.platform}`);
     }
 
-    // parse all files
+    // parse and process all files
     for (let i = 0; i < files.length; i++) {
-        progress.new("Parsing", files[i].name);
+        progress.new("Processing", files[i].name);
         try {
             const gen = parser.parse(files[i]);
             for await (const _ of gen) await builder.process();
