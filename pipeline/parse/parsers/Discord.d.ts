@@ -26,6 +26,14 @@ interface DiscordMessage {
     isPinned: boolean;
     content: string;
     author: DiscordAuthor;
+    reference?: {
+        channelId: Snowflake | null;
+        guildId: Snowflake | null;
+        messageId: Snowflake;
+    };
+    attachments: DiscordAttachment[];
+    reactions: DiscordReaction[];
+    mentions: DiscordMention[];
 }
 
 interface DiscordAuthor {
@@ -36,4 +44,29 @@ interface DiscordAuthor {
     color: string | null;
     isBot: boolean;
     avatarUrl: string;
+}
+
+interface DiscordReaction {
+    count: number;
+    emoji: {
+        id: Snowflake | null;
+        name: string;
+        isAnimated: boolean;
+        imageUrl: string;
+    };
+}
+
+interface DiscordAttachment {
+    id: Snowflake;
+    url: string;
+    fileName: string;
+    fileSizeBytes: number;
+}
+
+interface DiscordMention {
+    id: Snowflake;
+    name: string;
+    discriminator: string;
+    nickname: string;
+    isBot: boolean;
 }
