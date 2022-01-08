@@ -14,7 +14,7 @@ const DottedTable = (props: Props) => {
             <ul>
                 {props.lines.map(([key, value, decimals]) => (
                     <li key={key}>
-                        <span className="DottedTable__key">{key}:</span>
+                        <span className="DottedTable__key">{key}</span>
                         <span className="DottedTable__value">
                             <CountUp
                                 end={value}
