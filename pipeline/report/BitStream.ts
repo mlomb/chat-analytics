@@ -5,7 +5,7 @@ Support:
     - Signed integers
     - Reads and writes up to 32bits
     - Works in multiples of 32bits
-        
+
 cross boundary
 |--------------------------------| |---------------------------------|
 |           value1               | |            value2               |
@@ -45,12 +45,13 @@ export class BitStream {
     }
 
     setBits(bits: number, value: number): void {
-        const buffer = this.buffer;
         const offset = this.offset;
         this.offset += bits;
 
         // check if we must grow the buffer
-        if ((offset + bits) / 8 > buffer.byteLength - 4) this.grow();
+        if ((offset + bits) / 8 > this.buffer.byteLength - 4) this.grow();
+        // buffer may have grown
+        const buffer = this.buffer;
 
         // only keep the bits we need
         const mask = bits === 32 ? 0b11111111111111111111111111111111 : (1 << bits) - 1;
@@ -62,7 +63,7 @@ export class BitStream {
         // TODO: try to do it branchless
         if (delta + bits > 32) {
             const corr = bits - (32 - delta);
-            buffer[aligned32] = (buffer[aligned32] & ~(mask >> corr)) | (valueMasked >> corr);
+            buffer[aligned32] = (buffer[aligned32] & (~(mask >>> corr) >>> 0)) | (valueMasked >>> corr);
             buffer[aligned32 + 1] = (buffer[aligned32 + 1] & ~(mask << (32 - corr))) | (valueMasked << (32 - corr));
         } else {
             const corr = 32 - delta - bits;

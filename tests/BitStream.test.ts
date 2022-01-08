@@ -46,6 +46,19 @@ describe("writing", () => {
             [0b01110100101010101101000101000101, 0b10001000001000001001000100001000],
         ],
         [
+            "one bit",
+            // offset
+            15,
+            // bits
+            1,
+            // input
+            0b1,
+            // initial
+            [0b00000000000000000000000000000000, 0b00000000000000000000000000000000],
+            // expected
+            [0b00000000000000010000000000000000, 0b00000000000000000000000000000000],
+        ],
+        [
             "cross boundary",
             // offset
             25,
@@ -178,4 +191,22 @@ describe("reading", () => {
     });
 });
 
-// TODO: complex case
+test("read then write", () => {
+    let s = new BitStream();
+    let bits = [],
+        values = [];
+    for (let k = 0; k < 100; k++) {
+        for (let i = 1; i <= 32; i++) {
+            const value = Math.floor(Math.random() * Math.pow(2, i));
+            s.setBits(i, value);
+            bits.push(i);
+            values.push(value);
+        }
+    }
+    // check
+    s.offset = 0;
+    for (let k = 0; k < bits.length; k++) {
+        const value = s.getBits(bits[k]);
+        expect(value).toBe(values[k]);
+    }
+});
