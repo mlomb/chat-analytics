@@ -105,6 +105,7 @@ const Steps = () => {
             config: {
                 platform: state.platform as Platform,
             },
+            origin: window.location.origin,
         };
         worker.postMessage(init);
         setState((prevState) => ({
