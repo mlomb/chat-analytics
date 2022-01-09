@@ -2,7 +2,7 @@ import { unzipSync } from "fflate";
 import { AttachmentType, IMessage } from "@pipeline/Types";
 import { FileInput } from "@pipeline/File";
 import { Parser } from "@pipeline/parse/Parser";
-import { extractChatName, matchAttachmentType } from "@pipeline/parse/parsers/WhatsApp";
+import { extractChatName, matchAttachmentType, removeBadChars } from "@pipeline/parse/parsers/WhatsApp";
 
 /*
     There is a convenient parser already out there
@@ -67,6 +67,7 @@ export class WhatsAppParser extends Parser {
 
         for (const message of parsed) {
             const timestamp = message.date.getTime();
+            const messageContent = removeBadChars(message.message);
 
             if (message.author !== "System") {
                 const authorId = this.builder.addAuthor(message.author, {
@@ -79,15 +80,13 @@ export class WhatsAppParser extends Parser {
                     timestamp,
                 };
 
-                const attachment: AttachmentType | undefined = matchAttachmentType(message.message);
+                const attachment: AttachmentType | undefined = matchAttachmentType(messageContent);
                 if (attachment !== undefined) {
                     imsg.attachment = attachment;
                 } else {
                     // copy text content
-                    imsg.content = message.message;
+                    imsg.content = messageContent;
                 }
-
-                console.log(imsg);
 
                 this.builder.addMessage(imsg);
             } else {
