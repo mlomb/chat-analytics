@@ -39,7 +39,9 @@ export enum MessageFlags {
 
 export enum AttachmentType {
     Image,
+    ImageAnimated, // (GIFs)
     Video,
+    Sticker,
     Audio,
     Document,
     Other,
