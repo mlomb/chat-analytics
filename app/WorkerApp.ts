@@ -8,6 +8,7 @@ import { FileInput } from "@pipeline/File";
 export interface InitMessage {
     files: File[];
     config: ReportConfig;
+    origin: string;
 }
 
 export interface ResultMessage {
@@ -40,6 +41,12 @@ self.onmessage = async (ev: MessageEvent<InitMessage>) => {
         const database = await generateDatabase(files.map(wrapFile), ev.data.config);
         if (env.isDev) console.log(database);
         const result = await generateReportSite(database);
+        if (env.isDev) {
+            // include the origin in relative URLs, so it can be opened locally
+            result.html = result.html
+                .replace('<script defer src="', '<script defer src="' + ev.data.origin)
+                .replace('<link href="', '<link href="' + ev.data.origin);
+        }
         self.postMessage(<ResultMessage>{
             type: "result",
             data: env.isDev ? result.data : "",
