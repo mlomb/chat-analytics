@@ -1,3 +1,4 @@
+import { unzipSync } from "fflate";
 import { AttachmentType, IMessage } from "@pipeline/Types";
 import { FileInput } from "@pipeline/File";
 import { Parser } from "@pipeline/parse/Parser";
@@ -13,8 +14,33 @@ export class WhatsAppParser extends Parser {
     private messageIndex = 0;
 
     async *parse(file: FileInput) {
-        const file_buffer = await file.slice();
-        const file_content = new TextDecoder("utf-8").decode(file_buffer);
+        const fileBuffer = await file.slice();
+        let txtBuffer: ArrayBuffer | undefined = undefined;
+        if (file.name.toLowerCase().endsWith(".zip")) {
+            if (fileBuffer.byteLength > 300 * 1024 * 1024)
+                throw new Error("Do not attach media files while exporting (file too big)");
+
+            const unzippedFiles = unzipSync(new Uint8Array(fileBuffer));
+            const files = Object.keys(unzippedFiles);
+
+            // by default is included as "_chat.txt" inside the ZIP
+            if (files.includes("_chat.txt")) {
+                txtBuffer = unzippedFiles["_chat.txt"];
+            } else {
+                // otherwise we try to find a file that matches the pattern
+                const chatTxtFiles = files
+                    .filter((f) => f.match(/.*(?:chat|whatsapp).*\.txt$/i))
+                    .sort((a, b) => a.length - b.length);
+                if (chatTxtFiles.length > 0) txtBuffer = unzippedFiles[chatTxtFiles[0]];
+            }
+
+            if (txtBuffer === undefined) throw new Error("Could not find txt file in zip");
+        } else {
+            // regular .txt
+            txtBuffer = fileBuffer;
+        }
+
+        const file_content = new TextDecoder("utf-8").decode(txtBuffer);
         const parsed = parseStringSync(file_content);
 
         // try to extract the chat name from the filename

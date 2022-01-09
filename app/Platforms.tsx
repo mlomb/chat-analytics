@@ -178,7 +178,7 @@ export const Platforms: {
         platform: "whatsapp",
         title: "WhatsApp",
         color: [142, 70, 49],
-        defaultFilename: "WhatsApp Chat with <chat name>.txt",
+        defaultFilename: "WhatsApp Chat with <chat name>.txt/zip",
         logo: <img src={WhatsAppLogo} alt="" />,
         instructions: <WhatsAppInstructions />,
     },

@@ -11,8 +11,8 @@ export const extractChatName = (filename: string): string | undefined => {
     let name: string | undefined;
     for (const template of FilenamePatterns) {
         // expected: <pattern><chat name>.txt
-        if (filename.startsWith(template) && filename.endsWith(".txt")) {
-            name = filename.slice(template.length, -".txt".length);
+        if (filename.startsWith(template) && (filename.endsWith(".txt") || filename.endsWith(".zip"))) {
+            name = filename.slice(template.length, -4);
             break;
         }
     }
