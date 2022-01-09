@@ -1,10 +1,15 @@
 import { AttachmentType } from "@pipeline/Types";
 
-// prettier-ignore
 const FilenamePatterns = [
     "WhatsApp Chat - ",
     "WhatsApp Chat with ",
     "Chat de WhatsApp con ",
+    "Чат WhatsApp с ",
+    "Chat WhatsApp con ",
+    "Conversa no WhatsApp com ",
+    "Conversa do WhatsApp com ",
+    "WhatsApp Chat mit ",
+    "Discussion WhatsApp avec ",
     // TODO: ...
 ];
 
@@ -24,8 +29,8 @@ export const extractChatName = (filename: string): string | undefined => {
 export const removeBadChars = (str: string) => str.replace(/[\u202a\u200e\u202c\xa0]/g, "");
 
 type PatternType =
-    | // generic multimedia file (Android exports)
-    "media"
+    // generic multimedia file (Android exports)
+    | "media"
     // specific multimedia types (iOS exports)
     | "image"
     | "video"
