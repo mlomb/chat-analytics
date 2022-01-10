@@ -40,8 +40,8 @@ export class WhatsAppParser extends Parser {
             txtBuffer = fileBuffer;
         }
 
-        const file_content = new TextDecoder("utf-8").decode(txtBuffer);
-        const parsed = parseStringSync(file_content);
+        const fileContent = new TextDecoder("utf-8").decode(txtBuffer);
+        const parsed = parseStringSync(fileContent);
 
         // try to extract the chat name from the filename
         let name: string | undefined = extractChatName(file.name);
@@ -67,30 +67,28 @@ export class WhatsAppParser extends Parser {
 
         for (const message of parsed) {
             const timestamp = message.date.getTime();
+
+            // NOTE: messages in ephemeral mode appear as empty messages
             const messageContent = removeBadChars(message.message);
 
             if (message.author !== "System") {
                 const authorId = this.builder.addAuthor(message.author, {
                     n: message.author,
                 });
-                const imsg: IMessage = {
+
+                const attachment: AttachmentType | undefined = matchAttachmentType(messageContent);
+
+                this.builder.addMessage({
                     id: this.messageIndex++,
                     authorId,
                     channelId,
                     timestamp,
-                };
-
-                const attachment: AttachmentType | undefined = matchAttachmentType(messageContent);
-                if (attachment !== undefined) {
-                    imsg.attachment = attachment;
-                } else {
-                    // copy text content
-                    imsg.content = messageContent;
-                }
-
-                this.builder.addMessage(imsg);
+                    content: attachment === undefined ? messageContent : undefined,
+                    attachments: attachment === undefined ? [] : [attachment],
+                    reactions: [],
+                });
             } else {
-                // TODO: parse system messages
+                // parse system messages?
             }
         }
     }

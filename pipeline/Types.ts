@@ -142,8 +142,8 @@ export interface IMessage {
     timestamp: Timestamp;
     timestampEdit?: Timestamp;
     content?: string;
-    attachment?: AttachmentType;
-    reactions?: [Emoji, number][];
+    attachments: AttachmentType[];
+    reactions: [Emoji, number][];
 }
 
 // stored serialized during generation

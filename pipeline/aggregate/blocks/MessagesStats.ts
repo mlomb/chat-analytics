@@ -32,10 +32,12 @@ const fn: BlockFn<MessagesStats> = (database, filters) => {
         avgDay: total / filters.numActiveDays,
         mostAuthors: authorsCount
             .map((v, i) => ({ id: i, value: v }))
+            .filter((v) => v.value > 0)
             .sort((a, b) => b.value - a.value)
             .slice(0, 20),
         mostChannels: channelsCount
             .map((v, i) => ({ id: i, value: v }))
+            .filter((v) => v.value > 0)
             .sort((a, b) => b.value - a.value)
             .slice(0, 20),
     };

@@ -19,7 +19,7 @@ interface DiscordChannel {
 
 interface DiscordMessage {
     id: Snowflake;
-    type: "Default" | "Reply" | "ChannelPinnedMessage" | unknown;
+    type: "Default" | "Reply" | "ChannelPinnedMessage" | "GuildMemberJoin" | unknown;
     timestamp: string;
     timestampEdited: string;
     callEndedTimestamp: string;

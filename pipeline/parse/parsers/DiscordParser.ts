@@ -1,8 +1,8 @@
-import { IAuthor, ID } from "@pipeline/Types";
+import { AttachmentType, IAuthor, ID, IMessage } from "@pipeline/Types";
 import { Parser } from "@pipeline/parse/Parser";
 
 import { JSONStream } from "@pipeline/parse/JSONStream";
-import { FileInput, streamJSONFromFile } from "@pipeline/File";
+import { FileInput, getAttachmentTypeFromFileName, streamJSONFromFile } from "@pipeline/File";
 
 export class DiscordParser extends Parser {
     private channelId?: ID;
@@ -27,6 +27,7 @@ export class DiscordParser extends Parser {
         if (this.channelId === undefined) throw new Error("Missing channel ID");
 
         const timestamp = Date.parse(message.timestamp);
+        const timestampEdit = message.timestampEdited ? Date.parse(message.timestampEdited) : undefined;
 
         const author: IAuthor = {
             n: message.author.nickname,
@@ -47,34 +48,34 @@ export class DiscordParser extends Parser {
 
         // :)
         if (message.type == "Default" || message.type == "Reply") {
-            /*if (message.reactions) {
-                console.log(message.reactions);
-            }*/
-            /*if (message.attachments.length > 0 && message.content.length > 0) {
-                console.log(message);
-            }*/
             let content = message.content;
-
-            // replace names by nicknames in mentions
             for (const mention of message.mentions) {
+                // replace names by nicknames in mentions
                 // and just to make sure, replace spaces by underscores in the nickname
                 content = content.split(`@${mention.name}`).join(`@${mention.nickname.replace(" ", "_")}`);
             }
 
-            if (message.attachments.length > 1) {
-                console.log(message.attachments.length);
-            }
-
             this.builder.addMessage({
                 id: message.id,
-                replyTo: message.reference?.messageId || undefined,
+                replyTo: message.reference?.messageId,
                 authorId,
                 channelId: this.channelId,
                 timestamp,
-                content,
+                timestampEdit,
+                content: content.length > 0 ? content : undefined,
+                attachments: message.attachments.map((a) => getAttachmentTypeFromFileName(a.fileName)),
+                reactions: message.reactions.map((r) => [
+                    {
+                        n: r.emoji.name,
+                        id: r.emoji.id === null ? undefined : r.emoji.id,
+                    },
+                    r.count,
+                ]),
             });
         } else if (message.type == "ChannelPinnedMessage") {
+        } else if (message.type == "GuildMemberJoin") {
         } else {
+            // "8", "9", "20" ?
             // console.warn("Unhandled message type", message.type, message);
         }
     }

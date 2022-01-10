@@ -22,7 +22,7 @@ import { LanguageDetector, loadLanguageDetector } from "@pipeline/process/Langua
 import { Stopwords, loadStopwords } from "@pipeline/process/Stopwords";
 import { stripDiacritics } from "@pipeline/process/Diacritics";
 import { BitStream } from "@pipeline/report/BitStream";
-import { genTimeKeys, gtDateArr, ltDateArr, toDateArr } from "@pipeline/Util";
+import { dateToString, genTimeKeys, gtDateArr, ltDateArr, toDateArr } from "@pipeline/Util";
 import {
     MessageBitConfig,
     readIntermediateMessage,
@@ -76,6 +76,10 @@ export class DatabaseBuilder {
         this.stopwords = await loadStopwords();
         this.languageDetector = await loadLanguageDetector();
         // console.log(this.tokenizer.tokenize(`abc won't don't has test not word i'm don't abc`));
+    }
+
+    get numChannels() {
+        return this.channels.length;
     }
 
     public setTitle(title: string) {
@@ -159,7 +163,7 @@ export class DatabaseBuilder {
             const sentiment = Math.floor(Math.random() * 176);
             // TODO: use different tokenizers depending on language
             // TODO: https://github.com/marcellobarile/multilang-sentiment
-            const tokens = this.tokenizer.tokenize(msg.content);
+            const tokens = this.tokenizer.tokenize(msg.content || "");
             // console.log(msg.content, langIdx, tokens);
 
             // NOTE: we can't use an object because of this:
@@ -275,7 +279,7 @@ export class DatabaseBuilder {
                     const imsg = readIntermediateMessage(this.stream);
 
                     const msg: Message = {
-                        dayIndex: dayKeys.indexOf(`${imsg.year}-${imsg.month}-${imsg.day}`),
+                        dayIndex: dayKeys.indexOf(dateToString([imsg.year, imsg.month, imsg.day])),
                         hour: imsg.hour,
                         authorId: imsg.authorId,
                         langIdx: imsg.langIdx,
