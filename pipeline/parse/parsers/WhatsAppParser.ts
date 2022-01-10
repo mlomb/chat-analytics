@@ -76,7 +76,18 @@ export class WhatsAppParser extends Parser {
                     n: message.author,
                 });
 
-                const attachment: AttachmentType | undefined = matchAttachmentType(messageContent);
+                let attachment: AttachmentType | undefined = matchAttachmentType(messageContent);
+
+                // location attachment
+                // we should handle this better
+                // examples:
+                // Ubicación: https://maps.google.com/?q=-XX.XXXXXX,-XX.XXXXXX
+                // location: https://maps.google.com/?q=-XX.XXXXXX,-XX.XXXXXX
+                if (messageContent.includes("https://maps.google.com/?q=")) {
+                    attachment = AttachmentType.Other;
+                }
+
+                // TODO: handle "live location shared"
 
                 this.builder.addMessage({
                     id: this.messageIndex++,

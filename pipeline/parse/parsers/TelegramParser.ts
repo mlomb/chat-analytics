@@ -58,8 +58,17 @@ export class TelegramParser extends Parser {
 
             if (content.length === 0 && attachment === undefined) {
                 // sometimes messages do not include the "mime_type" but "photo"
-                if (message.photo !== undefined) attachment = AttachmentType.Image;
+                if (message.photo) attachment = AttachmentType.Image;
+                // polls
+                if (message.poll) {
+                    // put the question as the message content
+                    content = message.poll.question;
+                }
+                // NOTE: also :dart: emoji appears as empty content
             }
+
+            if (JSON.stringify(message.text).includes("@")) return;
+            console.log(message);
 
             this.builder.addMessage({
                 id: rawId,
