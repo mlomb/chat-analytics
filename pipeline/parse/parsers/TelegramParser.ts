@@ -1,8 +1,8 @@
-import { ID, RawID } from "@pipeline/Types";
+import { AttachmentType, ID, RawID } from "@pipeline/Types";
 import { Parser } from "@pipeline/parse/Parser";
 
 import { JSONStream } from "@pipeline/parse/JSONStream";
-import { FileInput, streamJSONFromFile } from "@pipeline/File";
+import { FileInput, getAttachmentTypeFromMimeType, streamJSONFromFile } from "@pipeline/File";
 
 export class TelegramParser extends Parser {
     private channelName?: string;
@@ -12,7 +12,7 @@ export class TelegramParser extends Parser {
         const stream = new JSONStream();
 
         stream.onObject<string>("name", this.onChannelName.bind(this));
-        stream.onObject<string>("id", this.onChannelId.bind(this));
+        stream.onObject<RawID>("id", this.onChannelId.bind(this));
         stream.onArrayItem<TelegramMessage>("messages", this.parseMessage.bind(this));
 
         yield* streamJSONFromFile(stream, file);
@@ -23,10 +23,10 @@ export class TelegramParser extends Parser {
 
     private onChannelName(channelName: string) {
         this.channelName = channelName;
-        this.builder.setTitle(channelName);
+        this.builder.setTitle(this.builder.numChannels === 0 ? channelName : "Telegram Chats");
     }
 
-    private onChannelId(rawChannelId: string) {
+    private onChannelId(rawChannelId: RawID) {
         this.channelId = this.builder.addChannel(rawChannelId, { n: this.channelName || "default" });
     }
 
@@ -35,6 +35,9 @@ export class TelegramParser extends Parser {
 
         const rawId: RawID = message.id + "";
         const rawAuthorId: RawID = message.from_id + "";
+        const rawReplyToId: RawID | undefined =
+            message.reply_to_message_id === null ? undefined : message.reply_to_message_id + "";
+
         const timestamp = Date.parse(message.date);
         const timestampEdit = message.edited ? Date.parse(message.edited) : undefined;
 
@@ -46,40 +49,28 @@ export class TelegramParser extends Parser {
 
         if (message.type === "message") {
             let content = this.parseTextArray(message.text);
+            let attachment: AttachmentType | undefined;
 
-            // append sticker_emoji as a normal emoji
-            if (message.sticker_emoji) {
-                if (content.length === 0) content = message.sticker_emoji;
-                else content += ` ${message.sticker_emoji}`;
-            }
+            // determinate attachment type
+            if (message.media_type === "sticker") attachment = AttachmentType.Sticker;
+            if (message.mime_type) attachment = getAttachmentTypeFromMimeType(message.mime_type);
+            if (message.location_information !== undefined) attachment = AttachmentType.Other;
 
-            // read mime_type
-            if (message.mime_type) {
-                // examples:
-                // application/pdf
-                // application/zip
-                // audio/mp3
-                // audio/mpeg
-                // audio/ogg
-                // image/gif
-                // image/jpeg
-                // image/png
-                // text/plain
-                // video/mp4
-                // video/webm
-                // ... lots more
+            if (content.length === 0 && attachment === undefined) {
+                // sometimes messages do not include the "mime_type" but "photo"
+                if (message.photo !== undefined) attachment = AttachmentType.Image;
             }
 
             this.builder.addMessage({
                 id: rawId,
-                replyTo: message.reply_to_message_id ? message.reply_to_message_id + "" : undefined,
+                replyTo: rawReplyToId,
                 authorId,
                 channelId: this.channelId,
                 timestamp,
                 timestampEdit,
                 content,
-                attachments: [],
-                // NOTE: as of now, Telegram doesn't export reactions
+                attachments: attachment === undefined ? [] : [attachment],
+                // NOTE: as of now, Telegram doesn't export reactions :(
                 reactions: [],
             });
         }
