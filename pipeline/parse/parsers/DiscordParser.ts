@@ -55,6 +55,9 @@ export class DiscordParser extends Parser {
                 content = content.split(`@${mention.name}`).join(`@${mention.nickname.replace(" ", "_")}`);
             }
 
+            // NOTE: stickers right now are messages with empty content
+            //       see https://github.com/Tyrrrz/DiscordChatExporter/issues/638
+
             this.builder.addMessage({
                 id: message.id,
                 replyTo: message.reference?.messageId,
