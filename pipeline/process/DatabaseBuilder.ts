@@ -3,7 +3,6 @@ import {
     BitAddress,
     Channel,
     Database,
-    DateArr,
     IAuthor,
     IChannel,
     ID,
@@ -15,21 +14,20 @@ import {
     Timestamp,
     Word,
 } from "@pipeline/Types";
+import { Day, genTimeKeys } from "@pipeline/Time";
 import IDMapper from "@pipeline/parse/IDMapper";
 import { progress } from "@pipeline/Progress";
 import { LanguageDetector, loadLanguageDetector } from "@pipeline/process/LanguageDetection";
 import { Stopwords, loadStopwords } from "@pipeline/process/Stopwords";
 import { stripDiacritics } from "@pipeline/process/Diacritics";
 import { BitStream } from "@pipeline/report/BitStream";
-import { dateToString, genTimeKeys, gtDateArr, ltDateArr, toDateArr } from "@pipeline/Util";
+import { tokenize } from "@pipeline/process/Tokenizer";
 import {
     MessageBitConfig,
     readIntermediateMessage,
     writeIntermediateMessage,
     writeMessage,
 } from "@pipeline/report/Serialization";
-
-import { tokenize } from "@pipeline/process/Tokenizer";
 
 // TODO: !
 const searchFormat = (x: string) => x.toLocaleLowerCase();
@@ -56,8 +54,8 @@ export class DatabaseBuilder {
     private authors: Author[] = [];
     private authorMessagesCount: number[] = [];
     private channels: Channel[] = [];
-    private minDate: DateArr | undefined;
-    private maxDate: DateArr | undefined;
+    private minDate: Day | undefined;
+    private maxDate: Day | undefined;
     private channelSections: { [id: ID]: ChannelSection[] } = {};
     private totalMessages = 0;
 
@@ -146,10 +144,10 @@ export class DatabaseBuilder {
         for (const msg of this.messageQueue) {
             // TODO: timezones
             const date = new Date(msg.timestamp);
-            const dateArr = toDateArr(date);
+            const day = Day.fromDate(date);
+            if (this.minDate === undefined || Day.lt(day, this.minDate)) this.minDate = day;
+            if (this.maxDate === undefined || Day.gt(day, this.maxDate)) this.maxDate = day;
 
-            if (this.minDate === undefined || ltDateArr(dateArr, this.minDate)) this.minDate = dateArr;
-            if (this.maxDate === undefined || gtDateArr(dateArr, this.maxDate)) this.maxDate = dateArr;
             this.authorMessagesCount[msg.authorId] += 1;
             this.channels[msg.channelId].msgCount += 1;
 
@@ -183,9 +181,7 @@ export class DatabaseBuilder {
             }
 
             const imsg: IntermediateMessage = {
-                year: dateArr[0],
-                month: dateArr[1],
-                day: dateArr[2],
+                day,
                 // TODO: timezones
                 hour: date.getHours(),
                 authorId: msg.authorId,
@@ -227,8 +223,8 @@ export class DatabaseBuilder {
     public getDatabase(): Database {
         if (this.minDate === undefined || this.maxDate === undefined) throw new Error("No messages processed");
 
-        const { dayKeys, monthKeys } = genTimeKeys(this.minDate, this.maxDate);
-        console.log(this.minDate, this.maxDate, dayKeys);
+        const { dateKeys, monthKeys } = genTimeKeys(this.minDate, this.maxDate);
+        console.log(this.minDate, this.maxDate, dateKeys);
 
         progress.new("Sorting authors");
         const authorsOrder: ID[] = Array.from({ length: this.authors.length }, (_, i) => i);
@@ -253,7 +249,7 @@ export class DatabaseBuilder {
         console.time("buff");
         progress.new("Generating final messages data");
         const bitConfig: MessageBitConfig = {
-            dayIndexBits: Math.max(1, nextPOTBits(dayKeys.length)),
+            dayIndexBits: Math.max(1, nextPOTBits(dateKeys.length)),
             authorIdBits: Math.max(1, nextPOTBits(this.authors.length)),
             wordIdxBits: Math.max(1, nextPOTBits(this.words.length)),
         };
@@ -268,7 +264,7 @@ export class DatabaseBuilder {
                     const imsg = readIntermediateMessage(this.stream);
 
                     const msg: Message = {
-                        dayIndex: dayKeys.indexOf(dateToString([imsg.year, imsg.month, imsg.day])),
+                        dayIndex: dateKeys.indexOf(imsg.day.dateKey),
                         hour: imsg.hour,
                         authorId: imsg.authorId,
                         langIdx: imsg.langIdx,
@@ -303,9 +299,9 @@ export class DatabaseBuilder {
             bitConfig,
             title: this.title,
             time: {
-                minDate: this.minDate,
-                maxDate: this.maxDate,
-                numDays: dayKeys.length,
+                minDate: this.minDate.dateKey,
+                maxDate: this.maxDate.dateKey,
+                numDays: dateKeys.length,
                 numMonths: monthKeys.length,
             },
             words: this.words,

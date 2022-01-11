@@ -1,12 +1,12 @@
-import { Database, DateStr, ID } from "@pipeline/Types";
-import { genTimeKeys } from "@pipeline/Util";
+import { Database, ID } from "@pipeline/Types";
+import { DateKey, Day, genTimeKeys } from "@pipeline/Time";
 
 export class Filters {
     channels: ID[];
     authors: Uint8Array;
     startDayIndex: number; // inclusive
     endDayIndex: number; // inclusive
-    dayKeys: string[];
+    dateKeys: DateKey[];
 
     constructor(database: Database) {
         this.channels = [];
@@ -15,8 +15,8 @@ export class Filters {
         this.endDayIndex = 0;
 
         // fill date keys
-        const { dayKeys } = genTimeKeys(database.time.minDate, database.time.maxDate);
-        this.dayKeys = dayKeys;
+        const { dateKeys } = genTimeKeys(Day.fromKey(database.time.minDate), Day.fromKey(database.time.maxDate));
+        this.dateKeys = dateKeys;
     }
 
     hasChannel(channelId: number): boolean {
@@ -42,12 +42,12 @@ export class Filters {
         this.authors.fill(0);
         for (const authorId of authors) this.authors[authorId] = 1;
     }
-    updateStartDate(startDate: DateStr) {
-        this.startDayIndex = this.dayKeys.indexOf(startDate);
+    updateStartDate(startDate: DateKey) {
+        this.startDayIndex = this.dateKeys.indexOf(startDate);
         console.assert(this.startDayIndex >= 0);
     }
-    updateEndDate(endDate: DateStr) {
-        this.endDayIndex = this.dayKeys.indexOf(endDate);
+    updateEndDate(endDate: DateKey) {
+        this.endDayIndex = this.dateKeys.indexOf(endDate);
         console.assert(this.endDayIndex >= 0);
     }
 }
