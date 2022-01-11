@@ -1,4 +1,5 @@
 import { MessageBitConfig } from "@pipeline/report/Serialization";
+import { DateKey, Day } from "@pipeline/Time";
 
 // raw ID that comes from the platform (e.g 9876554321)
 export type RawID = string | number;
@@ -14,11 +15,6 @@ export type BitAddress = number;
 
 // UTC timestamp
 export type Timestamp = number;
-
-// date with format "YYYY-MM-DD"
-export type DateStr = string;
-// date with format [year, month (1-based), day]
-export type DateArr = [number, number, number];
 
 // available platforms
 export type Platform = "discord" | "telegram" | "whatsapp";
@@ -62,8 +58,8 @@ export interface Database {
     bitConfig: MessageBitConfig;
     title: string;
     time: {
-        minDate: DateArr;
-        maxDate: DateArr;
+        minDate: DateKey;
+        maxDate: DateKey;
         numDays: number;
         numMonths: number;
     };
@@ -148,9 +144,7 @@ export interface IMessage {
 
 // stored serialized during generation
 export interface IntermediateMessage {
-    year: number;
-    month: number;
-    day: number;
+    day: Day;
     hour: number;
     authorId: ID;
     langIdx: number;

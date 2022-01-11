@@ -1,8 +1,8 @@
 import EventEmitter from "events";
 
-import { Database, DateArr, ID } from "@pipeline/Types";
+import { Database, ID } from "@pipeline/Types";
+import { Day } from "@pipeline/Time";
 import { BlockDescriptions, BlockInfo, BlockKey, BlockTrigger } from "@pipeline/aggregate/Blocks";
-import { dateToString, fromDateArr, maxDateArr, minDateArr, toDateArr } from "@pipeline/Util";
 
 import Worker, { BlockRequestMessage, BlockResultMessage, InitMessage, ReadyMessage } from "@report/WorkerReport";
 
@@ -30,8 +30,8 @@ export class DataProvider extends EventEmitter {
     private activeAuthors: ID[] = [];
     private channelsSet: boolean = false;
     private authorsSet: boolean = false;
-    private activeStartDate: DateArr = [0, 0, 0];
-    private activeEndDate: DateArr = [0, 0, 0];
+    private activeStartDate: Day | undefined;
+    private activeEndDate: Day | undefined;
 
     // Updated by this class and the Worker
     public database!: Database;
@@ -58,8 +58,8 @@ export class DataProvider extends EventEmitter {
             this.database = res.database;
             this.blocksDescs = res.blocksDescs;
             // set default time range
-            this.activeStartDate = res.database.time.minDate;
-            this.activeEndDate = res.database.time.maxDate;
+            this.activeStartDate = Day.fromKey(res.database.time.minDate);
+            this.activeEndDate = Day.fromKey(res.database.time.maxDate);
 
             // worker is ready
             console.log("Worker is ready");
@@ -97,11 +97,10 @@ export class DataProvider extends EventEmitter {
     }
 
     updateTimeRange(start: Date, end: Date) {
-        const clampDate = (date: DateArr) =>
-            maxDateArr(minDateArr(date, this.database.time.maxDate), this.database.time.minDate);
-
-        this.activeStartDate = clampDate(toDateArr(start));
-        this.activeEndDate = clampDate(toDateArr(end));
+        const clampDate = (day: Day) =>
+            Day.clamp(day, Day.fromKey(this.database.time.minDate), Day.fromKey(this.database.time.maxDate));
+        this.activeStartDate = clampDate(Day.fromDate(start));
+        this.activeEndDate = clampDate(Day.fromDate(end));
         this.invalidateBlocks("time");
     }
 
@@ -151,8 +150,8 @@ export class DataProvider extends EventEmitter {
             this.validRequestData.add("authors");
         }
         if (!this.validRequestData.has("time")) {
-            br.filters.startDate = dateToString(this.activeStartDate);
-            br.filters.endDate = dateToString(this.activeEndDate);
+            br.filters.startDate = this.activeStartDate?.dateKey;
+            br.filters.endDate = this.activeEndDate?.dateKey;
             this.validRequestData.add("time");
         }
         this.worker.postMessage(br);
@@ -216,11 +215,11 @@ export class DataProvider extends EventEmitter {
     }
 
     public getActiveStartDate(): Date {
-        return fromDateArr(this.activeStartDate);
+        return this.activeStartDate!.toDate;
     }
 
     public getActiveEndDate(): Date {
-        return fromDateArr(this.activeEndDate);
+        return this.activeEndDate!.toDate;
     }
 }
 

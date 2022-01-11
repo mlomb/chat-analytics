@@ -1,7 +1,7 @@
 import { Message } from "@pipeline/Types";
 import { BlockDescription, BlockFn } from "@pipeline/aggregate/Blocks";
 import { parseAndFilterMessages } from "@pipeline/aggregate/Helpers";
-import { genTimeKeys } from "@pipeline/Util";
+import { Day, genTimeKeys } from "@pipeline/Time";
 
 type MessagesInDate = {
     d: number; // date, as timestamp
@@ -19,12 +19,15 @@ const fn: BlockFn<MessagesPerCycle> = (database, filters) => {
         perMonth: [],
     };
 
-    const { dayKeys, monthKeys, dayToMonthIndex } = genTimeKeys(database.time.minDate, database.time.maxDate);
+    const { dateKeys, monthKeys, dateToMonthIndex } = genTimeKeys(
+        Day.fromKey(database.time.minDate),
+        Day.fromKey(database.time.maxDate)
+    );
 
     // fill empty
-    for (const dayKey of dayKeys) {
+    for (const dateKey of dateKeys) {
         res.perDay.push({
-            d: new Date(dayKey).getTime(),
+            d: new Date(dateKey).getTime(),
             m: 0,
         });
     }
@@ -37,7 +40,7 @@ const fn: BlockFn<MessagesPerCycle> = (database, filters) => {
 
     const processMessage = (msg: Message) => {
         res.perDay[msg.dayIndex].m++;
-        res.perMonth[dayToMonthIndex[msg.dayIndex]].m++;
+        res.perMonth[dateToMonthIndex[msg.dayIndex]].m++;
     };
 
     parseAndFilterMessages(processMessage, database, filters, {

@@ -1,10 +1,11 @@
 import { IntermediateMessage, Message } from "@pipeline/Types";
 import { BitStream } from "@pipeline/report/BitStream";
+import { Day } from "@pipeline/Time";
 
 export const writeIntermediateMessage = (message: IntermediateMessage, stream: BitStream) => {
-    stream.setBits(12, message.year); // 0-4095
-    stream.setBits(4, message.month); // 0-15
-    stream.setBits(5, message.day); // 0-31
+    stream.setBits(12, message.day.year); // 0-4095
+    stream.setBits(4, message.day.month); // 0-15
+    stream.setBits(5, message.day.day); // 0-31
     stream.setBits(5, message.hour); // 0-23
     stream.setBits(21, message.authorId); // 0-2097151
     stream.setBits(8, message.langIdx); // 0-255
@@ -18,9 +19,7 @@ export const writeIntermediateMessage = (message: IntermediateMessage, stream: B
 
 export const readIntermediateMessage = (stream: BitStream): IntermediateMessage => {
     const imsg: IntermediateMessage = {
-        year: stream.getBits(12),
-        month: stream.getBits(4),
-        day: stream.getBits(5),
+        day: new Day(stream.getBits(12), stream.getBits(4), stream.getBits(5)),
         hour: stream.getBits(5),
         authorId: stream.getBits(21),
         langIdx: stream.getBits(8),
