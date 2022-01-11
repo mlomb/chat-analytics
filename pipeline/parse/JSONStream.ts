@@ -87,7 +87,7 @@ export class JSONStream {
         let i = this.index;
         let c = this.buffer.charCodeAt(i);
 
-        while (c) {
+        while (c > 0) {
             // console.log(c, String.fromCharCode(c), chunk.substring(i - 5, i + 5), this.state);
 
             switch (this.state) {

@@ -14,7 +14,6 @@ import {
     ReportConfig,
     Timestamp,
     Word,
-    WordIndex,
 } from "@pipeline/Types";
 import IDMapper from "@pipeline/parse/IDMapper";
 import { progress } from "@pipeline/Progress";
@@ -30,7 +29,7 @@ import {
     writeMessage,
 } from "@pipeline/report/Serialization";
 
-import Tokenizer from "wink-tokenizer";
+import { tokenize } from "@pipeline/process/Tokenizer";
 
 // TODO: !
 const searchFormat = (x: string) => x.toLocaleLowerCase();
@@ -59,23 +58,18 @@ export class DatabaseBuilder {
     private channels: Channel[] = [];
     private minDate: DateArr | undefined;
     private maxDate: DateArr | undefined;
-    private stream: BitStream;
     private channelSections: { [id: ID]: ChannelSection[] } = {};
     private totalMessages = 0;
 
+    private stream: BitStream = new BitStream();
     private languageDetector?: LanguageDetector;
     private stopwords?: Stopwords;
-    private tokenizer: Tokenizer;
 
-    constructor(private readonly config: ReportConfig) {
-        this.stream = new BitStream();
-        this.tokenizer = new Tokenizer();
-    }
+    constructor(private readonly config: ReportConfig) {}
 
     public async init() {
         this.stopwords = await loadStopwords();
         this.languageDetector = await loadLanguageDetector();
-        // console.log(this.tokenizer.tokenize(`abc won't don't has test not word i'm don't abc`));
     }
 
     get numChannels() {
@@ -145,8 +139,8 @@ export class DatabaseBuilder {
     public async process(force: boolean = false) {
         if (!this.languageDetector) throw new Error("Language detector not initialized");
         if (!this.stopwords) throw new Error("Stopwords not initialized");
-
         if (this.messageQueue.length === 0) return;
+
         const section = this.getChannelSection(this.messageQueue[0].channelId, this.messageQueue[0].timestamp);
 
         for (const msg of this.messageQueue) {
@@ -163,7 +157,7 @@ export class DatabaseBuilder {
             const sentiment = Math.floor(Math.random() * 176);
             // TODO: use different tokenizers depending on language
             // TODO: https://github.com/marcellobarile/multilang-sentiment
-            const tokens = this.tokenizer.tokenize(msg.content || "");
+            const tokens = tokenize((msg.content || "").normalize("NFKC"));
             // console.log(msg.content, langIdx, tokens);
 
             // NOTE: we can't use an object because of this:
@@ -173,7 +167,7 @@ export class DatabaseBuilder {
             for (const token of tokens) {
                 let word: Word | undefined = undefined;
                 if (token.tag === "word") {
-                    const tagClean = stripDiacritics(token.value.toLocaleLowerCase());
+                    const tagClean = stripDiacritics(token.text.toLocaleLowerCase());
                     if (tagClean.length > 1 && tagClean.length < 25) {
                         if (!this.stopwords.isStopword("en", tagClean)) {
                             // MAX 25 chars per word
@@ -181,7 +175,7 @@ export class DatabaseBuilder {
                         }
                     }
                 } else if (token.tag === "emoji") {
-                    word = token.value;
+                    word = token.text;
                 }
                 if (word) {
                     wordsCount.set(word, (wordsCount.get(word) || 0) + 1);
@@ -214,17 +208,12 @@ export class DatabaseBuilder {
 
             // store message
             writeIntermediateMessage(imsg, this.stream);
-            this.totalMessages += 1;
+            progress.stat("messages", this.totalMessages++);
 
             // register in section
             section.end = this.stream.offset;
         }
         this.messageQueue = [];
-
-        progress.stat(
-            "messages",
-            this.channels.reduce((sum, c) => sum + c.msgCount, 0)
-        );
     }
 
     private getWord(word: Word): ID {
@@ -247,7 +236,7 @@ export class DatabaseBuilder {
             // first non-bots, then by messages count
             this.authors[a].b === this.authors[b].b
                 ? this.authorMessagesCount[b] - this.authorMessagesCount[a]
-                : +this.authors[a].b - +this.authors[b].b
+                : +(this.authors[a].b || false) - +(this.authors[b].b || false)
         );
         const authorsBotCutoff: number = authorsOrder.findIndex((i) => this.authors[i].b);
         progress.done();

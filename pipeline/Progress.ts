@@ -137,7 +137,7 @@ class Progress extends EventEmitter {
 
             // try by time
             // (check time every 100 items)
-            if (emit === false && this.active.progress.actual - this.lastCount > 100) {
+            if (emit === false /* && this.active.progress.actual - this.lastCount > 100*/) {
                 ts = Date.now();
                 emit = ts - this.lastTs > 15;
             }

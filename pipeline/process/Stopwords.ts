@@ -10,15 +10,19 @@ interface StopwordsData {
 }
 
 export class Stopwords {
-    constructor(private readonly data: StopwordsData) {
+    private stopwords: { [lang: string]: Set<string> };
+
+    constructor(data: StopwordsData) {
+        this.stopwords = {};
+
         for (const lang in data) {
-            data[lang] = data[lang].map((word) => stripDiacritics(word.toLowerCase()));
+            this.stopwords[lang] = new Set(data[lang].map((word) => stripDiacritics(word.toLowerCase())));
         }
     }
 
     isStopword(lang: LangCode, word: string): boolean {
-        if (!this.data[lang]) return false;
-        return this.data[lang].includes(word);
+        if (lang in this.stopwords) return this.stopwords[lang].has(word);
+        return false;
     }
 }
 
