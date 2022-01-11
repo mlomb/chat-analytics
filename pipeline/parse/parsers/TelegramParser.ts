@@ -67,9 +67,6 @@ export class TelegramParser extends Parser {
                 // NOTE: also :dart: emoji appears as empty content
             }
 
-            if (JSON.stringify(message.text).includes("@")) return;
-            console.log(message);
-
             this.builder.addMessage({
                 id: rawId,
                 replyTo: rawReplyToId,
