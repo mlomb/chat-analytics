@@ -1,5 +1,5 @@
 import { progress } from "@pipeline/Progress";
-import { downloadBinaryFile } from "@pipeline/File";
+import { downloadFile } from "@pipeline/File";
 
 export class FastTextModel {
     constructor(private readonly model: any) {}
@@ -22,7 +22,7 @@ export const loadFastTextModel = async (modelName: string) => {
     progress.done();
 
     progress.new("Downloading model", modelName);
-    const model = await downloadBinaryFile(`models/${modelName}.ftz`);
+    const model = new Uint8Array(await downloadFile(`models/${modelName}.ftz`, "arraybuffer"));
     progress.done();
 
     progress.new("Loading model", modelName);
