@@ -1,5 +1,5 @@
 import { progress } from "@pipeline/Progress";
-import { downloadTextFile } from "@pipeline/File";
+import { downloadFile } from "@pipeline/File";
 import { stripDiacritics } from "@pipeline/process/Diacritics";
 
 // ISO 639-1 language code
@@ -28,7 +28,7 @@ export class Stopwords {
 
 export const loadStopwords = async (): Promise<Stopwords> => {
     progress.new("Downloading file", "stopwords-iso.json");
-    const data = JSON.parse(await downloadTextFile(`stopwords-iso.json`)) as StopwordsData;
+    const data = (await downloadFile(`stopwords-iso.json`, "json")) as StopwordsData;
     progress.done();
     return new Stopwords(data);
 };

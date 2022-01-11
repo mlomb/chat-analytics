@@ -10,7 +10,7 @@ export interface FileInput {
 }
 
 export const streamJSONFromFile = async function* (stream: JSONStream, file: FileInput): AsyncGenerator<void> {
-    const CHUNK_SIZE = 1024 * 1024 * (2 * 2); // 4MB
+    const CHUNK_SIZE = 1024 * 1024 * 2; // 2MB
     const textDecoder = new TextDecoder("utf-8");
     const fileSize = file.size;
 
@@ -25,8 +25,11 @@ export const streamJSONFromFile = async function* (stream: JSONStream, file: Fil
     }
 };
 
-export const downloadFile = async (filepath: string, responseType: XMLHttpRequestResponseType): Promise<any> =>
-    new Promise((resolve, reject) => {
+export function downloadFile(filepath: string, responseType: "json"): Promise<any>;
+export function downloadFile(filepath: string, responseType: "text"): Promise<string>;
+export function downloadFile(filepath: string, responseType: "arraybuffer"): Promise<ArrayBuffer>;
+export function downloadFile(filepath: any, responseType: XMLHttpRequestResponseType): Promise<any> {
+    return new Promise((resolve, reject) => {
         let xhr = new XMLHttpRequest();
         xhr.responseType = responseType;
         xhr.open("GET", filepath);
@@ -38,10 +41,7 @@ export const downloadFile = async (filepath: string, responseType: XMLHttpReques
         xhr.onprogress = (e) => progress.progress("bytes", e.loaded || 0, e.total <= 0 ? undefined : e.total);
         xhr.send();
     });
-
-export const downloadTextFile = (filepath: string): Promise<string> => downloadFile(filepath, "text");
-export const downloadBinaryFile = async (filepath: string): Promise<Uint8Array> =>
-    new Uint8Array(await downloadFile(filepath, "arraybuffer"));
+}
 
 export const getAttachmentTypeFromFileName = (filename: string): AttachmentType => {
     const ext = (filename.split(".").pop() || "").toLocaleLowerCase();
@@ -85,7 +85,7 @@ export const getAttachmentTypeFromMimeType = (mimeType: string): AttachmentType 
     ];
     if (docMimeTypes.includes(mimeType)) return AttachmentType.Document;
 
-    console.log(`Unknown mime type: ${mimeType}`);
+    // console.log(`Unknown mime type: ${mimeType}`);
 
     // unknown or generic
     return AttachmentType.Other;
