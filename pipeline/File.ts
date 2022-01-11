@@ -25,19 +25,23 @@ export const streamJSONFromFile = async function* (stream: JSONStream, file: Fil
     }
 };
 
-export const downloadTextFile = async (filepath: string): Promise<string> => {
-    // TODO: progress
-    const req = await fetch(filepath);
-    const text = await req.text();
-    return text;
-};
+export const downloadFile = async (filepath: string, responseType: XMLHttpRequestResponseType): Promise<any> =>
+    new Promise((resolve, reject) => {
+        let xhr = new XMLHttpRequest();
+        xhr.responseType = responseType;
+        xhr.open("GET", filepath);
+        xhr.onload = function () {
+            if (xhr.status === 200) resolve(xhr.response);
+            else reject(xhr.statusText);
+        };
+        xhr.onerror = (e) => reject(e);
+        xhr.onprogress = (e) => progress.progress("bytes", e.loaded || 0, e.total <= 0 ? undefined : e.total);
+        xhr.send();
+    });
 
-export const downloadBinaryFile = async (filepath: string): Promise<Uint8Array> => {
-    // TODO: progress
-    const req = await fetch(filepath);
-    const bytes = await req.arrayBuffer();
-    return new Uint8Array(bytes);
-};
+export const downloadTextFile = (filepath: string): Promise<string> => downloadFile(filepath, "text");
+export const downloadBinaryFile = async (filepath: string): Promise<Uint8Array> =>
+    new Uint8Array(await downloadFile(filepath, "arraybuffer"));
 
 export const getAttachmentTypeFromFileName = (filename: string): AttachmentType => {
     const ext = (filename.split(".").pop() || "").toLocaleLowerCase();
