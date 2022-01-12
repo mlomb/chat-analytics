@@ -7,6 +7,9 @@ export type RawID = string | number;
 // internal ID that is used in the pipeline (incremental)
 export type ID = number;
 
+// a zero-based index
+export type Index = number;
+
 // offset in bytes in a Uint8Array buffer
 export type Address = number;
 
@@ -19,20 +22,6 @@ export type Timestamp = number;
 // available platforms
 export type Platform = "discord" | "telegram" | "whatsapp";
 
-// available message information
-// prettier-ignore
-export enum MessageFlags {
-    None,
-    Reply       = 1 << 0,
-    Edited      = 1 << 1,
-    Text        = 1 << 2,
-    Attachments = 1 << 3,
-    Reactions   = 1 << 4,
-    Mentions    = 1 << 5,
-    
-    Last        = 1 << 6,
-}
-
 export enum AttachmentType {
     Image,
     ImageAnimated, // (GIFs)
@@ -43,9 +32,6 @@ export enum AttachmentType {
     Other,
     Last,
 }
-
-export type Word = string;
-export type WordIndex = number;
 
 // configuration, set in the UI
 export interface ReportConfig {
@@ -64,9 +50,11 @@ export interface Database {
         numMonths: number;
     };
 
-    words: Word[];
     channels: Channel[];
     authors: Author[];
+    words: string[];
+    emojis: Emoji[];
+    mentions: string[];
 
     authorsOrder: number[];
     authorsBotCutoff: number;
@@ -122,13 +110,6 @@ export interface Emoji {
     n: string;
 }
 
-export interface Mention {
-    // if possible to connect with an actual author
-    id?: ID;
-    // mention text ("@user")
-    n: string;
-}
-
 // emitted by parsers
 export interface IMessage {
     id: RawID;
@@ -138,27 +119,30 @@ export interface IMessage {
     timestamp: Timestamp;
     timestampEdit?: Timestamp;
     content?: string;
-    attachments: AttachmentType[];
+    attachments: [AttachmentType, number][];
     reactions: [Emoji, number][];
 }
 
-// stored serialized during generation
-export interface IntermediateMessage {
-    day: Day;
+interface CommonMessageFields {
     hour: number;
     authorId: ID;
-    langIdx: number;
-    sentiment: number;
-    words: [WordIndex, number][];
+    sentiment?: number;
+    lang?: Index;
+    words?: [Index, number][];
+    emojis?: [Index, number][];
+    mentions?: [Index, number][];
+    reactions?: [Index, number][];
+    domains?: [Index, number][];
+    attachments?: [AttachmentType, number][];
+}
+
+// stored serialized during generation
+export interface IntermediateMessage extends CommonMessageFields {
+    day: Day;
 }
 
 // stored serialized on the final data file
 // (and what aggregators use)
-export interface Message {
+export interface Message extends CommonMessageFields {
     dayIndex: number;
-    hour: number;
-    authorId: ID;
-    langIdx: number;
-    sentiment: number;
-    words: [WordIndex, number][];
 }

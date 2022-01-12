@@ -3,19 +3,19 @@ import {
     BitAddress,
     Channel,
     Database,
+    Emoji,
     IAuthor,
     IChannel,
     ID,
     IMessage,
+    Index,
     IntermediateMessage,
     Message,
     RawID,
     ReportConfig,
     Timestamp,
-    Word,
 } from "@pipeline/Types";
 import { Day, genTimeKeys } from "@pipeline/Time";
-import IDMapper from "@pipeline/parse/IDMapper";
 import { progress } from "@pipeline/Progress";
 import { LanguageDetector, loadLanguageDetector } from "@pipeline/process/LanguageDetection";
 import { Stopwords, loadStopwords } from "@pipeline/process/Stopwords";
@@ -28,12 +28,12 @@ import {
     writeIntermediateMessage,
     writeMessage,
 } from "@pipeline/report/Serialization";
+import { IndexedData } from "@pipeline/process/IndexedData";
 
 // TODO: !
 const searchFormat = (x: string) => x.toLocaleLowerCase();
 
-// how many bits are needed to store n
-// n > 0
+// how many bits are needed to store n (n > 0)
 const nextPOTBits = (n: number) => 32 - Math.clz32(n);
 
 // section in the bitstream
@@ -44,18 +44,27 @@ type ChannelSection = {
 };
 
 export class DatabaseBuilder {
-    private authorIDMapper = new IDMapper();
-    private channelIDMapper = new IDMapper();
-    private messageQueue: IMessage[] = [];
     private title: string = "Chat";
-    private words: Word[] = [];
-    private wordsIDs: Map<Word, ID> = new Map();
-    private wordsCount: number[] = [];
-    private authors: Author[] = [];
-    private authorMessagesCount: number[] = [];
-    private channels: Channel[] = [];
     private minDate: Day | undefined;
     private maxDate: Day | undefined;
+
+    private channels = new IndexedData<RawID, Channel>();
+    private authors = new IndexedData<RawID, Author>();
+    private words = new IndexedData<string, string>();
+    private emojis = new IndexedData<string, Emoji>();
+    private mentions = new IndexedData<string, string>();
+    private domains = new IndexedData<string, string>();
+
+    get numChannels() { return this.channels.size; } // prettier-ignore
+    get numAuthors() { return this.authors.size; } // prettier-ignore
+    get numWords() { return this.words.size; } // prettier-ignore
+    get numEmojis() { return this.emojis.size; } // prettier-ignore
+    get numMentions() { return this.mentions.size; } // prettier-ignore
+
+    // temporal data
+    private messageQueue: IMessage[] = []; // [ past ... future ]
+    private wordsCount: number[] = [];
+    private authorMessagesCount: number[] = [];
     private channelSections: { [id: ID]: ChannelSection[] } = {};
     private totalMessages = 0;
 
@@ -70,159 +79,213 @@ export class DatabaseBuilder {
         this.languageDetector = await loadLanguageDetector();
     }
 
-    get numChannels() {
-        return this.channels.length;
-    }
-
     public setTitle(title: string) {
         this.title = title;
     }
 
-    public addChannel(rawId: RawID, channel: IChannel): ID {
-        const [id, _new] = this.channelIDMapper.get(rawId);
-        if (_new) {
-            this.channels[id] = {
+    public addChannel(rawId: RawID, channel: IChannel): Index {
+        let index = this.channels.getIndex(rawId);
+        if (index === undefined) {
+            index = this.channels.set(rawId, {
                 ...channel,
                 ns: searchFormat(channel.n),
                 msgAddr: 0,
                 msgCount: 0,
-            };
-            progress.stat("channels", this.channels.length);
+            });
+            progress.stat("channels", this.numChannels);
         }
-        return id;
+        return index;
     }
 
     public addAuthor(rawId: RawID, author: IAuthor): ID {
-        const [id, _new] = this.authorIDMapper.get(rawId);
-        if (_new) {
-            this.authors[id] = {
+        let index = this.authors.getIndex(rawId);
+        if (index === undefined) {
+            index = this.authors.set(rawId, {
                 ...author,
                 ns: searchFormat(author.n),
-            };
-            this.authorMessagesCount[id] = 0;
-            progress.stat("authors", this.authors.length);
+            });
+            progress.stat("authors", this.numAuthors);
         }
-        return id;
+        return index;
     }
 
     public addMessage(message: IMessage) {
         this.messageQueue.push(message);
     }
 
-    private getChannelSection(channelId: ID, timestamp: Timestamp): ChannelSection {
-        if (!(channelId in this.channelSections)) {
-            this.channelSections[channelId] = [
-                {
-                    ts: timestamp,
-                    start: this.stream.offset,
-                    end: this.stream.offset,
-                },
-            ];
+    // Process pending messages in the queue
+    // if final is true, it means there are no more messages
+    // of the current file (we can process the last group, and must clear the queue)
+    // ❗ we are making a big assumption here: ONE file only contains messages from ONE channel
+    public async process(final: boolean = false) {
+        if (this.messageQueue.length === 0) return;
+
+        const len = this.messageQueue.length;
+        let l = 0,
+            r = 1;
+        let currentAuthor: Index = this.messageQueue[0].authorId;
+        // [ M M M M M M M M ... ]
+        //       ↑ l     ↑ r  (a group)
+        while (r < len) {
+            const message = this.messageQueue[r];
+            if (message.authorId !== currentAuthor) {
+                // process group
+                const group = this.messageQueue.slice(l, r);
+                await this.processGroup(group);
+                currentAuthor = message.authorId;
+                l = r;
+            }
+            r++;
         }
-        const sections = this.channelSections[channelId];
-        const lastSection = sections[sections.length - 1];
-        if (lastSection.end === this.stream.offset) return lastSection;
-        else {
-            // create new section (non-contiguous)
-            sections.push({
-                ts: timestamp,
-                start: this.stream.offset,
-                end: this.stream.offset,
-            });
-            return sections[sections.length - 1];
+
+        if (final) {
+            // process last group
+            const group = this.messageQueue.slice(l, len);
+            await this.processGroup(group);
+            this.messageQueue = [];
+        } else {
+            // wait for more messages
+            this.messageQueue = this.messageQueue.slice(l, len);
         }
     }
 
-    // Process messages in the queue
-    public async process(force: boolean = false) {
+    // Inteaad of processing one message at a time, we process it
+    // in contiguous groups which have the same author (and channel ofc)
+    // Why? Because we can combine the content of the messages and
+    // detect the language of the whole group, being more efficient and
+    // more accurate (in general).
+    private async processGroup(messages: IMessage[]) {
         if (!this.languageDetector) throw new Error("Language detector not initialized");
         if (!this.stopwords) throw new Error("Stopwords not initialized");
-        if (this.messageQueue.length === 0) return;
 
-        const section = this.getChannelSection(this.messageQueue[0].channelId, this.messageQueue[0].timestamp);
+        // normalize and combine the content of the messages
+        let combined: string[] = [];
+        for (const msg of messages) {
+            if (msg.content && msg.content.length > 0) {
+                msg.content = msg.content
+                    // normalize the content using NFC (we want the compositions)
+                    // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/normalize
+                    .normalize("NFC")
+                    // change all whitespace to one space (important for the lang detector)
+                    .replace(/\s\s+/g, " ")
+                    // trim just in case
+                    .trim();
 
-        for (const msg of this.messageQueue) {
+                combined.push(msg.content);
+            }
+        }
+
+        // detect language in the whole group
+        let langIdx: number = -1;
+        if (combined.length > 0) {
+            // TODO: maybe we can filter out predictions with less than X chars, or % of confidence
+            // TODO: also, we can combine the words tokenized and exclude URLs and stuff like that
+            // langIdx = this.languageDetector.detectLine(combined.join(" "));
+            langIdx = 42;
+        }
+
+        interface Counts {
+            [idx: number]: number;
+        }
+        const countsToArray = (counts: Counts): [Index, number][] => {
+            const res: [Index, number][] = [];
+            for (const [idx, count] of Object.entries(counts)) {
+                res.push([parseInt(idx), count]);
+            }
+            return res;
+        };
+
+        // now process each message
+        for (const msg of messages) {
             // TODO: timezones
             const date = new Date(msg.timestamp);
             const day = Day.fromDate(date);
             if (this.minDate === undefined || Day.lt(day, this.minDate)) this.minDate = day;
             if (this.maxDate === undefined || Day.gt(day, this.maxDate)) this.maxDate = day;
 
-            this.authorMessagesCount[msg.authorId] += 1;
-            this.channels[msg.channelId].msgCount += 1;
+            const wordsCount: Counts = {};
+            const emojisCount: Counts = {};
+            const mentionsCount: Counts = {};
+            const reactionsCount: Counts = {};
+            const domainsCount: Counts = {};
 
-            const langIdx = Math.floor(Math.random() * 176); //this.languageDetector.detect(msg.content);
-            const sentiment = Math.floor(Math.random() * 176);
-            // TODO: use different tokenizers depending on language
-            // TODO: https://github.com/marcellobarile/multilang-sentiment
-            const tokens = tokenize((msg.content || "").normalize("NFKC"));
-            // console.log(msg.content, langIdx, tokens);
-
-            // NOTE: we can't use an object because of this:
-            // 'constructor' in {} === true
-            //  ({})["constructor"] === fn
-            const wordsCount: Map<Word, number> = new Map();
-            for (const token of tokens) {
-                let word: Word | undefined = undefined;
-                if (token.tag === "word") {
-                    const tagClean = stripDiacritics(token.text.toLocaleLowerCase());
-                    if (tagClean.length > 1 && tagClean.length < 25) {
-                        if (!this.stopwords.isStopword("en", tagClean)) {
-                            // MAX 25 chars per word
-                            word = tagClean;
-                        }
+            if (msg.reactions) {
+                for (const reaction of msg.reactions) {
+                    let emojiIdx = this.emojis.getIndex(reaction[0].n);
+                    if (emojiIdx === undefined) {
+                        emojiIdx = this.emojis.set(reaction[0].n, {
+                            id: reaction[0].id,
+                            n: reaction[0].n,
+                        });
+                    } else if (this.emojis.get(emojiIdx).id === undefined) {
+                        // ID is new, replace
+                        this.emojis.setAt(emojiIdx, {
+                            id: reaction[0].id,
+                            n: reaction[0].n,
+                        });
                     }
-                } else if (token.tag === "emoji") {
-                    word = token.text;
-                }
-                if (word) {
-                    wordsCount.set(word, (wordsCount.get(word) || 0) + 1);
+                    reactionsCount[emojiIdx] = (reactionsCount[emojiIdx] || 0) + reaction[1];
                 }
             }
 
-            const imsg: IntermediateMessage = {
-                day,
-                // TODO: timezones
-                hour: date.getHours(),
-                authorId: msg.authorId,
-                langIdx,
-                sentiment,
-                words: [],
-            };
-
-            const words = Array.from(wordsCount.keys());
-            const numWords = Math.min(words.length, 255); // MAX 255 words per message
-            for (let i = 0; i < numWords; i++) {
-                const wordIdx = this.getWord(words[i]);
-                const count = Math.min(wordsCount.get(words[i])!, 15);
-                if (isNaN(wordIdx) || isNaN(count)) {
-                    debugger;
+            if (msg.content) {
+                // tokenize
+                const tokens = tokenize(msg.content);
+                for (const { tag, text } of tokens) {
+                    if (tag === "word") {
+                        // only keep words between [2, 25] chars
+                        if (text.length > 1 && text.length <= 25) {
+                            let wordIdx = this.words.getIndex(text);
+                            if (wordIdx === undefined) wordIdx = this.words.set(text, text);
+                            wordsCount[wordIdx] = (wordsCount[wordIdx] || 0) + 1;
+                        }
+                    } else if (tag === "emoji" || tag === "custom-emoji") {
+                        let emojiIdx = this.emojis.getIndex(text);
+                        if (emojiIdx === undefined) emojiIdx = this.emojis.set(text, { n: text });
+                        emojisCount[emojiIdx] = (emojisCount[emojiIdx] || 0) + 1;
+                    } else if (tag === "mention") {
+                        let mentionIdx = this.mentions.getIndex(text);
+                        if (mentionIdx === undefined) mentionIdx = this.mentions.set(text, text);
+                        mentionsCount[mentionIdx] = (mentionsCount[mentionIdx] || 0) + 1;
+                    } else if (tag === "url") {
+                        try {
+                            const hostname = new URL(text).hostname;
+                            let domainIdx = this.domains.getIndex(hostname);
+                            if (domainIdx === undefined) domainIdx = this.domains.set(hostname, hostname);
+                            domainsCount[domainIdx] = (domainsCount[domainIdx] || 0) + 1;
+                        } catch (ex) {}
+                    }
                 }
-                this.wordsCount[wordIdx] = (this.wordsCount[wordIdx] || 0) + count;
-                imsg.words.push([wordIdx, count]); // MAX 15 occurrences per word
             }
 
             // store message
-            writeIntermediateMessage(imsg, this.stream);
+            writeIntermediateMessage(
+                <IntermediateMessage>{
+                    day,
+                    // TODO: timezones
+                    hour: date.getHours(),
+                    authorId: msg.authorId,
+                    words: countsToArray(wordsCount),
+                    emojis: countsToArray(emojisCount),
+                    mentions: countsToArray(mentionsCount),
+                    reactions: countsToArray(reactionsCount),
+                    domains: countsToArray(domainsCount),
+                    attachments: msg.attachments,
+                    langIdx,
+                    sentiment: 42,
+                },
+                this.stream
+            );
             progress.stat("messages", this.totalMessages++);
-
-            // register in section
-            section.end = this.stream.offset;
         }
-        this.messageQueue = [];
-    }
-
-    private getWord(word: Word): ID {
-        const id = this.wordsIDs.get(word);
-        if (id) return id;
-        this.wordsIDs.set(word, this.words.length);
-        this.words.push(word);
-        return this.words.length - 1;
     }
 
     public getDatabase(): Database {
         if (this.minDate === undefined || this.maxDate === undefined) throw new Error("No messages processed");
 
+        throw new Error("Not implemented");
+
+        /*
         const { dateKeys, monthKeys } = genTimeKeys(this.minDate, this.maxDate);
         console.log(this.minDate, this.maxDate, dateKeys);
 
@@ -312,21 +375,6 @@ export class DatabaseBuilder {
             // round to the nearest multiple of 4
             serialized: finalStream.buffer8.slice(0, ((Math.ceil(finalStream.offset / 8) + 3) & ~0x03) + 4),
         };
-    }
-
-    computeWordsCutoff(): number {
-        const sortedCounts = this.wordsCount.slice(0).sort((a, b) => b - a);
-        const total = sortedCounts.reduce((sum, c) => sum + c, 0);
-        const threshold = Math.ceil(total * 0.95);
-        const len = sortedCounts.length;
-        let i = 0,
-            acc = 0;
-        for (; i < len; i++) {
-            acc += sortedCounts[i];
-            if (acc >= threshold) break;
-            progress.progress("number", acc, threshold);
-        }
-        // at least two occurrences
-        return Math.max(2, sortedCounts[i] || 0);
+        */
     }
 }

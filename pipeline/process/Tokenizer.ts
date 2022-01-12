@@ -1,6 +1,6 @@
 import emojiRegex from "emoji-regex";
 
-export type Tag = "url" | "mention" | "emoji" | "custom-emoji" | "word" | "unknown";
+export type Tag = "code" | "url" | "mention" | "emoji" | "custom-emoji" | "word" | "unknown";
 
 export interface Token {
     text: string;
@@ -14,6 +14,12 @@ interface Matcher {
 
 // order is critical
 const Matchers: Matcher[] = [
+    {
+        // should we handle it this way?
+        // source code, ascii art, some other stuff should not be included
+        regex: /```[^`]*```/g,
+        tag: "code",
+    },
     {
         // match URLs
         // TODO: find a better regex, @dperini version (not this one ↓) is probably too restrictive for us
