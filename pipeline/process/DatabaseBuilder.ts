@@ -38,7 +38,6 @@ const nextPOTBits = (n: number) => 32 - Math.clz32(n);
 
 // section in the bitstream
 type ChannelSection = {
-    ts: Timestamp;
     start: BitAddress;
     end: BitAddress;
 };
@@ -61,12 +60,11 @@ export class DatabaseBuilder {
     get numEmojis() { return this.emojis.size; } // prettier-ignore
     get numMentions() { return this.mentions.size; } // prettier-ignore
 
-    // temporal data
+    // intermediate data
     private messageQueue: IMessage[] = []; // [ past ... future ]
-    private wordsCount: number[] = [];
+    private totalMessages = 0;
     private authorMessagesCount: number[] = [];
     private channelSections: { [id: ID]: ChannelSection[] } = {};
-    private totalMessages = 0;
 
     private stream: BitStream = new BitStream();
     private languageDetector?: LanguageDetector;
@@ -157,6 +155,8 @@ export class DatabaseBuilder {
     private async processGroup(messages: IMessage[]) {
         if (!this.languageDetector) throw new Error("Language detector not initialized");
         if (!this.stopwords) throw new Error("Stopwords not initialized");
+
+        const channelSection = this.getChannelSection(messages[0].channelId);
 
         // normalize and combine the content of the messages
         let combined: string[] = [];
@@ -270,13 +270,30 @@ export class DatabaseBuilder {
                     mentions: countsToArray(mentionsCount),
                     reactions: countsToArray(reactionsCount),
                     domains: countsToArray(domainsCount),
-                    attachments: msg.attachments,
+                    // TODO: should be combined
+                    attachments: msg.attachments.map((a) => [a, 1]),
                     langIdx,
                     sentiment: 42,
                 },
                 this.stream
             );
+            // extend section
+            channelSection.end = this.stream.offset;
             progress.stat("messages", this.totalMessages++);
+        }
+    }
+
+    private getChannelSection(channelId: ID): ChannelSection {
+        if (!(channelId in this.channelSections)) {
+            this.channelSections[channelId] = [{ start: this.stream.offset, end: this.stream.offset }];
+        }
+        const sections = this.channelSections[channelId];
+        const lastSection = sections[sections.length - 1];
+        if (lastSection.end === this.stream.offset) return lastSection;
+        else {
+            // create new section (non-contiguous)
+            sections.push({ start: this.stream.offset, end: this.stream.offset });
+            return sections[sections.length - 1];
         }
     }
 
@@ -295,7 +312,26 @@ export class DatabaseBuilder {
         };
         const finalStream = new BitStream();
         let messagesWritten = 0;
-        // TODO: write messages :)
+        for (const channelId in this.channelSections) {
+            this.channels.data[channelId].msgAddr = finalStream.offset;
+            for (const section of this.channelSections[channelId]) {
+                // seek
+                this.stream.offset = section.start;
+                while (this.stream.offset < section.end) {
+                    const imsg = readIntermediateMessage(this.stream);
+
+                    const msg: Message = {
+                        dayIndex: dateKeys.indexOf(imsg.day.dateKey),
+                        ...imsg,
+                    };
+
+                    // write final message
+                    writeMessage(msg, finalStream, bitConfig);
+                    progress.progress("number", messagesWritten++, this.totalMessages);
+                    this.channels.data[channelId].msgCount++;
+                }
+            }
+        }
         progress.done();
 
         // TODO: sort words, reindex

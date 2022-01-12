@@ -1,4 +1,4 @@
-import { Index, IntermediateMessage, Message } from "@pipeline/Types";
+import { CommonMessageFields, Index, IntermediateMessage, Message } from "@pipeline/Types";
 import { BitStream } from "@pipeline/report/BitStream";
 import { Day } from "@pipeline/Time";
 
@@ -15,7 +15,19 @@ export enum MessageFlags {
     Mentions    = 1 << 6,
 }
 
-const writeCommon = (message: IntermediateMessage, stream: BitStream) => {
+export interface MessageBitConfig {
+    dayIndexBits: number;
+    authorIdBits: number;
+    wordIdxBits: number;
+}
+
+const DefaultBitConfig: MessageBitConfig = {
+    dayIndexBits: 32,
+    authorIdBits: 32,
+    wordIdxBits: 32,
+};
+
+const writeCommon = (message: CommonMessageFields, stream: BitStream, config: MessageBitConfig) => {
     stream.setBits(5, message.hour); // 0-23
     stream.setBits(21, message.authorId); // 0-2097151
 
@@ -25,7 +37,7 @@ const writeCommon = (message: IntermediateMessage, stream: BitStream) => {
     if (message.attachments?.length) flags |= MessageFlags.Attachments;
     if (message.reactions?.length) flags |= MessageFlags.Reactions;
     if (message.mentions?.length) flags |= MessageFlags.Mentions;
-    stream.setBits(6, flags);
+    stream.setBits(7, flags);
 
     if (flags & MessageFlags.Text) {
         stream.setBits(8, message.sentiment!); // 0-255
@@ -40,68 +52,68 @@ const writeCommon = (message: IntermediateMessage, stream: BitStream) => {
 
 const writeCountArray = (counts: [Index, number][], stream: BitStream) => {
     // TODO: two formats
-    stream.setBits(8, counts.length); // 0-255
-    for (const [e, count] of counts) {
-        stream.setBits(16, e);
-        stream.setBits(4, count);
+    const len = Math.min(counts.length, 255);
+    stream.setBits(8, len); // 0-255
+    for (let i = 0; i < len; i++) {
+        stream.setBits(16, counts[i][0]);
+        stream.setBits(4, counts[i][1]);
     }
+};
+
+const readCommon = (stream: BitStream, config: MessageBitConfig): CommonMessageFields => {
+    const hour = stream.getBits(5);
+    const authorId = stream.getBits(21);
+    const flags = stream.getBits(7);
+
+    const message: CommonMessageFields = {
+        hour,
+        authorId,
+    };
+
+    if (flags & MessageFlags.Text) {
+        message.sentiment = stream.getBits(8);
+        message.lang = stream.getBits(8);
+        message.words = readCountArray(stream);
+    }
+    if (flags & MessageFlags.Emojis) message.emojis = readCountArray(stream);
+    if (flags & MessageFlags.Attachments) message.attachments = readCountArray(stream);
+    if (flags & MessageFlags.Reactions) message.reactions = readCountArray(stream);
+    if (flags & MessageFlags.Mentions) message.mentions = readCountArray(stream);
+
+    return message;
+};
+
+const readCountArray = (stream: BitStream): [Index, number][] => {
+    const count = stream.getBits(8);
+    const result: [Index, number][] = [];
+    for (let i = 0; i < count; i++) {
+        result.push([stream.getBits(16), stream.getBits(4)]);
+    }
+    return result;
 };
 
 export const writeIntermediateMessage = (message: IntermediateMessage, stream: BitStream) => {
     stream.setBits(12, message.day.year); // 0-4095
     stream.setBits(4, message.day.month); // 0-15
     stream.setBits(5, message.day.day); // 0-31
-    writeCommon(message, stream);
+    writeCommon(message, stream, DefaultBitConfig);
 };
 
 export const readIntermediateMessage = (stream: BitStream): IntermediateMessage => {
-    const imsg: IntermediateMessage = {
+    return {
         day: new Day(stream.getBits(12), stream.getBits(4), stream.getBits(5)),
-        hour: stream.getBits(5),
-        authorId: stream.getBits(21),
-        langIdx: stream.getBits(8),
-        sentiment: stream.getBits(8),
-        words: [],
+        ...readCommon(stream, DefaultBitConfig),
     };
-    const numWords = stream.getBits(8);
-    for (let i = 0; i < numWords; i++) {
-        imsg.words.push([stream.getBits(16), stream.getBits(4)]);
-    }
-    return imsg;
 };
-
-export interface MessageBitConfig {
-    dayIndexBits: number;
-    authorIdBits: number;
-    wordIdxBits: number;
-}
 
 export const writeMessage = (message: Message, stream: BitStream, config: MessageBitConfig) => {
     stream.setBits(config.dayIndexBits, message.dayIndex);
-    stream.setBits(5, message.hour);
-    stream.setBits(config.authorIdBits, message.authorId);
-    stream.setBits(8, message.langIdx);
-    stream.setBits(8, message.sentiment);
-    stream.setBits(8, message.words.length);
-    for (const [word, count] of message.words) {
-        stream.setBits(config.wordIdxBits, word);
-        stream.setBits(4, count);
-    }
+    writeCommon(message, stream, config);
 };
 
 export const readMessage = (stream: BitStream, config: MessageBitConfig): Message => {
-    const message: Message = {
+    return {
         dayIndex: stream.getBits(config.dayIndexBits),
-        hour: stream.getBits(5),
-        authorId: stream.getBits(config.authorIdBits),
-        langIdx: stream.getBits(8),
-        sentiment: stream.getBits(8),
-        words: [],
+        ...readCommon(stream, config),
     };
-    const numWords = stream.getBits(8);
-    stream.offset += numWords * (config.wordIdxBits + 4);
-    /*for (let i = 0; i < numWords; i++) {
-        message.words.push([stream.getBits(config.wordIdxBits), stream.getBits(4)]);
-    }*/
-    return message;
 };
