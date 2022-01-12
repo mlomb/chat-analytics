@@ -217,7 +217,7 @@ export class DatabaseBuilder {
                             id: reaction[0].id,
                             n: reaction[0].n,
                         });
-                    } else if (this.emojis.get(emojiIdx).id === undefined) {
+                    } else if (this.emojis.get(emojiIdx).id === undefined && reaction[0].id) {
                         // ID is new, replace
                         this.emojis.setAt(emojiIdx, {
                             id: reaction[0].id,
@@ -283,75 +283,20 @@ export class DatabaseBuilder {
     public getDatabase(): Database {
         if (this.minDate === undefined || this.maxDate === undefined) throw new Error("No messages processed");
 
-        throw new Error("Not implemented");
-
-        /*
         const { dateKeys, monthKeys } = genTimeKeys(this.minDate, this.maxDate);
-        console.log(this.minDate, this.maxDate, dateKeys);
+        const { authorsOrder, authorsBotCutoff } = this.sortAuthors();
 
-        progress.new("Sorting authors");
-        const authorsOrder: ID[] = Array.from({ length: this.authors.length }, (_, i) => i);
-        authorsOrder.sort((a, b) =>
-            // first non-bots, then by messages count
-            this.authors[a].b === this.authors[b].b
-                ? this.authorMessagesCount[b] - this.authorMessagesCount[a]
-                : +(this.authors[a].b || false) - +(this.authors[b].b || false)
-        );
-        const authorsBotCutoff: number = authorsOrder.findIndex((i) => this.authors[i].b);
-        progress.done();
-
-        progress.new("Computing words cutoff");
-        const wordsCutoff = this.computeWordsCutoff();
-        console.log("Words cutoff", wordsCutoff);
-        progress.done();
-
-        // @ts-ignore
-        console.log(this.words.map((w, i) => [w, this.wordsCount[i]]).sort((a, b) => b[1] - a[1]));
-
-        console.log("original", Math.ceil(this.stream.offset / 8));
-        console.time("buff");
         progress.new("Generating final messages data");
         const bitConfig: MessageBitConfig = {
             dayIndexBits: Math.max(1, nextPOTBits(dateKeys.length)),
-            authorIdBits: Math.max(1, nextPOTBits(this.authors.length)),
-            wordIdxBits: Math.max(1, nextPOTBits(this.words.length)),
+            authorIdBits: Math.max(1, nextPOTBits(this.authors.size)),
+            wordIdxBits: Math.max(1, nextPOTBits(this.words.size)),
+            // TODO: ...
         };
         const finalStream = new BitStream();
         let messagesWritten = 0;
-        for (const channelId in this.channelSections) {
-            this.channels[channelId].msgAddr = finalStream.offset;
-            for (const section of this.channelSections[channelId]) {
-                // seek
-                this.stream.offset = section.start;
-                while (this.stream.offset < section.end) {
-                    const imsg = readIntermediateMessage(this.stream);
-
-                    const msg: Message = {
-                        dayIndex: dateKeys.indexOf(imsg.day.dateKey),
-                        hour: imsg.hour,
-                        authorId: imsg.authorId,
-                        langIdx: imsg.langIdx,
-                        sentiment: imsg.sentiment,
-                        words: [],
-                    };
-
-                    // filter words
-                    for (let i = 0; i < imsg.words.length; i++) {
-                        const pair = imsg.words[i];
-                        if (this.wordsCount[pair[0]] >= wordsCutoff) {
-                            msg.words.push(pair);
-                        }
-                    }
-
-                    // write message
-                    writeMessage(msg, finalStream, bitConfig);
-                    progress.progress("number", messagesWritten++, this.totalMessages);
-                }
-            }
-        }
+        // TODO: write messages :)
         progress.done();
-        console.timeEnd("buff");
-        console.log("final", Math.ceil(finalStream.offset / 8));
 
         // TODO: sort words, reindex
         // TODO: filter words more efficiently
@@ -367,14 +312,35 @@ export class DatabaseBuilder {
                 numDays: dateKeys.length,
                 numMonths: monthKeys.length,
             },
-            words: this.words,
-            channels: this.channels,
-            authors: this.authors,
+            channels: this.channels.data,
+            authors: this.authors.data,
+            words: this.words.data,
+            emojis: this.emojis.data,
+            mentions: this.mentions.data,
+            domains: this.domains.data,
+
             authorsOrder,
             authorsBotCutoff,
+
             // round to the nearest multiple of 4
             serialized: finalStream.buffer8.slice(0, ((Math.ceil(finalStream.offset / 8) + 3) & ~0x03) + 4),
         };
-        */
+    }
+
+    private sortAuthors(): {
+        authorsOrder: ID[];
+        authorsBotCutoff: number;
+    } {
+        progress.new("Sorting authors");
+        const authorsOrder: ID[] = Array.from({ length: this.authors.size }, (_, i) => i);
+        authorsOrder.sort((a, b) =>
+            // first non-bots, then by messages count
+            this.authors.data[a].b === this.authors.data[b].b
+                ? this.authorMessagesCount[b] - this.authorMessagesCount[a]
+                : +(this.authors.data[a].b || false) - +(this.authors.data[b].b || false)
+        );
+        const authorsBotCutoff: number = authorsOrder.findIndex((i) => this.authors.data[i].b);
+        progress.done();
+        return { authorsOrder, authorsBotCutoff };
     }
 }
