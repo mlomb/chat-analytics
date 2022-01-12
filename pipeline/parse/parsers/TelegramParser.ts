@@ -75,7 +75,7 @@ export class TelegramParser extends Parser {
                 timestamp,
                 timestampEdit,
                 content,
-                attachments: attachment === undefined ? [] : [attachment],
+                attachments: attachment === undefined ? [] : [[attachment, 1]],
                 // NOTE: as of now, Telegram doesn't export reactions :(
                 reactions: [],
             });

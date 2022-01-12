@@ -1,9 +1,9 @@
 export default null as any;
 
 import { ReportConfig } from "@pipeline/Types";
-import { generateDatabase, generateReportSite } from "@pipeline/report/Generate";
-import { progress } from "@pipeline/Progress";
 import { FileInput } from "@pipeline/File";
+import { progress } from "@pipeline/Progress";
+import { generateDatabase, generateReportSite } from "@pipeline/process/Generate";
 
 export interface InitMessage {
     files: File[];

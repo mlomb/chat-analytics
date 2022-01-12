@@ -66,7 +66,8 @@ export class DiscordParser extends Parser {
                 timestamp,
                 timestampEdit,
                 content: content.length > 0 ? content : undefined,
-                attachments: message.attachments.map((a) => getAttachmentTypeFromFileName(a.fileName)),
+                // TODO: should be combined
+                attachments: message.attachments.map((a) => [getAttachmentTypeFromFileName(a.fileName), 1]),
                 reactions: message.reactions.map((r) => [
                     {
                         n: r.emoji.name,

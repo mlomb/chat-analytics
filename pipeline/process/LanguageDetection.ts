@@ -8,10 +8,10 @@ const LABEL_PREFIX_LENGTH = "__label__".length;
 export class LanguageDetector {
     constructor(private readonly model: FastTextModel) {}
 
-    public detect(text: string): number | -1 {
+    public detectLine(line: string): number | -1 {
         if (this.model === undefined) throw new Error("Language Model not initialized");
 
-        const result = this.model.predict(text, 1, 0.0);
+        const result = this.model.predict(line, 1, 0.0);
         if (result.length >= 1) return Languages.indexOf(result[0][1].slice(LABEL_PREFIX_LENGTH));
         return -1;
     }

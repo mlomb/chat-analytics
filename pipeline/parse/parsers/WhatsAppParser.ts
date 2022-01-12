@@ -95,7 +95,7 @@ export class WhatsAppParser extends Parser {
                     channelId,
                     timestamp,
                     content: attachment === undefined ? messageContent : undefined,
-                    attachments: attachment === undefined ? [] : [attachment],
+                    attachments: attachment === undefined ? [] : [[attachment, 1]],
                     reactions: [],
                 });
             } else {
