@@ -55,6 +55,7 @@ export interface Database {
     words: string[];
     emojis: Emoji[];
     mentions: string[];
+    domains: string[];
 
     authorsOrder: number[];
     authorsBotCutoff: number;
