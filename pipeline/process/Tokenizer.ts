@@ -26,6 +26,7 @@ const Matchers: Matcher[] = [
         regex: /(?:https?:\/\/)(?:[\da-z\.-]+)\.(?:[a-z\.]{2,6})(?:[\/\w\.\-\?#=]*)*\/?/gi,
         tag: "url",
     },
+    // TODO: match emails, so they are not parsed as mentions (@gmail, @hotmail, etc)
     {
         // match @mentions
         regex: /@[\p{L}_0-9]+/giu,
