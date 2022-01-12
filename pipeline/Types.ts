@@ -120,11 +120,11 @@ export interface IMessage {
     timestamp: Timestamp;
     timestampEdit?: Timestamp;
     content?: string;
-    attachments: [AttachmentType, number][];
+    attachments: AttachmentType[];
     reactions: [Emoji, number][];
 }
 
-interface CommonMessageFields {
+export interface CommonMessageFields {
     hour: number;
     authorId: ID;
     sentiment?: number;
