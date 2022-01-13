@@ -124,7 +124,9 @@ export interface IMessage {
     reactions: [Emoji, number][];
 }
 
-export interface CommonMessageFields {
+// stored serialized during generation
+export interface IntermediateMessage {
+    day: number;
     hour: number;
     authorId: ID;
     sentiment?: number;
@@ -135,15 +137,4 @@ export interface CommonMessageFields {
     reactions?: [Index, number][];
     domains?: [Index, number][];
     attachments?: [AttachmentType, number][];
-}
-
-// stored serialized during generation
-export interface IntermediateMessage extends CommonMessageFields {
-    day: Day;
-}
-
-// stored serialized on the final data file
-// (and what aggregators use)
-export interface Message extends CommonMessageFields {
-    dayIndex: number;
 }

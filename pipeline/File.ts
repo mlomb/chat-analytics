@@ -37,7 +37,7 @@ export function downloadFile(filepath: any, responseType: XMLHttpRequestResponse
             if (xhr.status === 200) resolve(xhr.response);
             else reject(xhr.statusText);
         };
-        xhr.onerror = (e) => reject(e);
+        xhr.onerror = (e) => reject("XHR Error");
         xhr.onprogress = (e) => progress.progress("bytes", e.loaded || 0, e.total <= 0 ? undefined : e.total);
         xhr.send();
     });

@@ -1,6 +1,7 @@
-import { ID, Message } from "@pipeline/Types";
+import { ID } from "@pipeline/Types";
 import { BlockDescription, BlockFn } from "@pipeline/aggregate/Blocks";
 import { parseAndFilterMessages } from "@pipeline/aggregate/Helpers";
+import { MessageView } from "@pipeline/report/serialization/MessageView";
 
 interface MostEntry {
     id: ID;
@@ -19,7 +20,7 @@ const fn: BlockFn<MessagesStats> = (database, filters) => {
     const authorsCount = new Array(database.authors.length).fill(0);
     const channelsCount = new Array(database.channels.length).fill(0);
 
-    const processMessage = (msg: Message, channelId: ID) => {
+    const processMessage = (msg: MessageView, channelId: ID) => {
         total++;
         authorsCount[msg.authorId]++;
         channelsCount[channelId]++;
