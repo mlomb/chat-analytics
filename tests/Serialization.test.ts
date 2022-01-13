@@ -10,11 +10,16 @@ import { readIndexArray, writeIndexArray } from "@pipeline/report/serialization/
 describe("index serialization", () => {
     // prettier-ignore
     const cases: { case: [Index, number][] }[] = [
+        // single
         { case: [[0, 1]] },
-        { case: [[0, 2]] },
-        { case: [[0, 3]] },
-        { case: [[0, 1], [1, 1], [2, 1], [3, 1], [4, 1]] },
-        { case: [[0, 1], [1, 1], [2, 2], [3, 3], [4, 4]] },
+        // double
+        { case: [[0, 1], [1, 1]] },
+        // double combined
+        { case: [[0, 1], [0, 1]] },
+        // serial
+        { case: [[0, 1], [1, 1], [2, 1]] },
+        // rle
+        { case: [[0, 100], [1, 100], [2, 100], [3, 100]] },
     ];
 
     function processArr(arr: [Index, number][]) {
@@ -25,12 +30,22 @@ describe("index serialization", () => {
         return readIndexArray(stream, 16);
     }
 
+    function equivalent(arr1: [Index, number][], arr2: [Index, number][]) {
+        const counts1: any = {},
+            counts2: any = {};
+        for (const [idx, count] of arr1) counts1[idx] = (counts1[idx] || 0) + count;
+        for (const [idx, count] of arr2) counts2[idx] = (counts2[idx] || 0) + count;
+
+        expect(Object.keys(counts1).sort()).toStrictEqual(Object.keys(counts2).sort());
+        for (const idx in counts1) expect(counts1[idx]).toStrictEqual(counts2[idx]);
+    }
+
     test.each(cases)("should read and write correctly $case", (t) => {
         const got = processArr(t.case);
-        expect(got).toStrictEqual(t.case);
+        equivalent(got, t.case);
     });
 
-    test("should overflow total with direct encoding", () => {
+    test("should overflow total with serial encoding", () => {
         const got = processArr(new Array(20000).fill([0, 1]));
         // some must be lost
         expect(got.length).toBeGreaterThan(0);

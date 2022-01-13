@@ -30,14 +30,19 @@ import { BitStream } from "@pipeline/report/BitStream";
 //   - 39.205400% of sum of counts are below 3
 //   - 30.442545% of sum of counts are exactly 1
 //
-// So, whith this data in mind, we can choose between two strategies:
-//   - Direct: [Sum of counts, Index, Index, Index, Index]
-//   - Run Length Encoding: [Counts Length, Bits for max count, (Index, Count), (Index, Count), ...]
+// So, whith this data in mind, we can choose between four strategies:
+//   - (0b00) Single Index (only if total === 1): [Index]
+//   - (0b01) Double Index (only if total === 2): [Index, Index]
+//   - (0b10) Serial: [Sum of counts, Index, Index, Index, Index]
+//   - (0b11) Run Length Encoding: [Counts Length, Bits for max count, (Index, Count), (Index, Count), ...]
 //
 // We can use one bit to decide the strategy per array basis, using the one which uses the less amount of bits.
 // :)
 
 export const writeIndexArray = (counts: [Index, number][], stream: BitStream, bitsPerIndex: number) => {
+    // sort in ascending order for delta encoding
+    counts.sort((a, b) => a[0] - b[0]);
+
     const len = counts.length;
     let total = 0;
     let maxCount = 0;
@@ -46,14 +51,38 @@ export const writeIndexArray = (counts: [Index, number][], stream: BitStream, bi
         total += c;
         maxCount = Math.max(maxCount, c);
     }
+
+    // check for single and double strategies
+    if (total === 1) {
+        stream.setBits(2, 0b00); // 0b00=single index
+        stream.setBits(bitsPerIndex, counts[0][0]);
+        return;
+    } else if (total === 2) {
+        stream.setBits(2, 0b01); // 0b01=double index
+        if (counts.length === 1) {
+            // [A, 2]
+            stream.setBits(bitsPerIndex, counts[0][0]);
+            stream.setBits(bitsPerIndex, counts[0][0]);
+        } else {
+            // [A, 1] [B, 1]
+            stream.setBits(bitsPerIndex, counts[0][0]);
+            stream.setBits(bitsPerIndex, counts[1][0]);
+        }
+        return;
+    }
+
     // bits needed to store maxCount
     const bitsPerCount = 32 - Math.clz32(maxCount);
+    // prevent overflow of total
+    const realTotal = Math.min(total, 1023);
+    // prevent overflow of len
+    const realLen = Math.min(len, 127);
 
-    const directBits =
+    const serialBits =
         // sum of counts, below 2^10=1024 (99.99%)
         10 +
         // index * total
-        bitsPerIndex * total;
+        bitsPerIndex * realTotal;
 
     const rleBits =
         // length of counts, below 2^7=128 (99.99%)
@@ -61,31 +90,30 @@ export const writeIndexArray = (counts: [Index, number][], stream: BitStream, bi
         // num bits for counts, up to 2^4=16
         4 +
         // (index + count) * len
-        (bitsPerIndex + bitsPerCount) * len;
+        (bitsPerIndex + bitsPerCount) * realLen;
 
-    if (directBits < rleBits) {
-        // use direct encoding
-        stream.setBits(1, 0); // 0=DIRECT
-
-        // prevent overflow of total
-        const realTotal = Math.min(total, 1023);
-        let written = 0;
-
+    if (serialBits < rleBits) {
+        // use serial encoding
+        stream.setBits(2, 0b10); // 0b10=serial
         stream.setBits(10, realTotal);
+
+        let written = 0;
+        let lastIndex = 0;
         for (let i = 0; i < len; i++) {
             for (let j = 0; j < counts[i][1] && written < realTotal; j++) {
-                stream.setBits(bitsPerIndex, counts[i][0]);
+                const diff = counts[i][0] - lastIndex;
+                // delta encoding
+                stream.setBits(bitsPerIndex, diff);
+                lastIndex = counts[i][0];
                 written++;
             }
         }
     } else {
         // use RLE
-        stream.setBits(1, 1); // 1=RLE
-
-        // prevent overflow of len
-        const realLen = Math.min(len, 127);
+        stream.setBits(2, 0b11); // 0b11=RLE
         stream.setBits(7, realLen);
         stream.setBits(4, bitsPerCount);
+
         for (let i = 0; i < realLen; i++) {
             stream.setBits(bitsPerIndex, counts[i][0]);
             stream.setBits(bitsPerCount, counts[i][1]);
@@ -95,20 +123,29 @@ export const writeIndexArray = (counts: [Index, number][], stream: BitStream, bi
 
 export const readIndexArray = (stream: BitStream, bitsPerIndex: number): [Index, number][] => {
     const counts: [Index, number][] = [];
-    const strategy = stream.getBits(1);
+    const strategy = stream.getBits(2);
 
-    if (strategy === 0) {
+    if (strategy === 0b00) {
+        // SINGLE INDEX
+        counts.push([stream.getBits(bitsPerIndex), 1]);
+    } else if (strategy === 0b01) {
+        // DOUBLE INDEX
+        counts.push([stream.getBits(bitsPerIndex), 1]);
+        counts.push([stream.getBits(bitsPerIndex), 1]);
+    } else if (strategy === 0b10) {
         // DIRECT
         const total = stream.getBits(10);
         let lastIndex = -1;
         for (let i = 0; i < total; i++) {
-            const index = stream.getBits(bitsPerIndex);
-            if (index === lastIndex) {
+            const diff = stream.getBits(bitsPerIndex);
+            if (lastIndex === -1) {
+                counts.push([diff, 1]);
+            } else if (diff === 0) {
                 counts[counts.length - 1][1]++;
             } else {
-                counts.push([index, 1]);
-                lastIndex = index;
+                counts.push([lastIndex + diff, 1]);
             }
+            lastIndex = diff;
         }
     } else {
         // RLE
@@ -125,9 +162,15 @@ export const readIndexArray = (stream: BitStream, bitsPerIndex: number): [Index,
 };
 
 export const skipIndexArray = (stream: BitStream, bitsPerIndex: number) => {
-    const strategy = stream.getBits(1);
+    const strategy = stream.getBits(2);
 
-    if (strategy === 0) {
+    if (strategy === 0b00) {
+        // SINGLE INDEX
+        stream.offset += bitsPerIndex;
+    } else if (strategy === 0b01) {
+        // DOUBLE INDEX
+        stream.offset += 2 * bitsPerIndex;
+    } else if (strategy === 0b10) {
         // DIRECT
         const total = stream.getBits(10);
         stream.offset += bitsPerIndex * total;
