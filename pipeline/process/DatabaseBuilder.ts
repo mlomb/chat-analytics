@@ -10,10 +10,8 @@ import {
     IMessage,
     Index,
     IntermediateMessage,
-    Message,
     RawID,
     ReportConfig,
-    Timestamp,
 } from "@pipeline/Types";
 import { Day, genTimeKeys } from "@pipeline/Time";
 import { progress } from "@pipeline/Progress";
@@ -26,21 +24,26 @@ import {
     MessageBitConfig,
     readIntermediateMessage,
     writeIntermediateMessage,
-    writeMessage,
 } from "@pipeline/report/serialization/MessageSerialization";
 import { IndexedData } from "@pipeline/process/IndexedData";
-import { writeIndexArray } from "@pipeline/report/serialization/IndexSerialization";
 
 // TODO: !
 const searchFormat = (x: string) => x.toLocaleLowerCase();
-
-// how many bits are needed to store n (n > 0)
-const nextPOTBits = (n: number) => 32 - Math.clz32(n);
 
 // section in the bitstream
 type ChannelSection = {
     start: BitAddress;
     end: BitAddress;
+};
+
+// Hand picked values, hoping they work well
+const DefaultBitConfig: MessageBitConfig = {
+    dayBits: 21, // 12 + 4 + 5
+    authorIdBits: 21,
+    wordIdxBits: 21,
+    emojiIdxBits: 18,
+    mentionsIdxBits: 20,
+    domainsIdxBits: 16,
 };
 
 export class DatabaseBuilder {
@@ -262,7 +265,7 @@ export class DatabaseBuilder {
             // store message
             writeIntermediateMessage(
                 <IntermediateMessage>{
-                    day,
+                    day: day.toBinary(),
                     // TODO: timezones
                     hour: date.getHours(),
                     authorId: msg.authorId,
@@ -276,7 +279,8 @@ export class DatabaseBuilder {
                     langIdx,
                     sentiment: 42,
                 },
-                this.stream
+                this.stream,
+                DefaultBitConfig
             );
             // extend section
             channelSection.end = this.stream.offset;
@@ -305,16 +309,18 @@ export class DatabaseBuilder {
         const { dateKeys, monthKeys } = genTimeKeys(this.minDate, this.maxDate);
         const { authorsOrder, authorsBotCutoff } = this.sortAuthors();
 
-        progress.new("Generating final messages data");
-        const bitConfig: MessageBitConfig = {
-            dayIndexBits: Math.max(1, nextPOTBits(dateKeys.length)),
-            authorIdBits: Math.max(1, nextPOTBits(this.authors.size)),
-            wordIdxBits: Math.max(1, nextPOTBits(this.words.size)),
-            emojiIdxBits: Math.max(1, nextPOTBits(this.emojis.size)),
-            mentionsIdxBits: Math.max(1, nextPOTBits(this.mentions.size)),
-            domainsIdxBits: Math.max(1, nextPOTBits(this.domains.size)),
-        };
+        progress.new("Compacting messages data");
+        // how many bits are needed to store n (n > 0)
+        const numBitsFor = (n: number) => 32 - Math.clz32(n);
         const finalStream = new BitStream();
+        const finalBitConfig: MessageBitConfig = {
+            dayBits: Math.max(1, numBitsFor(dateKeys.length)),
+            authorIdBits: Math.max(1, numBitsFor(this.authors.size)),
+            wordIdxBits: Math.max(1, numBitsFor(this.words.size)),
+            emojiIdxBits: Math.max(1, numBitsFor(this.emojis.size)),
+            mentionsIdxBits: Math.max(1, numBitsFor(this.mentions.size)),
+            domainsIdxBits: Math.max(1, numBitsFor(this.domains.size)),
+        };
         let messagesWritten = 0;
         for (const channelId in this.channelSections) {
             this.channels.data[channelId].msgAddr = finalStream.offset;
@@ -322,15 +328,12 @@ export class DatabaseBuilder {
                 // seek
                 this.stream.offset = section.start;
                 while (this.stream.offset < section.end) {
-                    const imsg = readIntermediateMessage(this.stream);
+                    const msg = readIntermediateMessage(this.stream, DefaultBitConfig);
 
-                    const msg: Message = {
-                        dayIndex: dateKeys.indexOf(imsg.day.dateKey),
-                        ...imsg,
-                    };
+                    msg.day = dateKeys.indexOf(Day.fromBinary(msg.day).dateKey);
 
                     // write final message
-                    writeMessage(msg, finalStream, bitConfig);
+                    writeIntermediateMessage(msg, finalStream, finalBitConfig);
                     progress.progress("number", messagesWritten++, this.totalMessages);
                     this.channels.data[channelId].msgCount++;
                 }
@@ -346,7 +349,7 @@ export class DatabaseBuilder {
 
         return {
             config: this.config,
-            bitConfig,
+            bitConfig: finalBitConfig,
             title: this.title,
             time: {
                 minDate: this.minDate.dateKey,

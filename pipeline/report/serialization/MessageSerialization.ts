@@ -1,5 +1,4 @@
-import { CommonMessageFields, IntermediateMessage, Message } from "@pipeline/Types";
-import { Day } from "@pipeline/Time";
+import { IntermediateMessage } from "@pipeline/Types";
 import { BitStream } from "@pipeline/report/BitStream";
 import { readIndexArray, writeIndexArray } from "@pipeline/report/serialization/IndexSerialization";
 
@@ -18,7 +17,7 @@ export enum MessageFlags {
 }
 
 export interface MessageBitConfig {
-    dayIndexBits: number;
+    dayBits: number;
     authorIdBits: number;
     wordIdxBits: number;
     emojiIdxBits: number;
@@ -26,18 +25,10 @@ export interface MessageBitConfig {
     domainsIdxBits: number;
 }
 
-const DefaultBitConfig: MessageBitConfig = {
-    dayIndexBits: 0, // not used
-    authorIdBits: 21,
-    wordIdxBits: 21,
-    emojiIdxBits: 18,
-    mentionsIdxBits: 20,
-    domainsIdxBits: 16,
-};
-
-const writeCommon = (message: CommonMessageFields, stream: BitStream, config: MessageBitConfig) => {
+export const writeIntermediateMessage = (message: IntermediateMessage, stream: BitStream, config: MessageBitConfig) => {
+    stream.setBits(config.dayBits, message.day);
     stream.setBits(5, message.hour); // 0-23
-    stream.setBits(21, message.authorId); // 0-2097151
+    stream.setBits(config.authorIdBits, message.authorId);
 
     let flags = MessageFlags.None;
     if (message.words?.length) flags |= MessageFlags.Text;
@@ -60,12 +51,14 @@ const writeCommon = (message: CommonMessageFields, stream: BitStream, config: Me
     if (flags & MessageFlags.Domains) writeIndexArray(message.domains!, stream, config.domainsIdxBits);
 };
 
-const readCommon = (stream: BitStream, config: MessageBitConfig): CommonMessageFields => {
+export const readIntermediateMessage = (stream: BitStream, config: MessageBitConfig): IntermediateMessage => {
+    const day = stream.getBits(config.dayBits);
     const hour = stream.getBits(5);
-    const authorId = stream.getBits(21);
+    const authorId = stream.getBits(config.authorIdBits);
     const flags = stream.getBits(8);
 
-    const message: CommonMessageFields = {
+    const message: IntermediateMessage = {
+        day,
         hour,
         authorId,
     };
@@ -82,34 +75,4 @@ const readCommon = (stream: BitStream, config: MessageBitConfig): CommonMessageF
     if (flags & MessageFlags.Domains) message.domains = readIndexArray(stream, config.domainsIdxBits);
 
     return message;
-};
-
-export const writeIntermediateMessage = (message: IntermediateMessage, stream: BitStream) => {
-    stream.setBits(12, message.day.year); // 0-4095
-    stream.setBits(4, message.day.month); // 0-15
-    stream.setBits(5, message.day.day); // 0-31
-    writeCommon(message, stream, DefaultBitConfig);
-};
-
-export const readIntermediateMessage = (stream: BitStream): IntermediateMessage => {
-    const day = new Day(stream.getBits(12), stream.getBits(4), stream.getBits(5));
-    const common = readCommon(stream, DefaultBitConfig);
-    // avoid unnecessary object creation
-    const msg = common as IntermediateMessage;
-    msg.day = day;
-    return msg;
-};
-
-export const writeMessage = (message: Message, stream: BitStream, config: MessageBitConfig) => {
-    stream.setBits(config.dayIndexBits, message.dayIndex);
-    writeCommon(message, stream, config);
-};
-
-export const readMessage = (stream: BitStream, config: MessageBitConfig): Message => {
-    const dayIndex = stream.getBits(config.dayIndexBits);
-    const common = readCommon(stream, config);
-    // avoid unnecessary object creation
-    const msg = common as Message;
-    msg.dayIndex = dayIndex;
-    return msg;
 };

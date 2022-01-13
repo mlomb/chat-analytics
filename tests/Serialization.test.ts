@@ -1,6 +1,9 @@
-import { Day } from "@pipeline/Time";
 import { BitStream } from "@pipeline/report/BitStream";
-import { readIntermediateMessage, writeIntermediateMessage } from "@pipeline/report/serialization/MessageSerialization";
+import {
+    MessageBitConfig,
+    readIntermediateMessage,
+    writeIntermediateMessage,
+} from "@pipeline/report/serialization/MessageSerialization";
 import { Index, IntermediateMessage } from "@pipeline/Types";
 import { readIndexArray, writeIndexArray } from "@pipeline/report/serialization/IndexSerialization";
 
@@ -47,12 +50,12 @@ describe("obj -> (serialize) -> (deserialize) -> obj", () => {
 
     const cases: IntermediateMessage[] = [
         {
-            day: new Day(1, 2, 3),
+            day: 123,
             hour: 4,
             authorId: 5,
         },
         {
-            day: new Day(1, 2, 3),
+            day: 123,
             hour: 4,
             authorId: 5,
             sentiment: 6,
@@ -64,7 +67,7 @@ describe("obj -> (serialize) -> (deserialize) -> obj", () => {
         },
         // prettier-ignore
         {
-            day: new Day(1, 2, 3),
+            day: 123,
             hour: 4,
             authorId: 5,
             sentiment: 6,
@@ -82,12 +85,21 @@ describe("obj -> (serialize) -> (deserialize) -> obj", () => {
         obj = _obj;
     });
 
+    const bitConfig: MessageBitConfig = {
+        dayBits: 8,
+        authorIdBits: 8,
+        wordIdxBits: 8,
+        emojiIdxBits: 8,
+        mentionsIdxBits: 8,
+        domainsIdxBits: 8,
+    };
+
     afterEach(() => {
         const stream = new BitStream();
         stream.offset = 0;
-        writeIntermediateMessage(obj, stream);
+        writeIntermediateMessage(obj, stream, bitConfig);
         stream.offset = 0;
-        const gotObj = readIntermediateMessage(stream);
+        const gotObj = readIntermediateMessage(stream, bitConfig);
         expect(gotObj).toStrictEqual(obj);
     });
 });

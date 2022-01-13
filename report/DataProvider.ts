@@ -215,11 +215,11 @@ export class DataProvider extends EventEmitter {
     }
 
     public getActiveStartDate(): Date {
-        return this.activeStartDate!.toDate;
+        return this.activeStartDate!.toDate();
     }
 
     public getActiveEndDate(): Date {
-        return this.activeEndDate!.toDate;
+        return this.activeEndDate!.toDate();
     }
 }
 

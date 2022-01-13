@@ -35,6 +35,7 @@ import { BitStream } from "@pipeline/report/BitStream";
 //   - Run Length Encoding: [Counts Length, Bits for max count, (Index, Count), (Index, Count), ...]
 //
 // We can use one bit to decide the strategy per array basis, using the one which uses the less amount of bits.
+// :)
 
 export const writeIndexArray = (counts: [Index, number][], stream: BitStream, bitsPerIndex: number) => {
     const len = counts.length;
@@ -121,4 +122,19 @@ export const readIndexArray = (stream: BitStream, bitsPerIndex: number): [Index,
     }
 
     return counts;
+};
+
+export const skipIndexArray = (stream: BitStream, bitsPerIndex: number) => {
+    const strategy = stream.getBits(1);
+
+    if (strategy === 0) {
+        // DIRECT
+        const total = stream.getBits(10);
+        stream.offset += bitsPerIndex * total;
+    } else {
+        // RLE
+        const len = stream.getBits(7);
+        const bitsPerCount = stream.getBits(4);
+        stream.offset += (bitsPerIndex + bitsPerCount) * len;
+    }
 };

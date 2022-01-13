@@ -25,8 +25,19 @@ export class Day {
         return new Day(year, month, day);
     }
 
-    get toDate(): Date {
+    static fromBinary(binary: number): Day {
+        const year = binary >>> 9;
+        const month = (binary >>> 5) & 0b1111;
+        const day = binary & 0b11111;
+        return new Day(year, month, day);
+    }
+
+    toDate(): Date {
         return new Date(this.year, this.month - 1, this.day);
+    }
+
+    toBinary(): number {
+        return (this.year << 9) | (this.month << 5) | this.day;
     }
 
     get monthKey(): MonthKey {
@@ -38,7 +49,7 @@ export class Day {
     }
 
     nextDay(): Day {
-        const d = this.toDate;
+        const d = this.toDate();
         d.setDate(d.getDate() + 1);
         return Day.fromDate(d);
     }
