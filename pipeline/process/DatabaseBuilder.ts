@@ -27,8 +27,9 @@ import {
     readIntermediateMessage,
     writeIntermediateMessage,
     writeMessage,
-} from "@pipeline/report/Serialization";
+} from "@pipeline/report/serialization/MessageSerialization";
 import { IndexedData } from "@pipeline/process/IndexedData";
+import { writeIndexArray } from "@pipeline/report/serialization/IndexSerialization";
 
 // TODO: !
 const searchFormat = (x: string) => x.toLocaleLowerCase();
@@ -279,6 +280,7 @@ export class DatabaseBuilder {
             );
             // extend section
             channelSection.end = this.stream.offset;
+            this.authorMessagesCount[msg.authorId] = (this.authorMessagesCount[msg.authorId] || 0) + 1;
             progress.stat("messages", this.totalMessages++);
         }
     }
@@ -308,7 +310,9 @@ export class DatabaseBuilder {
             dayIndexBits: Math.max(1, nextPOTBits(dateKeys.length)),
             authorIdBits: Math.max(1, nextPOTBits(this.authors.size)),
             wordIdxBits: Math.max(1, nextPOTBits(this.words.size)),
-            // TODO: ...
+            emojiIdxBits: Math.max(1, nextPOTBits(this.emojis.size)),
+            mentionsIdxBits: Math.max(1, nextPOTBits(this.mentions.size)),
+            domainsIdxBits: Math.max(1, nextPOTBits(this.domains.size)),
         };
         const finalStream = new BitStream();
         let messagesWritten = 0;
@@ -337,6 +341,8 @@ export class DatabaseBuilder {
         // TODO: sort words, reindex
         // TODO: filter words more efficiently
         // debugger;
+
+        console.log("size", finalStream.offset / 8, "bytes", require("pretty-bytes")(finalStream.offset / 8));
 
         return {
             config: this.config,
