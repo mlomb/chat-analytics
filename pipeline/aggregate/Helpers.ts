@@ -1,6 +1,6 @@
 import { Database, ID, Message } from "@pipeline/Types";
 import { BitStream } from "@pipeline/report/BitStream";
-import { readMessage } from "@pipeline/report/Serialization";
+import { readMessage } from "@pipeline/report/serialization/MessageSerialization";
 import { Filters } from "@pipeline/aggregate/Filters";
 
 export const parseAndFilterMessages = (
