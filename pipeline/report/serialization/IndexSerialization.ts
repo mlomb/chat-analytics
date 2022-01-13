@@ -133,7 +133,7 @@ export const readIndexArray = (stream: BitStream, bitsPerIndex: number): [Index,
         counts.push([stream.getBits(bitsPerIndex), 1]);
         counts.push([stream.getBits(bitsPerIndex), 1]);
     } else if (strategy === 0b10) {
-        // DIRECT
+        // SERIAL
         const total = stream.getBits(10);
         let lastIndex = -1;
         for (let i = 0; i < total; i++) {
@@ -171,7 +171,7 @@ export const skipIndexArray = (stream: BitStream, bitsPerIndex: number) => {
         // DOUBLE INDEX
         stream.offset += 2 * bitsPerIndex;
     } else if (strategy === 0b10) {
-        // DIRECT
+        // SERIAL
         const total = stream.getBits(10);
         stream.offset += bitsPerIndex * total;
     } else {
