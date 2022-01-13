@@ -91,4 +91,33 @@ export class BitStream {
         }
         return value >>> 0;
     }
+
+    // variable byte encode
+    writeVarint(value: number, maxBits: number = 32): void {
+        if (maxBits < 10) {
+            this.setBits(maxBits, value);
+            return;
+        }
+
+        while (value > 127) {
+            this.setBits(8, (value & 127) | 128);
+            value = value >>> 7;
+        }
+        this.setBits(8, value);
+    }
+
+    // variable byte decode
+    readVarint(maxBits: number = 32): number {
+        if (maxBits < 10) return this.getBits(maxBits);
+
+        let value = 0;
+        let byte = 0;
+        let shift = 0;
+        do {
+            byte = this.getBits(8);
+            value |= (byte & 127) << shift;
+            shift += 7;
+        } while (byte & 128);
+        return value;
+    }
 }

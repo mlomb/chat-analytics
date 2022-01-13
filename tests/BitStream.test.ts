@@ -210,3 +210,14 @@ test("read then write", () => {
         expect(value).toBe(values[k]);
     }
 });
+
+describe("varint", () => {
+    const cases: number[] = [0, 100, 200, 500, 1000, 5000, 10000, 100000, 2000000, 5000000];
+    test.each(cases)("%p", async (value) => {
+        let s = new BitStream();
+        s.offset = 0;
+        s.writeVarint(value);
+        s.offset = 0;
+        expect(s.readVarint()).toBe(value);
+    });
+});
