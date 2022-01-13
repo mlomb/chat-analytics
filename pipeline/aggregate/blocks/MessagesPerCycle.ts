@@ -1,7 +1,7 @@
 import { Day, genTimeKeys } from "@pipeline/Time";
 import { BlockDescription, BlockFn } from "@pipeline/aggregate/Blocks";
 import { parseAndFilterMessages } from "@pipeline/aggregate/Helpers";
-import { MessageView } from "@pipeline/report/serialization/MessageView";
+import { MessageView } from "@pipeline/serialization/MessageView";
 
 type MessagesInDate = {
     d: number; // date, as timestamp

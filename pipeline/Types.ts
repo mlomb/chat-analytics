@@ -1,5 +1,5 @@
-import { MessageBitConfig } from "@pipeline/report/serialization/MessageSerialization";
-import { DateKey, Day } from "@pipeline/Time";
+import { MessageBitConfig } from "@pipeline/serialization/MessageSerialization";
+import { DateKey } from "@pipeline/Time";
 
 // raw ID that comes from the platform (e.g 9876554321)
 export type RawID = string | number;

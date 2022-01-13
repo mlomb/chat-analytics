@@ -7,7 +7,7 @@ import { DiscordParser } from "@pipeline/parse/parsers/DiscordParser";
 import { TelegramParser } from "@pipeline/parse/parsers/TelegramParser";
 import { WhatsAppParser } from "@pipeline/parse/parsers/WhatsAppParser";
 import { DatabaseBuilder } from "@pipeline/process/DatabaseBuilder";
-import { compress } from "@pipeline/report/Compression";
+import { compress } from "@pipeline/compression/Compression";
 
 export const generateDatabase = async (files: FileInput[], config: ReportConfig): Promise<Database> => {
     let builder: DatabaseBuilder = new DatabaseBuilder(config);

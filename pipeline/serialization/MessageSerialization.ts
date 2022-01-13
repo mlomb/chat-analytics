@@ -1,6 +1,6 @@
 import { IntermediateMessage } from "@pipeline/Types";
-import { BitStream } from "@pipeline/report/BitStream";
-import { readIndexArray, writeIndexArray } from "@pipeline/report/serialization/IndexSerialization";
+import { BitStream } from "@pipeline/serialization/BitStream";
+import { readIndexArray, writeIndexArray } from "@pipeline/serialization/IndexSerialization";
 
 // available message information
 // prettier-ignore

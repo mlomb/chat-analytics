@@ -1,7 +1,7 @@
 import { BitAddress, ID, Index } from "@pipeline/Types";
-import { BitStream } from "@pipeline/report/BitStream";
-import { MessageBitConfig, MessageFlags } from "@pipeline/report/serialization/MessageSerialization";
-import { readIndexArray, skipIndexArray } from "@pipeline/report/serialization/IndexSerialization";
+import { BitStream } from "@pipeline/serialization/BitStream";
+import { MessageBitConfig, MessageFlags } from "@pipeline/serialization/MessageSerialization";
+import { readIndexArray, skipIndexArray } from "@pipeline/serialization/IndexSerialization";
 
 export class MessageView {
     readonly authorId: ID;

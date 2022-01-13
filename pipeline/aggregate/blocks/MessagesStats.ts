@@ -1,7 +1,7 @@
 import { ID } from "@pipeline/Types";
 import { BlockDescription, BlockFn } from "@pipeline/aggregate/Blocks";
 import { parseAndFilterMessages } from "@pipeline/aggregate/Helpers";
-import { MessageView } from "@pipeline/report/serialization/MessageView";
+import { MessageView } from "@pipeline/serialization/MessageView";
 
 interface MostEntry {
     id: ID;

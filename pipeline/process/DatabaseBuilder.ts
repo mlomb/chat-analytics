@@ -18,13 +18,13 @@ import { progress } from "@pipeline/Progress";
 import { LanguageDetector, loadLanguageDetector } from "@pipeline/process/LanguageDetection";
 import { Stopwords, loadStopwords } from "@pipeline/process/Stopwords";
 import { stripDiacritics } from "@pipeline/process/Diacritics";
-import { BitStream } from "@pipeline/report/BitStream";
+import { BitStream } from "@pipeline/serialization/BitStream";
 import { tokenize } from "@pipeline/process/Tokenizer";
 import {
     MessageBitConfig,
     readIntermediateMessage,
     writeIntermediateMessage,
-} from "@pipeline/report/serialization/MessageSerialization";
+} from "@pipeline/serialization/MessageSerialization";
 import { IndexedData } from "@pipeline/process/IndexedData";
 
 // TODO: !
