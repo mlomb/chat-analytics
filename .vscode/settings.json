@@ -1,0 +1,27 @@
+{
+    "files.exclude": {
+        ".git/": true,
+        "node_modules/": true,
+        "coverage/": true,
+    },
+    "search.exclude": {
+        "package-lock.json": true
+    },
+    "editor.rulers": [
+        { "column": 120, "color": "#3ca33c" }
+    ],
+    "editor.tabSize": 4,
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "[typescript]": {
+        "editor.formatOnSave": true
+    },
+    "[javascript]": {
+      "editor.formatOnSave": true
+    },
+    "[less]": {
+        "editor.formatOnSave": true
+    },
+    "[typescriptreact]": {
+        "editor.formatOnSave": true
+    },
+}
