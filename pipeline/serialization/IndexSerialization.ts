@@ -1,5 +1,5 @@
 import { Index } from "@pipeline/Types";
-import { BitStream } from "@pipeline/report/BitStream";
+import { BitStream } from "@pipeline/serialization/BitStream";
 
 // Some stats from a big chat sample (3.4M messages)
 // 4,062,249 samples

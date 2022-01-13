@@ -1,7 +1,7 @@
 import { Database, ID } from "@pipeline/Types";
-import { BitStream } from "@pipeline/report/BitStream";
+import { BitStream } from "@pipeline/serialization/BitStream";
 import { Filters } from "@pipeline/aggregate/Filters";
-import { MessageView } from "@pipeline/report/serialization/MessageView";
+import { MessageView } from "@pipeline/serialization/MessageView";
 
 export const parseAndFilterMessages = (
     fn: (msg: MessageView, channelId: ID) => void,

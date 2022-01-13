@@ -3,7 +3,7 @@ export default null as any;
 import { Database, ID } from "@pipeline/Types";
 import { Blocks, BlockDescriptions, BlockKey, BlockInfo } from "@pipeline/aggregate/Blocks";
 import { Filters } from "@pipeline/aggregate/Filters";
-import { decompress } from "@pipeline/report/Compression";
+import { decompress } from "@pipeline/compression/Compression";
 import { DateKey } from "@pipeline/Time";
 
 export interface InitMessage {

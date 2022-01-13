@@ -1,4 +1,4 @@
-import { BitStream } from "@pipeline/report/BitStream";
+import { BitStream } from "@pipeline/serialization/BitStream";
 
 describe("writing", () => {
     const cases: [string, number, number, number, [number, number], [number, number]][] = [
