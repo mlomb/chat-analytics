@@ -15,7 +15,6 @@ import {
 } from "@pipeline/Types";
 import { Day, genTimeKeys } from "@pipeline/Time";
 import { progress } from "@pipeline/Progress";
-import { LanguageDetector, loadLanguageDetector } from "@pipeline/process/LanguageDetection";
 import { BitStream } from "@pipeline/serialization/BitStream";
 import { IndexedData } from "@pipeline/process/IndexedData";
 import { tokenize } from "@pipeline/process/Tokenizer";
@@ -70,14 +69,8 @@ export class DatabaseBuilder {
     private channelSections: { [id: ID]: ChannelSection[] } = {};
 
     private stream: BitStream = new BitStream();
-    private languageDetector?: LanguageDetector;
 
     constructor(private readonly config: ReportConfig) {}
-
-    public async init() {
-        this.languageDetector = await loadLanguageDetector();
-        await loadTextData();
-    }
 
     public setTitle(title: string) {
         this.title = title;
@@ -117,7 +110,7 @@ export class DatabaseBuilder {
     // if final is true, it means there are no more messages
     // of the current file (we can process the last group, and must clear the queue)
     // ❗ we are making a big assumption here: ONE file only contains messages from ONE channel
-    public async process(final: boolean = false) {
+    public process(final: boolean = false) {
         if (this.messageQueue.length === 0) return;
 
         const len = this.messageQueue.length;
@@ -155,8 +148,6 @@ export class DatabaseBuilder {
     // detect the language of the whole group, being more efficient and
     // more accurate (in general).
     private processGroup(messages: IMessage[]) {
-        if (!this.languageDetector) throw new Error("Language detector not initialized");
-
         const channelSection = this.getChannelSection(messages[0].channelId);
 
         // normalize and combine the content of the messages

@@ -1,17 +1,20 @@
+import { Database, ReportConfig } from "@pipeline/Types";
 import { downloadFile, FileInput } from "@pipeline/File";
 import { progress } from "@pipeline/Progress";
-import { Database, ReportConfig } from "@pipeline/Types";
 
 import { Parser } from "@pipeline/parse/Parser";
 import { DiscordParser } from "@pipeline/parse/parsers/DiscordParser";
 import { TelegramParser } from "@pipeline/parse/parsers/TelegramParser";
 import { WhatsAppParser } from "@pipeline/parse/parsers/WhatsAppParser";
 import { DatabaseBuilder } from "@pipeline/process/DatabaseBuilder";
+import { loadTextData } from "@pipeline/process/Text";
 import { compress } from "@pipeline/compression/Compression";
 
 export const generateDatabase = async (files: FileInput[], config: ReportConfig): Promise<Database> => {
+    // load data needed for text processing
+    await loadTextData();
+
     let builder: DatabaseBuilder = new DatabaseBuilder(config);
-    await builder.init();
 
     // create parser
     let parser: Parser | null = null;
@@ -34,8 +37,8 @@ export const generateDatabase = async (files: FileInput[], config: ReportConfig)
         progress.new("Processing", files[i].name);
         try {
             const gen = parser.parse(files[i]);
-            for await (const _ of gen) await builder.process();
-            await builder.process(true);
+            for await (const _ of gen) builder.process();
+            builder.process(true);
         } catch (err) {
             if (err instanceof Error) {
                 const newErr = new Error(`Error parsing file "${files[i].name}":\n\n${err.message}`);

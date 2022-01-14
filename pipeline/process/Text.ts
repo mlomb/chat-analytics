@@ -33,7 +33,7 @@ export const loadTextData = async () => {
         stopwords = new Set(
             Object.values(data)
                 .reduce((acc, val) => acc.concat(val), [])
-                .map((word) => stripDiacritics(normalizeText(word)))
+                .map((word) => stripDiacritics(normalizeText(word)).toLowerCase())
         );
         progress.done();
     }
@@ -47,24 +47,25 @@ let diacriticsRegex: RegExp;
 let diacriticsReplacement: { [key: string]: string };
 let langPredictModel: FastTextModel;
 
+const whitespaceRegex = /\s\s+/g;
+
 export const normalizeText = (text: string) =>
     text
         // normalize the content using NFC (we want the compositions)
         // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/normalize
         .normalize("NFC")
         // change all whitespace to one space (important for the lang detector, newlines bad)
-        .replace(/\s\s+/g, " ")
+        .replace(whitespaceRegex, " ")
         // trim
         .trim();
 
 export const stripDiacritics = (text: string) => text.replace(diacriticsRegex, (match) => diacriticsReplacement[match]);
 
 // NOTE: assumes the word is normalized
-export const isStopword = (word: string) => stopwords.has(word);
+export const isStopword = (word: string) => stopwords.has(stripDiacritics(word).toLowerCase());
 
-const LABEL_PREFIX_LENGTH = "__label__".length;
 // NOTE: assumes the word is normalized and contains no newlines
 export const detectLanguageLine = async (line: string) => {
     const result = langPredictModel.predict(line, 1, 0.0);
-    return result[0][1].slice(LABEL_PREFIX_LENGTH);
+    return result[0][1].slice(9); // "__label__".length === 9
 };
