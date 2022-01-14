@@ -1,4 +1,4 @@
-import { AttachmentType, ID, RawID } from "@pipeline/Types";
+import { AttachmentType, Index, RawID } from "@pipeline/Types";
 import { Parser } from "@pipeline/parse/Parser";
 
 import { JSONStream } from "@pipeline/parse/JSONStream";
@@ -6,7 +6,7 @@ import { FileInput, getAttachmentTypeFromMimeType, streamJSONFromFile } from "@p
 
 export class TelegramParser extends Parser {
     private channelName?: string;
-    private channelId?: ID;
+    private channelIndex?: Index;
 
     async *parse(file: FileInput) {
         const stream = new JSONStream();
@@ -18,7 +18,7 @@ export class TelegramParser extends Parser {
         yield* streamJSONFromFile(stream, file);
 
         this.channelName = undefined;
-        this.channelId = undefined;
+        this.channelIndex = undefined;
     }
 
     private onChannelName(channelName: string) {
@@ -27,11 +27,11 @@ export class TelegramParser extends Parser {
     }
 
     private onChannelId(rawChannelId: RawID) {
-        this.channelId = this.builder.addChannel(rawChannelId, { n: this.channelName || "default" });
+        this.channelIndex = this.builder.addChannel(rawChannelId, { n: this.channelName || "default" });
     }
 
     private parseMessage(message: TelegramMessage) {
-        if (this.channelId === undefined) throw new Error("Missing channel ID");
+        if (this.channelIndex === undefined) throw new Error("Missing channel ID");
 
         const rawId: RawID = message.id + "";
         const rawAuthorId: RawID = message.from_id + "";
@@ -42,7 +42,7 @@ export class TelegramParser extends Parser {
         const timestampEdit = message.edited ? Date.parse(message.edited) : undefined;
 
         // NOTE: I can't find a reliable way to detect if a user is a bot :(
-        const authorId = this.builder.addAuthor(rawAuthorId, {
+        const authorIndex = this.builder.addAuthor(rawAuthorId, {
             // use the ID as name if no nickname is available
             n: message.from || rawId,
         });
@@ -70,8 +70,8 @@ export class TelegramParser extends Parser {
             this.builder.addMessage({
                 id: rawId,
                 replyTo: rawReplyToId,
-                authorId,
-                channelId: this.channelId,
+                authorIndex,
+                channelIndex: this.channelIndex,
                 timestamp,
                 timestampEdit,
                 content,

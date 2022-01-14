@@ -1,14 +1,14 @@
-import { BitAddress, ID, Index } from "@pipeline/Types";
+import { BitAddress, Index } from "@pipeline/Types";
 import { BitStream } from "@pipeline/serialization/BitStream";
 import { MessageBitConfig, MessageFlags } from "@pipeline/serialization/MessageSerialization";
 import { readIndexArray, skipIndexArray } from "@pipeline/serialization/IndexSerialization";
 
 export class MessageView {
-    readonly authorId: ID;
     readonly dayIndex: Index;
     readonly hour: number;
-    readonly lang?: Index;
-    readonly sentiment?: number;
+    readonly authorIndex: Index;
+    readonly langIndex: Index;
+    readonly sentiment: number;
 
     private wordsOffset: BitAddress = 0;
     private emojisOffset: BitAddress = 0;
@@ -20,11 +20,12 @@ export class MessageView {
     constructor(private readonly stream: BitStream, private readonly config: MessageBitConfig) {
         this.dayIndex = stream.getBits(config.dayBits);
         this.hour = stream.getBits(5);
-        this.authorId = stream.getBits(config.authorIdBits);
+        this.authorIndex = stream.getBits(config.authorIdxBits);
+        this.langIndex = stream.getBits(8);
+        this.sentiment = stream.getBits(8);
+
         const flags = stream.getBits(8);
         if (flags & MessageFlags.Text) {
-            this.sentiment = stream.getBits(8);
-            this.lang = stream.getBits(8);
             this.wordsOffset = stream.offset;
             skipIndexArray(stream, config.wordIdxBits);
         }

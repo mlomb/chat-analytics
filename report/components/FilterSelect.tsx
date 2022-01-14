@@ -21,7 +21,7 @@ const OPTION_HEIGHT = 35;
 const CHIPS_LIMIT = 3;
 
 type Index = number;
-type ItemComponent = (props: { id: Index }) => JSX.Element;
+type ItemComponent = (props: { index: Index }) => JSX.Element;
 type FocusDirection = "up" | "down" | "pageup" | "pagedown" | "first" | "last";
 
 export interface FilterOption {
@@ -65,7 +65,7 @@ const ValueOption = ({
     return (
         <div className="FilterSelect__option">
             <div className="FilterSelect__label">
-                <Item id={index} />
+                <Item index={index} />
             </div>
             {!isDisabled && (
                 <div className="FilterSelect__remove" onClick={onClick}>
@@ -87,7 +87,7 @@ const DataOptionList = (props: { index: Index; selected: boolean; itemComponent:
                 props.selected ? "FilterSelect__option-list--selected" : ""
             ].join(" ")}
         >
-            <Item id={props.index} />
+            <Item index={props.index} />
         </div>
     );
 };

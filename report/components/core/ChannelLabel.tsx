@@ -2,21 +2,21 @@ import "@assets/styles/Labels.less";
 
 import { memo } from "react";
 
-import { ID } from "@pipeline/Types";
+import { Index } from "@pipeline/Types";
 import { useDataProvider } from "@report/DataProvider";
 import Hashtag from "@assets/images/icons/hashtag.svg";
 
 interface Props {
-    id: ID;
+    index: Index;
 }
 
-const ChannelLabel = ({ id }: Props) => {
+const ChannelLabel = ({ index }: Props) => {
     const dp = useDataProvider();
     const platform = dp.database.config.platform;
-    const channel = dp.database.channels[id];
+    const channel = dp.database.channels[index];
 
     if (channel === undefined) {
-        return <span>invalid channel id {id}</span>;
+        return <span>invalid channel index {index}</span>;
     }
 
     return (

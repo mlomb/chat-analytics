@@ -1,11 +1,11 @@
-import { AttachmentType, IAuthor, ID, IMessage } from "@pipeline/Types";
+import { IAuthor, Index } from "@pipeline/Types";
 import { Parser } from "@pipeline/parse/Parser";
 
 import { JSONStream } from "@pipeline/parse/JSONStream";
 import { FileInput, getAttachmentTypeFromFileName, streamJSONFromFile } from "@pipeline/File";
 
 export class DiscordParser extends Parser {
-    private channelId?: ID;
+    private channelIndex?: Index;
 
     async *parse(file: FileInput) {
         const stream = new JSONStream();
@@ -16,15 +16,15 @@ export class DiscordParser extends Parser {
 
         yield* streamJSONFromFile(stream, file);
 
-        this.channelId = undefined;
+        this.channelIndex = undefined;
     }
 
     private parseChannel(channel: DiscordChannel) {
-        this.channelId = this.builder.addChannel(channel.id, { n: channel.name });
+        this.channelIndex = this.builder.addChannel(channel.id, { n: channel.name });
     }
 
     private parseMessage(message: DiscordMessage) {
-        if (this.channelId === undefined) throw new Error("Missing channel ID");
+        if (this.channelIndex === undefined) throw new Error("Missing channel ID");
 
         const timestamp = Date.parse(message.timestamp);
         const timestampEdit = message.timestampEdited ? Date.parse(message.timestampEdited) : undefined;
@@ -44,7 +44,7 @@ export class DiscordParser extends Parser {
             author.da = (" " + avatar).substring(1); // avoid leak
         }
 
-        const authorId = this.builder.addAuthor(message.author.id, author);
+        const authorIndex = this.builder.addAuthor(message.author.id, author);
 
         // :)
         if (message.type == "Default" || message.type == "Reply") {
@@ -61,8 +61,8 @@ export class DiscordParser extends Parser {
             this.builder.addMessage({
                 id: message.id,
                 replyTo: message.reference?.messageId,
-                authorId,
-                channelId: this.channelId,
+                authorIndex,
+                channelIndex: this.channelIndex,
                 timestamp,
                 timestampEdit,
                 content: content.length > 0 ? content : undefined,

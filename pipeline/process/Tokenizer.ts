@@ -43,6 +43,7 @@ const Matchers: Matcher[] = [
         tag: "custom-emoji",
     },
     // TODO: match words on languages that words are one character (help wanted)
+    // See: https://github.com/facebookresearch/fastText/blob/master/docs/crawl-vectors.md#tokenization
     {
         // match words
         // words can have numbers (k8s, i18n, etc) (is this a mistake?)

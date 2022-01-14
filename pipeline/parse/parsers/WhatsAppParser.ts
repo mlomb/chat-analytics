@@ -1,5 +1,5 @@
 import { unzipSync } from "fflate";
-import { AttachmentType, IMessage } from "@pipeline/Types";
+import { AttachmentType } from "@pipeline/Types";
 import { FileInput } from "@pipeline/File";
 import { Parser } from "@pipeline/parse/Parser";
 import { extractChatName, matchAttachmentType, removeBadChars } from "@pipeline/parse/parsers/WhatsApp";
@@ -61,7 +61,7 @@ export class WhatsAppParser extends Parser {
         }
 
         const channelIndex = this.channelIndex++;
-        const channelId = this.builder.addChannel(channelIndex, {
+        const assignedChannelIndex = this.builder.addChannel(channelIndex, {
             n: name || `Channel #${channelIndex}`,
         });
 
@@ -72,7 +72,7 @@ export class WhatsAppParser extends Parser {
             const messageContent = removeBadChars(message.message);
 
             if (message.author !== "System") {
-                const authorId = this.builder.addAuthor(message.author, {
+                const authorIndex = this.builder.addAuthor(message.author, {
                     n: message.author,
                 });
 
@@ -91,8 +91,8 @@ export class WhatsAppParser extends Parser {
 
                 this.builder.addMessage({
                     id: this.messageIndex++,
-                    authorId,
-                    channelId,
+                    authorIndex,
+                    channelIndex: assignedChannelIndex,
                     timestamp,
                     content: attachment === undefined ? messageContent : undefined,
                     attachments: attachment === undefined ? [] : [attachment],

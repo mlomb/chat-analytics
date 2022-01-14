@@ -1,8 +1,8 @@
-import { Database, ID } from "@pipeline/Types";
+import { Database, Index } from "@pipeline/Types";
 import { DateKey, Day, genTimeKeys } from "@pipeline/Time";
 
 export class Filters {
-    channels: ID[];
+    channels: Index[];
     authors: Uint8Array;
     startDayIndex: number; // inclusive
     endDayIndex: number; // inclusive
@@ -19,13 +19,13 @@ export class Filters {
         this.dateKeys = dateKeys;
     }
 
-    hasChannel(channelId: number): boolean {
+    hasChannel(channelIndex: number): boolean {
         // there arent that many channels
         // no need to optimize
-        return this.channels.indexOf(channelId) !== -1;
+        return this.channels.indexOf(channelIndex) !== -1;
     }
-    hasAuthor(authorId: number): boolean {
-        return this.authors[authorId] > 0;
+    hasAuthor(authorIndex: number): boolean {
+        return this.authors[authorIndex] > 0;
     }
     inTime(dayIndex: number): boolean {
         return this.startDayIndex <= dayIndex && dayIndex <= this.endDayIndex;
@@ -35,12 +35,12 @@ export class Filters {
         return this.endDayIndex - this.startDayIndex + 1;
     }
 
-    updateChannels(channels: ID[]) {
+    updateChannels(channels: Index[]) {
         this.channels = channels;
     }
-    updateAuthors(authors: ID[]) {
+    updateAuthors(authors: Index[]) {
         this.authors.fill(0);
-        for (const authorId of authors) this.authors[authorId] = 1;
+        for (const authorIndex of authors) this.authors[authorIndex] = 1;
     }
     updateStartDate(startDate: DateKey) {
         this.startDayIndex = this.dateKeys.indexOf(startDate);

@@ -67,14 +67,16 @@ describe("obj -> (serialize) -> (deserialize) -> obj", () => {
         {
             day: 123,
             hour: 4,
-            authorId: 5,
+            authorIndex: 5,
+            langIndex: 6,
+            sentiment: 7,
         },
         {
             day: 123,
             hour: 4,
-            authorId: 5,
-            sentiment: 6,
-            lang: 7,
+            authorIndex: 5,
+            langIndex: 6,
+            sentiment: 7,
             words: [
                 [8, 9],
                 [10, 11],
@@ -84,9 +86,9 @@ describe("obj -> (serialize) -> (deserialize) -> obj", () => {
         {
             day: 123,
             hour: 4,
-            authorId: 5,
-            sentiment: 6,
-            lang: 7,
+            authorIndex: 5,
+            langIndex: 6,
+            sentiment: 7,
             words: [[8, 1], [10, 2]],
             emojis: [[12, 3], [14, 4], [16, 5]],
             mentions: [[30, 1], [32, 2], [34, 3]],
@@ -102,7 +104,7 @@ describe("obj -> (serialize) -> (deserialize) -> obj", () => {
 
     const bitConfig: MessageBitConfig = {
         dayBits: 8,
-        authorIdBits: 8,
+        authorIdxBits: 8,
         wordIdxBits: 8,
         emojiIdxBits: 8,
         mentionsIdxBits: 8,

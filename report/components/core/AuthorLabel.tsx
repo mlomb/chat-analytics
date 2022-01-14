@@ -2,12 +2,12 @@ import "@assets/styles/Labels.less";
 
 import { memo } from "react";
 
-import { ID } from "@pipeline/Types";
+import { Index } from "@pipeline/Types";
 import { useDataProvider } from "@report/DataProvider";
 import ImageSmooth from "@report/components/core/ImageSmooth";
 
 interface Props {
-    id: ID;
+    index: Index;
 }
 
 import avatar_0 from "@assets/images/platforms/discord/avatars/avatar_0.png";
@@ -29,13 +29,13 @@ const TelegramBubbleColors = [
 
 import wpp_avatar from "@assets/images/platforms/whatsapp/default_avatar.png";
 
-const AuthorLabel = ({ id }: Props) => {
+const AuthorLabel = ({ index }: Props) => {
     const dp = useDataProvider();
     const platform = dp.database.config.platform;
-    const author = dp.database.authors[id];
+    const author = dp.database.authors[index];
 
     if (author === undefined) {
-        return <span>invalid author id {id}</span>;
+        return <span>invalid author index {index}</span>;
     }
 
     let avatarUrl: string | undefined;
@@ -72,7 +72,7 @@ const AuthorLabel = ({ id }: Props) => {
             letter = symbol;
             break;
         }
-        const colors = TelegramBubbleColors[(1779033703 ^ id) % TelegramBubbleColors.length];
+        const colors = TelegramBubbleColors[(1779033703 ^ index) % TelegramBubbleColors.length];
         placeholder = (
             <div
                 style={{
