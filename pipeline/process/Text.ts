@@ -61,8 +61,8 @@ export const normalizeText = (text: string) =>
 
 export const stripDiacritics = (text: string) => text.replace(diacriticsRegex, (match) => diacriticsReplacement[match]);
 
-// NOTE: assumes the word is normalized
-export const isStopword = (word: string) => stopwords.has(stripDiacritics(word).toLowerCase());
+// NOTE: assumes the word is normalized, with diacritics stripped and lowercase
+export const isStopword = (word: string) => stopwords.has(word);
 
 // NOTE: assumes the word is normalized and contains no newlines
 export const detectLanguageLine = async (line: string) => {
