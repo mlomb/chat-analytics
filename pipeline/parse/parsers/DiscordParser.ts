@@ -69,7 +69,7 @@ export class DiscordParser extends Parser {
                 attachments: message.attachments.map((a) => getAttachmentTypeFromFileName(a.fileName)),
                 reactions: message.reactions.map((r) => [
                     {
-                        n: r.emoji.name,
+                        n: r.emoji.name || r.emoji.id || "unknown",
                         id: r.emoji.id === null ? undefined : r.emoji.id,
                     },
                     r.count,
