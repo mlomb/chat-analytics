@@ -18,7 +18,7 @@ export enum MessageFlags {
 
 export interface MessageBitConfig {
     dayBits: number;
-    authorIdBits: number;
+    authorIdxBits: number;
     wordIdxBits: number;
     emojiIdxBits: number;
     mentionsIdxBits: number;
@@ -28,7 +28,9 @@ export interface MessageBitConfig {
 export const writeIntermediateMessage = (message: IntermediateMessage, stream: BitStream, config: MessageBitConfig) => {
     stream.setBits(config.dayBits, message.day);
     stream.setBits(5, message.hour); // 0-23
-    stream.setBits(config.authorIdBits, message.authorId);
+    stream.setBits(config.authorIdxBits, message.authorIndex);
+    stream.setBits(8, message.langIndex); // 0-255
+    stream.setBits(8, message.sentiment); // 0-255
 
     let flags = MessageFlags.None;
     if (message.words?.length) flags |= MessageFlags.Text;
@@ -39,11 +41,7 @@ export const writeIntermediateMessage = (message: IntermediateMessage, stream: B
     if (message.domains?.length) flags |= MessageFlags.Domains;
     stream.setBits(8, flags);
 
-    if (flags & MessageFlags.Text) {
-        stream.setBits(8, message.sentiment!); // 0-255
-        stream.setBits(8, message.lang!); // 0-255
-        writeIndexArray(message.words!, stream, config.wordIdxBits);
-    }
+    if (flags & MessageFlags.Text) writeIndexArray(message.words!, stream, config.wordIdxBits);
     if (flags & MessageFlags.Emojis) writeIndexArray(message.emojis!, stream, config.emojiIdxBits);
     if (flags & MessageFlags.Attachments) writeIndexArray(message.attachments!, stream, 3);
     if (flags & MessageFlags.Reactions) writeIndexArray(message.reactions!, stream, config.emojiIdxBits);
@@ -54,20 +52,20 @@ export const writeIntermediateMessage = (message: IntermediateMessage, stream: B
 export const readIntermediateMessage = (stream: BitStream, config: MessageBitConfig): IntermediateMessage => {
     const day = stream.getBits(config.dayBits);
     const hour = stream.getBits(5);
-    const authorId = stream.getBits(config.authorIdBits);
+    const authorIndex = stream.getBits(config.authorIdxBits);
+    const langIndex = stream.getBits(8);
+    const sentiment = stream.getBits(8);
     const flags = stream.getBits(8);
 
     const message: IntermediateMessage = {
         day,
         hour,
-        authorId,
+        authorIndex,
+        langIndex,
+        sentiment,
     };
 
-    if (flags & MessageFlags.Text) {
-        message.sentiment = stream.getBits(8);
-        message.lang = stream.getBits(8);
-        message.words = readIndexArray(stream, config.wordIdxBits);
-    }
+    if (flags & MessageFlags.Text) message.words = readIndexArray(stream, config.wordIdxBits);
     if (flags & MessageFlags.Emojis) message.emojis = readIndexArray(stream, config.emojiIdxBits);
     if (flags & MessageFlags.Attachments) message.attachments = readIndexArray(stream, 3);
     if (flags & MessageFlags.Reactions) message.reactions = readIndexArray(stream, config.emojiIdxBits);

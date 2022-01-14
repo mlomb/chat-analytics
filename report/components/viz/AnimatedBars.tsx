@@ -6,10 +6,10 @@ const ITEM_STRIDE = 40;
 const formattingFn = (n: number) => n.toLocaleString();
 
 type Index = number;
-type ItemComponent = (props: { id: Index }) => JSX.Element;
+type ItemComponent = (props: { index: Index }) => JSX.Element;
 
 export interface AnimatedBarEntry {
-    id: Index;
+    index: Index;
     value: number;
 }
 
@@ -40,7 +40,7 @@ const Item = (props: {
                 }}
             ></div>
             <div className="AnimatedBars__value">
-                <props.itemComponent id={props.entry.id} />
+                <props.itemComponent index={props.entry.index} />
             </div>
             <CountUp
                 className="AnimatedBars__unit"
@@ -55,7 +55,7 @@ const Item = (props: {
 };
 
 const AnimatedBars = (props: Props) => {
-    const sortedById = props.data.slice().sort((a, b) => (a.id > b.id ? 1 : -1));
+    const sortedById = props.data.slice().sort((a, b) => (a.index > b.index ? 1 : -1));
     const sortedByValue = props.data.slice().sort((a, b) => b.value - a.value);
     const maxValue = sortedByValue.length ? sortedByValue[0].value : 0;
 
@@ -69,7 +69,7 @@ const AnimatedBars = (props: Props) => {
                 {sortedById.map((entry) => (
                     <Item
                         entry={entry}
-                        key={entry.id}
+                        key={entry.index}
                         rank={sortedByValue.indexOf(entry)}
                         percent={(entry.value / maxValue) * 100}
                         itemComponent={props.itemComponent}

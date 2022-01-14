@@ -1,6 +1,6 @@
 import EventEmitter from "events";
 
-import { Database, ID } from "@pipeline/Types";
+import { Database, Index } from "@pipeline/Types";
 import { Day } from "@pipeline/Time";
 import { BlockDescriptions, BlockInfo, BlockKey, BlockTrigger } from "@pipeline/aggregate/Blocks";
 
@@ -26,8 +26,8 @@ export class DataProvider extends EventEmitter {
     private activeBlockIds: Set<number> = new Set();
 
     // active filters
-    private activeChannels: ID[] = [];
-    private activeAuthors: ID[] = [];
+    private activeChannels: Index[] = [];
+    private activeAuthors: Index[] = [];
     private channelsSet: boolean = false;
     private authorsSet: boolean = false;
     private activeStartDate: Day | undefined;
@@ -84,13 +84,13 @@ export class DataProvider extends EventEmitter {
         }
     }
 
-    updateChannels(channels: ID[]) {
+    updateChannels(channels: Index[]) {
         this.activeChannels = channels;
         this.invalidateBlocks("channels");
         this.channelsSet = true;
     }
 
-    updateAuthors(authors: ID[]) {
+    updateAuthors(authors: Index[]) {
         this.activeAuthors = authors;
         this.invalidateBlocks("authors");
         this.authorsSet = true;

@@ -1,10 +1,10 @@
-import { Database, ID } from "@pipeline/Types";
+import { Database, Index } from "@pipeline/Types";
 import { BitStream } from "@pipeline/serialization/BitStream";
 import { Filters } from "@pipeline/aggregate/Filters";
 import { MessageView } from "@pipeline/serialization/MessageView";
 
 export const parseAndFilterMessages = (
-    fn: (msg: MessageView, channelId: ID) => void,
+    fn: (msg: MessageView, channelIndex: Index) => void,
     database: Database,
     filters: Filters,
     activeFilters = { channels: true, authors: true, time: true }
@@ -22,7 +22,7 @@ export const parseAndFilterMessages = (
         for (let read = 0; read < channel.msgCount; read++) {
             const message = new MessageView(stream, database.bitConfig);
             // filter author
-            if (!activeFilters.authors || filters.hasAuthor(message.authorId)) {
+            if (!activeFilters.authors || filters.hasAuthor(message.authorIndex)) {
                 // filter time
                 if (!activeFilters.time || filters.inTime(message.dayIndex)) {
                     // make sure to preserve the offset, since reading an index array will overwrite it

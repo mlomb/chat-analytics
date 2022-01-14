@@ -4,9 +4,6 @@ import { DateKey } from "@pipeline/Time";
 // raw ID that comes from the platform (e.g 9876554321)
 export type RawID = string | number;
 
-// internal ID that is used in the pipeline (incremental)
-export type ID = number;
-
 // a zero-based index
 export type Index = number;
 
@@ -115,8 +112,8 @@ export interface Emoji {
 export interface IMessage {
     id: RawID;
     replyTo?: RawID;
-    authorId: ID;
-    channelId: ID;
+    authorIndex: Index;
+    channelIndex: Index;
     timestamp: Timestamp;
     timestampEdit?: Timestamp;
     content?: string;
@@ -128,9 +125,9 @@ export interface IMessage {
 export interface IntermediateMessage {
     day: number;
     hour: number;
-    authorId: ID;
-    sentiment?: number;
-    lang?: Index;
+    authorIndex: Index;
+    langIndex: Index;
+    sentiment: number;
     words?: [Index, number][];
     emojis?: [Index, number][];
     mentions?: [Index, number][];

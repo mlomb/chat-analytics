@@ -2,8 +2,8 @@ import "@assets/styles/Header.less";
 
 import { useCallback, useLayoutEffect, useMemo, useState } from "react";
 
-import { Database, ID } from "@pipeline/Types";
-import { DataProvider, useDataProvider } from "@report/DataProvider";
+import { Database, Index } from "@pipeline/Types";
+import { useDataProvider } from "@report/DataProvider";
 
 import AuthorLabel from "@report/components/core/AuthorLabel";
 import ChannelLabel from "@report/components/core/ChannelLabel";
@@ -89,8 +89,8 @@ const Header = (props: Props) => {
     const channelsFilterOptions = useMemo(() => channelsFilterOptionsFn(dataProvider.database), [dataProvider]);
     const authorsFilterOptions = useMemo(() => authorsFilterOptionsFn(dataProvider.database), [dataProvider]);
 
-    const [selectedChannels, setSelectedChannels] = useState<ID[]>(channelsFilterOptions[0].options);
-    const [selectedAuthors, setSelectedAuthors] = useState<ID[]>(authorsFilterOptions[0].options);
+    const [selectedChannels, setSelectedChannels] = useState<Index[]>(channelsFilterOptions[0].options);
+    const [selectedAuthors, setSelectedAuthors] = useState<Index[]>(authorsFilterOptions[0].options);
 
     useLayoutEffect(() => dataProvider.updateAuthors(selectedAuthors), [selectedAuthors]);
     useLayoutEffect(() => dataProvider.updateChannels(selectedChannels), [selectedChannels]);

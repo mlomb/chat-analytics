@@ -1,6 +1,7 @@
 import { progress } from "@pipeline/Progress";
 import { downloadFile } from "@pipeline/File";
 import { FastTextModel, loadFastTextModel } from "@pipeline/process/FastTextModel";
+import { LanguageCodes } from "@pipeline/Languages";
 
 export const loadTextData = async () => {
     // load diacritics
@@ -65,7 +66,13 @@ export const stripDiacritics = (text: string) => text.replace(diacriticsRegex, (
 export const isStopword = (word: string) => stopwords.has(word);
 
 // NOTE: assumes the word is normalized and contains no newlines
-export const detectLanguageLine = async (line: string) => {
+export const detectLanguageLine = (line: string) => {
     const result = langPredictModel.predict(line, 1, 0.0);
-    return result[0][1].slice(9); // "__label__".length === 9
+    const code = result[0][1].slice(9); // "__label__".length === 9
+    return {
+        accuracy: result[0][0],
+        // ISO 639-2/3
+        iso639: code,
+        index: LanguageCodes.indexOf(code),
+    };
 };

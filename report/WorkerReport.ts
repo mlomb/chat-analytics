@@ -1,6 +1,6 @@
 export default null as any;
 
-import { Database, ID } from "@pipeline/Types";
+import { Database, Index } from "@pipeline/Types";
 import { Blocks, BlockDescriptions, BlockKey, BlockInfo } from "@pipeline/aggregate/Blocks";
 import { Filters } from "@pipeline/aggregate/Filters";
 import { decompress } from "@pipeline/compression/Compression";
@@ -21,8 +21,8 @@ export interface BlockRequestMessage {
     type: "request";
     blockKey: BlockKey;
     filters: Partial<{
-        authors: ID[];
-        channels: ID[];
+        authors: Index[];
+        channels: Index[];
         startDate: DateKey;
         endDate: DateKey;
     }>;
