@@ -16,16 +16,15 @@ import {
 import { Day, genTimeKeys } from "@pipeline/Time";
 import { progress } from "@pipeline/Progress";
 import { LanguageDetector, loadLanguageDetector } from "@pipeline/process/LanguageDetection";
-import { Stopwords, loadStopwords } from "@pipeline/process/Stopwords";
-import { stripDiacritics } from "@pipeline/process/Diacritics";
 import { BitStream } from "@pipeline/serialization/BitStream";
+import { IndexedData } from "@pipeline/process/IndexedData";
 import { tokenize } from "@pipeline/process/Tokenizer";
+import { isStopword, loadTextData, normalizeText } from "@pipeline/process/Text";
 import {
     MessageBitConfig,
     readIntermediateMessage,
     writeIntermediateMessage,
 } from "@pipeline/serialization/MessageSerialization";
-import { IndexedData } from "@pipeline/process/IndexedData";
 
 // TODO: !
 const searchFormat = (x: string) => x.toLocaleLowerCase();
@@ -72,13 +71,12 @@ export class DatabaseBuilder {
 
     private stream: BitStream = new BitStream();
     private languageDetector?: LanguageDetector;
-    private stopwords?: Stopwords;
 
     constructor(private readonly config: ReportConfig) {}
 
     public async init() {
-        this.stopwords = await loadStopwords();
         this.languageDetector = await loadLanguageDetector();
+        await loadTextData();
     }
 
     public setTitle(title: string) {
@@ -133,7 +131,7 @@ export class DatabaseBuilder {
             if (message.authorId !== currentAuthor) {
                 // process group
                 const group = this.messageQueue.slice(l, r);
-                await this.processGroup(group);
+                this.processGroup(group);
                 currentAuthor = message.authorId;
                 l = r;
             }
@@ -143,7 +141,7 @@ export class DatabaseBuilder {
         if (final) {
             // process last group
             const group = this.messageQueue.slice(l, len);
-            await this.processGroup(group);
+            this.processGroup(group);
             this.messageQueue = [];
         } else {
             // wait for more messages
@@ -156,9 +154,8 @@ export class DatabaseBuilder {
     // Why? Because we can combine the content of the messages and
     // detect the language of the whole group, being more efficient and
     // more accurate (in general).
-    private async processGroup(messages: IMessage[]) {
+    private processGroup(messages: IMessage[]) {
         if (!this.languageDetector) throw new Error("Language detector not initialized");
-        if (!this.stopwords) throw new Error("Stopwords not initialized");
 
         const channelSection = this.getChannelSection(messages[0].channelId);
 
@@ -166,15 +163,7 @@ export class DatabaseBuilder {
         let combined: string[] = [];
         for (const msg of messages) {
             if (msg.content && msg.content.length > 0) {
-                msg.content = msg.content
-                    // normalize the content using NFC (we want the compositions)
-                    // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/normalize
-                    .normalize("NFC")
-                    // change all whitespace to one space (important for the lang detector)
-                    .replace(/\s\s+/g, " ")
-                    // trim just in case
-                    .trim();
-
+                msg.content = normalizeText(msg.content);
                 combined.push(msg.content);
             }
         }
@@ -237,8 +226,8 @@ export class DatabaseBuilder {
                 const tokens = tokenize(msg.content);
                 for (const { tag, text } of tokens) {
                     if (tag === "word") {
-                        // only keep words between [2, 25] chars
-                        if (text.length > 1 && text.length <= 25) {
+                        // only keep words between [2, 25] chars and are not stopwords
+                        if (text.length > 1 && text.length <= 25 && !isStopword(text)) {
                             let wordIdx = this.words.getIndex(text);
                             if (wordIdx === undefined) wordIdx = this.words.set(text, text);
                             wordsCount[wordIdx] = (wordsCount[wordIdx] || 0) + 1;
