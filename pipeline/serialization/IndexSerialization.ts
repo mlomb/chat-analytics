@@ -36,7 +36,7 @@ import { BitStream } from "@pipeline/serialization/BitStream";
 //   - (0b10) Serial: [Sum of counts, Index, Index, Index, Index]
 //   - (0b11) Run Length Encoding: [Counts Length, Bits for max count, (Index, Count), (Index, Count), ...]
 //
-// We can use one bit to decide the strategy per array basis, using the one which uses the less amount of bits.
+// We can use two bits to decide the strategy per array basis, using the one which uses the less amount of bits.
 // :)
 
 export const writeIndexArray = (counts: [Index, number][], stream: BitStream, bitsPerIndex: number) => {
