@@ -18,7 +18,7 @@ import { progress } from "@pipeline/Progress";
 import { BitStream } from "@pipeline/serialization/BitStream";
 import { IndexedData } from "@pipeline/process/IndexedData";
 import { tokenize } from "@pipeline/process/Tokenizer";
-import { isStopword, loadTextData, normalizeText } from "@pipeline/process/Text";
+import { isStopword, loadTextData, normalizeText, stripDiacritics } from "@pipeline/process/Text";
 import {
     MessageBitConfig,
     readIntermediateMessage,
@@ -195,12 +195,20 @@ export class DatabaseBuilder {
 
             if (msg.reactions) {
                 for (const reaction of msg.reactions) {
-                    let emojiIdx = this.emojis.getIndex(reaction[0].n);
+                    const emojiKey = reaction[0].n.toLowerCase();
+                    let emojiIdx = this.emojis.getIndex(emojiKey);
                     if (emojiIdx === undefined) {
-                        emojiIdx = this.emojis.set(reaction[0].n, {
-                            id: reaction[0].id,
-                            n: reaction[0].n,
-                        });
+                        emojiIdx = this.emojis.set(
+                            emojiKey,
+                            reaction[0].id === undefined
+                                ? {
+                                      n: reaction[0].n,
+                                  }
+                                : {
+                                      id: reaction[0].id,
+                                      n: reaction[0].n,
+                                  }
+                        );
                     } else if (this.emojis.get(emojiIdx).id === undefined && reaction[0].id) {
                         // ID is new, replace
                         this.emojis.setAt(emojiIdx, {
@@ -217,19 +225,22 @@ export class DatabaseBuilder {
                 const tokens = tokenize(msg.content);
                 for (const { tag, text } of tokens) {
                     if (tag === "word") {
+                        const wordKey = stripDiacritics(text).toLowerCase();
                         // only keep words between [2, 25] chars and are not stopwords
-                        if (text.length > 1 && text.length <= 25 && !isStopword(text)) {
-                            let wordIdx = this.words.getIndex(text);
-                            if (wordIdx === undefined) wordIdx = this.words.set(text, text);
+                        if (text.length > 1 && text.length <= 25 && !isStopword(wordKey)) {
+                            let wordIdx = this.words.getIndex(wordKey);
+                            if (wordIdx === undefined) wordIdx = this.words.set(wordKey, text);
                             wordsCount[wordIdx] = (wordsCount[wordIdx] || 0) + 1;
                         }
                     } else if (tag === "emoji" || tag === "custom-emoji") {
-                        let emojiIdx = this.emojis.getIndex(text);
-                        if (emojiIdx === undefined) emojiIdx = this.emojis.set(text, { n: text });
+                        const emojiKey = tag === "emoji" ? text : text.toLowerCase();
+                        let emojiIdx = this.emojis.getIndex(emojiKey);
+                        if (emojiIdx === undefined) emojiIdx = this.emojis.set(emojiKey, { n: text });
                         emojisCount[emojiIdx] = (emojisCount[emojiIdx] || 0) + 1;
                     } else if (tag === "mention") {
-                        let mentionIdx = this.mentions.getIndex(text);
-                        if (mentionIdx === undefined) mentionIdx = this.mentions.set(text, text);
+                        const mentionKey = stripDiacritics(text).toLowerCase();
+                        let mentionIdx = this.mentions.getIndex(mentionKey);
+                        if (mentionIdx === undefined) mentionIdx = this.mentions.set(mentionKey, text);
                         mentionsCount[mentionIdx] = (mentionsCount[mentionIdx] || 0) + 1;
                     } else if (tag === "url") {
                         try {
@@ -365,6 +376,13 @@ export class DatabaseBuilder {
                 : +(this.authors.data[a].b || false) - +(this.authors.data[b].b || false)
         );
         const authorsBotCutoff: number = authorsOrder.findIndex((i) => this.authors.data[i].b);
+
+        // only keep the profile picture of the 1000 most active authors
+        // to save space (picture URLs are very big)
+        for (let i = 1000; i < authorsOrder.length; i++) {
+            this.authors.data[authorsOrder[i]].da = undefined;
+        }
+
         progress.done();
         return { authorsOrder, authorsBotCutoff };
     }
