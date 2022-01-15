@@ -120,7 +120,7 @@ module.exports = (env) => {
                 },
             }),
             new CopyPlugin({
-                patterns: [resolve("assets/public")],
+                patterns: [resolve("assets/public"), { from: resolve("assets/data"), to: "data" }],
             }),
         ].concat(
             isProd
