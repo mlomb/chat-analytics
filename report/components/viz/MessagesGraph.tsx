@@ -16,7 +16,7 @@ import { useDataProvider } from "@report/DataProvider";
 import { MessagesPerCycle } from "@pipeline/aggregate/blocks/MessagesPerCycle";
 import { Themes } from "./AmCharts5";
 
-const MessagesGraph = ({ data }: { data: MessagesPerCycle }) => {
+const MessagesGraph = ({ data }: { data?: MessagesPerCycle }) => {
     const dataProvider = useDataProvider();
     const chartDiv = useRef<HTMLDivElement>(null);
     const [charts, setCharts] = useState<{
