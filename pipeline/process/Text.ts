@@ -2,6 +2,8 @@ import { progress } from "@pipeline/Progress";
 import { downloadFile } from "@pipeline/File";
 import { FastTextModel, loadFastTextModel } from "@pipeline/process/FastTextModel";
 import { LanguageCodes } from "@pipeline/Languages";
+import { Token } from "@pipeline/process/Tokenizer";
+import { Sentiment } from "@pipeline/process/Sentiment";
 
 export const loadTextData = async () => {
     // load diacritics
@@ -41,12 +43,18 @@ export const loadTextData = async () => {
 
     // load language detector model
     langPredictModel = await loadFastTextModel("lid.176");
+
+    // load sentiment data
+    {
+        sentimentInstance = new Sentiment();
+    }
 };
 
 let stopwords: Set<string>;
 let diacriticsRegex: RegExp;
 let diacriticsReplacement: { [key: string]: string };
 let langPredictModel: FastTextModel;
+let sentimentInstance: Sentiment;
 
 const whitespaceRegex = /\s\s+/g;
 
@@ -76,3 +84,5 @@ export const detectLanguageLine = (line: string) => {
         index: LanguageCodes.indexOf(code),
     };
 };
+
+export const analyzeSentiment = (tokens: Token[]) => sentimentInstance.get(tokens);

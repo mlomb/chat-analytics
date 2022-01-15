@@ -17,7 +17,8 @@ import { progress } from "@pipeline/Progress";
 import { BitStream } from "@pipeline/serialization/BitStream";
 import { IndexedData } from "@pipeline/process/IndexedData";
 import { Token, tokenize } from "@pipeline/process/Tokenizer";
-import { detectLanguageLine, isStopword, loadTextData, normalizeText, stripDiacritics } from "@pipeline/process/Text";
+import { Sentiment } from "@pipeline/process/Sentiment";
+import { analyzeSentiment, detectLanguageLine, normalizeText, stripDiacritics } from "@pipeline/process/Text";
 import {
     MessageBitConfig,
     readIntermediateMessage,
@@ -69,6 +70,7 @@ export class DatabaseBuilder {
     private authorMessagesCount: number[] = [];
     private wordsCount: number[] = [];
     private languagesCount: { [lang: number]: number } = {};
+    private totalLangPredictions = 0;
 
     private stream: BitStream = new BitStream();
 
@@ -144,7 +146,7 @@ export class DatabaseBuilder {
         }
     }
 
-    // Inteaad of processing one message at a time, we process it
+    // Instead of processing one message at a time, we process it
     // in contiguous groups which have the same author (and channel ofc)
     // Why? Because we can combine the content of the messages and
     // detect the language of the whole group, being more efficient and
@@ -174,14 +176,9 @@ export class DatabaseBuilder {
         if (combined.length > 0) {
             const combinedWords = combined.join(" ");
             const prediction = detectLanguageLine(combinedWords);
-
-            if (
-                (prediction.accuracy > 0.5 && combinedWords.length >= 8) ||
-                (prediction.accuracy > 0.9 && combinedWords.length < 8)
-            ) {
-                this.languagesCount[prediction.index] = (this.languagesCount[prediction.index] || 0) + 1;
-                langIndex = prediction.index;
-            }
+            langIndex = prediction.index;
+            this.languagesCount[langIndex] = (this.languagesCount[langIndex] || 0) + 1;
+            this.totalLangPredictions++;
         }
 
         interface Counts {
@@ -240,34 +237,41 @@ export class DatabaseBuilder {
 
             // tokenize
             const tokens = tokenizations[i];
-            for (const { tag, text } of tokens) {
-                if (tag === "word") {
-                    const wordKey = stripDiacritics(text).toLowerCase();
-                    // only keep words between [2, 30] chars
-                    if (text.length > 1 && text.length <= 30) {
-                        let wordIdx = this.words.getIndex(wordKey);
-                        if (wordIdx === undefined) wordIdx = this.words.set(wordKey, text);
-                        wordsCount[wordIdx] = (wordsCount[wordIdx] || 0) + 1;
-                        this.wordsCount[wordIdx] = (this.wordsCount[wordIdx] || 0) + 1;
+            if (tokens.length > 0) {
+                // process tokens
+                for (const { tag, text } of tokens) {
+                    if (tag === "word") {
+                        const wordKey = stripDiacritics(text).toLowerCase();
+                        // only keep words between [2, 30] chars
+                        if (text.length > 1 && text.length <= 30) {
+                            let wordIdx = this.words.getIndex(wordKey);
+                            if (wordIdx === undefined) wordIdx = this.words.set(wordKey, text);
+                            wordsCount[wordIdx] = (wordsCount[wordIdx] || 0) + 1;
+                            this.wordsCount[wordIdx] = (this.wordsCount[wordIdx] || 0) + 1;
+                        }
+                    } else if (tag === "emoji" || tag === "custom-emoji") {
+                        const emojiKey = tag === "emoji" ? text : text.toLowerCase();
+                        let emojiIdx = this.emojis.getIndex(emojiKey);
+                        if (emojiIdx === undefined) emojiIdx = this.emojis.set(emojiKey, { n: text });
+                        emojisCount[emojiIdx] = (emojisCount[emojiIdx] || 0) + 1;
+                    } else if (tag === "mention") {
+                        const mentionKey = stripDiacritics(text).toLowerCase();
+                        let mentionIdx = this.mentions.getIndex(mentionKey);
+                        if (mentionIdx === undefined) mentionIdx = this.mentions.set(mentionKey, text);
+                        mentionsCount[mentionIdx] = (mentionsCount[mentionIdx] || 0) + 1;
+                    } else if (tag === "url") {
+                        try {
+                            const hostname = new URL(text).hostname;
+                            let domainIdx = this.domains.getIndex(hostname);
+                            if (domainIdx === undefined) domainIdx = this.domains.set(hostname, hostname);
+                            domainsCount[domainIdx] = (domainsCount[domainIdx] || 0) + 1;
+                        } catch (ex) {}
                     }
-                } else if (tag === "emoji" || tag === "custom-emoji") {
-                    const emojiKey = tag === "emoji" ? text : text.toLowerCase();
-                    let emojiIdx = this.emojis.getIndex(emojiKey);
-                    if (emojiIdx === undefined) emojiIdx = this.emojis.set(emojiKey, { n: text });
-                    emojisCount[emojiIdx] = (emojisCount[emojiIdx] || 0) + 1;
-                } else if (tag === "mention") {
-                    const mentionKey = stripDiacritics(text).toLowerCase();
-                    let mentionIdx = this.mentions.getIndex(mentionKey);
-                    if (mentionIdx === undefined) mentionIdx = this.mentions.set(mentionKey, text);
-                    mentionsCount[mentionIdx] = (mentionsCount[mentionIdx] || 0) + 1;
-                } else if (tag === "url") {
-                    try {
-                        const hostname = new URL(text).hostname;
-                        let domainIdx = this.domains.getIndex(hostname);
-                        if (domainIdx === undefined) domainIdx = this.domains.set(hostname, hostname);
-                        domainsCount[domainIdx] = (domainsCount[domainIdx] || 0) + 1;
-                    } catch (ex) {}
                 }
+
+                // sentiment analysis
+                analyzeSentiment(tokens);
+                // TODO: do something
             }
 
             // store message
