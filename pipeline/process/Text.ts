@@ -4,6 +4,7 @@ import { FastTextModel, loadFastTextModel } from "@pipeline/process/FastTextMode
 import { LanguageCodes } from "@pipeline/Languages";
 import { Token } from "@pipeline/process/Tokenizer";
 import { Sentiment } from "@pipeline/process/Sentiment";
+import { Index } from "@pipeline/Types";
 
 export const loadTextData = async () => {
     // load diacritics
@@ -47,14 +48,14 @@ export const loadTextData = async () => {
     // load sentiment data
     {
         progress.new("Downloading file", "AFINN.zip");
-        const AFINNzipBuffer = await downloadFile("data/AFINN.zip", "arraybuffer");
+        const afinnZipBuffer = await downloadFile("data/AFINN.zip", "arraybuffer");
         progress.done();
         progress.new("Downloading file", "emoji-sentiment.json");
         const emojiSentiment = await downloadFile("data/emoji-sentiment.json", "json");
         progress.done();
 
         console.time("db");
-        sentimentInstance = new Sentiment(AFINNzipBuffer, emojiSentiment);
+        sentimentInstance = new Sentiment(afinnZipBuffer, emojiSentiment);
         console.timeEnd("db");
     }
 };
@@ -94,4 +95,4 @@ export const detectLanguageLine = (line: string) => {
     };
 };
 
-export const analyzeSentiment = (tokens: Token[]) => sentimentInstance.get(tokens);
+export const analyzeSentiment = (tokens: Token[], lang: Index) => sentimentInstance.get(tokens, lang);

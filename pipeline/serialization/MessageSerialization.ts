@@ -30,7 +30,7 @@ export const writeIntermediateMessage = (message: IntermediateMessage, stream: B
     stream.setBits(5, message.hour); // 0-23
     stream.setBits(config.authorIdxBits, message.authorIndex);
     stream.setBits(8, message.langIndex); // 0-255
-    stream.setBits(8, message.sentiment); // 0-255
+    stream.setBits(8, message.sentiment + 128); // 0-255
 
     let flags = MessageFlags.None;
     if (message.words?.length) flags |= MessageFlags.Text;
@@ -54,7 +54,7 @@ export const readIntermediateMessage = (stream: BitStream, config: MessageBitCon
     const hour = stream.getBits(5);
     const authorIndex = stream.getBits(config.authorIdxBits);
     const langIndex = stream.getBits(8);
-    const sentiment = stream.getBits(8);
+    const sentiment = stream.getBits(8) - 128;
     const flags = stream.getBits(8);
 
     const message: IntermediateMessage = {
