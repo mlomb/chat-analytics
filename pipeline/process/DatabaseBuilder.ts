@@ -237,6 +237,7 @@ export class DatabaseBuilder {
 
             // parse tokens
             let sentiment = 0;
+            let hasText = false;
             const tokens = tokenizations[i];
             if (tokens.length > 0) {
                 // process tokens
@@ -250,6 +251,7 @@ export class DatabaseBuilder {
                             wordsCount[wordIdx] = (wordsCount[wordIdx] || 0) + 1;
                             this.wordsCount[wordIdx] = (this.wordsCount[wordIdx] || 0) + 1;
                         }
+                        hasText = true;
                     } else if (tag === "emoji" || tag === "custom-emoji") {
                         const emojiKey = tag === "emoji" ? text : text.toLowerCase();
                         let emojiIdx = this.emojis.getIndex(emojiKey);
@@ -261,6 +263,7 @@ export class DatabaseBuilder {
                         if (mentionIdx === undefined) mentionIdx = this.mentions.set(mentionKey, text);
                         mentionsCount[mentionIdx] = (mentionsCount[mentionIdx] || 0) + 1;
                     } else if (tag === "url") {
+                        // TODO: transform URL only messages to attachments
                         try {
                             const hostname = new URL(text).hostname;
                             let domainIdx = this.domains.getIndex(hostname);
@@ -271,7 +274,9 @@ export class DatabaseBuilder {
                 }
 
                 // sentiment analysis
-                sentiment = analyzeSentiment(tokens, langIndex) || 0;
+                if (hasText) {
+                    sentiment = analyzeSentiment(tokens, langIndex) || 0;
+                }
             }
 
             // store message
@@ -279,10 +284,10 @@ export class DatabaseBuilder {
                 <IntermediateMessage>{
                     day: day.toBinary(),
                     // TODO: timezones
-                    hour: date.getHours(),
+                    secondOfDay: date.getSeconds() + 60 * (date.getMinutes() + 60 * date.getHours()),
                     authorIndex: msg.authorIndex,
-                    langIndex,
-                    sentiment,
+                    langIndex: hasText ? langIndex : undefined,
+                    sentiment: hasText ? sentiment : undefined,
                     words: countsToArray(wordsCount),
                     emojis: countsToArray(emojisCount),
                     mentions: countsToArray(mentionsCount),

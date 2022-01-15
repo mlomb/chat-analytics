@@ -3,22 +3,22 @@ import AnimatedBars from "@report/components/viz/AnimatedBars";
 import AuthorLabel from "@report/components/core/AuthorLabel";
 import ChannelLabel from "@report/components/core/ChannelLabel";
 
-const MessagesMostAuthors = ({ data }: { data: MessagesStats }) => (
+const MessagesMostAuthors = ({ data }: { data?: MessagesStats }) => (
     <AnimatedBars
         what="Author"
         unit="Total messages"
-        data={data.mostAuthors}
+        data={data?.mostAuthors || []}
         itemComponent={AuthorLabel}
         maxItems={16}
         colorHue={240}
     />
 );
 
-const MessagesMostChannels = ({ data }: { data: MessagesStats }) => (
+const MessagesMostChannels = ({ data }: { data?: MessagesStats }) => (
     <AnimatedBars
         what="Channel"
         unit="Total messages"
-        data={data.mostChannels}
+        data={data?.mostChannels || []}
         itemComponent={ChannelLabel}
         maxItems={16}
         colorHue={266}

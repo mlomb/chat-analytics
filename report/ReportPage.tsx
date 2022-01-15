@@ -10,7 +10,7 @@ import Card from "@report/components/Card";
 import { TabContainer } from "@report/components/Tabs";
 
 import MessagesGraph from "@report/components/viz/MessagesGraph";
-import MessagesStats from "@report/components/viz/MessagesStats";
+import MessagesStatsTable from "@report/components/viz/MessagesStatsTable";
 import { MessagesMostAuthors, MessagesMostChannels } from "@report/components/viz/MessagesMost";
 
 const CardContainer = (props: { children: React.ReactNode }) => <div className="CardContainer">{props.children}</div>;
@@ -30,7 +30,7 @@ const ReportDashboard = () => {
                         blockKey="messages-per-cycle"
                         children={MessagesGraph}
                     />
-                    <Card num={1} title="Messages stats" blockKey="messages-stats" children={MessagesStats} />
+                    <Card num={1} title="Messages stats" blockKey="messages-stats" children={MessagesStatsTable} />
                     <Card num={1} blockKey="messages-stats" title="Poner algo aca" children={() => <div>a</div>} />
                     <Card
                         num={1}

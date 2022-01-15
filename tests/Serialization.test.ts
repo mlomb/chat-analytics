@@ -66,14 +66,14 @@ describe("obj -> (serialize) -> (deserialize) -> obj", () => {
     const cases: IntermediateMessage[] = [
         {
             day: 123,
-            hour: 4,
+            secondOfDay: 4,
             authorIndex: 5,
             langIndex: 6,
             sentiment: 7,
         },
         {
             day: 123,
-            hour: 4,
+            secondOfDay: 4,
             authorIndex: 5,
             langIndex: 6,
             sentiment: 7,
@@ -85,7 +85,7 @@ describe("obj -> (serialize) -> (deserialize) -> obj", () => {
         // prettier-ignore
         {
             day: 123,
-            hour: 4,
+            secondOfDay: 4,
             authorIndex: 5,
             langIndex: 6,
             sentiment: 7,

@@ -24,7 +24,6 @@ export enum AttachmentType {
     Audio,
     Document,
     Other,
-    Last,
 }
 
 // configuration, set in the UI
@@ -121,10 +120,10 @@ export interface IMessage {
 // stored serialized during generation
 export interface IntermediateMessage {
     day: number;
-    hour: number;
+    secondOfDay: number;
     authorIndex: Index;
-    langIndex: Index;
-    sentiment: number;
+    langIndex?: Index;
+    sentiment?: number;
     words?: [Index, number][];
     emojis?: [Index, number][];
     mentions?: [Index, number][];

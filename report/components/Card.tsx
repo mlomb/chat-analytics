@@ -9,7 +9,7 @@ interface Props<K extends BlockKey> {
     num: 1 | 2 | 3;
     title?: string;
     blockKey: K;
-    children: (props: { data: BlockDataType<K> }) => JSX.Element;
+    children: (props: { data?: BlockDataType<K> }) => JSX.Element;
 }
 
 const Indicators: { [key in BlockState]: string } = {
@@ -23,7 +23,7 @@ const Card = <K extends BlockKey>(props: Props<K>) => {
     const Content = <K extends BlockKey>({ info }: { info: BlockInfo<K> }) => (
         <>
             {props.title ? <div className="Card_title">{props.title}</div> : null}
-            {info.data && <props.children data={info.data} />}
+            <props.children data={info.data || undefined} />
             <div className={"Card_overlay" + (info.state === "ready" ? " Card_overlay--hidden" : "")}>
                 <img src={Spinner} alt="Loading" height={60} />
                 {Indicators[info.state]}

@@ -54,7 +54,7 @@ export const getAttachmentTypeFromFileName = (filename: string): AttachmentType 
         [AttachmentType.Audio]: ["mp3", "ogg", "wav", "flac", "m4a"],
         [AttachmentType.Document]: ["doc", "docx", "odt", "pdf", "xls", "xlsx", "ods", "ppt", "pptx", "txt", "html"],
     };
-    for (let type: AttachmentType = 0; type < AttachmentType.Last; type++) {
+    for (let type: AttachmentType = 0; type <= AttachmentType.Other; type++) {
         if (mappings[type]?.includes(ext)) {
             return type;
         }

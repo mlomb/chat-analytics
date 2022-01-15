@@ -5,10 +5,10 @@ import { readIndexArray, skipIndexArray } from "@pipeline/serialization/IndexSer
 
 export class MessageView {
     readonly dayIndex: Index;
-    readonly hour: number;
+    readonly secondOfDay: number;
     readonly authorIndex: Index;
-    readonly langIndex: Index;
-    readonly sentiment: number;
+    readonly langIndex?: Index;
+    readonly sentiment?: number;
 
     private wordsOffset: BitAddress = 0;
     private emojisOffset: BitAddress = 0;
@@ -17,15 +17,25 @@ export class MessageView {
     private mentionsOffset: BitAddress = 0;
     private domainsOffset: BitAddress = 0;
 
+    get hasText(): boolean { return this.langIndex !== undefined; } // prettier-ignore
+    get hasWords(): boolean { return this.wordsOffset > 0; } // prettier-ignore
+    get hasEmojis(): boolean { return this.emojisOffset > 0; } // prettier-ignore
+    get hasAttachments(): boolean { return this.attachmentsOffset > 0; } // prettier-ignore
+    get hasReactions(): boolean { return this.reactionsOffset > 0; } // prettier-ignore
+    get hasMentions(): boolean { return this.mentionsOffset > 0; } // prettier-ignore
+    get hasDomains(): boolean { return this.domainsOffset > 0; } // prettier-ignore
+
     constructor(private readonly stream: BitStream, private readonly config: MessageBitConfig) {
         this.dayIndex = stream.getBits(config.dayBits);
-        this.hour = stream.getBits(5);
+        this.secondOfDay = stream.getBits(17);
         this.authorIndex = stream.getBits(config.authorIdxBits);
-        this.langIndex = stream.getBits(8);
-        this.sentiment = stream.getBits(8) - 128;
 
-        const flags = stream.getBits(8);
+        const flags = stream.getBits(9);
         if (flags & MessageFlags.Text) {
+            this.langIndex = stream.getBits(8);
+            this.sentiment = stream.getBits(8) - 128;
+        }
+        if (flags & MessageFlags.Words) {
             this.wordsOffset = stream.offset;
             skipIndexArray(stream, config.wordIdxBits);
         }
@@ -51,32 +61,38 @@ export class MessageView {
         }
     }
 
-    getWords(): [Index, number][] {
+    getWords(): [Index, number][] | undefined {
+        if (this.wordsOffset === 0) return undefined;
         this.stream.offset = this.wordsOffset;
         return readIndexArray(this.stream, this.config.wordIdxBits);
     }
 
-    getEmojis(): [Index, number][] {
+    getEmojis(): [Index, number][] | undefined {
+        if (this.emojisOffset === 0) return undefined;
         this.stream.offset = this.emojisOffset;
         return readIndexArray(this.stream, this.config.emojiIdxBits);
     }
 
-    getAttachments(): [Index, number][] {
+    getAttachments(): [Index, number][] | undefined {
+        if (this.attachmentsOffset === 0) return undefined;
         this.stream.offset = this.attachmentsOffset;
         return readIndexArray(this.stream, 3);
     }
 
-    getReactions(): [Index, number][] {
+    getReactions(): [Index, number][] | undefined {
+        if (this.reactionsOffset === 0) return undefined;
         this.stream.offset = this.reactionsOffset;
         return readIndexArray(this.stream, this.config.emojiIdxBits);
     }
 
-    getMentions(): [Index, number][] {
+    getMentions(): [Index, number][] | undefined {
+        if (this.mentionsOffset === 0) return undefined;
         this.stream.offset = this.mentionsOffset;
         return readIndexArray(this.stream, this.config.mentionsIdxBits);
     }
 
-    getDomains(): [Index, number][] {
+    getDomains(): [Index, number][] | undefined {
+        if (this.domainsOffset === 0) return undefined;
         this.stream.offset = this.domainsOffset;
         return readIndexArray(this.stream, this.config.domainsIdxBits);
     }
