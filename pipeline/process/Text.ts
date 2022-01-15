@@ -46,7 +46,16 @@ export const loadTextData = async () => {
 
     // load sentiment data
     {
-        sentimentInstance = new Sentiment();
+        progress.new("Downloading file", "AFINN.zip");
+        const AFINNzipBuffer = await downloadFile("data/AFINN.zip", "arraybuffer");
+        progress.done();
+        progress.new("Downloading file", "emoji-sentiment.json");
+        const emojiSentiment = await downloadFile("data/emoji-sentiment.json", "json");
+        progress.done();
+
+        console.time("db");
+        sentimentInstance = new Sentiment(AFINNzipBuffer, emojiSentiment);
+        console.timeEnd("db");
     }
 };
 

@@ -1,0 +1,608 @@
+{
+  "af": [
+    "kan nie",
+    "nie",
+    "sal nie",
+    "is nie",
+    "was nie"
+  ],
+  "am": [
+    "በቀዳሚ ግምገማዎች ላይ",
+    "በቀዳሚ ግምገማዎች ላይ ያለው ስምዎ",
+    "ደረጃ",
+    "በቀዳሚ",
+    "በቀዳሚ ግምገማዎች ላይ ያለው",
+    "ማስጠንቀቂያ ",
+    "ግምገማዎች ላይ"
+  ],
+  "ar": [
+    "لا يمكن",
+    "لا",
+    "غير",
+    "لن",
+    "لم يكن"
+  ],
+  "az": [
+    "bilmirəm",
+    "yoxdur",
+    "otaqlar",
+    "yox idi"
+  ],
+  "be": [
+    "не магу",
+    "не",
+    "нумары",
+    "не было"
+  ],
+  "bg": [
+    "не мога да",
+    "не",
+    "стаи",
+    "не е"
+  ],
+  "bn": [
+    "পারে না",
+    "না",
+    "অ",
+    "ছিল না"
+  ],
+  "bs": [
+    "ne mogu",
+    "ne",
+    "non",
+    "nećeš",
+    "zar ne",
+    "nije"
+  ],
+  "ca": [
+    "no pot",
+    "no"
+  ],
+  "ceb": [
+    "dili",
+    "non"
+  ],
+  "co": [],
+  "cs": [
+    "nemůžu",
+    "ne",
+    "nemá",
+    "non",
+    "nebude",
+    "není",
+    "nebyl"
+  ],
+  "cy": [
+    "allwch",
+    "peidiwch â",
+    "nid oes",
+    "nid",
+    "nad ydynt yn",
+    "ni fydd",
+    "nid yw",
+    "nid oedd"
+  ],
+  "da": [
+    "kan ikke",
+    "ikke",
+    "vil ikke",
+    "er det ikke",
+    "var det ikke"
+  ],
+  "de": [
+    "nicht",
+    "war nicht"
+  ],
+  "el": [
+    "δεν μπορεί να",
+    "δεν",
+    "μη",
+    "δεν θα",
+    "δεν είναι",
+    "δεν ήταν"
+  ],
+  "en": [
+    "can't",
+    "don't",
+    "doesn't",
+    "not",
+    "non",
+    "won't",
+    "isn't",
+    "wasn't",
+    "cant",
+    "dont",
+    "doesnt",
+    "not",
+    "non",
+    "wont",
+    "isnt",
+    "wasnt"
+  ],
+  "eo": [
+    "ne povas",
+    "ne"
+  ],
+  "es": [
+    "no se puede",
+    "no",
+    "no era"
+  ],
+  "et": [
+    "ei saa",
+    "ei",
+    "mitte",
+    "ei ole",
+    "ei olnud"
+  ],
+  "eu": [
+    "ezin",
+    "ez",
+    "ez da",
+    "ez zen"
+  ],
+  "fa": [
+    "نمی تواند",
+    "نمی",
+    "نه",
+    "غیر",
+    "نیست",
+    "نبود"
+  ],
+  "fi": [
+    "voi",
+    "älä",
+    "ei",
+    "ei ole",
+    "ei ollut"
+  ],
+  "fr": [
+    "ne peut pas",
+    "ne pas",
+    "pas",
+    "non",
+    "ne",
+    "n'estce pas",
+    "n'était pas"
+  ],
+  "fy": [],
+  "ga": [
+    "ní féidir",
+    "ná",
+    "ní",
+    "neamh",
+    "ní bheidh",
+    "nach bhfuil",
+    "ní raibh"
+  ],
+  "gd": [
+    "chan urrainn",
+    "don't",
+    "doesn'",
+    "chan eil",
+    "neo",
+    "choisinn cha",
+    "chan eil cha",
+    "cha robh"
+  ],
+  "gl": [
+    "non pode",
+    "non",
+    "non é",
+    "non era"
+  ],
+  "gu": [
+    "નથી કરી શકો છો",
+    "નથી",
+    "બિન",
+    "નહીં",
+    "ન હતી"
+  ],
+  "ha": [],
+  "haw": [],
+  "hi": [
+    "नहीं कर सकते हैं",
+    "नहीं",
+    "गैर",
+    "नहीं होंगे",
+    "नहीं है",
+    "नहीं था"
+  ],
+  "hmn": [],
+  "hr": [
+    "ne mogu",
+    "ne",
+    "sobe",
+    "nije bilo"
+  ],
+  "ht": [
+    "ka",
+    "pa",
+    "ki pa peye",
+    "se pa",
+    "pa t'"
+  ],
+  "hu": [
+    "nem"
+  ],
+  "hy": [
+    "չեմ կարող",
+    "ոչ",
+    "սենյակներ",
+    "չի եղել"
+  ],
+  "id": [
+    "tidak bisa",
+    "jangan",
+    "tidak",
+    "non"
+  ],
+  "ig": [],
+  "is": [
+    "getur ekki",
+    "ekki",
+    "skiptir ekki",
+    "non",
+    "er ekki",
+    "var ekki"
+  ],
+  "it": [
+    "non",
+    "non può",
+    "non possono",
+    "non poteva",
+    "non potrà",
+    "non è",
+    "non sono",
+    "non saranno",
+    "non ha",
+    "non hanno",
+    "non avrà",
+    "non aveva",
+    "non era"
+  ],
+  "iw": [],
+  "ja": [
+    "できない",
+    "な",
+    "ない",
+    "不"
+  ],
+  "jw": [],
+  "ka": [
+    "არ შეიძლება",
+    "არ",
+    "არა",
+    "არ არის",
+    "არ იყო"
+  ],
+  "kk": [
+    "жоқ",
+    "нөмірлері"
+  ],
+  "km": [
+    "មិនអាច",
+    "មិនបាន",
+    "មិន",
+    "មិនមែន",
+    "នឹងមិន"
+  ],
+  "kn": [
+    "ಸಾಧ್ಯವಿಲ್ಲ",
+    "ಇಲ್ಲ",
+    "ಅಲ್ಲ",
+    "ಅ",
+    "ಮಾಡುವುದಿಲ್ಲ"
+  ],
+  "ko": [
+    "할 수 없",
+    "지",
+    "비",
+    "지 않았"
+  ],
+  "ku": [],
+  "ky": [
+    "айта албайм",
+    "эмес",
+    "номерин",
+    "болгон эмес"
+  ],
+  "la": [
+    "non potest",
+    "non"
+  ],
+  "lb": [
+    "net",
+    "war net"
+  ],
+  "lo": [
+    "ບໍ່ສາມາດ",
+    "ບໍ່",
+    "ບໍ່ໄດ້",
+    "ຈະບໍ່ໄດ້",
+    "ບໍ່ແມ່ນ"
+  ],
+  "lt": [
+    "negaliu",
+    "nereikia",
+    "nėra",
+    "ne",
+    "nebus",
+    "nebuvau"
+  ],
+  "lv": [
+    "nevar",
+    "nav",
+    "nebūs",
+    "nebija"
+  ],
+  "mg": [
+    "tsy afaka",
+    "tsy"
+  ],
+  "mi": [
+    "e kore e taea e",
+    "kaua e",
+    "e kore e",
+    "kore",
+    "e kore te mea",
+    "kihai i"
+  ],
+  "mk": [
+    "не може да се",
+    "не",
+    "нема да",
+    "не е",
+    "не беше"
+  ],
+  "ml": [
+    "കഴിയില്ല.",
+    "don ' t",
+    "ഇല്ല",
+    "അല്ല",
+    "non",
+    "won ' t",
+    "ആയിരുന്നില്ല."
+  ],
+  "mn": [
+    "чадахгүй",
+    "байхгүй бол",
+    "биш",
+    "бус",
+    "байх болно",
+    "биш байсан"
+  ],
+  "mr": [
+    "करू शकत नाही",
+    "नाही",
+    "अ",
+    "होणार नाही"
+  ],
+  "ms": [
+    "tidak boleh",
+    "jangan",
+    "tidak",
+    "bukan",
+    "tidak akan",
+    "bukankah"
+  ],
+  "mt": [
+    "ma tista",
+    "ma",
+    "mhux",
+    "mhux se",
+    "mhuwiex",
+    "ma kienx"
+  ],
+  "my": [
+    "မ",
+    "ဘူး",
+    "မည်မဟုတ်",
+    "မဟုတ်ခဲ့"
+  ],
+  "ne": [
+    "सक्दैन",
+    "छैन",
+    "गैर",
+    "थिएन"
+  ],
+  "nl": [
+    "kan niet",
+    "niet",
+    "was niet"
+  ],
+  "no": [
+    "kan ikke",
+    "ikke",
+    "var ikke"
+  ],
+  "ny": [],
+  "pa": [
+    "ਨਾ ਕਰ ਸਕਦਾ ਹੈ",
+    "ਨਾ ਕਰੋ",
+    "ਨਹੀ ਕਰਦਾ ਹੈ",
+    "ਨਾ",
+    "ਗੈਰ",
+    "ਨਾ ਕਰੇਗਾ",
+    "ਨਹੀ ਹੈ,",
+    "ਨਾ ਕੀਤਾ ਗਿਆ ਸੀ"
+  ],
+  "pl": [
+    "nie mogę",
+    "nie",
+    "pokoje",
+    "nie było"
+  ],
+  "ps": [],
+  "pt": [
+    "não pode",
+    "não",
+    "não era"
+  ],
+  "ro": [
+    "nu pot",
+    "nu",
+    "non"
+  ],
+  "ru": [
+    "не могу",
+    "не",
+    "номера",
+    "не было"
+  ],
+  "sd": [],
+  "si": [
+    "බෑ",
+    "නෑ",
+    "නොවන",
+    "නේද"
+  ],
+  "sk": [
+    "neda",
+    "nemám",
+    "nemá",
+    "nie",
+    "non",
+    "nebude",
+    "nie je",
+    "nebol"
+  ],
+  "sl": [
+    "ne morem",
+    "ne",
+    "ni",
+    "ni bilo"
+  ],
+  "sm": [],
+  "sn": [],
+  "so": [],
+  "sq": [
+    "nuk mund të",
+    "nuk",
+    "jo",
+    "nuk do të",
+    "nuk është e",
+    "nuk ishte"
+  ],
+  "sr": [
+    "не могу да",
+    "не",
+    "бројеви",
+    "није било"
+  ],
+  "st": [],
+  "su": [
+    "bisa",
+    "teu",
+    "non",
+    "moal"
+  ],
+  "sv": [
+    "kan inte",
+    "inte",
+    "icke",
+    "var inte"
+  ],
+  "sw": [
+    "hawezi",
+    "je, si",
+    "haina",
+    "si",
+    "mashirika yasiyo ya",
+    "haikuwa"
+  ],
+  "ta": [
+    "முடியாது",
+    "வேண்டாம்",
+    "இல்லை",
+    "அல்லாத"
+  ],
+  "te": [
+    "కాదు",
+    "లేదు",
+    "నాన్",
+    "won ' t"
+  ],
+  "tg": [
+    "наметавонам",
+    "не",
+    "рақамҳои",
+    "буд,"
+  ],
+  "th": [
+    "ไม่สามารถ",
+    "ไม่",
+    "ไม่ใช่"
+  ],
+  "tl": [
+    "hindi",
+    "di"
+  ],
+  "tr": [
+    "yapamam",
+    "yapma",
+    "değil",
+    "olmayan",
+    "olmaz",
+    "değildi"
+  ],
+  "uk": [
+    "не можу",
+    "не",
+    "номери",
+    "не було"
+  ],
+  "ur": [
+    "نہیں کر سکتے ہیں",
+    "نہیں",
+    "غیر",
+    "نہیں تھا"
+  ],
+  "uz": [
+    "mumkin emas",
+    "yo'q",
+    "yo'q qilmaydi,",
+    "nooziq",
+    "bo'lmaydi",
+    "yo'q emas",
+    "emas edi"
+  ],
+  "vi": [
+    "không thể",
+    "đừng",
+    "đó không",
+    "không",
+    "sẽ không",
+    "phải không",
+    "không phải"
+  ],
+  "xh": [
+    "andinaku",
+    "musa",
+    "akuthethi ukuba",
+    "hayi",
+    "non",
+    "uphumelele khange",
+    "ayonto",
+    "akusebenzi khange"
+  ],
+  "yi": [
+    "קענען ניט",
+    "טאָן ניט",
+    "טוט ניט",
+    "ניט",
+    "וועט ניט",
+    "איז נישט"
+  ],
+  "yo": [],
+  "zhtw": [],
+  "zh": [
+    "不能",
+    "不不",
+    "不",
+    "非",
+    "会不会",
+    "是不是"
+  ],
+  "zu": []
+}
