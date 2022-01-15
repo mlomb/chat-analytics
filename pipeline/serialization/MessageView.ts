@@ -22,7 +22,7 @@ export class MessageView {
         this.hour = stream.getBits(5);
         this.authorIndex = stream.getBits(config.authorIdxBits);
         this.langIndex = stream.getBits(8);
-        this.sentiment = stream.getBits(8);
+        this.sentiment = stream.getBits(8) - 128;
 
         const flags = stream.getBits(8);
         if (flags & MessageFlags.Text) {

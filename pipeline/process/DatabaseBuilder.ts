@@ -235,7 +235,8 @@ export class DatabaseBuilder {
                 }
             }
 
-            // tokenize
+            // parse tokens
+            let sentiment = 0;
             const tokens = tokenizations[i];
             if (tokens.length > 0) {
                 // process tokens
@@ -270,8 +271,7 @@ export class DatabaseBuilder {
                 }
 
                 // sentiment analysis
-                analyzeSentiment(tokens);
-                // TODO: do something
+                sentiment = analyzeSentiment(tokens, langIndex) || 0;
             }
 
             // store message
@@ -282,7 +282,7 @@ export class DatabaseBuilder {
                     hour: date.getHours(),
                     authorIndex: msg.authorIndex,
                     langIndex,
-                    sentiment: 42,
+                    sentiment,
                     words: countsToArray(wordsCount),
                     emojis: countsToArray(emojisCount),
                     mentions: countsToArray(mentionsCount),
