@@ -7,10 +7,7 @@ export type RawID = string | number;
 // a zero-based index
 export type Index = number;
 
-// offset in bytes in a Uint8Array buffer
-export type Address = number;
-
-// offset in BITS in a BitBuffer
+// offset in BITS in a BitStream
 export type BitAddress = number;
 
 // UTC timestamp
@@ -80,7 +77,7 @@ export interface Channel extends IChannel {
     // name searchable
     ns: string;
     // messages location
-    msgAddr: Address;
+    msgAddr: BitAddress;
     msgCount: number;
 }
 
