@@ -48,6 +48,9 @@ const numberFormatterFns = {
             result += minutes + "m";
             unitsShown++;
         }
+        if (unitsShown === 0) {
+            result += "0m";
+        }
 
         return result;
     },
