@@ -22,8 +22,7 @@ export class DataProvider extends EventEmitter {
 
     // active blocks
     // we track keys and ids because there can be multiple instances of the same block key (with different IDs)
-    private activeBlocks: Set<BlockKey> = new Set();
-    private activeBlockIds: Set<number> = new Set();
+    private activeBlocks: Set<`${BlockKey}|${number}`> = new Set();
 
     // active filters
     private activeChannels: Index[] = [];
@@ -70,17 +69,15 @@ export class DataProvider extends EventEmitter {
     }
 
     toggleBlock(blockKey: BlockKey, id: number, active: boolean) {
+        const key: `${BlockKey}|${number}` = `${blockKey}|${id}`;
+
         if (active) {
-            this.activeBlockIds.add(id);
-            this.activeBlocks.add(blockKey);
+            this.activeBlocks.add(key);
 
             // try to dispatch right away
             this.tryToDispatchWork();
         } else {
-            if (this.activeBlockIds.has(id)) {
-                this.activeBlocks.delete(blockKey);
-                this.activeBlockIds.delete(id);
-            }
+            this.activeBlocks.delete(key);
         }
     }
 
@@ -115,12 +112,14 @@ export class DataProvider extends EventEmitter {
         }
 
         // pick an active block that is not ready
-        const pendingBlocks = Array.from(this.activeBlocks).filter((k) => !this.readyBlocks.has(k));
+        const pendingBlocks = Array.from(this.activeBlocks).filter(
+            (k) => !this.readyBlocks.has(k.split("|")[0] as BlockKey)
+        );
 
         // if there is pending work and the worker is available
         if (pendingBlocks.length > 0 && this.currentBlock === undefined) {
             // work goes brrr
-            this.dispatchWork(pendingBlocks[0]);
+            this.dispatchWork(pendingBlocks[0].split("|")[0] as BlockKey);
         }
     }
 
