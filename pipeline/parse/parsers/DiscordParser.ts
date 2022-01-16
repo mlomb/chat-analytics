@@ -44,10 +44,10 @@ export class DiscordParser extends Parser {
             author.da = (" " + avatar).substring(1); // avoid leak
         }
 
-        const authorIndex = this.builder.addAuthor(message.author.id, author);
-
         // :)
         if (message.type == "Default" || message.type == "Reply") {
+            const authorIndex = this.builder.addAuthor(message.author.id, author);
+
             let content = message.content;
             for (const mention of message.mentions) {
                 // replace names by nicknames in mentions

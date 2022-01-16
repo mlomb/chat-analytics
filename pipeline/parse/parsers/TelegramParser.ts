@@ -41,13 +41,13 @@ export class TelegramParser extends Parser {
         const timestamp = Date.parse(message.date);
         const timestampEdit = message.edited ? Date.parse(message.edited) : undefined;
 
-        // NOTE: I can't find a reliable way to detect if a user is a bot :(
-        const authorIndex = this.builder.addAuthor(rawAuthorId, {
-            // use the ID as name if no nickname is available
-            n: message.from || rawId,
-        });
-
         if (message.type === "message") {
+            // NOTE: I can't find a reliable way to detect if a user is a bot :(
+            const authorIndex = this.builder.addAuthor(rawAuthorId, {
+                // use the ID as name if no nickname is available
+                n: message.from || rawId,
+            });
+
             let content = this.parseTextArray(message.text);
             let attachment: AttachmentType | undefined;
 
