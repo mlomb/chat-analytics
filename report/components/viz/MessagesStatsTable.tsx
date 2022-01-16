@@ -95,18 +95,41 @@ const MessagesStatsTable = ({ data }: { data?: MessagesStats }) => {
             type: "number",
             formatter: "time",
             label: "Longest period without messages",
-            value: data ? data.timeWithoutMessages.minutes * 60 : undefined,
+            value: data ? data.longestTimeWithoutMessages.minutes * 60 : undefined,
             tooltip: (
                 <>
                     Longest inactivity period:
                     <br />
                     <b>
-                        from {data?.timeWithoutMessages.start}
+                        from {data?.longestTimeWithoutMessages.start}
                         <br />
-                        to {data?.timeWithoutMessages.end}
+                        to {data?.longestTimeWithoutMessages.end}
                     </b>
                     <br />
                     (rounded to 5 minutes)
+                </>
+            ),
+        },
+        {
+            type: "number",
+            formatter: "time",
+            label: "Longest active conversation",
+            value: data ? data.longestActiveConversation.minutes * 60 : undefined,
+            tooltip: (
+                <>
+                    Longest active conversation:
+                    <br />
+                    <b>
+                        from {data?.longestActiveConversation.start}
+                        <br />
+                        to {data?.longestActiveConversation.end}
+                    </b>
+                    <br />
+                    (rounded to 5 minutes)
+                    <br />
+                    <br />
+                    <b>❓ Active conversation:</b> considered still active if the time between the previous and next
+                    message is less than 10 minutes. Makes more sense when filtering by a single channel.
                 </>
             ),
         },

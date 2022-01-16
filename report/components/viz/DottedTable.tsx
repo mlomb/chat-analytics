@@ -24,12 +24,32 @@ const numberFormatterFns = {
     integer: (n: number) => Math.round(n).toLocaleString(),
     decimal: (n: number) => n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
     time: (n: number) => {
-        const hours = Math.max(n / 3600, 0);
-        if (hours > 72) {
-            return numberFormatterFns.decimal(hours / 24) + " days";
-        } else {
-            return numberFormatterFns.decimal(hours) + " hours";
+        // n in seconds
+        // expected formats:
+        // XXd XXh
+        // XXh XXm
+        // XXm
+
+        const days = Math.floor(n / (24 * 60 * 60));
+        const hours = Math.floor((n % (24 * 60 * 60)) / (60 * 60));
+        const minutes = Math.floor((n % (60 * 60)) / 60);
+        let result = "";
+        let unitsShown = 0;
+
+        if (days > 0) {
+            result += days + "d ";
+            unitsShown++;
         }
+        if (hours > 0) {
+            result += hours + "h ";
+            unitsShown++;
+        }
+        if (unitsShown < 2 && minutes > 0) {
+            result += minutes + "m";
+            unitsShown++;
+        }
+
+        return result;
     },
 };
 
