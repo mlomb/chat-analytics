@@ -409,7 +409,7 @@ export class DatabaseBuilder {
         authorsOrder.sort((a, b) =>
             // first non-bots, then by messages count
             this.authors.data[a].b === this.authors.data[b].b
-                ? this.authorMessagesCount[b] - this.authorMessagesCount[a]
+                ? (this.authorMessagesCount[b] || 0) - (this.authorMessagesCount[a] || 0)
                 : +(this.authors.data[a].b || false) - +(this.authors.data[b].b || false)
         );
         const authorsBotCutoff: number = authorsOrder.findIndex((i) => this.authors.data[i].b);
