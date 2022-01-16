@@ -2,12 +2,15 @@ import { AttachmentType } from "@pipeline/Types";
 import { Day } from "@pipeline/Time";
 import { MessagesStats } from "@pipeline/aggregate/blocks/MessagesStats";
 import DottedTable, { Line } from "@report/components/viz/DottedTable";
+import { useDataProvider } from "@report/DataProvider";
 
 const timeFormat = (day: Day, secondsOfDay: number): string => {
     return "a date";
 };
 
 const MessagesStatsTable = ({ data }: { data?: MessagesStats }) => {
+    const dataProvider = useDataProvider();
+
     const lines: Line[] = [
         {
             type: "number",
@@ -56,6 +59,10 @@ const MessagesStatsTable = ({ data }: { data?: MessagesStats }) => {
             label: "🎉 with stickers",
             depth: 1,
             value: data?.attachmentsCount[AttachmentType.Sticker],
+            tooltip:
+                dataProvider.database.config.platform === "discord"
+                    ? "Discord exports do not include stickers for now."
+                    : undefined,
         },
         {
             type: "number",
@@ -89,9 +96,19 @@ const MessagesStatsTable = ({ data }: { data?: MessagesStats }) => {
             formatter: "time",
             label: "Longest period without messages",
             value: data ? data.timeWithoutMessages.minutes * 60 : undefined,
-            tooltip: data
-                ? `Longest inactivity period:\n${data.timeWithoutMessages.start}\nto\n${data.timeWithoutMessages.end}\n(rounded to 5 minutes)`
-                : "",
+            tooltip: (
+                <>
+                    Longest inactivity period:
+                    <br />
+                    <b>
+                        from {data?.timeWithoutMessages.start}
+                        <br />
+                        to {data?.timeWithoutMessages.end}
+                    </b>
+                    <br />
+                    (rounded to 5 minutes)
+                </>
+            ),
         },
         {
             type: "number",

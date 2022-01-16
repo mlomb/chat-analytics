@@ -125,8 +125,9 @@ export const genTimeKeys = (start: Day, end: Day): TimeKeysResult => {
     return { dateKeys, monthKeys, dateToMonthIndex };
 };
 
-export const formatTime = (day: Day, seconds: number): string => {
+export const formatTime = (day: Day, seconds: number, hideSeconds: boolean = true): string => {
     const d = day.toDate();
     d.setSeconds(seconds);
-    return d.toLocaleString();
+    const str = d.toLocaleString();
+    return hideSeconds && str.endsWith(":00") ? str.slice(0, -3) : str;
 };
