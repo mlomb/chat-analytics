@@ -23,14 +23,21 @@
                 ". . . . . . . . . . . . . . . . . . . . " ". . . . . . . . . . . . . . . . . . . . "
                 ". . . . . . . . . . . . . . . . . . . . ";
         }
-        span:first-child {
-            padding-right: 0.33em;
-            background: #22292f;
-        }
-        span + span {
-            float: right;
-            padding-left: 0.33em;
-            background: #22292f;
-        }
+    }
+}
+
+.DottedTable__key {
+    padding-right: 0.33em;
+    background: #22292f;
+}
+.DottedTable__value {
+    float: right;
+    padding-left: 0.33em;
+    background: #22292f;
+    display: flex;
+    align-items: center;
+
+    .Tooltip {
+        margin-right: 3px;
     }
 }

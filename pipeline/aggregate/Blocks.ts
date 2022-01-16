@@ -1,9 +1,15 @@
 import { Database } from "@pipeline/Types";
+import { TimeKeysResult } from "@pipeline/Time";
 import { Filters } from "@pipeline/aggregate/Filters";
+
+// this is data used by multiple blocks and can be computed only once
+export interface CommonBlockData {
+    timeKeys: TimeKeysResult;
+}
 
 export type BlockState = "loading" | "stale" | "ready" | "error";
 export type BlockTrigger = "authors" | "channels" | "time";
-export type BlockFn<T> = (database: Database, filters: Filters) => T;
+export type BlockFn<T> = (database: Database, filters: Filters, common: CommonBlockData) => T;
 export type BlockDescription<K, T> = {
     key: K;
     triggers: BlockTrigger[];
