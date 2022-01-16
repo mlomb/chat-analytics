@@ -7,6 +7,10 @@
         overflow-x: hidden;
         list-style: none;
 
+        li {
+            display: flex;
+        }
+
         li:before {
             float: left;
             width: 0;
@@ -26,9 +30,12 @@
     }
 }
 
-.DottedTable__key {
+.DottedTable__label {
     padding-right: 0.33em;
     background: #22292f;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
 }
 .DottedTable__value {
     float: right;
@@ -36,8 +43,10 @@
     background: #22292f;
     display: flex;
     align-items: center;
+    margin-left: auto;
+    white-space: nowrap;
 
-    .Tooltip {
+    img {
         margin-right: 3px;
     }
 }

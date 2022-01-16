@@ -12,7 +12,7 @@ interface NumberLine {
 
 export type Line = NumberLine & {
     label: string;
-    tooltip?: string;
+    tooltip?: React.ReactElement | string;
     depth?: number;
 };
 
@@ -51,19 +51,17 @@ const LineItem = ({ line }: { line: Line }) => {
             break;
     }
 
+    const valueContainer = (
+        <span className="DottedTable__value" style={{ fontWeight: depth === 0 ? "bold" : undefined }}>
+            {line.tooltip ? <img src={InfoIcon} height={16} /> : null}
+            {value}
+        </span>
+    );
+
     return (
         <li style={{ paddingLeft: 20 * depth, color: depth === 1 ? "#c7c7c7" : undefined }}>
-            <span className="DottedTable__key">{line.label}</span>
-            <span className="DottedTable__value" style={{ fontWeight: depth === 0 ? "bold" : undefined }}>
-                {line.tooltip && (
-                    <div className="TooltipWrapper">
-                        <Tooltip content={line.tooltip} position="left">
-                            <img src={InfoIcon} height={16} />
-                        </Tooltip>
-                    </div>
-                )}
-                {value}
-            </span>
+            <span className="DottedTable__label" title={line.label} children={line.label} />
+            {line.tooltip ? <Tooltip content={line.tooltip} children={valueContainer} /> : valueContainer}
         </li>
     );
 };
