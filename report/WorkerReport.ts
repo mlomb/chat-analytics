@@ -1,10 +1,10 @@
 export default null as any;
 
 import { Database, Index } from "@pipeline/Types";
-import { Blocks, BlockDescriptions, BlockKey, BlockInfo } from "@pipeline/aggregate/Blocks";
+import { Blocks, BlockDescriptions, BlockKey, BlockInfo, CommonBlockData } from "@pipeline/aggregate/Blocks";
 import { Filters } from "@pipeline/aggregate/Filters";
 import { decompress } from "@pipeline/compression/Compression";
-import { DateKey } from "@pipeline/Time";
+import { DateKey, Day, genTimeKeys } from "@pipeline/Time";
 
 export interface InitMessage {
     type: "init";
@@ -36,10 +36,14 @@ export interface BlockResultMessage<K extends BlockKey> {
 
 let database: Database | null = null;
 let filters: Filters | null = null;
+let common: CommonBlockData | null = null;
 
 const init = (msg: InitMessage) => {
     database = decompress(msg.dataStr);
     filters = new Filters(database);
+    common = {
+        timeKeys: genTimeKeys(Day.fromKey(database.time.minDate), Day.fromKey(database.time.maxDate)),
+    };
 
     self.postMessage(<ReadyMessage>{
         type: "ready",
@@ -56,7 +60,7 @@ const init = (msg: InitMessage) => {
 };
 
 const request = async (msg: BlockRequestMessage) => {
-    if (!database || !filters) throw new Error("No data provided");
+    if (!database || !filters || !common) throw new Error("No data provided");
 
     // update active data if provided
     if (msg.filters.channels) filters.updateChannels(msg.filters.channels);
@@ -77,7 +81,7 @@ const request = async (msg: BlockRequestMessage) => {
         if (!(msg.blockKey in Blocks)) throw new Error("BlockFn not found");
 
         console.time(msg.blockKey);
-        const data = Blocks[msg.blockKey].fn(database, filters);
+        const data = Blocks[msg.blockKey].fn(database, filters, common);
         console.timeEnd(msg.blockKey);
 
         result.blockInfo = {

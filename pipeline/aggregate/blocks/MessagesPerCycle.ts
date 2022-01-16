@@ -13,16 +13,13 @@ export interface MessagesPerCycle {
     perMonth: MessagesInDate[];
 }
 
-const fn: BlockFn<MessagesPerCycle> = (database, filters) => {
+const fn: BlockFn<MessagesPerCycle> = (database, filters, common) => {
     const res: MessagesPerCycle = {
         perDay: [],
         perMonth: [],
     };
 
-    const { dateKeys, monthKeys, dateToMonthIndex } = genTimeKeys(
-        Day.fromKey(database.time.minDate),
-        Day.fromKey(database.time.maxDate)
-    );
+    const { dateKeys, monthKeys, dateToMonthIndex } = common.timeKeys;
 
     // fill empty
     for (const dateKey of dateKeys) {

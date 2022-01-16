@@ -30,7 +30,7 @@ const ReportDashboard = () => {
                         blockKey="messages-per-cycle"
                         children={MessagesGraph}
                     />
-                    <Card num={1} title="Messages stats" blockKey="messages-stats" children={MessagesStatsTable} />
+                    <Card num={1} title="Message statistics" blockKey="messages-stats" children={MessagesStatsTable} />
                     <Card num={1} blockKey="messages-stats" title="Poner algo aca" children={() => <div>a</div>} />
                     <Card
                         num={1}

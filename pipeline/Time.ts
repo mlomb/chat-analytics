@@ -93,7 +93,7 @@ export class Day {
     }
 }
 
-interface TimeKeysResult {
+export interface TimeKeysResult {
     dateKeys: DateKey[];
     monthKeys: MonthKey[];
     // correspondance between dateKey and monthKeys
@@ -123,4 +123,10 @@ export const genTimeKeys = (start: Day, end: Day): TimeKeysResult => {
     }
 
     return { dateKeys, monthKeys, dateToMonthIndex };
+};
+
+export const formatTime = (day: Day, seconds: number): string => {
+    const d = day.toDate();
+    d.setSeconds(seconds);
+    return d.toLocaleString();
 };
