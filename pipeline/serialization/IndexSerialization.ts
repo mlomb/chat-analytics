@@ -104,7 +104,7 @@ export const writeIndexArray = (counts: [Index, number][], stream: BitStream, bi
                 const diff = counts[i][0] - lastIndex;
                 // delta encoding
                 stream.setBits(bitsPerIndex, diff);
-                lastIndex = counts[i][0];
+                lastIndex += diff;
                 written++;
             }
         }
@@ -140,12 +140,13 @@ export const readIndexArray = (stream: BitStream, bitsPerIndex: number): [Index,
             const diff = stream.getBits(bitsPerIndex);
             if (lastIndex === -1) {
                 counts.push([diff, 1]);
+                lastIndex = diff;
             } else if (diff === 0) {
                 counts[counts.length - 1][1]++;
             } else {
                 counts.push([lastIndex + diff, 1]);
+                lastIndex += diff;
             }
-            lastIndex = diff;
         }
     } else {
         // RLE

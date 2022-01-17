@@ -383,7 +383,7 @@ export class DatabaseBuilder {
         const finalBitConfig: MessageBitConfig = {
             dayBits: Math.max(1, numBitsFor(dateKeys.length)),
             authorIdxBits: Math.max(1, numBitsFor(this.authors.size)),
-            wordIdxBits: Math.max(1, numBitsFor(this.words.size)),
+            wordIdxBits: Math.max(1, numBitsFor(newWords.length)),
             emojiIdxBits: Math.max(1, numBitsFor(this.emojis.size)),
             mentionsIdxBits: Math.max(1, numBitsFor(this.mentions.size)),
             domainsIdxBits: Math.max(1, numBitsFor(this.domains.size)),
@@ -477,22 +477,33 @@ export class DatabaseBuilder {
         newWords: string[];
         newWordsMapping: number[];
     } {
-        progress.new("Filtering words");
-
-        let words = this.words.data.map((word, i) => [i, word]) as [Index, string][];
+        const len = this.words.size;
 
         // filter words in case we have too many
-        if (words.length > 100000) {
-            // we will keep the word if it has been said at least twice
-            words = words.filter((e) => this.wordsCount[e[0]] >= 2);
+        if (len > 100000) {
+            const newWords: string[] = [];
+            const newWordsMapping: number[] = new Array(len).fill(-1);
+
+            progress.new("Filtering words");
+            for (let i = 0; i < len; i++) {
+                // we will keep the word if it has been said at least twice
+                if (this.wordsCount[i] >= 2) {
+                    newWordsMapping[i] = newWords.length;
+                    newWords.push(this.words.data[i]);
+                }
+                progress.progress("number", i, len);
+            }
+            progress.done();
+
+            // NOTE: I tried sorting alphabetically to improve compression, but it was worse
+
+            return { newWords, newWordsMapping };
+        } else {
+            const newWords = this.words.data;
+            const newWordsMapping = Array(len)
+                .fill(0)
+                .map((_, i) => i);
+            return { newWords, newWordsMapping };
         }
-
-        // NOTE: I tried sorting alphabetically, but it was worse
-
-        const newWords = words.map((e) => e[1]);
-        const newWordsMapping = words.map((e) => e[0]);
-
-        progress.done();
-        return { newWords, newWordsMapping };
     }
 }
