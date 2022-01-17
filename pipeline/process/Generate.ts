@@ -7,14 +7,12 @@ import { DiscordParser } from "@pipeline/parse/parsers/DiscordParser";
 import { TelegramParser } from "@pipeline/parse/parsers/TelegramParser";
 import { WhatsAppParser } from "@pipeline/parse/parsers/WhatsAppParser";
 import { DatabaseBuilder } from "@pipeline/process/DatabaseBuilder";
-import { loadTextData } from "@pipeline/process/Text";
 import { compress } from "@pipeline/compression/Compression";
 
 export const generateDatabase = async (files: FileInput[], config: ReportConfig): Promise<Database> => {
-    // load data needed for text processing
-    await loadTextData();
-
     let builder: DatabaseBuilder = new DatabaseBuilder(config);
+    // load data needed for processing
+    await builder.init();
 
     // create parser
     let parser: Parser | null = null;

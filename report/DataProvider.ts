@@ -2,6 +2,7 @@ import EventEmitter from "events";
 
 import { Database, Index } from "@pipeline/Types";
 import { Day } from "@pipeline/Time";
+import { searchFormat } from "@pipeline/Text";
 import { BlockDescriptions, BlockInfo, BlockKey, BlockTrigger } from "@pipeline/aggregate/Blocks";
 
 import Worker, { BlockRequestMessage, BlockResultMessage, InitMessage, ReadyMessage } from "@report/WorkerReport";
@@ -34,6 +35,7 @@ export class DataProvider extends EventEmitter {
 
     // Updated by this class and the Worker
     public database!: Database;
+    public wordsSearchFormat!: string[];
     private blocksDescs?: BlockDescriptions;
     private readyBlocks: Set<BlockKey> = new Set();
 
@@ -55,6 +57,8 @@ export class DataProvider extends EventEmitter {
         const res = e.data;
         if (res.type === "ready") {
             this.database = res.database;
+            // compute search format for words
+            this.wordsSearchFormat = this.database.words.map((word) => searchFormat(word));
             this.blocksDescs = res.blocksDescs;
             // set default time range
             this.activeStartDate = Day.fromKey(res.database.time.minDate);

@@ -1,9 +1,9 @@
 import { unzipSync } from "fflate";
 import { Index } from "@pipeline/Types";
 import { Token, tokenize } from "@pipeline/process/Tokenizer";
-import { normalizeText } from "./Text";
 import { progress } from "@pipeline/Progress";
 import { LanguageCodes } from "@pipeline/Languages";
+import { normalizeText } from "@pipeline/Text";
 
 type EmojiData = {
     sequence: string;

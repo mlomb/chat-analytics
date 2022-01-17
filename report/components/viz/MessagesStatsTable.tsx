@@ -4,10 +4,6 @@ import { MessagesStats } from "@pipeline/aggregate/blocks/MessagesStats";
 import DottedTable, { Line } from "@report/components/viz/DottedTable";
 import { useDataProvider } from "@report/DataProvider";
 
-const timeFormat = (day: Day, secondsOfDay: number): string => {
-    return "a date";
-};
-
 const MessagesStatsTable = ({ data }: { data?: MessagesStats }) => {
     const dataProvider = useDataProvider();
 

@@ -1,4 +1,4 @@
-import { Database } from "@pipeline/Types";
+import { Database, Index } from "@pipeline/Types";
 import { TimeKeysResult } from "@pipeline/Time";
 import { Filters } from "@pipeline/aggregate/Filters";
 
@@ -19,10 +19,12 @@ export type BlockDescription<K, T> = {
 // register blocks
 import MessagesPerCycle from "@pipeline/aggregate/blocks/MessagesPerCycle";
 import MessagesStats from "@pipeline/aggregate/blocks/MessagesStats";
+import LanguageStats from "@pipeline/aggregate/blocks/LanguageStats";
 
 export const Blocks = {
     [MessagesPerCycle.key]: MessagesPerCycle,
     [MessagesStats.key]: MessagesStats,
+    [LanguageStats.key]: LanguageStats,
 } as const;
 
 export type BlockKey = keyof typeof Blocks;
@@ -34,3 +36,9 @@ export type BlockInfo<K extends BlockKey> = {
 export type BlockDescriptions = {
     [K in BlockKey]: Omit<BlockDescription<K, BlockDataType<K>>, "fn">;
 };
+
+// common interfaces used by multiple blocks
+export interface IndexEntry {
+    index: Index;
+    value: number;
+}

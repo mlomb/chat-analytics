@@ -1,13 +1,8 @@
 import { Index } from "@pipeline/Types";
-import { BlockDescription, BlockFn } from "@pipeline/aggregate/Blocks";
+import { BlockDescription, BlockFn, IndexEntry } from "@pipeline/aggregate/Blocks";
 import { parseAndFilterMessages } from "@pipeline/aggregate/Helpers";
 import { MessageView } from "@pipeline/serialization/MessageView";
 import { Day, formatTime } from "@pipeline/Time";
-
-interface MostEntry {
-    index: Index;
-    value: number;
-}
 
 interface PeriodStat {
     minutes: number;
@@ -31,8 +26,8 @@ export interface MessagesStats {
     withText: number;
     withLinks: number;
 
-    mostAuthors: MostEntry[];
-    mostChannels: MostEntry[];
+    mostAuthors: IndexEntry[];
+    mostChannels: IndexEntry[];
 }
 
 const fn: BlockFn<MessagesStats> = (database, filters, common) => {
