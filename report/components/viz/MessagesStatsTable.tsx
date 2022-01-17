@@ -133,11 +133,6 @@ const MessagesStatsTable = ({ data }: { data?: MessagesStats }) => {
                 </>
             ),
         },
-        {
-            type: "number",
-            formatter: "integer",
-            label: "Dummy entry",
-        },
     ];
 
     return (

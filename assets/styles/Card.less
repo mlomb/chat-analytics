@@ -22,6 +22,36 @@
     margin-bottom: 15px;
     text-align: center;
     border-bottom: 5px solid #282f35;
+
+    select {
+        display: inline-grid;
+        appearance: none;
+        background: none;
+        color: white;
+        font-family: inherit;
+        font-size: inherit;
+        border-bottom: 2px dotted #dddddd;
+        padding-right: 26px;
+        background-image: ~"url(@assets/images/icons/chevron-down.svg)";
+        background-repeat: no-repeat;
+        background-position-x: 95%;
+        background-position-y: 60%;
+
+        option {
+            background: #22292f;
+        }
+
+        &:focus {
+            outline: none;
+            border-bottom-color: #1ac6ff;
+        }
+    }
+
+    span + *,
+    select + * {
+        margin-left: 6px;
+        margin-left: 1ch;
+    }
 }
 .Card_overlay {
     position: absolute;

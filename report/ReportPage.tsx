@@ -31,7 +31,12 @@ const ReportDashboard = () => {
                         children={MessagesGraph}
                     />
                     <Card num={1} title="Message statistics" blockKey="messages-stats" children={MessagesStatsTable} />
-                    <Card num={1} blockKey="messages-stats" title="Poner algo aca" children={() => <div>a</div>} />
+                    <Card
+                        num={1}
+                        blockKey="messages-stats"
+                        title={["Peak Activity", ["overview", "heatmap"]]}
+                        children={() => <div>TO-DO</div>}
+                    />
                     <Card
                         num={1}
                         blockKey="messages-stats"
