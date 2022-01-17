@@ -13,20 +13,20 @@ import {
     ReportConfig,
 } from "@pipeline/Types";
 import { Day, genTimeKeys } from "@pipeline/Time";
+import { downloadFile } from "@pipeline/File";
 import { progress } from "@pipeline/Progress";
 import { BitStream } from "@pipeline/serialization/BitStream";
 import { IndexedData } from "@pipeline/process/IndexedData";
 import { Token, tokenize } from "@pipeline/process/Tokenizer";
 import { Sentiment } from "@pipeline/process/Sentiment";
-import { analyzeSentiment, detectLanguageLine, normalizeText, stripDiacritics } from "@pipeline/process/Text";
+import { FastTextModel, loadFastTextModel } from "@pipeline/process/FastTextModel";
+import { normalizeText, searchFormat } from "@pipeline/Text";
 import {
     MessageBitConfig,
     readIntermediateMessage,
     writeIntermediateMessage,
 } from "@pipeline/serialization/MessageSerialization";
-
-// TODO: !
-const searchFormat = (x: string) => x.toLocaleLowerCase();
+import { LanguageCodes } from "@pipeline/Languages";
 
 // section in the bitstream
 type ChannelSection = {
@@ -63,6 +63,7 @@ export class DatabaseBuilder {
     get numMentions() { return this.mentions.size; } // prettier-ignore
 
     // intermediate data
+    private stream: BitStream = new BitStream();
     private messageQueue: IMessage[] = []; // [ past ... future ]
     private totalMessages = 0;
     private channelSections: { [index: Index]: ChannelSection[] } = {};
@@ -70,11 +71,60 @@ export class DatabaseBuilder {
     private authorMessagesCount: number[] = [];
     private wordsCount: number[] = [];
     private languagesCount: { [lang: number]: number } = {};
-    private totalLangPredictions = 0;
 
-    private stream: BitStream = new BitStream();
+    // static data
+    private stopwords: Set<string> = new Set();
+    private langPredictModel: FastTextModel | null = null;
+    private sentiment: Sentiment | null = null;
 
     constructor(private readonly config: ReportConfig) {}
+
+    // download static data
+    public async init() {
+        // load stopwords
+        {
+            progress.new("Downloading file", "stopwords-iso.json");
+            interface StopwordsJSON {
+                [lang: string]: string[];
+            }
+            const data = (await downloadFile("data/stopwords-iso.json", "json")) as StopwordsJSON;
+
+            // combining all stopwords is a mistake?
+            this.stopwords = new Set(
+                Object.values(data)
+                    .reduce((acc, val) => acc.concat(val), [])
+                    .map((word) => searchFormat(word))
+            );
+            progress.done();
+        }
+
+        // load language detector model
+        this.langPredictModel = await loadFastTextModel("lid.176");
+
+        // load sentiment data
+        {
+            progress.new("Downloading file", "AFINN.zip");
+            const afinnZipBuffer = await downloadFile("data/AFINN.zip", "arraybuffer");
+            progress.done();
+            progress.new("Downloading file", "emoji-sentiment.json");
+            const emojiSentiment = await downloadFile("data/emoji-sentiment.json", "json");
+            progress.done();
+
+            this.sentiment = new Sentiment(afinnZipBuffer, emojiSentiment);
+        }
+    }
+
+    // NOTE: assumes the word is normalized and contains no newlines
+    private detectLanguageLine(line: string) {
+        const result = this.langPredictModel!.predict(line, 1, 0.0);
+        const code = result[0][1].slice(9); // "__label__".length === 9
+        return {
+            accuracy: result[0][0],
+            // ISO 639-2/3
+            iso639: code,
+            index: LanguageCodes.indexOf(code),
+        };
+    }
 
     public setTitle(title: string) {
         this.title = title;
@@ -175,10 +225,9 @@ export class DatabaseBuilder {
         }
         if (combined.length > 0) {
             const combinedWords = combined.join(" ");
-            const prediction = detectLanguageLine(combinedWords);
+            const prediction = this.detectLanguageLine(combinedWords);
             langIndex = prediction.index;
             this.languagesCount[langIndex] = (this.languagesCount[langIndex] || 0) + 1;
-            this.totalLangPredictions++;
         }
 
         interface Counts {
@@ -243,7 +292,7 @@ export class DatabaseBuilder {
                 // process tokens
                 for (const { tag, text } of tokens) {
                     if (tag === "word") {
-                        const wordKey = stripDiacritics(text).toLowerCase();
+                        const wordKey = searchFormat(text);
                         // only keep words between [2, 30] chars
                         if (text.length > 1 && text.length <= 30) {
                             let wordIdx = this.words.getIndex(wordKey);
@@ -258,7 +307,7 @@ export class DatabaseBuilder {
                         if (emojiIdx === undefined) emojiIdx = this.emojis.set(emojiKey, { n: text });
                         emojisCount[emojiIdx] = (emojisCount[emojiIdx] || 0) + 1;
                     } else if (tag === "mention") {
-                        const mentionKey = stripDiacritics(text).toLowerCase();
+                        const mentionKey = searchFormat(text);
                         let mentionIdx = this.mentions.getIndex(mentionKey);
                         if (mentionIdx === undefined) mentionIdx = this.mentions.set(mentionKey, text);
                         mentionsCount[mentionIdx] = (mentionsCount[mentionIdx] || 0) + 1;
@@ -275,7 +324,7 @@ export class DatabaseBuilder {
 
                 // sentiment analysis
                 if (hasText) {
-                    sentiment = analyzeSentiment(tokens, langIndex) || 0;
+                    sentiment = this.sentiment?.get(tokens, langIndex) || 0;
                 }
             }
 

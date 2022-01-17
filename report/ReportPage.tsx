@@ -11,6 +11,8 @@ import { TabContainer } from "@report/components/Tabs";
 
 import MessagesGraph from "@report/components/viz/MessagesGraph";
 import MessagesStatsTable from "@report/components/viz/MessagesStatsTable";
+import LanguageStatsTable from "@report/components/viz/LanguageStatsTable";
+import MostUsedWords from "@report/components/viz/MostUsedWords";
 import { MessagesMostAuthors, MessagesMostChannels } from "@report/components/viz/MessagesMost";
 
 const CardContainer = (props: { children: React.ReactNode }) => <div className="CardContainer">{props.children}</div>;
@@ -49,6 +51,12 @@ const ReportDashboard = () => {
                         title="Most messages sent by channel"
                         children={MessagesMostChannels}
                     />
+                </CardContainer>
+            </TabContainer>
+            <TabContainer currentValue={tab} value="language">
+                <CardContainer>
+                    <Card num={1} title="Most used words" blockKey="language-stats" children={MostUsedWords} />
+                    <Card num={1} title="Language statistics" blockKey="language-stats" children={LanguageStatsTable} />
                 </CardContainer>
             </TabContainer>
         </>
