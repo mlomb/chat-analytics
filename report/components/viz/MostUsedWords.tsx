@@ -4,6 +4,7 @@ import { searchFormat } from "@pipeline/Text";
 import { LanguageStats } from "@pipeline/aggregate/blocks/LanguageStats";
 import { useDataProvider } from "@report/DataProvider";
 import AnimatedBars from "@report/components/viz/AnimatedBars";
+import SearchInput from "../core/SearchInput";
 
 const WordLabel = ({ index, pin }: { index: number; pin: boolean }) => {
     const dataProvider = useDataProvider();
@@ -46,7 +47,7 @@ const MostUsedWords = ({ data }: { data?: LanguageStats }) => {
 
     return (
         <div>
-            <input type="text" value={wordFilter} onChange={(e) => setWordFilter(e.target.value)} />
+            <SearchInput placeholder="Filter words..." value={wordFilter} onChange={setWordFilter} />
             <AnimatedBars what="Word" unit="Times used" data={arr} itemComponent={WordLabel} maxItems={16} />
         </div>
     );
