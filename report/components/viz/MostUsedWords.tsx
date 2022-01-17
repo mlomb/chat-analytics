@@ -16,7 +16,6 @@ const WordLabel = ({ index }: { index: number }) => {
 const MostUsedWords = ({ data }: { data?: LanguageStats }) => {
     const dataProvider = useDataProvider();
     const [wordFilter, setWordFilter] = useState<string>("");
-    console.log(data);
 
     const wordFilterSearchFormat = searchFormat(wordFilter);
     const arr = data?.wordsCount
@@ -29,6 +28,7 @@ const MostUsedWords = ({ data }: { data?: LanguageStats }) => {
                 c.value > 0 &&
                 (wordFilter.length === 0 || dataProvider.wordsSearchFormat[c.index].includes(wordFilterSearchFormat))
         )
+        .sort((a, b) => b.value - a.value)
         .slice(0, 15);
 
     return (
