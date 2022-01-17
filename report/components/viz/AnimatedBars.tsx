@@ -6,11 +6,12 @@ const ITEM_STRIDE = 40;
 const formattingFn = (n: number) => n.toLocaleString();
 
 type Index = number;
-type ItemComponent = (props: { index: Index }) => JSX.Element;
+type ItemComponent = (props: { index: Index; pin: boolean }) => JSX.Element;
 
 export interface AnimatedBarEntry {
     index: Index;
     value: number;
+    pin?: boolean;
 }
 
 interface Props {
@@ -40,7 +41,7 @@ const Item = (props: {
                 }}
             ></div>
             <div className="AnimatedBars__value">
-                <props.itemComponent index={props.entry.index} />
+                <props.itemComponent index={props.entry.index} pin={props.entry.pin || false} />
             </div>
             <CountUp
                 className="AnimatedBars__unit"
@@ -56,8 +57,10 @@ const Item = (props: {
 
 const AnimatedBars = (props: Props) => {
     const sortedById = props.data.slice().sort((a, b) => (a.index > b.index ? 1 : -1));
-    const sortedByValue = props.data.slice().sort((a, b) => b.value - a.value);
-    const maxValue = sortedByValue.length ? sortedByValue[0].value : 0;
+    const sortedByValue = props.data
+        .slice()
+        .sort((a, b) => (a.pin === b.pin ? b.value - a.value : +(b.pin || 0) - +(a.pin || 0)));
+    const maxValue = sortedByValue.reduce((max, entry) => Math.max(max, entry.value), 0);
 
     return (
         <div className="AnimatedBars">
@@ -71,7 +74,7 @@ const AnimatedBars = (props: Props) => {
                         entry={entry}
                         key={entry.index}
                         rank={sortedByValue.indexOf(entry)}
-                        percent={(entry.value / maxValue) * 100}
+                        percent={Math.max((entry.value / maxValue) * 100, 1)}
                         itemComponent={props.itemComponent}
                         colorHue={props.colorHue}
                     ></Item>
