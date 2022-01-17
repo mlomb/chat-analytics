@@ -52,7 +52,8 @@ export class DiscordParser extends Parser {
             for (const mention of message.mentions) {
                 // replace names by nicknames in mentions
                 // and just to make sure, replace spaces by underscores in the nickname
-                content = content.split(`@${mention.name}`).join(`@${mention.nickname.replace(/\s/g, "_")}`);
+                // and add spaces in the sides
+                content = content.split(`@${mention.name}`).join(` @${mention.nickname.replace(/\s/g, "_")} `);
             }
 
             // NOTE: stickers right now are messages with empty content
