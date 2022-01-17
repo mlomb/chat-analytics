@@ -1,16 +1,18 @@
 import { useState } from "react";
-import { AttachmentType } from "@pipeline/Types";
-import { Day } from "@pipeline/Time";
-import { LanguageStats } from "@pipeline/aggregate/blocks/LanguageStats";
-import DottedTable, { Line } from "@report/components/viz/DottedTable";
-import { useDataProvider } from "@report/DataProvider";
-import { LanguageNames } from "@pipeline/Languages";
-import AnimatedBars from "@report/components/viz/AnimatedBars";
-import { searchFormat } from "@pipeline/Text";
 
-const WordLabel = ({ index }: { index: number }) => {
+import { searchFormat } from "@pipeline/Text";
+import { LanguageStats } from "@pipeline/aggregate/blocks/LanguageStats";
+import { useDataProvider } from "@report/DataProvider";
+import AnimatedBars from "@report/components/viz/AnimatedBars";
+
+const WordLabel = ({ index, pin }: { index: number; pin: boolean }) => {
     const dataProvider = useDataProvider();
-    return <div>{dataProvider.database.words[index]}</div>;
+    return (
+        <>
+            <span>{dataProvider.database.words[index]}</span>
+            {pin && <span className="AnimatedBars__exact">EXACT</span>}
+        </>
+    );
 };
 
 const MostUsedWords = ({ data }: { data?: LanguageStats }) => {
@@ -18,30 +20,34 @@ const MostUsedWords = ({ data }: { data?: LanguageStats }) => {
     const [wordFilter, setWordFilter] = useState<string>("");
 
     const wordFilterSearchFormat = searchFormat(wordFilter);
-    const arr = data?.wordsCount
-        .map((c, i) => ({
-            index: i,
-            value: c,
-        }))
-        .filter(
-            (c) =>
-                c.value > 0 &&
-                (wordFilter.length === 0 || dataProvider.wordsSearchFormat[c.index].includes(wordFilterSearchFormat))
-        )
-        .sort((a, b) => b.value - a.value)
-        .slice(0, 15);
+
+    let exactIndex = -1;
+    if (wordFilterSearchFormat.length > 0 && data !== undefined) {
+        exactIndex = dataProvider.wordsSearchFormat.indexOf(wordFilterSearchFormat);
+    }
+
+    let arr = data
+        ? data.wordsCount.map((c, i) => ({
+              index: i,
+              value: c,
+              pin: exactIndex === i,
+          }))
+        : [];
+    arr = arr.filter(
+        (c) =>
+            c.value > 0 &&
+            // NOTE: startsWith or includes?
+            (wordFilter.length === 0 ||
+                c.pin ||
+                dataProvider.wordsSearchFormat[c.index].startsWith(wordFilterSearchFormat))
+    );
+    arr.sort((a, b) => b.value - a.value);
+    arr = arr.slice(0, 15);
 
     return (
         <div>
             <input type="text" value={wordFilter} onChange={(e) => setWordFilter(e.target.value)} />
-            <AnimatedBars
-                what="Word"
-                unit="Times used"
-                data={arr || []}
-                itemComponent={WordLabel}
-                maxItems={16}
-                colorHue={340}
-            />
+            <AnimatedBars what="Word" unit="Times used" data={arr} itemComponent={WordLabel} maxItems={16} />
         </div>
     );
 };
