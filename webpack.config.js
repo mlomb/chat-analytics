@@ -31,6 +31,7 @@ module.exports = (env) => {
             path: resolve("dist"),
             publicPath: "/",
             clean: true,
+            assetModuleFilename: "assets/[hash:8][ext]",
         },
         module: {
             rules: [
@@ -58,10 +59,7 @@ module.exports = (env) => {
                 },
                 {
                     test: /\.(svg|png|jpe?g|gif|mp4)$/,
-                    loader: "file-loader",
-                    options: {
-                        name: "[hash:8].[ext]",
-                    },
+                    type: "asset/resource",
                     issuer: {
                         // force NOT inline the following issuers
                         and: notInline,
@@ -69,10 +67,11 @@ module.exports = (env) => {
                 },
                 {
                     test: /\.(svg|png|jpe?g|gif|mp4)$/,
-                    loader: "url-loader",
-                    options: {
-                        limit: 2 ** 16, // inline everything
-                        name: "[hash:8].[ext]",
+                    type: "asset/inline",
+                    parser: {
+                        dataUrlCondition: {
+                            maxSize: 2 ** 16, // inline everything
+                        },
                     },
                     issuer: {
                         not: notInline,
