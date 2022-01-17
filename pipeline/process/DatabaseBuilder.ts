@@ -293,8 +293,8 @@ export class DatabaseBuilder {
                 for (const { tag, text } of tokens) {
                     if (tag === "word") {
                         const wordKey = searchFormat(text);
-                        // only keep words between [2, 30] chars
-                        if (text.length > 1 && text.length <= 30) {
+                        // only keep words between [2, 30] chars and no stopwords
+                        if (text.length > 1 && text.length <= 30 && !this.stopwords.has(wordKey)) {
                             let wordIdx = this.words.getIndex(wordKey);
                             if (wordIdx === undefined) wordIdx = this.words.set(wordKey, text);
                             wordsCount[wordIdx] = (wordsCount[wordIdx] || 0) + 1;
