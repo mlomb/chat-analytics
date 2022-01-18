@@ -10,8 +10,8 @@ import Card from "@report/components/Card";
 import { TabContainer } from "@report/components/Tabs";
 
 import MessagesGraph from "@report/components/viz/MessagesGraph";
-import MessagesStatsTable from "@report/components/viz/MessagesStatsTable";
-import LanguageStatsTable from "@report/components/viz/LanguageStatsTable";
+import MessagesStatsTable from "@report/components/cards/MessagesStatsTable";
+import LanguageStatsTable from "@report/components/cards/LanguageStatsTable";
 import EmojiStatsTable from "@report/components/cards/EmojiStatsTable";
 import {
     MostMessagesAuthors,

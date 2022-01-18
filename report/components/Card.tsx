@@ -31,8 +31,8 @@ const Card = <K extends BlockKey>(props: Props<K>) => {
             } else {
                 titleElems.push(
                     <select>
-                        {options.map((option) => (
-                            <option>{option}</option>
+                        {options.map((option, i) => (
+                            <option key={i}>{option}</option>
                         ))}
                     </select>
                 );
