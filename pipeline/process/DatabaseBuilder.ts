@@ -6,6 +6,7 @@ import {
     Emoji,
     IAuthor,
     IChannel,
+    IEmoji,
     IMessage,
     Index,
     IntermediateMessage,
@@ -258,27 +259,25 @@ export class DatabaseBuilder {
             const domainsCount: Counts = {};
 
             if (msg.reactions) {
+                const emojiFromIEmoji = (e: IEmoji) => {
+                    const emoji: Emoji = {
+                        n: e.n,
+                        ns: searchFormat(e.n),
+                    };
+                    if (e.id !== undefined) {
+                        emoji.id = e.id;
+                    }
+                    return emoji;
+                };
+
                 for (const reaction of msg.reactions) {
                     const emojiKey = reaction[0].n.toLowerCase();
                     let emojiIdx = this.emojis.getIndex(emojiKey);
                     if (emojiIdx === undefined) {
-                        emojiIdx = this.emojis.set(
-                            emojiKey,
-                            reaction[0].id === undefined
-                                ? {
-                                      n: reaction[0].n,
-                                  }
-                                : {
-                                      id: reaction[0].id,
-                                      n: reaction[0].n,
-                                  }
-                        );
+                        emojiIdx = this.emojis.set(emojiKey, emojiFromIEmoji(reaction[0]));
                     } else if (this.emojis.get(emojiIdx).id === undefined && reaction[0].id) {
                         // ID is new, replace
-                        this.emojis.setAt(emojiIdx, {
-                            id: reaction[0].id,
-                            n: reaction[0].n,
-                        });
+                        this.emojis.setAt(emojiIdx, emojiFromIEmoji(reaction[0]));
                     }
                     reactionsCount[emojiIdx] = (reactionsCount[emojiIdx] || 0) + reaction[1];
                 }
@@ -304,7 +303,8 @@ export class DatabaseBuilder {
                     } else if (tag === "emoji" || tag === "custom-emoji") {
                         const emojiKey = tag === "emoji" ? text : text.toLowerCase();
                         let emojiIdx = this.emojis.getIndex(emojiKey);
-                        if (emojiIdx === undefined) emojiIdx = this.emojis.set(emojiKey, { n: text });
+                        // TODO: emoji to name
+                        if (emojiIdx === undefined) emojiIdx = this.emojis.set(emojiKey, { n: text, ns: text });
                         emojisCount[emojiIdx] = (emojisCount[emojiIdx] || 0) + 1;
                     } else if (tag === "mention") {
                         const mentionKey = searchFormat(text);
@@ -314,7 +314,7 @@ export class DatabaseBuilder {
                     } else if (tag === "url") {
                         // TODO: transform URL only messages to attachments
                         try {
-                            const hostname = new URL(text).hostname;
+                            const hostname = new URL(text).hostname.toLowerCase();
                             let domainIdx = this.domains.getIndex(hostname);
                             if (domainIdx === undefined) domainIdx = this.domains.set(hostname, hostname);
                             domainsCount[domainIdx] = (domainsCount[domainIdx] || 0) + 1;

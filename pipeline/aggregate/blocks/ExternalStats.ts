@@ -3,31 +3,29 @@ import { BlockDescription, BlockFn, IndexEntry } from "@pipeline/aggregate/Block
 import { parseAndFilterMessages } from "@pipeline/aggregate/Helpers";
 import { MessageView } from "@pipeline/serialization/MessageView";
 
-export interface EmojiStats {
-    emojisCount: number[];
+export interface ExternalStats {
+    domainsCount: number[];
 }
 
-const fn: BlockFn<EmojiStats> = (database, filters, common) => {
-    const emojisCount = new Array(database.emojis.length).fill(0);
+const fn: BlockFn<ExternalStats> = (database, filters, common) => {
+    const domainsCount = new Array(database.domains.length).fill(0);
 
     const processMessage = (msg: MessageView, channelIndex: Index) => {
-        const emojis = msg.getEmojis();
-        if (emojis) {
-            for (const emoji of emojis) {
-                emojisCount[emoji[0]] += emoji[1];
+        const domains = msg.getDomains();
+        if (domains) {
+            for (const domain of domains) {
+                domainsCount[domain[0]] += domain[1];
             }
         }
     };
 
     parseAndFilterMessages(processMessage, database, filters);
 
-    return {
-        emojisCount,
-    };
+    return { domainsCount };
 };
 
 export default {
-    key: "emoji-stats",
+    key: "external-stats",
     triggers: ["authors", "channels", "time"],
     fn,
-} as BlockDescription<"emoji-stats", EmojiStats>;
+} as BlockDescription<"external-stats", ExternalStats>;
