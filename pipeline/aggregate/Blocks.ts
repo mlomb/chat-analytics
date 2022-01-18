@@ -20,11 +20,13 @@ export type BlockDescription<K, T> = {
 import MessagesPerCycle from "@pipeline/aggregate/blocks/MessagesPerCycle";
 import MessagesStats from "@pipeline/aggregate/blocks/MessagesStats";
 import LanguageStats from "@pipeline/aggregate/blocks/LanguageStats";
+import EmojiStats from "@pipeline/aggregate/blocks/EmojiStats";
 
 export const Blocks = {
     [MessagesPerCycle.key]: MessagesPerCycle,
     [MessagesStats.key]: MessagesStats,
     [LanguageStats.key]: LanguageStats,
+    [EmojiStats.key]: EmojiStats,
 } as const;
 
 export type BlockKey = keyof typeof Blocks;

@@ -1,0 +1,41 @@
+.ProgressBar {
+    display: block;
+    position: relative;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    overflow-x: hidden;
+
+    &:before {
+        content: "";
+        position: absolute;
+        display: block;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 100%;
+        animation: LoadingBar 1.5s ease-in-out infinite;
+        background-color: red;
+        /*background-image: linear-gradient(90deg, #fe17c2 0%, #00cbfe 50%, #1efecb 100%);*/
+    }
+}
+
+@keyframes LoadingBar {
+    0% {
+        transform: translateX(-100%);
+    }
+    45% {
+        transform: translateX(0);
+    }
+    55% {
+        transform: translateX(0);
+    }
+    90% {
+        transform: translateX(100%);
+    }
+    100% {
+        transform: translateX(100%);
+    }
+}

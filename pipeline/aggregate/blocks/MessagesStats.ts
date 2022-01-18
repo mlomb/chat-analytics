@@ -26,8 +26,8 @@ export interface MessagesStats {
     withText: number;
     withLinks: number;
 
-    mostAuthors: IndexEntry[];
-    mostChannels: IndexEntry[];
+    authorsCount: number[];
+    channelsCount: number[];
 }
 
 const fn: BlockFn<MessagesStats> = (database, filters, common) => {
@@ -110,16 +110,8 @@ const fn: BlockFn<MessagesStats> = (database, filters, common) => {
         withText,
         withLinks,
 
-        mostAuthors: authorsCount
-            .map((v, i) => ({ index: i, value: v }))
-            .filter((v) => v.value > 0)
-            .sort((a, b) => b.value - a.value)
-            .slice(0, 15),
-        mostChannels: channelsCount
-            .map((v, i) => ({ index: i, value: v }))
-            .filter((v) => v.value > 0)
-            .sort((a, b) => b.value - a.value)
-            .slice(0, 15),
+        authorsCount,
+        channelsCount,
     };
 };
 

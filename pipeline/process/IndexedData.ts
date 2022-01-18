@@ -27,7 +27,7 @@ export class IndexedData<K extends string | number, T> {
 
     // the key must not already exist
     public set(key: K, value: T): Index {
-        if (this.has(key)) debugger;
+        // TODO: remove this check
         console.assert(!this.has(key));
 
         const index = this.nextIndex++;
