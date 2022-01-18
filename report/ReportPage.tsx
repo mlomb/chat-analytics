@@ -12,8 +12,13 @@ import { TabContainer } from "@report/components/Tabs";
 import MessagesGraph from "@report/components/viz/MessagesGraph";
 import MessagesStatsTable from "@report/components/viz/MessagesStatsTable";
 import LanguageStatsTable from "@report/components/viz/LanguageStatsTable";
-import MostUsedWords from "@report/components/viz/MostUsedWords";
-import { MessagesMostAuthors, MessagesMostChannels } from "@report/components/viz/MessagesMost";
+import EmojiStatsTable from "@report/components/cards/EmojiStatsTable";
+import {
+    MostMessagesAuthors,
+    MostMessagesChannels,
+    MostUsedEmojis,
+    MostUsedWords,
+} from "@report/components/cards/MostUsedCards";
 
 const CardContainer = (props: { children: React.ReactNode }) => <div className="CardContainer">{props.children}</div>;
 
@@ -43,13 +48,13 @@ const ReportDashboard = () => {
                         num={1}
                         blockKey="messages-stats"
                         title="Most messages sent by author"
-                        children={MessagesMostAuthors}
+                        children={MostMessagesAuthors}
                     />
                     <Card
                         num={1}
                         blockKey="messages-stats"
                         title="Most messages sent by channel"
-                        children={MessagesMostChannels}
+                        children={MostMessagesChannels}
                     />
                 </CardContainer>
             </TabContainer>
@@ -57,6 +62,12 @@ const ReportDashboard = () => {
                 <CardContainer>
                     <Card num={1} title="Most used words" blockKey="language-stats" children={MostUsedWords} />
                     <Card num={1} title="Language statistics" blockKey="language-stats" children={LanguageStatsTable} />
+                </CardContainer>
+            </TabContainer>
+            <TabContainer currentValue={tab} value="emojis">
+                <CardContainer>
+                    <Card num={1} title="Most used emojis" blockKey="emoji-stats" children={MostUsedEmojis} />
+                    <Card num={1} title="Emoji statistics" blockKey="emoji-stats" children={EmojiStatsTable} />
                 </CardContainer>
             </TabContainer>
         </>

@@ -1,5 +1,3 @@
-import { AttachmentType } from "@pipeline/Types";
-import { Day } from "@pipeline/Time";
 import { LanguageStats } from "@pipeline/aggregate/blocks/LanguageStats";
 import DottedTable, { Line } from "@report/components/viz/DottedTable";
 import { useDataProvider } from "@report/DataProvider";
@@ -26,8 +24,6 @@ const LanguageStatsTable = ({ data }: { data?: LanguageStats }) => {
                 } as Line)
         ) ?? []),
     ];
-
-    console.log(data);
 
     return (
         <div>
