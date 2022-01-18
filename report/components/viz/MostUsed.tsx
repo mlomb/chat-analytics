@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 import { Index } from "@pipeline/Types";
 import { searchFormat } from "@pipeline/Text";
@@ -46,15 +46,20 @@ const MostUsed = (props: Props) => {
     entries.sort((a, b) => b.value - a.value);
     entries = entries.slice(0, 15);
 
-    const Item = ({ index, pin }: { index: number; pin: boolean }) => {
-        const ItemComponent = props.itemComponent;
-        return (
-            <>
-                <ItemComponent index={index} />
-                {pin && <span className="AnimatedBars__exact">EXACT</span>}
-            </>
-        );
-    };
+    // memo component
+    const Item = useMemo(
+        () =>
+            ({ index, pin }: { index: number; pin: boolean }) => {
+                const ItemComponent = props.itemComponent;
+                return (
+                    <>
+                        <ItemComponent index={index} />
+                        {pin && <span className="AnimatedBars__exact">EXACT</span>}
+                    </>
+                );
+            },
+        [props.itemComponent]
+    );
 
     return (
         <div>
