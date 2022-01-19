@@ -1,5 +1,4 @@
 import { AttachmentType } from "@pipeline/Types";
-import { Day } from "@pipeline/Time";
 import { MessagesStats } from "@pipeline/aggregate/blocks/MessagesStats";
 import DottedTable, { Line } from "@report/components/viz/DottedTable";
 import { useDataProvider } from "@report/DataProvider";

@@ -5,13 +5,19 @@ import { MessageView } from "@pipeline/serialization/MessageView";
 
 export interface LanguageStats {
     languages: IndexEntry[];
+
+    totalWords: number;
+    uniqueWords: number;
+    avgWordsPerMessage: number;
     wordsCount: number[];
 }
 
 const fn: BlockFn<LanguageStats> = (database, filters, common) => {
     let totalWithLang = 0;
+    let totalWords = 0;
     const languagesCount = new Array(255).fill(0);
     const wordsCount = new Array(database.words.length).fill(0);
+    const uniqueWords = new Set<number>();
 
     const processMessage = (msg: MessageView, channelIndex: Index) => {
         if (msg.langIndex !== undefined) {
@@ -22,6 +28,8 @@ const fn: BlockFn<LanguageStats> = (database, filters, common) => {
         if (words) {
             for (const word of words) {
                 wordsCount[word[0]] += word[1];
+                totalWords += word[1];
+                uniqueWords.add(word[0]);
             }
         }
     };
@@ -40,6 +48,10 @@ const fn: BlockFn<LanguageStats> = (database, filters, common) => {
 
     return {
         languages: languageList,
+
+        totalWords,
+        uniqueWords: uniqueWords.size,
+        avgWordsPerMessage: totalWords / totalWithLang,
         wordsCount,
     };
 };
