@@ -1,9 +1,7 @@
 import { useDataProvider } from "@report/DataProvider";
 import MostUsed from "@report/components/viz/MostUsed";
 
-import AuthorLabel from "@report/components/core/AuthorLabel";
-import ChannelLabel from "@report/components/core/ChannelLabel";
-import DomainLabel from "@report/components/core/DomainLabel";
+import { AuthorLabel, ChannelLabel, WordLabel, EmojiLabel, DomainLabel } from "@report/components/core/Labels";
 
 import { MessagesStats } from "@pipeline/aggregate/blocks/MessagesStats";
 import { LanguageStats } from "@pipeline/aggregate/blocks/LanguageStats";
@@ -41,7 +39,6 @@ export const MostMessagesChannels = ({ data }: { data?: MessagesStats }) => (
 ///////////////////////////
 /// WORDS
 ///////////////////////////
-const WordLabel = ({ index }: { index: number }) => <span>{useDataProvider().database.words[index]}</span>;
 const WordsIndexOf = (value: string) => useDataProvider().wordsSearchFormat.indexOf(value);
 const WordsInFilter = (index: number, filter: string) => useDataProvider().wordsSearchFormat[index].startsWith(filter);
 export const MostUsedWords = ({ data }: { data?: LanguageStats }) => (
@@ -61,7 +58,6 @@ export const MostUsedWords = ({ data }: { data?: LanguageStats }) => (
 ///////////////////////////
 /// EMOJIS
 ///////////////////////////
-const EmojiLabel = ({ index }: { index: number }) => <span>{useDataProvider().database.emojis[index].n}</span>;
 export const MostUsedEmojis = ({ data }: { data?: EmojiStats }) => (
     <MostUsed
         what="Emoji"
@@ -71,7 +67,7 @@ export const MostUsedEmojis = ({ data }: { data?: EmojiStats }) => (
         maxItems={15}
         itemComponent={EmojiLabel}
         searchable
-        indexOf={(value) => useDataProvider().database.emojis.findIndex((e) => e.ns.includes(value))}
+        indexOf={(value) => useDataProvider().database.emojis.findIndex((e) => e.n === value || e.ns === value)}
         inFilter={(index, filter) => useDataProvider().database.emojis[index].ns.includes(filter)}
     />
 );

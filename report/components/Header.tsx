@@ -5,8 +5,7 @@ import { useCallback, useLayoutEffect, useMemo, useState } from "react";
 import { Database, Index } from "@pipeline/Types";
 import { useDataProvider } from "@report/DataProvider";
 
-import AuthorLabel from "@report/components/core/AuthorLabel";
-import ChannelLabel from "@report/components/core/ChannelLabel";
+import { AuthorLabel, ChannelLabel } from "@report/components/core/Labels";
 import { TabSwitch } from "@report/components/Tabs";
 import TimeSelector from "@report/components/TimeSelector";
 import FilterSelect, { FilterOption } from "@report/components/FilterSelect";
