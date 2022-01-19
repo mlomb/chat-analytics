@@ -35,9 +35,12 @@ export class DataProvider extends EventEmitter {
 
     // Updated by this class and the Worker
     public database!: Database;
-    public wordsSearchFormat!: string[];
     private blocksDescs?: BlockDescriptions;
     private readyBlocks: Set<BlockKey> = new Set();
+
+    // cached for performance reasons
+    public wordsSearchFormat!: string[];
+    public mentionsSearchFormat!: string[];
 
     constructor(dataStr: string) {
         super();
@@ -59,6 +62,8 @@ export class DataProvider extends EventEmitter {
             this.database = res.database;
             // compute search format for words
             this.wordsSearchFormat = this.database.words.map((word) => searchFormat(word));
+            this.mentionsSearchFormat = this.database.mentions.map((mention) => searchFormat(mention));
+
             this.blocksDescs = res.blocksDescs;
             // set default time range
             this.activeStartDate = Day.fromKey(res.database.time.minDate);

@@ -21,6 +21,7 @@ import MessagesPerCycle from "@pipeline/aggregate/blocks/MessagesPerCycle";
 import MessagesStats from "@pipeline/aggregate/blocks/MessagesStats";
 import LanguageStats from "@pipeline/aggregate/blocks/LanguageStats";
 import EmojiStats from "@pipeline/aggregate/blocks/EmojiStats";
+import InteractionStats from "@pipeline/aggregate/blocks/InteractionStats";
 import ExternalStats from "@pipeline/aggregate/blocks/ExternalStats";
 
 export const Blocks = {
@@ -28,6 +29,7 @@ export const Blocks = {
     [MessagesStats.key]: MessagesStats,
     [LanguageStats.key]: LanguageStats,
     [EmojiStats.key]: EmojiStats,
+    [InteractionStats.key]: InteractionStats,
     [ExternalStats.key]: ExternalStats,
 } as const;
 

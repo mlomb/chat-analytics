@@ -191,9 +191,28 @@ const _DomainLabel = ({ index }: LabelProps) => {
     );
 };
 
+const _MentionLabel = ({ index }: LabelProps) => {
+    const dp = useDataProvider();
+    const mention = dp.database.mentions[index];
+
+    if (mention === undefined) {
+        return <span>invalid mention index {index}</span>;
+    }
+
+    return (
+        <div className="Label" title={mention}>
+            <div className="Label__name">
+                <span style={{ color: "gray" }}>@</span>
+                {mention}
+            </div>
+        </div>
+    );
+};
+
 // memoize labels
 export const AuthorLabel = memo(_AuthorLabel) as typeof _AuthorLabel;
 export const ChannelLabel = memo(_ChannelLabel) as typeof _ChannelLabel;
 export const WordLabel = memo(_WordLabel) as typeof _WordLabel;
 export const EmojiLabel = memo(_EmojiLabel) as typeof _EmojiLabel;
 export const DomainLabel = memo(_DomainLabel) as typeof _DomainLabel;
+export const MentionLabel = memo(_MentionLabel) as typeof _MentionLabel;

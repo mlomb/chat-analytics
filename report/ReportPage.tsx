@@ -15,6 +15,7 @@ import LanguageStatsTable from "@report/components/cards/LanguageStatsTable";
 import EmojiStatsTable from "@report/components/cards/EmojiStatsTable";
 import {
     MostLinkedDomains,
+    MostMentioned,
     MostMessagesAuthors,
     MostMessagesChannels,
     MostUsedEmojis,
@@ -69,6 +70,11 @@ const ReportDashboard = () => {
                 <CardContainer>
                     <Card num={1} title="Most used emojis" blockKey="emoji-stats" children={MostUsedEmojis} />
                     <Card num={1} title="Emoji statistics" blockKey="emoji-stats" children={EmojiStatsTable} />
+                </CardContainer>
+            </TabContainer>
+            <TabContainer currentValue={tab} value="interaction">
+                <CardContainer>
+                    <Card num={1} title="Most mentioned" blockKey="interaction-stats" children={MostMentioned} />
                 </CardContainer>
             </TabContainer>
             <TabContainer currentValue={tab} value="external">

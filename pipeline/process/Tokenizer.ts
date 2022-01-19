@@ -10,6 +10,7 @@ export interface Token {
 interface Matcher {
     regex: RegExp;
     tag: Tag;
+    transform?: (match: string) => string;
 }
 
 // order is critical
@@ -31,6 +32,7 @@ const Matchers: Matcher[] = [
         // match @mentions
         regex: /@[\p{L}_0-9]+/giu,
         tag: "mention",
+        transform: (match) => match.slice(1), // remove @
     },
     {
         // match emojis 🔥
@@ -41,6 +43,7 @@ const Matchers: Matcher[] = [
         // match custom emojis :pepe:
         regex: /:\w+:/gi,
         tag: "custom-emoji",
+        transform: (match) => match.slice(1, -1), // remove :
     },
     // TODO: match words on languages that words are one character (help wanted)
     // See: https://github.com/facebookresearch/fastText/blob/master/docs/crawl-vectors.md#tokenization
@@ -63,7 +66,12 @@ const matchOne = (input: string, matcher: Matcher): (string | Token)[] => {
     for (let i = 0; i < remaining.length; i++) {
         const s = remaining[i].trim();
         if (s.length > 0) result.push(s);
-        if (i < matches.length) result.push({ text: matches[i], tag: matcher.tag });
+        if (i < matches.length) {
+            result.push({
+                text: matcher.transform ? matcher.transform(matches[i]) : matches[i],
+                tag: matcher.tag,
+            });
+        }
     }
     return result;
 };
