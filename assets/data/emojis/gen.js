@@ -31,7 +31,7 @@ for (const line of emojiTest) {
             groups: { type, emoji, desc },
         } = emojiMatch;
         if (type !== "component") {
-            const _emoji = removeVariantForm(emoji); // TODO: we should also remove the Variant Form (FE0F) from the text processed
+            const _emoji = removeVariantForm(emoji);
             result[_emoji] = {
                 n: desc.replace(/:/g, ""),
             };
