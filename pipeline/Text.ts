@@ -100,7 +100,7 @@ const DiacriticsAndSymbols = [
 let diacriticsAndSymbolsRegex: RegExp;
 let diacriticsAndSymbolsReplacement: { [key: string]: string };
 
-diacriticsAndSymbolsRegex = new RegExp("[" + DiacriticsAndSymbols.map((d) => d.letters).join("") + "]", "g");
+diacriticsAndSymbolsRegex = new RegExp("[" + DiacriticsAndSymbols.map((d) => d.letters).join("") + "]", "gu");
 diacriticsAndSymbolsReplacement = {};
 for (const entry of DiacriticsAndSymbols) {
     for (const letter of entry.letters) {
