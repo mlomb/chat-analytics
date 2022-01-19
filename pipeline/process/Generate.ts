@@ -68,7 +68,7 @@ export const generateReportSite = async (
     progress.done();
 
     progress.new("Downloading", "report HTML");
-    const html = await downloadFile("report.html", "text");
+    const html = await downloadFile("/report.html", "text");
     progress.done();
 
     const template = "[[[DATA]]]";

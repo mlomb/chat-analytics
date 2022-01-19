@@ -202,7 +202,7 @@ const _MentionLabel = ({ index }: LabelProps) => {
     return (
         <div className="Label" title={mention}>
             <div className="Label__name">
-                <span style={{ color: "gray" }}>@</span>
+                <span style={{ color: "#eded3d" }}>@</span>
                 {mention}
             </div>
         </div>
