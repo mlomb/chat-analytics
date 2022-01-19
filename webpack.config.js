@@ -122,7 +122,12 @@ module.exports = (env) => {
                 },
             }),
             new CopyPlugin({
-                patterns: [resolve("assets/public"), { from: resolve("assets/data"), to: "data" }],
+                patterns: [
+                    resolve("assets/public"),
+                    { from: resolve("assets/data/models"), to: "data" },
+                    { from: resolve("assets/data/text"), to: "data" },
+                    { from: resolve("assets/data/emojis/emoji-data.json"), to: "data" },
+                ],
             }),
         ].concat(
             isProd

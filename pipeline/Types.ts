@@ -97,16 +97,13 @@ export interface Author extends IAuthor {
     ns: string;
 }
 
-export interface IEmoji {
-    // Discord emoji ID (if custom)
-    id?: RawID;
-    // name (🔥 or "custom_emoji")
+export interface Emoji {
+    // name ("fire" or "custom_emoji")
     n: string;
-}
-
-export interface Emoji extends IEmoji {
-    // name searchable
-    ns: string;
+    // character (🔥)
+    c?: string;
+    // Discord emoji ID (if custom and available)
+    id?: RawID;
 }
 
 // emitted by parsers
@@ -119,7 +116,7 @@ export interface IMessage {
     timestampEdit?: Timestamp;
     content?: string;
     attachments: AttachmentType[];
-    reactions: [IEmoji, number][];
+    reactions: [Emoji, number][];
 }
 
 // stored serialized during generation

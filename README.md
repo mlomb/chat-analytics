@@ -44,7 +44,7 @@ add this links
 * [FastText](https://fasttext.cc/), a library by Facebook for efficient sentence classification. MIT licensed.
 * [lid.176.ftz model](https://fasttext.cc/docs/en/language-identification.html), provided by FastText developers for language identification. Distributed under [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/).
 * [multilang-sentiment](https://github.com/marcellobarile/multilang-sentiment), for the translated AFINN database. MIT licensed.
-* [emoji-sentiment](https://github.com/dematerializer/emoji-sentiment) for the emoji sentiment data as JSON. Original dataset from the work of Kralj Novak, Petra; Smailović, Jasmina; Sluban, Borut and Mozetič, Igor, 2015, Emoji Sentiment Ranking 1.0, Slovenian language resource repository CLARIN.SI, http://hdl.handle.net/11356/1048. JSON licensed as MIT, original dataset with [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/).
+* Emoji sentiment data from the work of Kralj Novak, Petra; Smailović, Jasmina; Sluban, Borut and Mozetič, Igor, 2015, Emoji Sentiment Ranking 1.0, Slovenian language resource repository CLARIN.SI, http://hdl.handle.net/11356/1048. Licensed with [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/).
 * [stopwords-iso](https://github.com/stopwords-iso/stopwords-iso) for a collection of stopwords in a variety of languages. MIT licensed.
 * All the libraries and tools that made this project possible 😀
 

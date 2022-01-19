@@ -75,8 +75,13 @@ export const MostUsedEmojis = ({ data }: { data?: EmojiStats }) => (
         itemComponent={EmojiLabel}
         searchable
         searchPlaceholder={'Filter emojis... (e.g. "fire" or "🔥")'}
-        indexOf={(value) => useDataProvider().database.emojis.findIndex((e) => e.n === value || e.ns === value)}
-        inFilter={(index, filter) => useDataProvider().database.emojis[index].ns.includes(filter)}
+        transformFilter={(filter: string) => filter.replace(/:/g, "")}
+        indexOf={(value) => {
+            const rawEmoji = useDataProvider().database.emojis.findIndex((e) => e.c === value);
+            if (rawEmoji === -1) return useDataProvider().emojiSearchFormat.indexOf(value);
+            return rawEmoji;
+        }}
+        inFilter={(index, filter) => useDataProvider().emojiSearchFormat[index].includes(filter)}
     />
 );
 

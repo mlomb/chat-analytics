@@ -7,6 +7,9 @@ export const normalizeText = (text: string) =>
         .normalize("NFKC")
         // change all whitespace to one space (important for the lang detector, newlines bad)
         .replace(whitespaceRegex, " ")
+        // remove variant forms from emojis
+        // See: https://stackoverflow.com/questions/38100329/what-does-u-ufe0f-in-an-emoji-mean-is-it-the-same-if-i-delete-it
+        .replace(/[\u{FE0F}\u{FE0E}]/gu, "")
         // trim
         .trim();
 

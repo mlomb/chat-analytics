@@ -6,7 +6,6 @@ import {
     Emoji,
     IAuthor,
     IChannel,
-    IEmoji,
     IMessage,
     Index,
     IntermediateMessage,
@@ -22,6 +21,7 @@ import { Token, tokenize } from "@pipeline/process/Tokenizer";
 import { Sentiment } from "@pipeline/process/Sentiment";
 import { FastTextModel, loadFastTextModel } from "@pipeline/process/FastTextModel";
 import { normalizeText, searchFormat } from "@pipeline/Text";
+import { Emojis } from "@pipeline/process/Emojis";
 import {
     MessageBitConfig,
     readIntermediateMessage,
@@ -76,6 +76,7 @@ export class DatabaseBuilder {
     // static data
     private stopwords: Set<string> = new Set();
     private langPredictModel: FastTextModel | null = null;
+    private emojisData: Emojis | null = null;
     private sentiment: Sentiment | null = null;
 
     constructor(private readonly config: ReportConfig) {}
@@ -102,16 +103,21 @@ export class DatabaseBuilder {
         // load language detector model
         this.langPredictModel = await loadFastTextModel("lid.176");
 
+        // load emoji data
+        {
+            progress.new("Downloading file", "emoji-data.json");
+            const data = await downloadFile("/data/emoji-data.json", "json");
+            this.emojisData = new Emojis(data);
+            progress.done();
+        }
+
         // load sentiment data
         {
             progress.new("Downloading file", "AFINN.zip");
             const afinnZipBuffer = await downloadFile("/data/AFINN.zip", "arraybuffer");
             progress.done();
-            progress.new("Downloading file", "emoji-sentiment.json");
-            const emojiSentiment = await downloadFile("/data/emoji-sentiment.json", "json");
-            progress.done();
 
-            this.sentiment = new Sentiment(afinnZipBuffer, emojiSentiment);
+            this.sentiment = new Sentiment(afinnZipBuffer, this.emojisData);
         }
     }
 
@@ -259,25 +265,21 @@ export class DatabaseBuilder {
             const domainsCount: Counts = {};
 
             if (msg.reactions) {
-                const emojiFromIEmoji = (e: IEmoji) => {
-                    const emoji: Emoji = {
-                        n: e.n,
-                        ns: searchFormat(e.n),
-                    };
-                    if (e.id !== undefined) {
-                        emoji.id = e.id;
-                    }
-                    return emoji;
-                };
-
                 for (const reaction of msg.reactions) {
-                    const emojiKey = reaction[0].n.toLowerCase();
+                    const emojiKey = normalizeText(reaction[0].n).toLowerCase();
+
+                    const emojiObj: Emoji = {
+                        id: reaction[0].id,
+                        n: reaction[0].id ? reaction[0].n : this.emojisData!.getName(emojiKey),
+                        c: reaction[0].id ? undefined : emojiKey,
+                    };
+
                     let emojiIdx = this.emojis.getIndex(emojiKey);
                     if (emojiIdx === undefined) {
-                        emojiIdx = this.emojis.set(emojiKey, emojiFromIEmoji(reaction[0]));
+                        emojiIdx = this.emojis.set(emojiKey, emojiObj);
                     } else if (this.emojis.get(emojiIdx).id === undefined && reaction[0].id) {
                         // ID is new, replace
-                        this.emojis.setAt(emojiIdx, emojiFromIEmoji(reaction[0]));
+                        this.emojis.setAt(emojiIdx, emojiObj);
                     }
                     reactionsCount[emojiIdx] = (reactionsCount[emojiIdx] || 0) + reaction[1];
                 }
@@ -301,10 +303,20 @@ export class DatabaseBuilder {
                         }
                         hasText = true;
                     } else if (tag === "emoji" || tag === "custom-emoji") {
-                        const emojiKey = tag === "emoji" ? text : text.toLowerCase();
+                        const emojiKey = text.toLowerCase();
                         let emojiIdx = this.emojis.getIndex(emojiKey);
-                        // TODO: emoji to name
-                        if (emojiIdx === undefined) emojiIdx = this.emojis.set(emojiKey, { n: emojiKey, ns: emojiKey });
+                        if (emojiIdx === undefined) {
+                            const emojiObj: Emoji =
+                                tag === "emoji"
+                                    ? {
+                                          c: text,
+                                          n: this.emojisData!.getName(text),
+                                      }
+                                    : {
+                                          n: text,
+                                      };
+                            emojiIdx = this.emojis.set(emojiKey, emojiObj);
+                        }
                         emojisCount[emojiIdx] = (emojisCount[emojiIdx] || 0) + 1;
                     } else if (tag === "mention") {
                         const mentionKey = searchFormat(text);
