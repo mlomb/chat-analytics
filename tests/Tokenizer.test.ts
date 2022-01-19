@@ -6,12 +6,12 @@ describe("should match tag", () => {
         // urls
         ["http://example.com", "http://example.com", "url"],
         // mentions
-        ["@mention", "@mention", "mention"],
-        ["@123123123", "@123123123", "mention"],
+        ["@mention", "mention", "mention"],
+        ["@123123123", "123123123", "mention"],
         // emojis
         ["🔥", "🔥", "emoji"],
         // custom emojis
-        [":pepe:", ":pepe:", "custom-emoji"],
+        [":pepe:", "pepe", "custom-emoji"],
         // word
         ["a", "a", "word"],
         ["hello", "hello", "word"],
