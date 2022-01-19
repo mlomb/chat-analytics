@@ -88,7 +88,7 @@ export class DatabaseBuilder {
             interface StopwordsJSON {
                 [lang: string]: string[];
             }
-            const data = (await downloadFile("data/stopwords-iso.json", "json")) as StopwordsJSON;
+            const data = (await downloadFile("/data/stopwords-iso.json", "json")) as StopwordsJSON;
 
             // combining all stopwords is a mistake?
             this.stopwords = new Set(
@@ -105,10 +105,10 @@ export class DatabaseBuilder {
         // load sentiment data
         {
             progress.new("Downloading file", "AFINN.zip");
-            const afinnZipBuffer = await downloadFile("data/AFINN.zip", "arraybuffer");
+            const afinnZipBuffer = await downloadFile("/data/AFINN.zip", "arraybuffer");
             progress.done();
             progress.new("Downloading file", "emoji-sentiment.json");
-            const emojiSentiment = await downloadFile("data/emoji-sentiment.json", "json");
+            const emojiSentiment = await downloadFile("/data/emoji-sentiment.json", "json");
             progress.done();
 
             this.sentiment = new Sentiment(afinnZipBuffer, emojiSentiment);

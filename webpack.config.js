@@ -31,6 +31,7 @@ module.exports = (env) => {
             path: resolve("dist"),
             publicPath: "/",
             clean: true,
+            filename: "assets/[name].[hash:8].js",
             assetModuleFilename: "assets/[hash:8][ext]",
         },
         module: {
@@ -107,7 +108,9 @@ module.exports = (env) => {
                 filename: "report.html",
                 minify: isProd,
             }),
-            new MiniCssExtractPlugin(),
+            new MiniCssExtractPlugin({
+                filename: "assets/[name].[hash:8].css",
+            }),
             new webpack.DefinePlugin({
                 env: {
                     isProd: JSON.stringify(isProd),
