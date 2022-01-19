@@ -40,6 +40,7 @@ export class DataProvider extends EventEmitter {
 
     // cached for performance reasons
     public wordsSearchFormat!: string[];
+    public emojiSearchFormat!: string[];
     public mentionsSearchFormat!: string[];
 
     constructor(dataStr: string) {
@@ -62,6 +63,7 @@ export class DataProvider extends EventEmitter {
             this.database = res.database;
             // compute search format for words
             this.wordsSearchFormat = this.database.words.map((word) => searchFormat(word));
+            this.emojiSearchFormat = this.database.emojis.map((emoji) => searchFormat(emoji.n));
             this.mentionsSearchFormat = this.database.mentions.map((mention) => searchFormat(mention));
 
             this.blocksDescs = res.blocksDescs;

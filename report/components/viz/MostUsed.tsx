@@ -21,6 +21,7 @@ interface SimpleProps extends BaseProps {
 interface SearchProps extends BaseProps {
     searchable: true;
     searchPlaceholder: string;
+    transformFilter?: (filter: string) => string;
     indexOf: (value: string) => number | -1;
     inFilter(index: Index, filter: string): boolean;
 }
@@ -30,7 +31,9 @@ type Props = SimpleProps | SearchProps;
 const MostUsed = (props: Props) => {
     const [filter, setFilter] = useState<string>("");
 
-    const filterFormatted = searchFormat(filter);
+    const filterFormatted = searchFormat(
+        props.searchable && props.transformFilter ? props.transformFilter(filter) : filter
+    );
     let exactIndex =
         filterFormatted.length > 0 && props.counts.length > 0 && props.searchable ? props.indexOf(filterFormatted) : -1;
     let entries: AnimatedBarEntry[] = props.counts.map((c, i) => ({

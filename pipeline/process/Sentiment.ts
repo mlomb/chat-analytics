@@ -4,14 +4,7 @@ import { Token, tokenize } from "@pipeline/process/Tokenizer";
 import { progress } from "@pipeline/Progress";
 import { LanguageCodes } from "@pipeline/Languages";
 import { normalizeText } from "@pipeline/Text";
-
-type EmojiData = {
-    sequence: string;
-    occurrences: number;
-    negative: number;
-    neutral: number;
-    positive: number;
-}[];
+import { Emojis } from "@pipeline/process/Emojis";
 
 export class Sentiment {
     private readonly langs: {
@@ -21,9 +14,7 @@ export class Sentiment {
         };
     } = {};
 
-    private readonly emojiMatcher: PatternMatcher;
-
-    constructor(afinnZipBuffer: ArrayBuffer, emojiData: EmojiData) {
+    constructor(afinnZipBuffer: ArrayBuffer, private emojiData: Emojis) {
         const filesAsBuffers = unzipSync(new Uint8Array(afinnZipBuffer));
         const filesAsStrings: { [key: string]: string } = {};
 
@@ -59,20 +50,6 @@ export class Sentiment {
             progress.progress("number", processed++, total);
         }
         progress.done();
-
-        // parse emoji data
-        const emojis: string[] = [];
-        const emojiValues: number[] = [];
-        for (const e of emojiData) {
-            const str = String.fromCodePoint(parseInt(e.sequence, 16));
-            const sentiment = Math.floor(5 * (e.positive / e.occurrences - e.negative / e.occurrences));
-
-            if (!Number.isNaN(sentiment)) {
-                emojis.push(str);
-                emojiValues.push(sentiment);
-            }
-        }
-        this.emojiMatcher = new PatternMatcher(emojis, emojiValues);
     }
 
     // NOTE: based on marcellobarile/multilang-sentiment
@@ -97,10 +74,7 @@ export class Sentiment {
             nearNegatorDist++;
 
             if (token.tag === "emoji") {
-                const emojiMatch = this.emojiMatcher.match([token]);
-                if (emojiMatch) {
-                    score += emojiMatch.value;
-                }
+                score += this.emojiData.getSentiment(token.text);
                 continue;
             }
 
