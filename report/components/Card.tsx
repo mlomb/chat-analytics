@@ -27,10 +27,10 @@ const Card = <K extends BlockKey>(props: Props<K>) => {
         for (const _options of titleArr) {
             const options = Array.isArray(_options) ? _options : [_options];
             if (options.length === 1) {
-                titleElems.push(<span>{options[0]}</span>);
+                titleElems.push(<span key={options[0]}>{options[0]}</span>);
             } else {
                 titleElems.push(
-                    <select>
+                    <select key={options[0]}>
                         {options.map((option, i) => (
                             <option key={i}>{option}</option>
                         ))}
