@@ -1,16 +1,39 @@
 import { EmojiStats } from "@pipeline/aggregate/blocks/EmojiStats";
 import DottedTable, { Line } from "@report/components/viz/DottedTable";
-import { useDataProvider } from "@report/DataProvider";
 
 const MessagesStatsTable = ({ data }: { data?: EmojiStats }) => {
-    const dataProvider = useDataProvider();
-
     const lines: Line[] = [
         {
             type: "number",
             formatter: "integer",
-            label: "Total messages sent",
-            value: 0,
+            label: "Total emojis used",
+            value: data?.totalEmojis,
+        },
+        {
+            type: "number",
+            formatter: "integer",
+            depth: 1,
+            label: "regular emojis (❤)",
+            value: data ? data.totalEmojis - data.totalCustomEmojis : 0,
+        },
+        {
+            type: "number",
+            formatter: "integer",
+            depth: 1,
+            label: "custom emojis (:pepe:)",
+            value: data?.totalCustomEmojis,
+        },
+        {
+            type: "number",
+            formatter: "integer",
+            label: "Unique emojis used",
+            value: data?.uniqueEmojis,
+        },
+        {
+            type: "number",
+            formatter: "integer",
+            label: "Messages with at least one emoji",
+            value: data?.messagesWithAtLeastOneEmoji,
         },
     ];
 

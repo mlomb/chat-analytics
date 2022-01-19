@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "scripts": {
     "build": "webpack build --env production --progress",
-    "size": "webpack build --env production --profile --json > stats.json",
+    "stats": "webpack build --env production --profile --json > stats.json",
     "dev": "webpack serve --progress",
     "test": "jest --verbose --coverage",
     "test:watch": "jest --watchAll",
