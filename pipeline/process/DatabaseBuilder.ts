@@ -301,12 +301,10 @@ export class DatabaseBuilder {
                         }
                         hasText = true;
                     } else if (tag === "emoji" || tag === "custom-emoji") {
-                        const emojiText = tag === "emoji" ? text : text.slice(1, -1);
-                        const emojiKey = emojiText.toLowerCase();
+                        const emojiKey = tag === "emoji" ? text : text.toLowerCase();
                         let emojiIdx = this.emojis.getIndex(emojiKey);
                         // TODO: emoji to name
-                        if (emojiIdx === undefined)
-                            emojiIdx = this.emojis.set(emojiKey, { n: emojiText, ns: emojiText });
+                        if (emojiIdx === undefined) emojiIdx = this.emojis.set(emojiKey, { n: emojiKey, ns: emojiKey });
                         emojisCount[emojiIdx] = (emojisCount[emojiIdx] || 0) + 1;
                     } else if (tag === "mention") {
                         const mentionKey = searchFormat(text);
