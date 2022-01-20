@@ -23,7 +23,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         if (dataStr.length === 0 || dataStr === "[[[DATA]]]") {
             alert("Missing report data");
-            window.location.href = "/";
+            if (env.isProd) window.location.href = "/";
+            return;
         }
 
         initDataProvider(dataStr);
