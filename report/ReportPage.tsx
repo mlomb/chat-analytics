@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { useDataProvider } from "@report/DataProvider";
 
 import Header from "@report/components/Header";
+import Footer from "@report/components/Footer";
 import LoadingOverlay from "@report/components/LoadingOverlay";
 import Card from "@report/components/Card";
 import { TabContainer } from "@report/components/Tabs";
@@ -94,6 +95,8 @@ const ReportDashboard = () => {
                     <Card num={1} title="Most linked domains" blockKey="external-stats" children={MostLinkedDomains} />
                 </CardContainer>
             </TabContainer>
+
+            <Footer />
         </>
     );
 };
