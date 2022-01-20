@@ -31,12 +31,12 @@
     "jest": "^27.4.7",
     "less": "^4.1.2",
     "less-loader": "^10.2.0",
-    "mini-css-extract-plugin": "~2.4.5",
+    "mini-css-extract-plugin": "~2.5.2",
     "postcss-loader": "^6.2.1",
     "prettier": "^2.5.1",
     "pretty-bytes": "^5.6.0",
     "react": "^17.0.2",
-    "react-countup": "^6.1.0",
+    "react-countup": "^6.1.1",
     "react-dom": "^17.0.2",
     "react-intersection-observer": "^8.33.1",
     "react-window": "^1.8.6",
@@ -46,8 +46,7 @@
     "webpack": "^5.66.0",
     "webpack-cli": "^4.9.1",
     "webpack-dev-server": "^4.7.3",
-    "whatsapp-chat-parser": "^3.2.1",
-    "worker-loader": "^3.0.8"
+    "whatsapp-chat-parser": "^3.2.1"
   },
   "jest": {
     "roots": [

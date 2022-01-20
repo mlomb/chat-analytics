@@ -4,7 +4,7 @@ import { useState } from "react";
 
 import { Platform } from "@pipeline/Types";
 import { ProgressKeys, ProgressMessage, TaskInfo } from "@pipeline/Progress";
-import WorkerApp, { InitMessage, ResultMessage } from "@app/WorkerApp";
+import { InitMessage, ResultMessage } from "@app/WorkerApp";
 
 import Stepper from "@app/components/Stepper";
 import Button from "@app/components/Button";
@@ -53,7 +53,8 @@ const Steps = () => {
     });
 
     const startGeneration = () => {
-        const worker = new WorkerApp() as Worker;
+        // @ts-ignore
+        const worker = new Worker(new URL("@app/WorkerApp.ts", import.meta.url));
         worker.onerror = (e) => {
             console.log(e);
             worker.terminate();

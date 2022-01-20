@@ -1,5 +1,3 @@
-export default null as any;
-
 import { ReportConfig } from "@pipeline/Types";
 import { FileInput } from "@pipeline/File";
 import { progress } from "@pipeline/Progress";

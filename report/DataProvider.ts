@@ -5,7 +5,7 @@ import { Day } from "@pipeline/Time";
 import { searchFormat } from "@pipeline/Text";
 import { BlockDescriptions, BlockInfo, BlockKey, BlockTrigger } from "@pipeline/aggregate/Blocks";
 
-import Worker, { BlockRequestMessage, BlockResultMessage, InitMessage, ReadyMessage } from "@report/WorkerReport";
+import { BlockRequestMessage, BlockResultMessage, InitMessage, ReadyMessage } from "@report/WorkerReport";
 
 export declare interface DataProvider {
     emit<K extends BlockKey>(event: K, info: BlockInfo<K>): boolean;
@@ -45,7 +45,26 @@ export class DataProvider extends EventEmitter {
 
     constructor(dataStr: string) {
         super();
-        this.worker = Worker();
+        if (env.isDev) {
+            if (document.location.protocol === "blob:") {
+                // this is when we are in a blob, in that case building the URL with import.meta.url will fail
+                // so we use the following workaround to use the correct origin
+                this.worker = new Worker(
+                    new URL(__webpack_require__.u("report_WorkerReport_ts"), document.location.origin)
+                );
+            } else {
+                // normal webpack v5 worker loading
+                // @ts-ignore
+                this.worker = new Worker(new URL("@report/WorkerReport.ts", import.meta.url));
+            }
+        } else {
+            // Why we use base64 instead of Blob+URL.createObjectURL?
+            // Chrome Mobile crashes if you use createObjectURL from an .html file :)
+            // See: https://bugs.chromium.org/p/chromium/issues/detail?id=1150828&q=createObjectURL%20crash
+            // We can work around it using base64, so no requests are made
+            const workerJs = document.getElementById("worker-script")!.textContent!;
+            this.worker = new Worker("data:application/javascript;base64," + btoa(workerJs));
+        }
         this.worker.onerror = this.onError.bind(this);
         this.worker.onmessage = this.onMessage.bind(this);
         this.worker.postMessage(<InitMessage>{ type: "init", dataStr });

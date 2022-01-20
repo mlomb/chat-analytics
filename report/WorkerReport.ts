@@ -1,5 +1,3 @@
-export default null as any;
-
 import { Database, Index } from "@pipeline/Types";
 import { Blocks, BlockDescriptions, BlockKey, BlockInfo, CommonBlockData } from "@pipeline/aggregate/Blocks";
 import { Filters } from "@pipeline/aggregate/Filters";
