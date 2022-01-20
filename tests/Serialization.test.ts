@@ -1,10 +1,6 @@
 import { BitStream } from "@pipeline/serialization/BitStream";
-import {
-    MessageBitConfig,
-    readIntermediateMessage,
-    writeIntermediateMessage,
-} from "@pipeline/serialization/MessageSerialization";
-import { Index, IntermediateMessage } from "@pipeline/Types";
+import { MessageBitConfig, readMessage, writeMessage } from "@pipeline/serialization/MessageSerialization";
+import { Index, Message } from "@pipeline/Types";
 import { readIndexArray, writeIndexArray } from "@pipeline/serialization/IndexSerialization";
 
 describe("index serialization", () => {
@@ -63,9 +59,9 @@ describe("index serialization", () => {
 });
 
 describe("obj -> (serialize) -> (deserialize) -> obj", () => {
-    let obj: IntermediateMessage;
+    let obj: Message;
 
-    const cases: IntermediateMessage[] = [
+    const cases: Message[] = [
         {
             day: 123,
             secondOfDay: 4,
@@ -116,9 +112,9 @@ describe("obj -> (serialize) -> (deserialize) -> obj", () => {
     afterEach(() => {
         const stream = new BitStream();
         stream.offset = 0;
-        writeIntermediateMessage(obj, stream, bitConfig);
+        writeMessage(obj, stream, bitConfig);
         stream.offset = 0;
-        const gotObj = readIntermediateMessage(stream, bitConfig);
+        const gotObj = readMessage(stream, bitConfig);
         expect(gotObj).toStrictEqual(obj);
     });
 });

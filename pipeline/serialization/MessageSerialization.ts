@@ -1,4 +1,4 @@
-import { IntermediateMessage } from "@pipeline/Types";
+import { Message } from "@pipeline/Types";
 import { BitStream } from "@pipeline/serialization/BitStream";
 import { readIndexArray, writeIndexArray } from "@pipeline/serialization/IndexSerialization";
 
@@ -26,7 +26,7 @@ export interface MessageBitConfig {
     domainsIdxBits: number;
 }
 
-export const writeIntermediateMessage = (message: IntermediateMessage, stream: BitStream, config: MessageBitConfig) => {
+export const writeMessage = (message: Message, stream: BitStream, config: MessageBitConfig) => {
     stream.setBits(config.dayBits, message.day);
     stream.setBits(17, message.secondOfDay); // 0-2^17 (needed 86400)
     stream.setBits(config.authorIdxBits, message.authorIndex);
@@ -54,13 +54,13 @@ export const writeIntermediateMessage = (message: IntermediateMessage, stream: B
     if (flags & MessageFlags.Domains) writeIndexArray(message.domains!, stream, config.domainsIdxBits);
 };
 
-export const readIntermediateMessage = (stream: BitStream, config: MessageBitConfig): IntermediateMessage => {
+export const readMessage = (stream: BitStream, config: MessageBitConfig): Message => {
     const day = stream.getBits(config.dayBits);
     const secondOfDay = stream.getBits(17);
     const authorIndex = stream.getBits(config.authorIdxBits);
     const flags = stream.getBits(9);
 
-    const message: IntermediateMessage = {
+    const message: Message = {
         day,
         secondOfDay,
         authorIndex,
