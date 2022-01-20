@@ -120,7 +120,8 @@ export interface IMessage {
 }
 
 // stored serialized during generation
-export interface IntermediateMessage {
+// then used in the UI (but rarely)
+export interface Message {
     day: number;
     secondOfDay: number;
     authorIndex: Index;

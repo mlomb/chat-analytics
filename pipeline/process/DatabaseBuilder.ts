@@ -8,7 +8,7 @@ import {
     IChannel,
     IMessage,
     Index,
-    IntermediateMessage,
+    Message,
     RawID,
     ReportConfig,
 } from "@pipeline/Types";
@@ -22,11 +22,7 @@ import { Sentiment } from "@pipeline/process/Sentiment";
 import { FastTextModel, loadFastTextModel } from "@pipeline/process/FastTextModel";
 import { normalizeText, searchFormat } from "@pipeline/Text";
 import { Emojis } from "@pipeline/process/Emojis";
-import {
-    MessageBitConfig,
-    readIntermediateMessage,
-    writeIntermediateMessage,
-} from "@pipeline/serialization/MessageSerialization";
+import { MessageBitConfig, readMessage, writeMessage } from "@pipeline/serialization/MessageSerialization";
 import { LanguageCodes } from "@pipeline/Languages";
 
 // section in the bitstream
@@ -341,8 +337,8 @@ export class DatabaseBuilder {
             }
 
             // store message
-            writeIntermediateMessage(
-                <IntermediateMessage>{
+            writeMessage(
+                <Message>{
                     day: day.toBinary(),
                     // TODO: timezones
                     secondOfDay: date.getSeconds() + 60 * (date.getMinutes() + 60 * date.getHours()),
@@ -407,7 +403,7 @@ export class DatabaseBuilder {
                 // seek
                 this.stream.offset = section.start;
                 while (this.stream.offset < section.end) {
-                    const msg = readIntermediateMessage(this.stream, DefaultBitConfig);
+                    const msg = readMessage(this.stream, DefaultBitConfig);
 
                     msg.day = dateKeys.indexOf(Day.fromBinary(msg.day).dateKey);
 
@@ -426,7 +422,7 @@ export class DatabaseBuilder {
                     }
 
                     // write final message
-                    writeIntermediateMessage(msg, finalStream, finalBitConfig);
+                    writeMessage(msg, finalStream, finalBitConfig);
                     progress.progress("number", messagesWritten++, this.totalMessages);
                     this.channels.data[channelIndex].msgCount++;
                 }
