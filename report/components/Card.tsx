@@ -1,15 +1,18 @@
 import "@assets/styles/Card.less";
 
+import { useState } from "react";
 import { BlockDataType, BlockInfo, BlockKey, BlockState } from "@pipeline/aggregate/Blocks";
 import Block from "@report/components/Block";
 
 import Spinner from "@assets/images/icons/spinner.svg";
 
+type Title = string | (string | string[])[];
+
 interface Props<K extends BlockKey> {
     num: 1 | 2 | 3;
-    title?: string | (string | string[])[];
+    title: Title;
     blockKey: K;
-    children: (props: { data?: BlockDataType<K> }) => JSX.Element;
+    children: (props: { data?: BlockDataType<K>; options: number[] }) => JSX.Element;
 }
 
 const Indicators: { [key in BlockState]: string } = {
@@ -20,36 +23,58 @@ const Indicators: { [key in BlockState]: string } = {
 };
 
 const Card = <K extends BlockKey>(props: Props<K>) => {
-    const titleElems: JSX.Element[] = [];
-    if (props.title) {
-        const titleArr = typeof props.title === "string" ? [props.title] : props.title;
+    const Content = <K extends BlockKey>({ info }: { info: BlockInfo<K> }) => {
+        // normalize title, make sure it's an array
+        const title = typeof props.title === "string" ? [props.title] : props.title;
 
-        for (const _options of titleArr) {
-            const options = Array.isArray(_options) ? _options : [_options];
-            if (options.length === 1) {
-                titleElems.push(<span key={options[0]}>{options[0]}</span>);
+        // by default all options are 0
+        const [options, setOptions] = useState<number[]>(title.filter((a) => typeof a !== "string").map((_) => 0));
+
+        const elements: JSX.Element[] = [];
+
+        let optionIndex = 0;
+        for (const entry of title) {
+            if (typeof entry === "string") {
+                // raw text
+                elements.push(<span key={entry}>{entry}</span>);
             } else {
-                titleElems.push(
-                    <select key={options[0]}>
-                        {options.map((option, i) => (
-                            <option key={i}>{option}</option>
+                // select with options
+                let localOptionIndex = optionIndex;
+                elements.push(
+                    // use first option as key
+                    <select
+                        key={entry[0]}
+                        value={options[localOptionIndex]}
+                        onChange={(e) =>
+                            setOptions((prev) => {
+                                const newOptions = [...prev];
+                                newOptions[localOptionIndex] = parseInt(e.target.value);
+                                return newOptions;
+                            })
+                        }
+                    >
+                        {entry.map((o, i) => (
+                            <option key={i} value={i}>
+                                {o}
+                            </option>
                         ))}
                     </select>
                 );
+                optionIndex++;
             }
         }
-    }
 
-    const Content = <K extends BlockKey>({ info }: { info: BlockInfo<K> }) => (
-        <>
-            {titleElems.length ? <div className="Card_title">{titleElems}</div> : null}
-            <props.children data={info.data || undefined} />
-            <div className={"Card_overlay" + (info.state === "ready" ? " Card_overlay--hidden" : "")}>
-                <img src={Spinner} alt="Loading" height={60} />
-                {Indicators[info.state]}
-            </div>
-        </>
-    );
+        return (
+            <>
+                <div className="Card_title">{elements}</div>
+                <props.children data={info.data || undefined} options={options} />
+                <div className={"Card_overlay" + (info.state === "ready" ? " Card_overlay--hidden" : "")}>
+                    <img src={Spinner} alt="Loading" height={60} />
+                    {Indicators[info.state]}
+                </div>
+            </>
+        );
+    };
 
     return (
         <div className={"Card Card--" + props.num}>

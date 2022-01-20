@@ -66,15 +66,26 @@ export const MostUsedWords = ({ data }: { data?: LanguageStats }) => (
 ///////////////////////////
 /// EMOJIS
 ///////////////////////////
-export const MostUsedEmojis = ({ data }: { data?: EmojiStats }) => (
+const EmojiFilterFns = {
+    "0": undefined, // all emoji
+    "1": (index: number) => useDataProvider().database.emojis[index].c !== undefined, // regular emoji
+    "2": (index: number) => useDataProvider().database.emojis[index].c === undefined, // custom emoji
+};
+const EmojiFilterPlaceholders = {
+    "0": 'Filter emojis... (e.g. "fire", "🔥" or ":pepe:")',
+    "1": 'Filter emojis... (e.g. "fire" or "🔥")',
+    "2": 'Filter emojis... (e.g. ":pepe:")',
+};
+export const MostUsedEmojis = ({ data, options }: { data?: EmojiStats; options: number[] }) => (
     <MostUsed
         what="Emoji"
         unit="Times used"
         counts={data?.emojisCount || []}
+        filter={EmojiFilterFns[options[0] as unknown as keyof typeof EmojiFilterFns]}
         maxItems={15}
         itemComponent={EmojiLabel}
         searchable
-        searchPlaceholder={'Filter emojis... (e.g. "fire" or "🔥")'}
+        searchPlaceholder={EmojiFilterPlaceholders[options[0] as unknown as keyof typeof EmojiFilterPlaceholders]}
         transformFilter={(filter: string) => filter.replace(/:/g, "")}
         indexOf={(value) => {
             const rawEmoji = useDataProvider().database.emojis.findIndex((e) => e.c === value);

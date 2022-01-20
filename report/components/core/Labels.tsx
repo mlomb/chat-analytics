@@ -146,12 +146,12 @@ const _EmojiLabel = ({ index }: LabelProps) => {
 
     let image: JSX.Element | null = null;
     if (emoji.id) {
-        image = <img src={`https://cdn.discordapp.com/emojis/${emoji.id}.png?size=32`} height={16} />;
+        image = <img src={`https://cdn.discordapp.com/emojis/${emoji.id}.png?size=32`} height={20} />;
     }
 
     return (
         <div className="Label" title={emoji.n}>
-            <span style={{ marginRight: 5 }}>
+            <span style={{ marginRight: 5, display: "inline-flex" }}>
                 {image ? image : <span style={{ color: "#b9b9b9" }}>{emoji.c}</span>}
             </span>
             {emoji.n !== emoji.c ? <div className="Label__name">{emoji.c ? emoji.n : `:${emoji.n}:`}</div> : null}

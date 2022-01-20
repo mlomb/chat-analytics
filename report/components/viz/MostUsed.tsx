@@ -9,6 +9,7 @@ interface BaseProps {
     what: string;
     unit: string;
     counts: number[];
+    filter?: (index: number) => boolean;
     itemComponent: (props: { index: Index }) => JSX.Element;
     maxItems: number;
     colorHue?: number;
@@ -44,7 +45,8 @@ const MostUsed = (props: Props) => {
     entries = entries.filter(
         (c) =>
             c.value > 0 &&
-            (filterFormatted.length === 0 || c.pin || (props.searchable && props.inFilter(c.index, filterFormatted)))
+            (filterFormatted.length === 0 || c.pin || (props.searchable && props.inFilter(c.index, filterFormatted))) &&
+            (!props.filter || props.filter(c.index))
     );
     entries.sort((a, b) => b.value - a.value);
     entries = entries.slice(0, 15);
