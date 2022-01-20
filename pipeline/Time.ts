@@ -48,10 +48,14 @@ export class Day {
         return `${this.monthKey}-${this.day}`;
     }
 
-    nextDay(): Day {
+    nextDays(days: number): Day {
         const d = this.toDate();
-        d.setDate(d.getDate() + 1);
+        d.setDate(d.getDate() + days);
         return Day.fromDate(d);
+    }
+
+    nextDay(): Day {
+        return this.nextDays(1);
     }
 
     // equal
@@ -125,9 +129,27 @@ export const genTimeKeys = (start: Day, end: Day): TimeKeysResult => {
     return { dateKeys, monthKeys, dateToMonthIndex };
 };
 
-export const formatTime = (day: Day, seconds: number, hideSeconds: boolean = true): string => {
+export const formatTime = (
+    day: Day,
+    seconds: number,
+    options = {
+        showDate: true, // day, month, year
+        showTime: true, // hour, minute, second
+        hideSeconds: true, // if true, removes seconds from showTime
+    }
+): string => {
     const d = day.toDate();
     d.setSeconds(seconds);
-    const str = d.toLocaleString();
-    return hideSeconds && str.endsWith(":00") ? str.slice(0, -3) : str;
+    let str = "";
+    if (options.showDate && options.showTime) {
+        str = d.toLocaleString();
+    } else if (options.showDate) {
+        str = d.toLocaleDateString();
+    } else if (options.showTime) {
+        str = d.toLocaleTimeString();
+    }
+    if (options.showTime && options.hideSeconds) {
+        str = str.slice(0, -3);
+    }
+    return str;
 };

@@ -1,4 +1,4 @@
-import { BitAddress, Index } from "@pipeline/Types";
+import { BitAddress, Index, Message } from "@pipeline/Types";
 import { BitStream } from "@pipeline/serialization/BitStream";
 import { MessageBitConfig, MessageFlags } from "@pipeline/serialization/MessageSerialization";
 import { readIndexArray, skipIndexArray } from "@pipeline/serialization/IndexSerialization";
@@ -95,5 +95,21 @@ export class MessageView {
         if (this.domainsOffset === 0) return undefined;
         this.stream.offset = this.domainsOffset;
         return readIndexArray(this.stream, this.config.domainsIdxBits);
+    }
+
+    getFullMessage(): Message {
+        return {
+            day: this.dayIndex,
+            secondOfDay: this.secondOfDay,
+            authorIndex: this.authorIndex,
+            langIndex: this.langIndex,
+            sentiment: this.sentiment,
+            words: this.getWords(),
+            emojis: this.getEmojis(),
+            attachments: this.getAttachments(),
+            reactions: this.getReactions(),
+            mentions: this.getMentions(),
+            domains: this.getDomains(),
+        };
     }
 }
