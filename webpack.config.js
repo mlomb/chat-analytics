@@ -25,19 +25,18 @@ module.exports = (env) => {
         entry: {
             app: resolve("app/index.tsx"),
             report: resolve("report/index.tsx"),
+            reportWorker: resolve("report/WorkerReport.ts"),
         },
         mode: isProd ? "production" : "development",
         output: {
             path: resolve("dist"),
             publicPath: "/",
             clean: true,
-            filename: "assets/[name].[hash:8].js",
-            assetModuleFilename: "assets/[hash:8][ext]",
+            filename: "assets/[name].[contenthash:8].js",
+            assetModuleFilename: "assets/[contenthash:8][ext]",
         },
         module: {
             rules: [
-                { test: /WorkerApp/, loader: "worker-loader" },
-                { test: /WorkerReport/, loader: "worker-loader", options: { inline: "fallback" } },
                 { test: /\.tsx?$/, loader: "ts-loader", exclude: [/node_modules/] },
                 {
                     test: /\.less$/,
@@ -103,13 +102,13 @@ module.exports = (env) => {
                 minify: isProd,
             }),
             new HtmlWebpackPlugin({
-                chunks: ["report"],
+                chunks: isProd ? ["report", "reportWorker"] : ["report"],
                 template: resolve("assets/report.html"),
                 filename: "report.html",
                 minify: isProd,
             }),
             new MiniCssExtractPlugin({
-                filename: "assets/[name].[hash:8].css",
+                filename: "assets/[name].[contenthash:8].css",
             }),
             new webpack.DefinePlugin({
                 env: {
@@ -170,7 +169,11 @@ class InlineChunkHtmlPlugin {
         if (asset == null) {
             return tag;
         }
-        return { tagName: "script", innerHTML: asset.source(), closeTag: true };
+        let tagName = "script";
+        if (scriptName.toLowerCase().includes("worker")) {
+            tagName += ' type="text/plain" id="worker-script"';
+        }
+        return { tagName, innerHTML: asset.source(), closeTag: true };
     }
 
     apply(compiler) {
