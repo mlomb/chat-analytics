@@ -10,6 +10,7 @@ export interface EmojiStats {
     messagesWithAtLeastOneEmoji: number;
     emojisCount: number[];
     authorEmojiCount: number[];
+    channelEmojiCount: number[];
 }
 
 const fn: BlockFn<EmojiStats> = (database, filters, common) => {
@@ -18,6 +19,7 @@ const fn: BlockFn<EmojiStats> = (database, filters, common) => {
     let messagesWithAtLeastOneEmoji = 0;
     const emojisCount = new Array(database.emojis.length).fill(0);
     const authorEmojiCount = new Array(database.authors.length).fill(0);
+    const channelEmojiCount = new Array(database.channels.length).fill(0);
     const uniqueEmojis = new Set<number>();
 
     const processMessage = (msg: MessageView, channelIndex: Index) => {
@@ -26,6 +28,7 @@ const fn: BlockFn<EmojiStats> = (database, filters, common) => {
             for (const emoji of emojis) {
                 emojisCount[emoji[0]] += emoji[1];
                 authorEmojiCount[msg.authorIndex] += emoji[1];
+                channelEmojiCount[channelIndex] += emoji[1];
                 totalEmojis += emoji[1];
                 if (database.emojis[emoji[0]].c === undefined) {
                     totalCustomEmojis += emoji[1];
@@ -45,6 +48,7 @@ const fn: BlockFn<EmojiStats> = (database, filters, common) => {
         messagesWithAtLeastOneEmoji,
         emojisCount,
         authorEmojiCount,
+        channelEmojiCount,
     };
 };
 
