@@ -68,7 +68,12 @@ const ReportDashboard = () => {
             </TabContainer>
             <TabContainer currentValue={tab} value="emojis">
                 <CardContainer>
-                    <Card num={1} title="Most used emojis" blockKey="emoji-stats" children={MostUsedEmojis} />
+                    <Card
+                        num={1}
+                        title={["Most used", ["emojis (all)", "regular emojis", "custom emojis"]]}
+                        blockKey="emoji-stats"
+                        children={MostUsedEmojis}
+                    />
                     <Card num={1} title="Emoji statistics" blockKey="emoji-stats" children={EmojiStatsTable} />
                 </CardContainer>
             </TabContainer>
