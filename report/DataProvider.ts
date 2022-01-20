@@ -62,6 +62,7 @@ export class DataProvider extends EventEmitter {
             // Chrome Mobile crashes if you use createObjectURL from an .html file :)
             // See: https://bugs.chromium.org/p/chromium/issues/detail?id=1150828&q=createObjectURL%20crash
             // We can work around it using base64, so no requests are made
+            // NOTE: data:application/javascript breaks
             const workerJs = document.getElementById("worker-script")!.textContent!;
             this.worker = new Worker("data:application/javascript;base64," + btoa(workerJs));
         }
