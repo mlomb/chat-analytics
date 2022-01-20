@@ -107,9 +107,7 @@ module.exports = (env) => {
                 filename: "report.html",
                 minify: isProd,
             }),
-            new MiniCssExtractPlugin({
-                filename: "assets/[name].[contenthash:8].css",
-            }),
+            new MiniCssExtractPlugin(isProd ? { filename: "assets/[name].[contenthash:8].css" } : undefined),
             new webpack.DefinePlugin({
                 env: {
                     isProd: JSON.stringify(isProd),
