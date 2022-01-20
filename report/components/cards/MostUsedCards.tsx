@@ -16,6 +16,8 @@ import { EmojiStats } from "@pipeline/aggregate/blocks/EmojiStats";
 import { InteractionStats } from "@pipeline/aggregate/blocks/InteractionStats";
 import { ExternalStats } from "@pipeline/aggregate/blocks/ExternalStats";
 
+const EmptyArray: any[] = [];
+
 ///////////////////////////
 /// AUTHORS
 ///////////////////////////
@@ -23,7 +25,7 @@ export const MostMessagesAuthors = ({ data }: { data?: MessagesStats }) => (
     <MostUsed
         what="Author"
         unit="Total messages"
-        counts={data?.authorsCount || []}
+        counts={data?.authorsCount || EmptyArray}
         itemComponent={AuthorLabel}
         maxItems={16}
         colorHue={240}
@@ -37,7 +39,7 @@ export const MostMessagesChannels = ({ data }: { data?: MessagesStats }) => (
     <MostUsed
         what="Channel"
         unit="Total messages"
-        counts={data?.channelsCount || []}
+        counts={data?.channelsCount || EmptyArray}
         itemComponent={ChannelLabel}
         maxItems={16}
         colorHue={266}
@@ -53,7 +55,7 @@ export const MostUsedWords = ({ data }: { data?: LanguageStats }) => (
     <MostUsed
         what="Word"
         unit="Times used"
-        counts={data?.wordsCount || []}
+        counts={data?.wordsCount || EmptyArray}
         maxItems={15}
         itemComponent={WordLabel}
         searchable
@@ -80,7 +82,7 @@ export const MostUsedEmojis = ({ data, options }: { data?: EmojiStats; options: 
     <MostUsed
         what="Emoji"
         unit="Times used"
-        counts={data?.emojisCount || []}
+        counts={data?.emojisCount || EmptyArray}
         filter={EmojiFilterFns[options[0] as unknown as keyof typeof EmojiFilterFns]}
         maxItems={15}
         itemComponent={EmojiLabel}
@@ -95,6 +97,16 @@ export const MostUsedEmojis = ({ data, options }: { data?: EmojiStats; options: 
         inFilter={(index, filter) => useDataProvider().emojiSearchFormat[index].includes(filter)}
     />
 );
+export const MostProducerEmojis = ({ data, options }: { data?: EmojiStats; options: number[] }) => (
+    <MostUsed
+        what={options[0] === 0 ? "Author" : "Channel"}
+        unit="Number of emojis used"
+        counts={data ? (options[0] === 0 ? data.authorEmojiCount : data.channelEmojiCount) : []}
+        maxItems={15}
+        itemComponent={options[0] === 0 ? AuthorLabel : ChannelLabel}
+        colorHue={240}
+    />
+);
 
 ///////////////////////////
 /// DOMAINS
@@ -103,7 +115,7 @@ export const MostLinkedDomains = ({ data }: { data?: ExternalStats }) => (
     <MostUsed
         what="Domain"
         unit="Times linked"
-        counts={data?.domainsCount || []}
+        counts={data?.domainsCount || EmptyArray}
         maxItems={15}
         itemComponent={DomainLabel}
         searchable
@@ -120,7 +132,7 @@ export const MostMentioned = ({ data }: { data?: InteractionStats }) => (
     <MostUsed
         what="Who"
         unit="Times mentioned"
-        counts={data?.mentionsCount || []}
+        counts={data?.mentionsCount || EmptyArray}
         itemComponent={MentionLabel}
         maxItems={16}
         searchable

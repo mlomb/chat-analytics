@@ -18,6 +18,7 @@ import {
     MostMentioned,
     MostMessagesAuthors,
     MostMessagesChannels,
+    MostProducerEmojis,
     MostUsedEmojis,
     MostUsedWords,
 } from "@report/components/cards/MostUsedCards";
@@ -49,13 +50,13 @@ const ReportDashboard = () => {
                     <Card
                         num={1}
                         blockKey="messages-stats"
-                        title="Most messages sent by author"
+                        title="Messages sent by author"
                         children={MostMessagesAuthors}
                     />
                     <Card
                         num={1}
                         blockKey="messages-stats"
-                        title="Most messages sent by channel"
+                        title="Messages sent by channel"
                         children={MostMessagesChannels}
                     />
                 </CardContainer>
@@ -73,6 +74,12 @@ const ReportDashboard = () => {
                         title={["Most used", ["emojis (all)", "regular emojis", "custom emojis"]]}
                         blockKey="emoji-stats"
                         children={MostUsedEmojis}
+                    />
+                    <Card
+                        num={1}
+                        title={["Emojis sent by", ["authors", "channels"]]}
+                        blockKey="emoji-stats"
+                        children={MostProducerEmojis}
                     />
                     <Card num={1} title="Emoji statistics" blockKey="emoji-stats" children={EmojiStatsTable} />
                 </CardContainer>
