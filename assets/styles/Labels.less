@@ -59,15 +59,15 @@
 
 .MessageLabel {
     margin: 10px;
-    padding: 8px;
     background: #181f22;
     border-radius: 8px;
-    height: 160px;
+    overflow: hidden;
 }
 .MessageLabel__header {
     display: flex;
     align-items: center;
-    margin-bottom: 5px;
+    margin-bottom: 10px;
+    padding: 8px 8px 0px 8px;
 }
 .MessageLabel__time {
     color: darkgrey;
@@ -95,11 +95,17 @@
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
-    margin: 0px -5px;
-    padding: 6px 0;
+    margin: -5px 0px -5px -5px;
     border-top: 1px solid #ffffff1c;
     overflow: auto;
     max-height: 85px;
+    padding: 6px 0 8px 8px;
+}
+.MessageLabel__empty {
+    color: #596570;
+    margin-bottom: 5px;
+    text-align: center;
+    width: 100%;
 }
 .MessageLabelChip {
     display: flex;
@@ -108,8 +114,10 @@
     line-height: 18px;
     border-radius: 4px;
     overflow: hidden;
+    height: 22px;
 }
 .MessageLabelChip__content {
+    display: flex;
     background: #59616880;
     padding: 2px 6px;
     overflow: hidden;

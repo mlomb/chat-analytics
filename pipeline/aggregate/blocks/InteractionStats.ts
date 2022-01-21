@@ -5,13 +5,12 @@ import { MessageView } from "@pipeline/serialization/MessageView";
 
 export interface InteractionStats {
     mentionsCount: number[];
-    topReaction: Message | null;
+    topReactions: [Message, number][];
 }
 
 const fn: BlockFn<InteractionStats> = (database, filters, common) => {
     const mentionsCount = new Array(database.mentions.length).fill(0);
-    let topReaction: Message | null = null;
-    let topReactionCount = 0;
+    let topReactions: [Message, number][] = [];
 
     const processMessage = (msg: MessageView, channelIndex: Index) => {
         const mentions = msg.getMentions();
@@ -26,9 +25,11 @@ const fn: BlockFn<InteractionStats> = (database, filters, common) => {
             for (const reaction of reactions) {
                 reactionCount += reaction[1];
             }
-            if (reactionCount > topReactionCount) {
-                topReactionCount = reactionCount;
-                topReaction = msg.getFullMessage();
+            if (reactionCount > 0) {
+                if (topReactions.length === 0 || reactionCount > topReactions[topReactions.length - 1][1]) {
+                    topReactions.push([msg.getFullMessage(), reactionCount]);
+                    topReactions = topReactions.sort((a, b) => b[1] - a[1]).slice(0, 3);
+                }
             }
         }
     };
@@ -37,7 +38,7 @@ const fn: BlockFn<InteractionStats> = (database, filters, common) => {
 
     return {
         mentionsCount,
-        topReaction,
+        topReactions,
     };
 };
 
