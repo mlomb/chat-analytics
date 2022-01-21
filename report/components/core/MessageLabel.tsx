@@ -65,6 +65,7 @@ export const MessageLabel = (props: { message?: Message }) => {
                 <Tooltip content={<>{fullDateTime}</>} children={<div className="MessageLabel__time">{date}</div>} />
             </div>
             <div className="MessageLabel__chips">
+                {chips.length === 0 && <div className="MessageLabel__empty">No content found</div>}
                 {chips.map((c) => (
                     <Chip chip={c} />
                 ))}
