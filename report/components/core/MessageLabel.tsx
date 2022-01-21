@@ -52,22 +52,39 @@ export const MessageLabel = (props: { message?: FullMessage }) => {
         )
         .sort(sortFn);
 
+    const reactions = (msg.reactions || []).sort((a, b) => b[1] - a[1]);
+
     return (
         <div className="MessageLabel">
-            <div className="MessageLabel__header">
-                <div className="MessageLabel__author">
-                    <AuthorLabel index={msg.authorIndex} />
+            <div className="MessageLabel__main">
+                <div className="MessageLabel__header">
+                    <div className="MessageLabel__author">
+                        <AuthorLabel index={msg.authorIndex} />
+                    </div>
+                    <span className="MessageLabel__on">on</span>
+                    <div className="MessageLabel__channel">
+                        <ChannelLabel index={msg.channelIndex} />
+                    </div>
+                    <Tooltip
+                        content={<>{fullDateTime}</>}
+                        children={<div className="MessageLabel__time">{date}</div>}
+                    />
                 </div>
-                <span className="MessageLabel__on">on</span>
-                <div className="MessageLabel__channel">
-                    <ChannelLabel index={msg.channelIndex} />
+                <div className="MessageLabel__chips">
+                    {chips.length === 0 && <div className="MessageLabel__empty">No content found</div>}
+                    {chips.map((c) => (
+                        <Chip chip={c} />
+                    ))}
                 </div>
-                <Tooltip content={<>{fullDateTime}</>} children={<div className="MessageLabel__time">{date}</div>} />
             </div>
-            <div className="MessageLabel__chips">
-                {chips.length === 0 && <div className="MessageLabel__empty">No content found</div>}
-                {chips.map((c) => (
-                    <Chip chip={c} />
+            <div className="MessageLabel__reactions">
+                {reactions.map((r) => (
+                    <Tooltip content="reaction">
+                        <div className="MessageLabel__reaction">
+                            <EmojiLabel index={r[0]} hideNameIfPossible />
+                            <span className="MessageLabel__reactionCount">{r[1]}</span>
+                        </div>
+                    </Tooltip>
                 ))}
             </div>
         </div>
@@ -112,7 +129,7 @@ const Chip = (props: { chip: ChipProps }) => {
         <Tooltip content={type}>
             <div className="MessageLabelChip">
                 <div className="MessageLabelChip__content">{content}</div>
-                <div className="MessageLabelChip__count">{count}</div>
+                {count > 1 && <div className="MessageLabelChip__count">{count}</div>}
             </div>
         </Tooltip>
     );

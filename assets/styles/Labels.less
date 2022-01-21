@@ -57,17 +57,31 @@
     }
 }
 
-.MessageLabel {
-    margin: 10px;
-    background: #181f22;
+.MessageLabel,
+.MessageLabel__main {
     border-radius: 8px;
     overflow: hidden;
+}
+.MessageLabel {
+    margin: 10px;
+    background: #394045;
+}
+.MessageLabel__main {
+    background: #181f22;
+}
+.MessageLabel__reactions {
+    display: flex;
+    flex-wrap: wrap;
+    max-height: 70px;
+    overflow: auto;
+    margin: 0px 0 -5px -3px;
+    padding: 8px 0 6px 8px;
 }
 .MessageLabel__header {
     display: flex;
     align-items: center;
-    margin-bottom: 10px;
-    padding: 8px 8px 0px 8px;
+    margin-bottom: 13px;
+    padding: 8px 8px 0;
 }
 .MessageLabel__time {
     color: darkgrey;
@@ -95,11 +109,11 @@
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
-    margin: -5px 0px -5px -5px;
+    margin: -5px 0 -5px -3px;
     border-top: 1px solid #ffffff1c;
     overflow: auto;
     max-height: 85px;
-    padding: 6px 0 8px 8px;
+    padding: 8px 0 8px 8px;
 }
 .MessageLabel__empty {
     color: #596570;
@@ -126,4 +140,17 @@
 .MessageLabelChip__count {
     background: #535d64;
     padding: 2px 6px;
+}
+.MessageLabel__reaction {
+    display: flex;
+    align-items: center;
+    background: #3b405a;
+    border: 1px solid #5865f2;
+    border-radius: 4px;
+    margin-bottom: 5px;
+    margin-right: 5px;
+    padding: 3px;
+}
+.MessageLabel__reactionCount {
+    margin-left: 4px;
 }
