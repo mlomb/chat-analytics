@@ -34,6 +34,7 @@
     font-weight: normal;
     color: rgb(255 255 255 / 65%);
     font-family: monospace;
+    margin: auto;
 }
 
 .Label-domain {
@@ -79,6 +80,7 @@
     padding: 3px;
     border-radius: 3px;
     overflow: hidden;
+    font-size: 12px;
 }
 .MessageLabel__author {
     background: #4d4dff;
@@ -88,4 +90,30 @@
 }
 .MessageLabel__on {
     margin: 0 5px;
+}
+.MessageLabel__chips {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    margin: 0px -5px;
+    padding: 6px 0;
+    border-top: 1px solid #ffffff1c;
+}
+.MessageLabelChip {
+    display: flex;
+    margin: 0 3px 4px 3px;
+    font-size: 11px;
+    line-height: 18px;
+}
+.MessageLabelChip__content {
+    background: #59616880;
+    padding: 2px 3px 2px 6px;
+    border-top-left-radius: 16px;
+    border-bottom-left-radius: 16px;
+}
+.MessageLabelChip__count {
+    background: #535d64;
+    border-top-right-radius: 16px;
+    border-bottom-right-radius: 16px;
+    padding: 2px 6px;
 }
