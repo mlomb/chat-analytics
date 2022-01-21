@@ -120,7 +120,6 @@ export interface IMessage {
 }
 
 // stored serialized during generation
-// then used in the UI (but rarely)
 export interface Message {
     day: number;
     secondOfDay: number;
@@ -133,4 +132,9 @@ export interface Message {
     reactions?: [Index, number][];
     domains?: [Index, number][];
     attachments?: [AttachmentType, number][];
+}
+
+// used in the UI, basically a Message but with the channel
+export interface FullMessage extends Message {
+    channelIndex: Index;
 }

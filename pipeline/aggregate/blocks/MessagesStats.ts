@@ -42,10 +42,10 @@ const fn: BlockFn<MessagesStats> = (database, filters, common) => {
     const numFiveMinBlocks = 24 * 12 * database.time.numDays;
     const fiveMinMessagesCount = new Array(numFiveMinBlocks).fill(0);
 
-    const processMessage = (msg: MessageView, channelIndex: Index) => {
+    const processMessage = (msg: MessageView) => {
         total++;
         authorsCount[msg.authorIndex]++;
-        channelsCount[channelIndex]++;
+        channelsCount[msg.channelIndex]++;
         fiveMinMessagesCount[msg.dayIndex * 288 + Math.floor(msg.secondOfDay / 300)]++;
 
         const attachments = msg.getAttachments();

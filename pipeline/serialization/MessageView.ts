@@ -1,9 +1,10 @@
-import { BitAddress, Index, Message } from "@pipeline/Types";
+import { BitAddress, FullMessage, Index } from "@pipeline/Types";
 import { BitStream } from "@pipeline/serialization/BitStream";
 import { MessageBitConfig, MessageFlags } from "@pipeline/serialization/MessageSerialization";
 import { readIndexArray, skipIndexArray } from "@pipeline/serialization/IndexSerialization";
 
 export class MessageView {
+    readonly channelIndex: Index;
     readonly dayIndex: Index;
     readonly secondOfDay: number;
     readonly authorIndex: Index;
@@ -25,7 +26,8 @@ export class MessageView {
     get hasMentions(): boolean { return this.mentionsOffset > 0; } // prettier-ignore
     get hasDomains(): boolean { return this.domainsOffset > 0; } // prettier-ignore
 
-    constructor(private readonly stream: BitStream, private readonly config: MessageBitConfig) {
+    constructor(private readonly stream: BitStream, private readonly config: MessageBitConfig, channelIndex: Index) {
+        this.channelIndex = channelIndex;
         this.dayIndex = stream.getBits(config.dayBits);
         this.secondOfDay = stream.getBits(17);
         this.authorIndex = stream.getBits(config.authorIdxBits);
@@ -97,7 +99,7 @@ export class MessageView {
         return readIndexArray(this.stream, this.config.domainsIdxBits);
     }
 
-    getFullMessage(): Message {
+    getFullMessage(): FullMessage {
         return {
             day: this.dayIndex,
             secondOfDay: this.secondOfDay,
@@ -110,6 +112,7 @@ export class MessageView {
             reactions: this.getReactions(),
             mentions: this.getMentions(),
             domains: this.getDomains(),
+            channelIndex: this.channelIndex,
         };
     }
 }

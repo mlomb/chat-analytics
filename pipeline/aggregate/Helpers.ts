@@ -4,7 +4,7 @@ import { Filters } from "@pipeline/aggregate/Filters";
 import { MessageView } from "@pipeline/serialization/MessageView";
 
 export const parseAndFilterMessages = (
-    fn: (msg: MessageView, channelIndex: Index) => void,
+    fn: (msg: MessageView) => void,
     database: Database,
     filters: Filters,
     activeFilters = { channels: true, authors: true, time: true }
@@ -20,14 +20,14 @@ export const parseAndFilterMessages = (
 
         // read messages
         for (let read = 0; read < channel.msgCount; read++) {
-            const message = new MessageView(stream, database.bitConfig);
+            const message = new MessageView(stream, database.bitConfig, i);
             // filter author
             if (!activeFilters.authors || filters.hasAuthor(message.authorIndex)) {
                 // filter time
                 if (!activeFilters.time || filters.inTime(message.dayIndex)) {
                     // make sure to preserve the offset, since reading an index array will overwrite it
                     let prevOffset = stream.offset;
-                    fn(message, i);
+                    fn(message);
                     stream.offset = prevOffset;
                 }
             }

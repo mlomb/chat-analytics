@@ -19,7 +19,7 @@ const fn: BlockFn<LanguageStats> = (database, filters, common) => {
     const wordsCount = new Array(database.words.length).fill(0);
     const uniqueWords = new Set<number>();
 
-    const processMessage = (msg: MessageView, channelIndex: Index) => {
+    const processMessage = (msg: MessageView) => {
         if (msg.langIndex !== undefined) {
             totalWithLang++;
             languagesCount[msg.langIndex]++;

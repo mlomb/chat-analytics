@@ -1,6 +1,6 @@
 import "@assets/styles/Labels.less";
 
-import { AttachmentType, Message } from "@pipeline/Types";
+import { AttachmentType, FullMessage } from "@pipeline/Types";
 import { Day, formatTime } from "@pipeline/Time";
 import {
     AuthorLabel,
@@ -30,7 +30,7 @@ const sortFn = (a: ChipProps, b: ChipProps) => {
     }
 };
 
-export const MessageLabel = (props: { message?: Message }) => {
+export const MessageLabel = (props: { message?: FullMessage }) => {
     const dp = useDataProvider();
     const msg = props.message;
 
@@ -60,7 +60,7 @@ export const MessageLabel = (props: { message?: Message }) => {
                 </div>
                 <span className="MessageLabel__on">on</span>
                 <div className="MessageLabel__channel">
-                    <ChannelLabel index={3} />
+                    <ChannelLabel index={msg.channelIndex} />
                 </div>
                 <Tooltip content={<>{fullDateTime}</>} children={<div className="MessageLabel__time">{date}</div>} />
             </div>
