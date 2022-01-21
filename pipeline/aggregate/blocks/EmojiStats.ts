@@ -22,13 +22,13 @@ const fn: BlockFn<EmojiStats> = (database, filters, common) => {
     const channelEmojiCount = new Array(database.channels.length).fill(0);
     const uniqueEmojis = new Set<number>();
 
-    const processMessage = (msg: MessageView, channelIndex: Index) => {
+    const processMessage = (msg: MessageView) => {
         const emojis = msg.getEmojis();
         if (emojis) {
             for (const emoji of emojis) {
                 emojisCount[emoji[0]] += emoji[1];
                 authorEmojiCount[msg.authorIndex] += emoji[1];
-                channelEmojiCount[channelIndex] += emoji[1];
+                channelEmojiCount[msg.channelIndex] += emoji[1];
                 totalEmojis += emoji[1];
                 if (database.emojis[emoji[0]].c === undefined) {
                     totalCustomEmojis += emoji[1];
