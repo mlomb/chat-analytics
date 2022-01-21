@@ -136,9 +136,10 @@ const _WordLabel = ({ index }: LabelProps) => {
     );
 };
 
-const _EmojiLabel = ({ index }: LabelProps) => {
+const _EmojiLabel = ({ index, hideNameIfPossible }: LabelProps & { hideNameIfPossible?: boolean }) => {
     const dp = useDataProvider();
     const emoji = dp.database.emojis[index];
+    hideNameIfPossible = hideNameIfPossible === true;
 
     if (emoji === undefined) {
         return <span>invalid emoji index {index}</span>;
@@ -149,12 +150,14 @@ const _EmojiLabel = ({ index }: LabelProps) => {
         image = <img src={`https://cdn.discordapp.com/emojis/${emoji.id}.png?size=32`} height={20} />;
     }
 
+    const showName = emoji.n !== emoji.c && (!hideNameIfPossible || (emoji.c === undefined && image === null));
+
     return (
         <div className="Label" title={emoji.n}>
-            <span style={{ marginRight: 5, display: "inline-flex" }}>
+            <span style={{ marginRight: showName ? 5 : 0, display: "inline-flex" }}>
                 {image ? image : <span style={{ color: "#b9b9b9" }}>{emoji.c}</span>}
             </span>
-            {emoji.n !== emoji.c ? <div className="Label__name">{emoji.c ? emoji.n : `:${emoji.n}:`}</div> : null}
+            {showName ? <div className="Label__name">{emoji.c ? emoji.n : `:${emoji.n}:`}</div> : null}
         </div>
     );
 };

@@ -62,7 +62,7 @@
     padding: 8px;
     background: #181f22;
     border-radius: 8px;
-    height: 96px;
+    height: 160px;
 }
 .MessageLabel__header {
     display: flex;
@@ -98,22 +98,24 @@
     margin: 0px -5px;
     padding: 6px 0;
     border-top: 1px solid #ffffff1c;
+    overflow: auto;
+    max-height: 85px;
 }
 .MessageLabelChip {
     display: flex;
     margin: 0 3px 4px 3px;
     font-size: 11px;
     line-height: 18px;
+    border-radius: 4px;
+    overflow: hidden;
 }
 .MessageLabelChip__content {
     background: #59616880;
-    padding: 2px 3px 2px 6px;
-    border-top-left-radius: 16px;
-    border-bottom-left-radius: 16px;
+    padding: 2px 6px;
+    overflow: hidden;
+    max-width: 165px;
 }
 .MessageLabelChip__count {
     background: #535d64;
-    border-top-right-radius: 16px;
-    border-bottom-right-radius: 16px;
     padding: 2px 6px;
 }
