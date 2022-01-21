@@ -115,7 +115,7 @@ const _ChannelLabel = ({ index }: LabelProps) => {
 
     return (
         <div className="Label" title={channel.n}>
-            {platform === "discord" && <img src={Hashtag} />}
+            {platform === "discord" && <img src={Hashtag} height={16} />}
             <span className="Label__name">{channel.n}</span>
         </div>
     );
@@ -147,7 +147,7 @@ const _EmojiLabel = ({ index, hideNameIfPossible }: LabelProps & { hideNameIfPos
 
     let image: JSX.Element | null = null;
     if (emoji.id) {
-        image = <img src={`https://cdn.discordapp.com/emojis/${emoji.id}.png?size=32`} height={20} />;
+        image = <img src={`https://cdn.discordapp.com/emojis/${emoji.id}.png?size=32`} height={16} />;
     }
 
     const showName = emoji.n !== emoji.c && (!hideNameIfPossible || (emoji.c === undefined && image === null));
