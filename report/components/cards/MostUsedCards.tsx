@@ -104,7 +104,7 @@ export const MostProducerEmojis = ({ data, options }: { data?: EmojiStats; optio
         counts={data ? (options[0] === 0 ? data.authorEmojiCount : data.channelEmojiCount) : []}
         maxItems={15}
         itemComponent={options[0] === 0 ? AuthorLabel : ChannelLabel}
-        colorHue={240}
+        colorHue={options[0] === 0 ? 240 : 266}
     />
 );
 
