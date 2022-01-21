@@ -1,16 +1,34 @@
 import "@assets/styles/Labels.less";
 
-import { Message } from "@pipeline/Types";
+import { AttachmentType, Message } from "@pipeline/Types";
 import { Day, formatTime } from "@pipeline/Time";
-import { AuthorLabel, ChannelLabel, EmojiLabel, MentionLabel, WordLabel } from "@report/components/core/Labels";
+import {
+    AuthorLabel,
+    ChannelLabel,
+    DomainLabel,
+    EmojiLabel,
+    MentionLabel,
+    WordLabel,
+} from "@report/components/core/Labels";
 import Tooltip from "@report/components/core//Tooltip";
 import { useDataProvider } from "@report/DataProvider";
 
 interface ChipProps {
-    type: "attachment" | "word" | "emoji" | "mention" | "link";
+    type: "attachment" | "link" | "mention" | "word" | "emoji";
     index: number;
     count: number;
 }
+
+const order = ["attachment", "link", "mention", "word", "emoji"];
+const sortFn = (a: ChipProps, b: ChipProps) => {
+    if (a.type === b.type) {
+        // if type is the same, sort by count
+        return b.count - a.count;
+    } else {
+        // if type is different, sort by order
+        return order.indexOf(a.type) - order.indexOf(b.type);
+    }
+};
 
 export const MessageLabel = (props: { message?: Message }) => {
     const dp = useDataProvider();
@@ -24,15 +42,15 @@ export const MessageLabel = (props: { message?: Message }) => {
     const date = formatTime(day, msg.secondOfDay, { showDate: true, showTime: false, hideSeconds: false });
     const fullDateTime = formatTime(day, msg.secondOfDay);
 
-    const chips: ChipProps[] = ([] as ChipProps[]).concat(
-        msg.attachments?.map((x) => ({ type: "attachment", index: x[0], count: x[1] })) || [],
-        msg.words?.map((x) => ({ type: "word", index: x[0], count: x[1] })) || [],
-        msg.emojis?.map((x) => ({ type: "emoji", index: x[0], count: x[1] })) || [],
-        msg.mentions?.map((x) => ({ type: "mention", index: x[0], count: x[1] })) || [],
-        msg.domains?.map((x) => ({ type: "link", index: x[0], count: x[1] })) || []
-    );
-
-    console.log(chips);
+    const chips: ChipProps[] = ([] as ChipProps[])
+        .concat(
+            msg.attachments?.map((x) => ({ type: "attachment", index: x[0], count: x[1] })) || [],
+            msg.words?.map((x) => ({ type: "word", index: x[0], count: x[1] })) || [],
+            msg.emojis?.map((x) => ({ type: "emoji", index: x[0], count: x[1] })) || [],
+            msg.mentions?.map((x) => ({ type: "mention", index: x[0], count: x[1] })) || [],
+            msg.domains?.map((x) => ({ type: "link", index: x[0], count: x[1] })) || []
+        )
+        .sort(sortFn);
 
     return (
         <div className="MessageLabel">
@@ -61,14 +79,31 @@ const Chip = (props: { chip: ChipProps }) => {
     let content: JSX.Element | null = null;
 
     switch (type) {
+        case "attachment":
+            let kind: string = "unknown";
+            // prettier-ignore
+            switch (index as AttachmentType) {
+                case AttachmentType.Image: kind = "image"; break;
+                case AttachmentType.ImageAnimated: kind = "GIF"; break;
+                case AttachmentType.Video: kind = "video"; break;
+                case AttachmentType.Sticker: kind = "sticker"; break;
+                case AttachmentType.Audio: kind = "audio"; break;
+                case AttachmentType.Document: kind = "document"; break;
+                case AttachmentType.Other: kind = "other attachment"; break;
+            }
+            content = <span className="MessageLabel__attachment">{kind}</span>;
+            break;
         case "word":
             content = <WordLabel index={index} />;
             break;
         case "emoji":
-            content = <EmojiLabel index={index} />;
+            content = <EmojiLabel index={index} hideNameIfPossible />;
             break;
         case "mention":
             content = <MentionLabel index={index} />;
+            break;
+        case "link":
+            content = <DomainLabel index={index} />;
             break;
     }
 
