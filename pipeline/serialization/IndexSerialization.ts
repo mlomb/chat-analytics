@@ -112,7 +112,7 @@ export const writeIndexArray = (counts: [Index, number][], stream: BitStream, bi
         // use RLE
         stream.setBits(2, 0b11); // 0b11=RLE
         stream.setBits(7, realLen);
-        stream.setBits(4, bitsPerCount);
+        stream.setBits(5, bitsPerCount - 1); // since 0 is not possible, we can squeeze one more value
 
         for (let i = 0; i < realLen; i++) {
             stream.setBits(bitsPerIndex, counts[i][0]);
@@ -151,7 +151,7 @@ export const readIndexArray = (stream: BitStream, bitsPerIndex: number): [Index,
     } else {
         // RLE
         const len = stream.getBits(7);
-        const bitsPerCount = stream.getBits(4);
+        const bitsPerCount = stream.getBits(5) + 1;
         for (let i = 0; i < len; i++) {
             const index = stream.getBits(bitsPerIndex);
             const count = stream.getBits(bitsPerCount);
@@ -178,7 +178,7 @@ export const skipIndexArray = (stream: BitStream, bitsPerIndex: number) => {
     } else {
         // RLE
         const len = stream.getBits(7);
-        const bitsPerCount = stream.getBits(4);
+        const bitsPerCount = stream.getBits(5) + 1;
         stream.offset += (bitsPerIndex + bitsPerCount) * len;
     }
 };
