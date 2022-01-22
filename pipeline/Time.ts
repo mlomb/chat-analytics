@@ -20,9 +20,13 @@ export class Day {
         return new Day(date.getFullYear(), date.getMonth() + 1, date.getDate());
     }
 
-    static fromKey(key: DateKey): Day {
-        const [year, month, day] = key.split("-").map(Number);
-        return new Day(year, month, day);
+    static fromKey(key: DateKey | MonthKey): Day {
+        const arr = key.split("-").map(Number);
+        if (arr.length === 2) {
+            return new Day(arr[0], arr[1], 1);
+        } else {
+            return new Day(arr[0], arr[1], arr[2]);
+        }
     }
 
     static fromBinary(binary: number): Day {
@@ -34,6 +38,10 @@ export class Day {
 
     toDate(): Date {
         return new Date(this.year, this.month - 1, this.day);
+    }
+
+    toTimestamp(): number {
+        return this.toDate().getTime();
     }
 
     toBinary(): number {
