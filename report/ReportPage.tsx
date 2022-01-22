@@ -107,12 +107,14 @@ const ReportDashboard = () => {
                         blockKey="emoji-stats"
                         children={MostGetterEmojis}
                     />
+                    {/*
                     <Card
                         num={1}
                         title={["Messages with the most replies"]}
                         blockKey="interaction-stats"
                         children={TopReplies}
                     />
+                    */}
                 </CardContainer>
             </TabContainer>
             <TabContainer currentValue={tab} value="external">
