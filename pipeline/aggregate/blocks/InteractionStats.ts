@@ -11,9 +11,9 @@ export interface InteractionStats {
 
 const fn: BlockFn<InteractionStats> = (database, filters, common) => {
     const mentionsCount = new Array(database.mentions.length).fill(0);
-    let topTotalReactions: [FullMessage, number][] = [];
-    let topSingleReactions: [FullMessage, number][] = [];
-    let topReplies: [FullMessage, number][] = [];
+    let topTotalReactions: [MessageView, number][] = [];
+    let topSingleReactions: [MessageView, number][] = [];
+    let topReplies: [MessageView, number][] = [];
 
     const processMessage = (msg: MessageView) => {
         const mentions = msg.getMentions();
@@ -35,7 +35,7 @@ const fn: BlockFn<InteractionStats> = (database, filters, common) => {
                     topTotalReactions.length === 0 ||
                     reactionCount > topTotalReactions[topTotalReactions.length - 1][1]
                 ) {
-                    topTotalReactions.push([msg.getFullMessage(), reactionCount]);
+                    topTotalReactions.push([msg, reactionCount]);
                     topTotalReactions = topTotalReactions.sort((a, b) => b[1] - a[1]).slice(0, 3);
                 }
             }
@@ -44,7 +44,7 @@ const fn: BlockFn<InteractionStats> = (database, filters, common) => {
                     topSingleReactions.length === 0 ||
                     maxReactionCount > topSingleReactions[topSingleReactions.length - 1][1]
                 ) {
-                    topSingleReactions.push([msg.getFullMessage(), maxReactionCount]);
+                    topSingleReactions.push([msg, maxReactionCount]);
                     topSingleReactions = topSingleReactions.sort((a, b) => b[1] - a[1]).slice(0, 3);
                 }
             }
@@ -55,8 +55,8 @@ const fn: BlockFn<InteractionStats> = (database, filters, common) => {
 
     return {
         mentionsCount,
-        topTotalReactions: topTotalReactions.map(([msg, _]) => msg),
-        topSingleReactions: topSingleReactions.map(([msg, _]) => msg),
+        topTotalReactions: topTotalReactions.map(([msg, _]) => msg.getFullMessage()),
+        topSingleReactions: topSingleReactions.map(([msg, _]) => msg.getFullMessage()),
     };
 };
 
