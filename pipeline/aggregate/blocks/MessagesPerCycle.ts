@@ -24,13 +24,13 @@ const fn: BlockFn<MessagesPerCycle> = (database, filters, common) => {
     // fill empty
     for (const dateKey of dateKeys) {
         res.perDay.push({
-            d: new Date(dateKey).getTime(),
+            d: Day.fromKey(dateKey).toTimestamp(),
             m: 0,
         });
     }
     for (const monthKey of monthKeys) {
         res.perMonth.push({
-            d: new Date(monthKey).getTime(),
+            d: Day.fromKey(monthKey).toTimestamp(),
             m: 0,
         });
     }
