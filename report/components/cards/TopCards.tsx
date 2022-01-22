@@ -4,9 +4,12 @@ import { TopMessages } from "@report/components/viz/TopMessages";
 
 const EmptyArray: any[] = [];
 
-export const TopReplies = ({ data }: { data?: InteractionStats }) => {
-    return <div>TODO</div>;
-};
+export const TopReplies = ({ data }: { data?: InteractionStats }) => (
+    <TopMessages
+        messages={data?.topSingleReactions || EmptyArray}
+        title={(msg: FullMessage) => ` reacted to messages`}
+    />
+);
 
 const TopReactedTitleFns = {
     "0": (msg: FullMessage) =>
