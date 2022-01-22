@@ -16,6 +16,7 @@ import LanguageStatsTable from "@report/components/cards/LanguageStatsTable";
 import EmojiStatsTable from "@report/components/cards/EmojiStatsTable";
 import TopReacted from "@report/components/cards/TopReacted";
 import {
+    MostGetterEmojis,
     MostLinkedDomains,
     MostMentioned,
     MostMessagesAuthors,
@@ -73,13 +74,18 @@ const ReportDashboard = () => {
                 <CardContainer>
                     <Card
                         num={1}
-                        title={["Most used", ["emojis (all)", "regular emojis", "custom emojis"]]}
+                        title={[
+                            "Most used",
+                            ["emojis (all)", "regular emojis", "custom emojis"],
+                            "in",
+                            ["text", "reactions"],
+                        ]}
                         blockKey="emoji-stats"
                         children={MostUsedEmojis}
                     />
                     <Card
                         num={1}
-                        title={["Emojis sent by", ["authors", "channels"]]}
+                        title={["Emojis sent", ["by author", "in channel"]]}
                         blockKey="emoji-stats"
                         children={MostProducerEmojis}
                     />
@@ -94,6 +100,12 @@ const ReportDashboard = () => {
                         title={["Top reacted messages", ["(total)", "(single)"]]}
                         blockKey="interaction-stats"
                         children={TopReacted}
+                    />
+                    <Card
+                        num={1}
+                        title={[["Authors", "Channels"], "that get the most reactions"]}
+                        blockKey="emoji-stats"
+                        children={MostGetterEmojis}
                     />
                 </CardContainer>
             </TabContainer>

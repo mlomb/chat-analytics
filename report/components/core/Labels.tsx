@@ -98,8 +98,12 @@ const _AuthorLabel = ({ index }: LabelProps) => {
     return (
         <div className="Label" title={author.n}>
             <div className="Label__avatar">{avatar}</div>
-            <span className="Label__name">{author.n}</span>
-            {author.d !== undefined && <span className="Label__discriminator">#{`${author.d}`.padStart(4, "0")}</span>}
+            <span className="Label__name">
+                {author.n}
+                {author.d !== undefined && (
+                    <span className="Label__discriminator">#{`${author.d}`.padStart(4, "0")}</span>
+                )}
+            </span>
         </div>
     );
 };

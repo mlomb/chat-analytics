@@ -81,8 +81,8 @@ const EmojiFilterPlaceholders = {
 export const MostUsedEmojis = ({ data, options }: { data?: EmojiStats; options: number[] }) => (
     <MostUsed
         what="Emoji"
-        unit="Times used"
-        counts={data?.emojisCount || EmptyArray}
+        unit={options[1] === 0 ? "Times used" : "Times reacted"}
+        counts={data && options ? (options[1] === 0 ? data.inText.count : data.inReactions.count) : EmptyArray}
         filter={EmojiFilterFns[options[0] as unknown as keyof typeof EmojiFilterFns]}
         maxItems={15}
         itemComponent={EmojiLabel}
@@ -101,7 +101,18 @@ export const MostProducerEmojis = ({ data, options }: { data?: EmojiStats; optio
     <MostUsed
         what={options[0] === 0 ? "Author" : "Channel"}
         unit="Number of emojis used"
-        counts={data ? (options[0] === 0 ? data.authorEmojiCount : data.channelEmojiCount) : []}
+        counts={data ? (options[0] === 0 ? data?.inText.authorCount : data?.inText.channelCount) : EmptyArray}
+        maxItems={15}
+        itemComponent={options[0] === 0 ? AuthorLabel : ChannelLabel}
+        colorHue={options[0] === 0 ? 240 : 266}
+    />
+);
+// at this point in the project, I just can't came up with new names
+export const MostGetterEmojis = ({ data, options }: { data?: EmojiStats; options: number[] }) => (
+    <MostUsed
+        what={options[0] === 0 ? "Author" : "Channel"}
+        unit="Number of reactions received"
+        counts={data ? (options[0] === 0 ? data?.inReactions.authorCount : data?.inReactions.channelCount) : EmptyArray}
         maxItems={15}
         itemComponent={options[0] === 0 ? AuthorLabel : ChannelLabel}
         colorHue={options[0] === 0 ? 240 : 266}

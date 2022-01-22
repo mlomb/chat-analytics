@@ -66,9 +66,9 @@ const Card = <K extends BlockKey>(props: Props<K>) => {
 
         return (
             <>
-                <div className="Card_title">{elements}</div>
+                <div className="Card__title">{elements}</div>
                 <props.children data={info.data || undefined} options={options} />
-                <div className={"Card_overlay" + (info.state === "ready" ? " Card_overlay--hidden" : "")}>
+                <div className={"Card__overlay" + (info.state === "ready" ? " Card__overlay--hidden" : "")}>
                     <img src={Spinner} alt="Loading" height={60} />
                     {Indicators[info.state]}
                 </div>
