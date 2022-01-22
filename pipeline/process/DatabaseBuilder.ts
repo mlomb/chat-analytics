@@ -195,6 +195,7 @@ export class DatabaseBuilder {
             const group = this.messageQueue.slice(l, len);
             this.processGroup(group);
             this.messageQueue = [];
+            this.recentIDs = [];
         } else {
             // wait for more messages
             this.messageQueue = this.messageQueue.slice(l, len);
