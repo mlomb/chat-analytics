@@ -72,14 +72,14 @@ export const MessageLabel = (props: { message?: FullMessage }) => {
                 </div>
                 <div className="MessageLabel__chips">
                     {chips.length === 0 && <div className="MessageLabel__empty">No content found</div>}
-                    {chips.map((c) => (
-                        <Chip chip={c} />
+                    {chips.map((c, i) => (
+                        <Chip chip={c} key={i} />
                     ))}
                 </div>
             </div>
             <div className="MessageLabel__reactions">
-                {reactions.map((r) => (
-                    <Tooltip content="reaction">
+                {reactions.map((r, i) => (
+                    <Tooltip content="reaction" key={i}>
                         <div className="MessageLabel__reaction">
                             <EmojiLabel index={r[0]} hideNameIfPossible />
                             <span className="MessageLabel__reactionCount">{r[1]}</span>
