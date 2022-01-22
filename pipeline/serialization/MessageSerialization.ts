@@ -32,6 +32,7 @@ export const writeMessage = (message: Message, stream: BitStream, config: Messag
     stream.setBits(config.authorIdxBits, message.authorIndex);
 
     let flags = MessageFlags.None;
+    if (message.replyOffset) flags |= MessageFlags.Reply;
     if (message.langIndex !== undefined) flags |= MessageFlags.Text;
     if (message.words?.length) flags |= MessageFlags.Words;
     if (message.emojis?.length) flags |= MessageFlags.Emojis;
@@ -40,6 +41,8 @@ export const writeMessage = (message: Message, stream: BitStream, config: Messag
     if (message.mentions?.length) flags |= MessageFlags.Mentions;
     if (message.domains?.length) flags |= MessageFlags.Domains;
     stream.setBits(9, flags);
+
+    if (flags & MessageFlags.Reply) stream.setBits(10, message.replyOffset!); // 1024
 
     if (flags & MessageFlags.Text) {
         stream.setBits(8, message.langIndex!); // 0-255
@@ -65,6 +68,8 @@ export const readMessage = (stream: BitStream, config: MessageBitConfig): Messag
         secondOfDay,
         authorIndex,
     };
+
+    if (flags & MessageFlags.Reply) message.replyOffset = stream.getBits(10);
 
     if (flags & MessageFlags.Text) {
         message.langIndex = stream.getBits(8);
