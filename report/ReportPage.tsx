@@ -89,7 +89,12 @@ const ReportDashboard = () => {
             <TabContainer currentValue={tab} value="interaction">
                 <CardContainer>
                     <Card num={1} title="Most mentioned" blockKey="interaction-stats" children={MostMentioned} />
-                    <Card num={1} title="Top reacted messages" blockKey="interaction-stats" children={TopReacted} />
+                    <Card
+                        num={1}
+                        title={["Top reacted messages", ["(total)", "(single)"]]}
+                        blockKey="interaction-stats"
+                        children={TopReacted}
+                    />
                 </CardContainer>
             </TabContainer>
             <TabContainer currentValue={tab} value="external">

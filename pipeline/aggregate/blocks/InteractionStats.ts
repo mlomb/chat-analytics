@@ -5,12 +5,14 @@ import { MessageView } from "@pipeline/serialization/MessageView";
 
 export interface InteractionStats {
     mentionsCount: number[];
-    topReactions: [FullMessage, number][];
+    topTotalReactions: FullMessage[];
+    topSingleReactions: FullMessage[];
 }
 
 const fn: BlockFn<InteractionStats> = (database, filters, common) => {
     const mentionsCount = new Array(database.mentions.length).fill(0);
-    let topReactions: [FullMessage, number][] = [];
+    let topTotalReactions: [FullMessage, number][] = [];
+    let topSingleReactions: [FullMessage, number][] = [];
 
     const processMessage = (msg: MessageView) => {
         const mentions = msg.getMentions();
@@ -21,14 +23,28 @@ const fn: BlockFn<InteractionStats> = (database, filters, common) => {
         }
         const reactions = msg.getReactions();
         if (reactions) {
-            let reactionCount = 0;
+            let reactionCount = 0,
+                maxReactionCount = 0;
             for (const reaction of reactions) {
                 reactionCount += reaction[1];
+                maxReactionCount = Math.max(maxReactionCount, reaction[1]);
             }
             if (reactionCount > 0) {
-                if (topReactions.length === 0 || reactionCount > topReactions[topReactions.length - 1][1]) {
-                    topReactions.push([msg.getFullMessage(), reactionCount]);
-                    topReactions = topReactions.sort((a, b) => b[1] - a[1]).slice(0, 3);
+                if (
+                    topTotalReactions.length === 0 ||
+                    reactionCount > topTotalReactions[topTotalReactions.length - 1][1]
+                ) {
+                    topTotalReactions.push([msg.getFullMessage(), reactionCount]);
+                    topTotalReactions = topTotalReactions.sort((a, b) => b[1] - a[1]).slice(0, 3);
+                }
+            }
+            if (maxReactionCount > 0) {
+                if (
+                    topSingleReactions.length === 0 ||
+                    maxReactionCount > topSingleReactions[topSingleReactions.length - 1][1]
+                ) {
+                    topSingleReactions.push([msg.getFullMessage(), maxReactionCount]);
+                    topSingleReactions = topSingleReactions.sort((a, b) => b[1] - a[1]).slice(0, 3);
                 }
             }
         }
@@ -38,7 +54,8 @@ const fn: BlockFn<InteractionStats> = (database, filters, common) => {
 
     return {
         mentionsCount,
-        topReactions,
+        topTotalReactions: topTotalReactions.map(([msg, _]) => msg),
+        topSingleReactions: topSingleReactions.map(([msg, _]) => msg),
     };
 };
 
