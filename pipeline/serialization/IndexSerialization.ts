@@ -87,8 +87,8 @@ export const writeIndexArray = (counts: [Index, number][], stream: BitStream, bi
     const rleBits =
         // length of counts, below 2^7=128 (99.99%)
         7 +
-        // num bits for counts, up to 2^4=16
-        4 +
+        // num bits for counts, up to 2^5=32
+        5 +
         // (index + count) * len
         (bitsPerIndex + bitsPerCount) * realLen;
 
