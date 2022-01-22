@@ -88,8 +88,6 @@ const fn: BlockFn<EmojiStats> = (database, filters, common) => {
     inReactions.unique = inReactions.set!.size;
     inReactions.set = undefined;
 
-    console.log(inText, inReactions);
-
     return {
         inText,
         inReactions,
