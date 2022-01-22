@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { memo, useMemo, useState } from "react";
 
 import { Index } from "@pipeline/Types";
 import { searchFormat } from "@pipeline/Text";
@@ -83,4 +83,4 @@ const MostUsed = (props: Props) => {
     );
 };
 
-export default MostUsed;
+export default memo(MostUsed) as typeof MostUsed;

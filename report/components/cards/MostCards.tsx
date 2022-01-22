@@ -1,3 +1,4 @@
+import { Index } from "@pipeline/Types";
 import { useDataProvider } from "@report/DataProvider";
 import MostUsed from "@report/components/viz/MostUsed";
 
@@ -78,6 +79,13 @@ const EmojiFilterPlaceholders = {
     "1": 'Filter emojis... (e.g. "fire" or "🔥")',
     "2": 'Filter emojis... (e.g. ":pepe:")',
 };
+const EmojisTransformFilter = (filter: string) => filter.replace(/:/g, "");
+const EmojisIndexOf = (value: string) => {
+    const rawEmoji = useDataProvider().database.emojis.findIndex((e) => e.c === value);
+    if (rawEmoji === -1) return useDataProvider().emojiSearchFormat.indexOf(value);
+    return rawEmoji;
+};
+const EmojisInFilter = (index: Index, filter: string) => useDataProvider().emojiSearchFormat[index].includes(filter);
 export const MostUsedEmojis = ({ data, options }: { data?: EmojiStats; options: number[] }) => (
     <MostUsed
         what="Emoji"
@@ -88,13 +96,9 @@ export const MostUsedEmojis = ({ data, options }: { data?: EmojiStats; options: 
         itemComponent={EmojiLabel}
         searchable
         searchPlaceholder={EmojiFilterPlaceholders[options[0] as unknown as keyof typeof EmojiFilterPlaceholders]}
-        transformFilter={(filter: string) => filter.replace(/:/g, "")}
-        indexOf={(value) => {
-            const rawEmoji = useDataProvider().database.emojis.findIndex((e) => e.c === value);
-            if (rawEmoji === -1) return useDataProvider().emojiSearchFormat.indexOf(value);
-            return rawEmoji;
-        }}
-        inFilter={(index, filter) => useDataProvider().emojiSearchFormat[index].includes(filter)}
+        transformFilter={EmojisTransformFilter}
+        indexOf={EmojisIndexOf}
+        inFilter={EmojisInFilter}
     />
 );
 export const MostProducerEmojis = ({ data, options }: { data?: EmojiStats; options: number[] }) => (
@@ -122,6 +126,8 @@ export const MostGetterEmojis = ({ data, options }: { data?: EmojiStats; options
 ///////////////////////////
 /// DOMAINS
 ///////////////////////////
+const DomainsIndexOf = (value: string) => useDataProvider().database.domains.indexOf(value);
+const DomainsInFilter = (index: number, filter: string) => useDataProvider().database.domains[index].includes(filter);
 export const MostLinkedDomains = ({ data }: { data?: ExternalStats }) => (
     <MostUsed
         what="Domain"
@@ -131,14 +137,17 @@ export const MostLinkedDomains = ({ data }: { data?: ExternalStats }) => (
         itemComponent={DomainLabel}
         searchable
         searchPlaceholder="Filter domains..."
-        indexOf={(value) => useDataProvider().database.domains.indexOf(value)}
-        inFilter={(index, filter) => useDataProvider().database.domains[index].includes(filter)}
+        indexOf={DomainsIndexOf}
+        inFilter={DomainsInFilter}
     />
 );
 
 ///////////////////////////
 /// MENTIONS
 ///////////////////////////
+const MentionsIndexOf = (value: string) => useDataProvider().mentionsSearchFormat.indexOf(value);
+const MentionsInFilter = (index: number, filter: string) =>
+    useDataProvider().mentionsSearchFormat[index].includes(filter);
 export const MostMentioned = ({ data }: { data?: InteractionStats }) => (
     <MostUsed
         what="Who"
@@ -148,7 +157,7 @@ export const MostMentioned = ({ data }: { data?: InteractionStats }) => (
         maxItems={16}
         searchable
         searchPlaceholder="Filter @mentions..."
-        indexOf={(value) => useDataProvider().mentionsSearchFormat.indexOf(value)}
-        inFilter={(index, filter) => useDataProvider().mentionsSearchFormat[index].includes(filter)}
+        indexOf={MentionsIndexOf}
+        inFilter={MentionsInFilter}
     />
 );
