@@ -14,7 +14,6 @@ import MessagesGraph from "@report/components/viz/MessagesGraph";
 import MessagesStatsTable from "@report/components/cards/MessagesStatsTable";
 import LanguageStatsTable from "@report/components/cards/LanguageStatsTable";
 import EmojiStatsTable from "@report/components/cards/EmojiStatsTable";
-import TopReacted from "@report/components/cards/TopReacted";
 import {
     MostGetterEmojis,
     MostLinkedDomains,
@@ -24,7 +23,8 @@ import {
     MostProducerEmojis,
     MostUsedEmojis,
     MostUsedWords,
-} from "@report/components/cards/MostUsedCards";
+} from "@report/components/cards/MostCards";
+import { TopReacted, TopReplies } from "@report/components/cards/TopCards";
 
 const CardContainer = (props: { children: React.ReactNode }) => <div className="CardContainer">{props.children}</div>;
 
@@ -106,6 +106,12 @@ const ReportDashboard = () => {
                         title={[["Authors", "Channels"], "that get the most reactions"]}
                         blockKey="emoji-stats"
                         children={MostGetterEmojis}
+                    />
+                    <Card
+                        num={1}
+                        title={["Messages with the most replies"]}
+                        blockKey="interaction-stats"
+                        children={TopReplies}
                     />
                 </CardContainer>
             </TabContainer>

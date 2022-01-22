@@ -13,6 +13,7 @@ const fn: BlockFn<InteractionStats> = (database, filters, common) => {
     const mentionsCount = new Array(database.mentions.length).fill(0);
     let topTotalReactions: [FullMessage, number][] = [];
     let topSingleReactions: [FullMessage, number][] = [];
+    let topReplies: [FullMessage, number][] = [];
 
     const processMessage = (msg: MessageView) => {
         const mentions = msg.getMentions();
