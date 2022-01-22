@@ -82,7 +82,7 @@ export const MostUsedEmojis = ({ data, options }: { data?: EmojiStats; options: 
     <MostUsed
         what="Emoji"
         unit={options[1] === 0 ? "Times used" : "Times reacted"}
-        counts={data && options ? (options[1] === 0 ? data.inText.count : data.inReactions.count) : EmptyArray}
+        counts={data ? (options[1] === 0 ? data.inText.count : data.inReactions.count) : EmptyArray}
         filter={EmojiFilterFns[options[0] as unknown as keyof typeof EmojiFilterFns]}
         maxItems={15}
         itemComponent={EmojiLabel}
