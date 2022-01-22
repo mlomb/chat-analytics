@@ -68,6 +68,8 @@ export class DatabaseBuilder {
     private authorMessagesCount: number[] = [];
     private wordsCount: number[] = [];
     private languagesCount: { [lang: number]: number } = {};
+    // keep a window of IDs to calculate replyOffset
+    private recentIDs: RawID[] = [];
 
     // static data
     private stopwords: Set<string> = new Set();
@@ -336,6 +338,21 @@ export class DatabaseBuilder {
                 }
             }
 
+            // reply offset
+            // add this message to the window
+            this.recentIDs.push(msg.id);
+            let replyOffset = undefined;
+            if (msg.replyTo) {
+                let replyOffset = this.recentIDs.indexOf(msg.replyTo);
+                if (replyOffset === -1) {
+                    replyOffset = 0; // message too far / message in another file (probably, not supported)
+                } else {
+                    replyOffset = this.recentIDs.length - replyOffset - 1;
+                }
+            }
+            // only keep last 1020 messages in the window
+            if (this.recentIDs.length > 1020) this.recentIDs.shift();
+
             // store message
             writeMessage(
                 <Message>{
@@ -343,6 +360,7 @@ export class DatabaseBuilder {
                     // TODO: timezones
                     secondOfDay: date.getSeconds() + 60 * (date.getMinutes() + 60 * date.getHours()),
                     authorIndex: msg.authorIndex,
+                    replyOffset,
                     langIndex: hasText ? langIndex : undefined,
                     sentiment: hasText ? sentiment : undefined,
                     words: countsToArray(wordsCount),
@@ -386,7 +404,7 @@ export class DatabaseBuilder {
 
         progress.new("Compacting messages data");
         // how many bits are needed to store n (n > 0)
-        const numBitsFor = (n: number) => 32 - Math.clz32(n);
+        const numBitsFor = (n: number) => (n === 0 ? 1 : 32 - Math.clz32(n));
         const finalStream = new BitStream();
         const finalBitConfig: MessageBitConfig = {
             dayBits: Math.max(1, numBitsFor(dateKeys.length)),

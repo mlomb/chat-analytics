@@ -8,6 +8,7 @@ export class MessageView {
     readonly dayIndex: Index;
     readonly secondOfDay: number;
     readonly authorIndex: Index;
+    readonly replyOffset?: number;
     readonly langIndex?: Index;
     readonly sentiment?: number;
 
@@ -33,6 +34,9 @@ export class MessageView {
         this.authorIndex = stream.getBits(config.authorIdxBits);
 
         const flags = stream.getBits(9);
+        if (flags & MessageFlags.Reply) {
+            this.replyOffset = stream.getBits(10);
+        }
         if (flags & MessageFlags.Text) {
             this.langIndex = stream.getBits(8);
             this.sentiment = stream.getBits(8) - 128;
@@ -104,6 +108,7 @@ export class MessageView {
             day: this.dayIndex,
             secondOfDay: this.secondOfDay,
             authorIndex: this.authorIndex,
+            replyOffset: this.replyOffset,
             langIndex: this.langIndex,
             sentiment: this.sentiment,
             words: this.getWords(),

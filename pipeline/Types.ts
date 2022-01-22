@@ -124,6 +124,7 @@ export interface Message {
     day: number;
     secondOfDay: number;
     authorIndex: Index;
+    replyOffset?: number;
     langIndex?: Index;
     sentiment?: number;
     words?: [Index, number][];
