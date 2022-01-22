@@ -127,7 +127,7 @@ const Chip = (props: { chip: ChipProps }) => {
 
     return (
         <Tooltip content={type}>
-            <div className="MessageLabelChip">
+            <div className={["MessageLabelChip", "MessageLabelChip--" + type].join(" ")}>
                 <div className="MessageLabelChip__content">{content}</div>
                 {count > 1 && <div className="MessageLabelChip__count">{count}</div>}
             </div>
