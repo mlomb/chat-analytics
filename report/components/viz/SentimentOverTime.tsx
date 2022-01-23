@@ -1,16 +1,7 @@
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef } from "react";
 
-import { Root, Color, Label, p50, Legend, Tooltip } from "@amcharts/amcharts5";
-import {
-    XYChart,
-    DateAxis,
-    ValueAxis,
-    AxisRendererX,
-    AxisRendererY,
-    StepLineSeries,
-    ColumnSeries,
-    XYCursor,
-} from "@amcharts/amcharts5/xy";
+import { Root, Color } from "@amcharts/amcharts5";
+import { XYChart, DateAxis, ValueAxis, AxisRendererX, AxisRendererY, ColumnSeries } from "@amcharts/amcharts5/xy";
 
 import { useDataProvider } from "@report/DataProvider";
 import { SentimentInDate, SentimentPerCycle } from "@pipeline/aggregate/blocks/SentimentPerCycle";
@@ -28,33 +19,32 @@ const SentimentOverTime = ({ data, options }: { data?: SentimentPerCycle; option
         const root = Root.new(chartDiv.current!);
         root.setThemes(Themes(root, false));
 
-        let chart = root.container.children.push(
+        const chart = root.container.children.push(
             XYChart.new(root, {
                 layout: root.verticalLayout,
             })
         );
         chart.zoomOutButton.set("forceHidden", true);
 
-        let xAxis = chart.xAxes.push(
+        const xAxis = chart.xAxes.push(
             DateAxis.new(root, {
                 baseInterval: { timeUnit: "week", count: 1 },
                 renderer: AxisRendererX.new(root, {}),
             })
         );
-        let yAxis = chart.yAxes.push(
+        const yAxis = chart.yAxes.push(
             ValueAxis.new(root, {
                 renderer: AxisRendererY.new(root, {}),
             })
         );
 
-        function createSeries(field: keyof SentimentInDate, title: string, color: Color) {
+        function createSeries(field: keyof SentimentInDate, color: Color) {
             let series = chart.series.push(
                 ColumnSeries.new(root, {
                     xAxis: xAxis,
                     yAxis: yAxis,
                     valueXField: "t",
                     valueYField: field,
-                    name: title,
                     fill: color,
                     stacked: true,
                 })
@@ -63,8 +53,8 @@ const SentimentOverTime = ({ data, options }: { data?: SentimentPerCycle; option
             seriesRef.current.push(series);
         }
 
-        createSeries("p", "Positive tokens", root.interfaceColors.get("positive")!);
-        createSeries("n", "Negative tokens", root.interfaceColors.get("negative")!);
+        createSeries("p", root.interfaceColors.get("positive")!); // positive tokens
+        createSeries("n", root.interfaceColors.get("negative")!); // negative tokens
 
         xAxisRef.current = xAxis;
         yAxisRef.current = yAxis;
@@ -114,7 +104,7 @@ const SentimentOverTime = ({ data, options }: { data?: SentimentPerCycle; option
                 series[1].set("valueYField", "n");
             }
             if (data) {
-                series.forEach((s) => s.data.setAll(options[0] === 0 ? data.perWeek : data.perMonth));
+                series.forEach((s) => s.data.setAll([data.perWeek, data.perMonth][options[0]]));
             }
         }
     }, [data, options]);
@@ -125,7 +115,7 @@ const SentimentOverTime = ({ data, options }: { data?: SentimentPerCycle; option
             style={{
                 minHeight: 550,
                 marginLeft: 5,
-                marginBottom: 5,
+                marginBottom: 8,
             }}
         ></div>
     );

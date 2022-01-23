@@ -10,21 +10,29 @@ type MessagesInDate = {
 
 export interface MessagesPerCycle {
     perDay: MessagesInDate[];
+    perWeek: MessagesInDate[];
     perMonth: MessagesInDate[];
 }
 
 const fn: BlockFn<MessagesPerCycle> = (database, filters, common) => {
     const res: MessagesPerCycle = {
         perDay: [],
+        perWeek: [],
         perMonth: [],
     };
 
-    const { dateKeys, monthKeys, dateToMonthIndex } = common.timeKeys;
+    const { dateKeys, weekKeys, monthKeys, dateToWeekIndex, dateToMonthIndex } = common.timeKeys;
 
     // fill empty
     for (const dateKey of dateKeys) {
         res.perDay.push({
             d: Day.fromKey(dateKey).toTimestamp(),
+            m: 0,
+        });
+    }
+    for (const weekKey of weekKeys) {
+        res.perWeek.push({
+            d: Day.fromKey(weekKey).toTimestamp(),
             m: 0,
         });
     }
@@ -37,6 +45,7 @@ const fn: BlockFn<MessagesPerCycle> = (database, filters, common) => {
 
     const processMessage = (msg: MessageView) => {
         res.perDay[msg.dayIndex].m++;
+        res.perWeek[dateToWeekIndex[msg.dayIndex]].m++;
         res.perMonth[dateToMonthIndex[msg.dayIndex]].m++;
     };
 

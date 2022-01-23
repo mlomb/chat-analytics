@@ -116,11 +116,11 @@ export class Day {
 
 export interface TimeKeysResult {
     dateKeys: DateKey[];
-    monthKeys: MonthKey[];
     weekKeys: WeekKey[];
-    // correspondance between dateKey and monthKeys
-    dateToMonthIndex: number[];
+    monthKeys: MonthKey[];
+    // correspondance between dateKey and weekKeys/monthKeys
     dateToWeekIndex: number[];
+    dateToMonthIndex: number[];
 }
 
 export const genTimeKeys = (start: Day, end: Day): TimeKeysResult => {
@@ -130,10 +130,10 @@ export const genTimeKeys = (start: Day, end: Day): TimeKeysResult => {
     const onePastEnd = end.nextDay();
 
     const dateKeys: DateKey[] = [];
-    const monthKeys: MonthKey[] = [];
     const weekKeys: WeekKey[] = [];
-    const dateToMonthIndex: number[] = [];
+    const monthKeys: MonthKey[] = [];
     const dateToWeekIndex: number[] = [];
+    const dateToMonthIndex: number[] = [];
 
     let day = start;
     while (!Day.eq(day, onePastEnd)) {
@@ -141,11 +141,11 @@ export const genTimeKeys = (start: Day, end: Day): TimeKeysResult => {
         const monthKey = day.monthKey;
         const weekKey = day.weekKey;
 
-        if (monthKeys.length === 0 || monthKeys[monthKeys.length - 1] !== monthKey) monthKeys.push(monthKey);
         if (weekKeys.length === 0 || weekKeys[weekKeys.length - 1] !== weekKey) weekKeys.push(weekKey);
-        dateToMonthIndex.push(monthKeys.length - 1);
-        dateToWeekIndex.push(weekKeys.length - 1);
+        if (monthKeys.length === 0 || monthKeys[monthKeys.length - 1] !== monthKey) monthKeys.push(monthKey);
         dateKeys.push(dateKey);
+        dateToWeekIndex.push(weekKeys.length - 1);
+        dateToMonthIndex.push(monthKeys.length - 1);
 
         day = day.nextDay();
     }
