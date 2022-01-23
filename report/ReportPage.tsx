@@ -14,6 +14,7 @@ import MessagesGraph from "@report/components/viz/MessagesGraph";
 import MessagesStatsTable from "@report/components/cards/MessagesStatsTable";
 import LanguageStatsTable from "@report/components/cards/LanguageStatsTable";
 import EmojiStatsTable from "@report/components/cards/EmojiStatsTable";
+import SentimentOverTime from "@report/components/viz/SentimentOverTime";
 import {
     MostGetterEmojis,
     MostLinkedDomains,
@@ -24,7 +25,7 @@ import {
     MostUsedEmojis,
     MostUsedWords,
 } from "@report/components/cards/MostCards";
-import { TopReacted, TopReplies } from "@report/components/cards/TopCards";
+import { TopReacted } from "@report/components/cards/TopCards";
 
 const CardContainer = (props: { children: React.ReactNode }) => <div className="CardContainer">{props.children}</div>;
 
@@ -115,6 +116,20 @@ const ReportDashboard = () => {
                         children={TopReplies}
                     />
                     */}
+                </CardContainer>
+            </TabContainer>
+            <TabContainer currentValue={tab} value="sentiment">
+                <CardContainer>
+                    <Card
+                        num={2}
+                        title={[
+                            "Sentiment over time",
+                            ["by week", "by month"],
+                            ["(% difference)", "(raw difference)", "(raw tokens)"],
+                        ]}
+                        blockKey="sentiment-per-cycle"
+                        children={SentimentOverTime}
+                    />
                 </CardContainer>
             </TabContainer>
             <TabContainer currentValue={tab} value="external">
