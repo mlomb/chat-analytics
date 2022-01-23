@@ -14,6 +14,7 @@ import MessagesGraph from "@report/components/viz/MessagesGraph";
 import MessagesStatsTable from "@report/components/cards/MessagesStatsTable";
 import LanguageStatsTable from "@report/components/cards/LanguageStatsTable";
 import EmojiStatsTable from "@report/components/cards/EmojiStatsTable";
+import SentimentStatsTable from "@report/components/cards/SentimentStatsTable";
 import SentimentOverTime from "@report/components/viz/SentimentOverTime";
 import {
     MostGetterEmojis,
@@ -129,6 +130,12 @@ const ReportDashboard = () => {
                         ]}
                         blockKey="sentiment-per-cycle"
                         children={SentimentOverTime}
+                    />
+                    <Card
+                        num={1}
+                        title="Sentiment overview"
+                        blockKey="sentiment-per-cycle"
+                        children={SentimentStatsTable}
                     />
                 </CardContainer>
             </TabContainer>
