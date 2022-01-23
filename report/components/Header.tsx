@@ -5,6 +5,7 @@ import { useCallback, useLayoutEffect, useMemo, useState } from "react";
 import { Database, Index } from "@pipeline/Types";
 import { useDataProvider } from "@report/DataProvider";
 
+import { Section } from "@report/ReportPage";
 import { AuthorLabel, ChannelLabel } from "@report/components/core/Labels";
 import { TabSwitch } from "@report/components/Tabs";
 import TimeSelector from "@report/components/TimeSelector";
@@ -13,40 +14,10 @@ import FilterSelect, { FilterOption } from "@report/components/FilterSelect";
 import Logo from "@assets/images/logos/app.svg";
 
 interface Props {
-    tab: string;
-    setTab: (tab: string) => void;
+    section: string;
+    setSection: (tab: string) => void;
+    sections: Section[];
 }
-
-const tabs = [
-    {
-        name: "💬 Messages",
-        value: "messages",
-    },
-    {
-        name: "🅰️ Language",
-        value: "language",
-    },
-    {
-        name: "😃 Emojis",
-        value: "emojis",
-    },
-    {
-        name: "🌀 Interaction",
-        value: "interaction",
-    },
-    {
-        name: "💙 Sentiment",
-        value: "sentiment",
-    },
-    {
-        name: "🔗 External",
-        value: "external",
-    },
-    {
-        name: "📅 Timeline",
-        value: "timeline",
-    },
-];
 
 const channelsFilterOptionsFn: (db: Database) => FilterOption[] = (db) => [
     {
@@ -82,7 +53,7 @@ const authorsFilterOptionsFn: (db: Database) => FilterOption[] = (db) => {
 };
 
 const Header = (props: Props) => {
-    const { tab, setTab } = props;
+    const { sections, section, setSection } = props;
     const dataProvider = useDataProvider();
 
     const channelsFilterOptions = useMemo(() => channelsFilterOptionsFn(dataProvider.database), [dataProvider]);
@@ -153,8 +124,14 @@ const Header = (props: Props) => {
                 </div>
             </div>
             <div className="Header__Tabs" role="tablist">
-                {tabs.map((t) => (
-                    <TabSwitch key={t.value} currentValue={tab} onChange={setTab} value={t.value} children={t.name} />
+                {sections.map((t) => (
+                    <TabSwitch
+                        key={t.value}
+                        currentValue={section}
+                        onChange={setSection}
+                        value={t.value}
+                        children={t.name}
+                    />
                 ))}
             </div>
         </div>
