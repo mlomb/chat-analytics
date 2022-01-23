@@ -32,6 +32,16 @@ export const MostMessagesAuthors = ({ data }: { data?: MessagesStats }) => (
         colorHue={240}
     />
 );
+export const MostRepliesAuthors = ({ data }: { data?: InteractionStats }) => (
+    <MostUsed
+        what="Author"
+        unit="Number of messages replied"
+        counts={data?.authorsReplyCount || EmptyArray}
+        itemComponent={AuthorLabel}
+        maxItems={16}
+        colorHue={240}
+    />
+);
 
 ///////////////////////////
 /// CHANNELS
