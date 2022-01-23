@@ -2,6 +2,8 @@
 export type MonthKey = `${number}-${number}`;
 // YYYY-MM-DD
 export type DateKey = `${MonthKey}-${number}`;
+// YYYY-MM--W (0-3, aligned to month)
+export type WeekKey = `${MonthKey}--${number}`;
 
 // I prefer working with [year, month, day] instead of Date objects
 // to avoid all kind of problems
@@ -20,12 +22,14 @@ export class Day {
         return new Day(date.getFullYear(), date.getMonth() + 1, date.getDate());
     }
 
-    static fromKey(key: DateKey | MonthKey): Day {
+    static fromKey(key: DateKey | MonthKey | WeekKey): Day {
         const arr = key.split("-").map(Number);
         if (arr.length === 2) {
             return new Day(arr[0], arr[1], 1);
-        } else {
+        } else if (arr.length === 3) {
             return new Day(arr[0], arr[1], arr[2]);
+        } else {
+            return new Day(arr[0], arr[1], arr[3] * 7 + 1);
         }
     }
 
@@ -50,6 +54,11 @@ export class Day {
 
     get monthKey(): MonthKey {
         return `${this.year}-${this.month}`;
+    }
+
+    get weekKey(): WeekKey {
+        const week = Math.floor((this.day - 1) / 7);
+        return `${this.year}-${this.month}--${week}`;
     }
 
     get dateKey(): DateKey {
@@ -108,8 +117,10 @@ export class Day {
 export interface TimeKeysResult {
     dateKeys: DateKey[];
     monthKeys: MonthKey[];
+    weekKeys: WeekKey[];
     // correspondance between dateKey and monthKeys
     dateToMonthIndex: number[];
+    dateToWeekIndex: number[];
 }
 
 export const genTimeKeys = (start: Day, end: Day): TimeKeysResult => {
@@ -120,21 +131,26 @@ export const genTimeKeys = (start: Day, end: Day): TimeKeysResult => {
 
     const dateKeys: DateKey[] = [];
     const monthKeys: MonthKey[] = [];
+    const weekKeys: WeekKey[] = [];
     const dateToMonthIndex: number[] = [];
+    const dateToWeekIndex: number[] = [];
 
     let day = start;
     while (!Day.eq(day, onePastEnd)) {
         const dateKey = day.dateKey;
         const monthKey = day.monthKey;
+        const weekKey = day.weekKey;
 
         if (monthKeys.length === 0 || monthKeys[monthKeys.length - 1] !== monthKey) monthKeys.push(monthKey);
+        if (weekKeys.length === 0 || weekKeys[weekKeys.length - 1] !== weekKey) weekKeys.push(weekKey);
         dateToMonthIndex.push(monthKeys.length - 1);
+        dateToWeekIndex.push(weekKeys.length - 1);
         dateKeys.push(dateKey);
 
         day = day.nextDay();
     }
 
-    return { dateKeys, monthKeys, dateToMonthIndex };
+    return { dateKeys, monthKeys, weekKeys, dateToMonthIndex, dateToWeekIndex };
 };
 
 export const formatTime = (
