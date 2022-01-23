@@ -19,12 +19,19 @@ export type SentimentInDate = {
 };
 
 export interface SentimentPerCycle {
+    positiveMessages: number;
+    negativeMessages: number;
+    neutralMessages: number;
+
     perMonth: SentimentInDate[];
     perWeek: SentimentInDate[];
 }
 
 const fn: BlockFn<SentimentPerCycle> = (database, filters, common) => {
     const res: SentimentPerCycle = {
+        positiveMessages: 0,
+        negativeMessages: 0,
+        neutralMessages: 0,
         perMonth: [],
         perWeek: [],
     };
@@ -57,11 +64,15 @@ const fn: BlockFn<SentimentPerCycle> = (database, filters, common) => {
 
     const processMessage = (msg: MessageView) => {
         const sentiment = msg.sentiment;
-        if (sentiment !== undefined && sentiment !== 0) {
-            if (sentiment > 0) {
+        if (sentiment !== undefined) {
+            if (sentiment === 0) {
+                res.neutralMessages++;
+            } else if (sentiment > 0) {
+                res.positiveMessages++;
                 res.perMonth[dateToMonthIndex[msg.dayIndex]].p += 1;
                 res.perWeek[dateToWeekIndex[msg.dayIndex]].p += 1;
             } else {
+                res.negativeMessages++;
                 res.perMonth[dateToMonthIndex[msg.dayIndex]].n -= 1;
                 res.perWeek[dateToWeekIndex[msg.dayIndex]].n -= 1;
             }
