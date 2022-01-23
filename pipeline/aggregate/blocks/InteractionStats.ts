@@ -5,15 +5,18 @@ import { MessageView } from "@pipeline/serialization/MessageView";
 
 export interface InteractionStats {
     mentionsCount: number[];
+    authorsReplyCount: number[];
+
     topTotalReactions: FullMessage[];
     topSingleReactions: FullMessage[];
 }
 
 const fn: BlockFn<InteractionStats> = (database, filters, common) => {
     const mentionsCount = new Array(database.mentions.length).fill(0);
+    const authorsReplyCount: number[] = new Array(database.authors.length).fill(0);
+
     let topTotalReactions: [MessageView, number][] = [];
     let topSingleReactions: [MessageView, number][] = [];
-    let topReplies: [MessageView, number][] = [];
 
     const processMessage = (msg: MessageView) => {
         const mentions = msg.getMentions();
@@ -49,12 +52,18 @@ const fn: BlockFn<InteractionStats> = (database, filters, common) => {
                 }
             }
         }
+
+        if (msg.replyOffset !== undefined) {
+            authorsReplyCount[msg.authorIndex] += 1;
+        }
     };
 
     parseAndFilterMessages(processMessage, database, filters);
 
     return {
         mentionsCount,
+        authorsReplyCount,
+
         topTotalReactions: topTotalReactions.map(([msg, _]) => msg.getFullMessage()),
         topSingleReactions: topSingleReactions.map(([msg, _]) => msg.getFullMessage()),
     };

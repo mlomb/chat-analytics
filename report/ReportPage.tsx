@@ -23,6 +23,7 @@ import {
     MostMessagesAuthors,
     MostMessagesChannels,
     MostProducerEmojis,
+    MostRepliesAuthors,
     MostUsedEmojis,
     MostUsedWords,
 } from "@report/components/cards/MostCards";
@@ -108,6 +109,12 @@ const ReportDashboard = () => {
                         title={[["Authors", "Channels"], "that get the most reactions"]}
                         blockKey="emoji-stats"
                         children={MostGetterEmojis}
+                    />
+                    <Card
+                        num={1}
+                        title="Authors that reply the most messages"
+                        blockKey="interaction-stats"
+                        children={MostRepliesAuthors}
                     />
                     {/*
                     <Card

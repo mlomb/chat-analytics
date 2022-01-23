@@ -344,7 +344,7 @@ export class DatabaseBuilder {
             this.recentIDs.push(msg.id);
             let replyOffset = undefined;
             if (msg.replyTo) {
-                let replyOffset = this.recentIDs.indexOf(msg.replyTo);
+                replyOffset = this.recentIDs.indexOf(msg.replyTo);
                 if (replyOffset === -1) {
                     replyOffset = 0; // message too far / message in another file (probably, not supported)
                 } else {
