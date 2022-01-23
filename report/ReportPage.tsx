@@ -77,6 +77,7 @@ const ReportDashboard = () => {
                 name: "🅰️ Language",
                 value: "language",
                 cards: [
+                    <Card num={1} title="Most used words" blockKey="language-stats" children={MostUsedWords} />,
                     <Card
                         num={1}
                         title="Language statistics"
@@ -177,7 +178,7 @@ const ReportDashboard = () => {
             <Header sections={sections} section={section} setSection={setSection} />
 
             {sections.map((s) => (
-                <TabContainer key={s.value} currentValue={section} value="messages">
+                <TabContainer key={s.value} value={s.value} currentValue={section}>
                     <CardContainer>
                         {s.cards.map((c, i) => (
                             <Fragment key={i}>{c}</Fragment>

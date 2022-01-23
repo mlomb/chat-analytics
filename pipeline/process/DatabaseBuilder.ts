@@ -20,7 +20,7 @@ import { IndexedData } from "@pipeline/process/IndexedData";
 import { Token, tokenize } from "@pipeline/process/Tokenizer";
 import { Sentiment } from "@pipeline/process/Sentiment";
 import { FastTextModel, loadFastTextModel } from "@pipeline/process/FastTextModel";
-import { normalizeText, searchFormat } from "@pipeline/Text";
+import { normalizeText, matchFormat } from "@pipeline/Text";
 import { Emojis } from "@pipeline/process/Emojis";
 import { MessageBitConfig, readMessage, writeMessage } from "@pipeline/serialization/MessageSerialization";
 import { LanguageCodes } from "@pipeline/Languages";
@@ -93,7 +93,7 @@ export class DatabaseBuilder {
             this.stopwords = new Set(
                 Object.values(data)
                     .reduce((acc, val) => acc.concat(val), [])
-                    .map((word) => searchFormat(word))
+                    .map((word) => matchFormat(word))
             );
             progress.done();
         }
@@ -140,7 +140,6 @@ export class DatabaseBuilder {
         if (index === undefined) {
             index = this.channels.set(rawId, {
                 ...channel,
-                ns: searchFormat(channel.n),
                 msgAddr: 0,
                 msgCount: 0,
             });
@@ -152,10 +151,7 @@ export class DatabaseBuilder {
     public addAuthor(rawId: RawID, author: IAuthor): Index {
         let index = this.authors.getIndex(rawId);
         if (index === undefined) {
-            index = this.authors.set(rawId, {
-                ...author,
-                ns: searchFormat(author.n),
-            });
+            index = this.authors.set(rawId, author);
             progress.stat("authors", this.numAuthors);
         }
         return index;
@@ -292,7 +288,7 @@ export class DatabaseBuilder {
                 // process tokens
                 for (const { tag, text } of tokens) {
                     if (tag === "word") {
-                        const wordKey = searchFormat(text);
+                        const wordKey = matchFormat(text);
                         // only keep words between [2, 30] chars and no stopwords
                         if (text.length > 1 && text.length <= 30 && !this.stopwords.has(wordKey)) {
                             let wordIdx = this.words.getIndex(wordKey);
@@ -318,7 +314,7 @@ export class DatabaseBuilder {
                         }
                         emojisCount[emojiIdx] = (emojisCount[emojiIdx] || 0) + 1;
                     } else if (tag === "mention") {
-                        const mentionKey = searchFormat(text);
+                        const mentionKey = matchFormat(text);
                         let mentionIdx = this.mentions.getIndex(mentionKey);
                         if (mentionIdx === undefined) mentionIdx = this.mentions.set(mentionKey, text);
                         mentionsCount[mentionIdx] = (mentionsCount[mentionIdx] || 0) + 1;

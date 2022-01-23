@@ -1,8 +1,7 @@
 import EventEmitter from "events";
 
-import { Database, Index } from "@pipeline/Types";
+import { Database, FormatCache, Index } from "@pipeline/Types";
 import { Day } from "@pipeline/Time";
-import { searchFormat } from "@pipeline/Text";
 import { BlockDescriptions, BlockInfo, BlockKey, BlockTrigger } from "@pipeline/aggregate/Blocks";
 
 import { BlockRequestMessage, BlockResultMessage, InitMessage, ReadyMessage } from "@report/WorkerReport";
@@ -35,13 +34,9 @@ export class DataProvider extends EventEmitter {
 
     // Updated by this class and the Worker
     public database!: Database;
+    public formatCache!: FormatCache;
     private blocksDescs?: BlockDescriptions;
-    private readyBlocks: Set<BlockKey> = new Set();
-
-    // cached for performance reasons
-    public wordsSearchFormat!: string[];
-    public emojiSearchFormat!: string[];
-    public mentionsSearchFormat!: string[];
+    private readyBlocks: Map<BlockKey, BlockInfo<any>> = new Map();
 
     constructor(dataStr: string) {
         super();
@@ -81,10 +76,7 @@ export class DataProvider extends EventEmitter {
         const res = e.data;
         if (res.type === "ready") {
             this.database = res.database;
-            // compute search format for words
-            this.wordsSearchFormat = this.database.words.map((word) => searchFormat(word));
-            this.emojiSearchFormat = this.database.emojis.map((emoji) => searchFormat(emoji.n));
-            this.mentionsSearchFormat = this.database.mentions.map((mention) => searchFormat(mention));
+            this.formatCache = res.formatCache;
 
             this.blocksDescs = res.blocksDescs;
             // set default time range
@@ -200,8 +192,7 @@ export class DataProvider extends EventEmitter {
         } else {
             // store block result in case it is needed later
             // and notify the UI
-            // TODO: store it
-            this.readyBlocks.add(blockKey);
+            this.readyBlocks.set(blockKey, blockInfo);
             this.emit(blockKey, blockInfo);
         }
 
@@ -250,6 +241,17 @@ export class DataProvider extends EventEmitter {
 
     public getActiveEndDate(): Date {
         return this.activeEndDate!.toDate();
+    }
+
+    public getBlockInfo<K extends BlockKey>(blockKey: K): BlockInfo<K> {
+        if (this.readyBlocks.has(blockKey)) {
+            return this.readyBlocks.get(blockKey)!;
+        } else {
+            return {
+                state: "stale",
+                data: null,
+            };
+        }
     }
 }
 

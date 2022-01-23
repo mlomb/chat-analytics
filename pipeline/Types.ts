@@ -73,8 +73,6 @@ export interface IChannel {
 }
 
 export interface Channel extends IChannel {
-    // name searchable
-    ns: string;
     // messages location
     msgAddr: BitAddress;
     msgCount: number;
@@ -93,8 +91,7 @@ export interface IAuthor {
 }
 
 export interface Author extends IAuthor {
-    // name searchable
-    ns: string;
+    // empty for now, but we may add something later on
 }
 
 export interface Emoji {
@@ -138,4 +135,13 @@ export interface Message {
 // used in the UI, basically a Message but with the channel
 export interface FullMessage extends Message {
     channelIndex: Index;
+}
+
+// used in the UI to cache the format of common objects (mostly for searching)
+export interface FormatCache {
+    authors: string[];
+    channels: string[];
+    words: string[];
+    emojis: string[];
+    mentions: string[];
 }

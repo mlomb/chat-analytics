@@ -1,7 +1,7 @@
 import { memo, useMemo, useState } from "react";
 
 import { Index } from "@pipeline/Types";
-import { searchFormat } from "@pipeline/Text";
+import { matchFormat } from "@pipeline/Text";
 import AnimatedBars, { AnimatedBarEntry } from "@report/components/viz/AnimatedBars";
 import SearchInput from "@report/components/core/SearchInput";
 
@@ -32,7 +32,7 @@ type Props = SimpleProps | SearchProps;
 const MostUsed = (props: Props) => {
     const [filter, setFilter] = useState<string>("");
 
-    const filterFormatted = searchFormat(
+    const filterFormatted = matchFormat(
         props.searchable && props.transformFilter ? props.transformFilter(filter) : filter
     );
     let exactIndex =

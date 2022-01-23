@@ -1,4 +1,4 @@
-export const TabContainer = (props: { currentValue: string; value: string; children: React.ReactNode }) => {
+export const TabContainer = (props: { currentValue: string; value: string; children: JSX.Element }) => {
     return (
         <div
             style={{

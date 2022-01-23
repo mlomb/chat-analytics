@@ -114,4 +114,4 @@ for (const entry of DiacriticsAndSymbols) {
 const reMap = (match: string) => diacriticsAndSymbolsReplacement[match];
 export const stripDiacriticsAndSymbols = (text: string) => text.replace(diacriticsAndSymbolsRegex, reMap);
 
-export const searchFormat = (x: string) => stripDiacriticsAndSymbols(normalizeText(x).toLocaleLowerCase());
+export const matchFormat = (x: string) => stripDiacriticsAndSymbols(normalizeText(x).toLocaleLowerCase());

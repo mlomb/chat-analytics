@@ -3,6 +3,7 @@ import "@assets/styles/Header.less";
 import { useCallback, useLayoutEffect, useMemo, useState } from "react";
 
 import { Database, Index } from "@pipeline/Types";
+import { matchFormat } from "@pipeline/Text";
 import { useDataProvider } from "@report/DataProvider";
 
 import { Section } from "@report/ReportPage";
@@ -66,13 +67,17 @@ const Header = (props: Props) => {
     useLayoutEffect(() => dataProvider.updateChannels(selectedChannels), [selectedChannels]);
 
     const filterChannels = useCallback(
-        (term: string) =>
-            channelsFilterOptions[0].options.filter((i) => dataProvider.database.channels[i].ns.includes(term)),
+        (_term: string) => {
+            const term = matchFormat(_term);
+            return channelsFilterOptions[0].options.filter((i) => dataProvider.formatCache.channels.includes(term));
+        },
         [dataProvider]
     );
     const filterAuthors = useCallback(
-        (term: string) =>
-            authorsFilterOptions[0].options.filter((i) => dataProvider.database.authors[i].ns.includes(term)),
+        (_term: string) => {
+            const term = matchFormat(_term);
+            return channelsFilterOptions[0].options.filter((i) => dataProvider.formatCache.authors.includes(term));
+        },
         [dataProvider]
     );
 
