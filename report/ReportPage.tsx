@@ -10,12 +10,12 @@ import LoadingOverlay from "@report/components/LoadingOverlay";
 import Card from "@report/components/Card";
 import { TabContainer } from "@report/components/Tabs";
 
-import MessagesGraph from "@report/components/viz/MessagesGraph";
+import MessagesOverTime from "@report/components/viz/MessagesOverTime";
+import SentimentOverTime from "@report/components/viz/SentimentOverTime";
 import MessagesStatsTable from "@report/components/cards/MessagesStatsTable";
 import LanguageStatsTable from "@report/components/cards/LanguageStatsTable";
 import EmojiStatsTable from "@report/components/cards/EmojiStatsTable";
 import SentimentStatsTable from "@report/components/cards/SentimentStatsTable";
-import SentimentOverTime from "@report/components/viz/SentimentOverTime";
 import {
     MostGetterEmojis,
     MostLinkedDomains,
@@ -42,9 +42,9 @@ const ReportDashboard = () => {
                 <CardContainer>
                     <Card
                         num={2}
-                        title="Messages sent per day &amp; month"
+                        title={["Messages sent over time", ["by day", "by week", "by month"]]}
                         blockKey="messages-per-cycle"
-                        children={MessagesGraph}
+                        children={MessagesOverTime}
                     />
                     <Card num={1} title="Message statistics" blockKey="messages-stats" children={MessagesStatsTable} />
                     <Card
