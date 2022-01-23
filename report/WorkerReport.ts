@@ -1,8 +1,9 @@
-import { Database, Index } from "@pipeline/Types";
+import { Database, FormatCache, Index } from "@pipeline/Types";
 import { Blocks, BlockDescriptions, BlockKey, BlockInfo, CommonBlockData } from "@pipeline/aggregate/Blocks";
 import { Filters } from "@pipeline/aggregate/Filters";
 import { decompress } from "@pipeline/compression/Compression";
 import { DateKey, Day, genTimeKeys } from "@pipeline/Time";
+import { matchFormat } from "@pipeline/Text";
 
 export interface InitMessage {
     type: "init";
@@ -13,6 +14,7 @@ export interface ReadyMessage {
     type: "ready";
     database: Database;
     blocksDescs: BlockDescriptions;
+    formatCache: FormatCache;
 }
 
 export interface BlockRequestMessage {
@@ -37,11 +39,23 @@ let filters: Filters | null = null;
 let common: CommonBlockData | null = null;
 
 const init = (msg: InitMessage) => {
+    console.time("Decompress time");
     database = decompress(msg.dataStr);
+    console.timeEnd("Decompress time");
     filters = new Filters(database);
     common = {
         timeKeys: genTimeKeys(Day.fromKey(database.time.minDate), Day.fromKey(database.time.maxDate)),
     };
+
+    console.time("Build format cache");
+    const formatCache = {
+        authors: database.authors.map((author) => matchFormat(author.n)),
+        channels: database.channels.map((channel) => matchFormat(channel.n)),
+        words: database.words.map((word) => matchFormat(word)),
+        emojis: database.emojis.map((emoji) => matchFormat(emoji.n)),
+        mentions: database.mentions.map((mention) => matchFormat(mention)),
+    };
+    console.timeEnd("Build format cache");
 
     self.postMessage(<ReadyMessage>{
         type: "ready",
@@ -50,6 +64,7 @@ const init = (msg: InitMessage) => {
             // no needed in the UI
             serialized: undefined,
         },
+        formatCache,
         // remove functions
         blocksDescs: JSON.parse(JSON.stringify(Blocks)) as BlockDescriptions,
     });

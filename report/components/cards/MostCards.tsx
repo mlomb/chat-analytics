@@ -60,8 +60,8 @@ export const MostMessagesChannels = ({ data }: { data?: MessagesStats }) => (
 ///////////////////////////
 /// WORDS
 ///////////////////////////
-const WordsIndexOf = (value: string) => useDataProvider().wordsSearchFormat.indexOf(value);
-const WordsInFilter = (index: number, filter: string) => useDataProvider().wordsSearchFormat[index].startsWith(filter);
+const WordsIndexOf = (value: string) => useDataProvider().formatCache.words.indexOf(value);
+const WordsInFilter = (index: number, filter: string) => useDataProvider().formatCache.words[index].startsWith(filter);
 export const MostUsedWords = ({ data }: { data?: LanguageStats }) => (
     <MostUsed
         what="Word"
@@ -92,10 +92,10 @@ const EmojiFilterPlaceholders = {
 const EmojisTransformFilter = (filter: string) => filter.replace(/:/g, "");
 const EmojisIndexOf = (value: string) => {
     const rawEmoji = useDataProvider().database.emojis.findIndex((e) => e.c === value);
-    if (rawEmoji === -1) return useDataProvider().emojiSearchFormat.indexOf(value);
+    if (rawEmoji === -1) return useDataProvider().formatCache.emojis.indexOf(value);
     return rawEmoji;
 };
-const EmojisInFilter = (index: Index, filter: string) => useDataProvider().emojiSearchFormat[index].includes(filter);
+const EmojisInFilter = (index: Index, filter: string) => useDataProvider().formatCache.emojis[index].includes(filter);
 export const MostUsedEmojis = ({ data, options }: { data?: EmojiStats; options: number[] }) => (
     <MostUsed
         what="Emoji"
@@ -155,9 +155,9 @@ export const MostLinkedDomains = ({ data }: { data?: ExternalStats }) => (
 ///////////////////////////
 /// MENTIONS
 ///////////////////////////
-const MentionsIndexOf = (value: string) => useDataProvider().mentionsSearchFormat.indexOf(value);
+const MentionsIndexOf = (value: string) => useDataProvider().formatCache.mentions.indexOf(value);
 const MentionsInFilter = (index: number, filter: string) =>
-    useDataProvider().mentionsSearchFormat[index].includes(filter);
+    useDataProvider().formatCache.mentions[index].includes(filter);
 export const MostMentioned = ({ data }: { data?: InteractionStats }) => (
     <MostUsed
         what="Who"
