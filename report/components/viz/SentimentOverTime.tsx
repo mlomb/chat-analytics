@@ -30,16 +30,10 @@ const SentimentOverTime = ({ data, options }: { data?: SentimentPerCycle; option
 
         let chart = root.container.children.push(
             XYChart.new(root, {
-                layout: root.horizontalLayout,
+                layout: root.verticalLayout,
             })
         );
         chart.zoomOutButton.set("forceHidden", true);
-        let legend = chart.children.push(
-            Legend.new(root, {
-                centerX: p50,
-                x: p50,
-            })
-        );
 
         let xAxis = chart.xAxes.push(
             DateAxis.new(root, {
