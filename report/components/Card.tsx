@@ -1,10 +1,9 @@
 import "@assets/styles/Card.less";
 
 import { useState } from "react";
-import { BlockDataType, BlockInfo, BlockKey, BlockState } from "@pipeline/aggregate/Blocks";
+import { BlockDataType, BlockInfo, BlockKey } from "@pipeline/aggregate/Blocks";
 import Block from "@report/components/Block";
-
-import Spinner from "@assets/images/icons/spinner.svg";
+import ErrorBoundary from "@report/components/ErrorBoundary";
 
 type Title = string | (string | string[])[];
 
@@ -14,13 +13,6 @@ interface Props<K extends BlockKey> {
     blockKey: K;
     children: (props: { data?: BlockDataType<K>; options: number[] }) => JSX.Element;
 }
-
-const Indicators: { [key in BlockState]: string } = {
-    loading: "⚙️",
-    stale: "⌛",
-    error: "❌",
-    ready: "✅",
-};
 
 const Card = <K extends BlockKey>(props: Props<K>) => {
     const Content = <K extends BlockKey>({ info }: { info: BlockInfo<K> }) => {
@@ -66,12 +58,23 @@ const Card = <K extends BlockKey>(props: Props<K>) => {
 
         return (
             <>
-                <div className="Card__title">{elements}</div>
-                <props.children data={info.data || undefined} options={options} />
-                <div className={"Card__overlay" + (info.state === "ready" ? " Card__overlay--hidden" : "")}>
-                    <img src={Spinner} alt="Loading" height={60} />
-                    {Indicators[info.state]}
-                </div>
+                <ErrorBoundary>
+                    <div
+                        className={
+                            "Card__overlay" +
+                            (info.state === "ready"
+                                ? " Card__overlay--hidden"
+                                : info.state === "error"
+                                ? " Card__overlay--error"
+                                : "")
+                        }
+                    ></div>
+                    {info.state === "error" && (
+                        <div className="Card__error">Error ocurred, please check the console for more details</div>
+                    )}
+                    <div className={"Card__title Card__title--" + info.state}>{elements}</div>
+                    <props.children data={info.data || undefined} options={options} />
+                </ErrorBoundary>
             </>
         );
     };
