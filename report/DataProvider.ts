@@ -59,7 +59,9 @@ export class DataProvider extends EventEmitter {
             // We can work around it using base64, so no requests are made
             // NOTE: data:application/javascript breaks
             const workerJs = document.getElementById("worker-script")!.textContent!;
-            this.worker = new Worker("data:application/javascript;base64," + btoa(workerJs));
+            this.worker = new Worker(
+                "data:application/javascript;base64," + btoa(unescape(encodeURIComponent(workerJs)))
+            );
         }
         this.worker.onerror = this.onError.bind(this);
         this.worker.onmessage = this.onMessage.bind(this);
