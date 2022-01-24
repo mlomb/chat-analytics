@@ -6,9 +6,6 @@ import ReportPage from "@report/ReportPage";
 import { initDataProvider } from "@report/DataProvider";
 
 document.addEventListener("DOMContentLoaded", async () => {
-    // set basic loading message
-    document.querySelector(".basic")!.textContent = "Loading, please wait...";
-
     try {
         const dataElem = document.getElementById("data")!;
         let dataStr: string = dataElem.textContent || "";
