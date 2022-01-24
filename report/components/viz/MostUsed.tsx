@@ -67,7 +67,7 @@ const MostUsed = (props: Props) => {
     );
 
     return (
-        <div>
+        <>
             {props.searchable === true && (
                 <SearchInput placeholder={props.searchPlaceholder} value={filter} onChange={setFilter} />
             )}
@@ -79,7 +79,7 @@ const MostUsed = (props: Props) => {
                 maxItems={props.maxItems}
                 colorHue={props.colorHue}
             />
-        </div>
+        </>
     );
 };
 
