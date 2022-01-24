@@ -10,7 +10,7 @@ interface Props {
 // true: loaded correctly
 const loadStatus: { [url: string]: "ok" | "error" } = {};
 
-const ImageSmooth = ({ src, children }: Props) => {
+const LazyImage = ({ src, children }: Props) => {
     const [_, ping] = useState<number>(0);
     const onLoad = () => {
         loadStatus[src] = "ok";
@@ -30,7 +30,7 @@ const ImageSmooth = ({ src, children }: Props) => {
                 <img
                     loading="lazy"
                     src={src}
-                    className="ImageSmooth"
+                    className="LazyImage"
                     style={{ opacity: status === "ok" ? 1 : 0 }}
                     onError={status === undefined ? onError : undefined}
                     onLoad={status === undefined ? onLoad : undefined}
@@ -40,4 +40,4 @@ const ImageSmooth = ({ src, children }: Props) => {
     );
 };
 
-export default ImageSmooth;
+export default LazyImage;
