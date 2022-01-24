@@ -73,7 +73,9 @@ const Card = <K extends BlockKey>(props: Props<K>) => {
                         <div className="Card__error">Error ocurred, please check the console for more details</div>
                     )}
                     <div className={"Card__title Card__title--" + info.state}>{elements}</div>
-                    <props.children data={info.data || undefined} options={options} />
+                    <div className={info.state !== "ready" ? "Card__gray" : ""}>
+                        <props.children data={info.data || undefined} options={options} />
+                    </div>
                 </ErrorBoundary>
             </>
         );
