@@ -1,5 +1,7 @@
 import "@assets/styles/Footer.less";
 
+import Tooltip from "@report/components/core/Tooltip";
+
 import GitHub from "@assets/images/logos/github.svg";
 
 export default () => {
@@ -16,9 +18,9 @@ export default () => {
                 <a href="https://github.com" target="_blank">
                     <img src={GitHub} alt="GitHub" />
                 </a>
-                <span className="Footer__build" title={env.build.date}>
-                    build {env.build.hash}
-                </span>
+                <Tooltip content={`Build date: ${env.build.date}`}>
+                    <span className="Footer__build">build {env.build.hash}</span>
+                </Tooltip>
             </span>
         </div>
     );
