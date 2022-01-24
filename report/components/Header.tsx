@@ -69,14 +69,14 @@ const Header = (props: Props) => {
     const filterChannels = useCallback(
         (_term: string) => {
             const term = matchFormat(_term);
-            return channelsFilterOptions[0].options.filter((i) => dataProvider.formatCache.channels.includes(term));
+            return channelsFilterOptions[0].options.filter((i) => dataProvider.formatCache.channels[i].includes(term));
         },
         [dataProvider]
     );
     const filterAuthors = useCallback(
         (_term: string) => {
             const term = matchFormat(_term);
-            return channelsFilterOptions[0].options.filter((i) => dataProvider.formatCache.authors.includes(term));
+            return authorsFilterOptions[0].options.filter((i) => dataProvider.formatCache.authors[i].includes(term));
         },
         [dataProvider]
     );
