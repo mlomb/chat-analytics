@@ -57,6 +57,46 @@
     select + * {
         margin-left: 6px;
     }
+
+    &::before {
+        content: "";
+        position: absolute;
+        display: block;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 5px;
+        width: 200%;
+        background: url("data:image/svg+xml,<svg width='40' height='40' xmlns='http://www.w3.org/2000/svg'><path d='M0 40 40 0H20L0 20m40 20V20L20 40' fill='rgba(255, 255, 255, 0.2)' fill-rule='evenodd'/></svg>");
+        background-repeat: repeat-x;
+        background-size: 15px;
+        animation: slide 12s linear infinite;
+        transition: 0.25s opacity;
+        z-index: 3;
+
+        @keyframes slide {
+            from {
+                transform: translateX(-50%);
+            }
+            to {
+                transform: translateX(0);
+            }
+        }
+    }
+
+    &.Card__title--stale::before {
+        opacity: 0.2;
+        animation: none;
+    }
+    &.Card__title--ready::before {
+        opacity: 0;
+        animation: none;
+    }
+    &.Card__title--error::before {
+        background: red;
+        animation: none;
+    }
 }
 .Card__overlay {
     position: absolute;
@@ -65,24 +105,29 @@
     right: 0;
     bottom: 0;
     background: rgb(0 0 0 / 41%);
-    border-radius: 15px;
     z-index: 2;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    user-select: none;
-    font-family: monospace;
-    font-size: 20px;
     opacity: 1;
     transition: 0.25s opacity;
-    img {
-        margin-bottom: 15px;
-    }
+
     &.Card__overlay--hidden {
         opacity: 0;
         pointer-events: none;
     }
+    &.Card__overlay--error {
+        background: rgb(0 0 0 / 90%);
+    }
+}
+.Card__error {
+    z-index: 4;
+    position: absolute;
+    text-align: center;
+    font-weight: bold;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    padding: 25px;
+    box-sizing: border-box;
 }
 @media (min-width: (2 * @card-min-width + 3 * @cards-gap)) {
     .CardContainer {

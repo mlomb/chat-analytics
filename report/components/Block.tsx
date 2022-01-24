@@ -45,7 +45,7 @@ const Block = <K extends BlockKey>(props: Props<K>) => {
         }
     };
 
-    return <InView onChange={onChange}>{props.children({ info })}</InView>;
+    return <InView onChange={onChange} fallbackInView={true} children={props.children({ info })} />;
 };
 
 export default Block;
