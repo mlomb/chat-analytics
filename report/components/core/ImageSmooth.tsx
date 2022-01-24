@@ -11,15 +11,17 @@ interface Props {
 const loadStatus: { [url: string]: "ok" | "error" } = {};
 
 const ImageSmooth = ({ src, children }: Props) => {
-    const [status, setStatus] = useState<"ok" | "error" | "loading">(loadStatus[src] || "loading");
+    const [_, ping] = useState<number>(0);
     const onLoad = () => {
         loadStatus[src] = "ok";
-        setStatus("ok");
+        ping(Date.now());
     };
     const onError = () => {
         loadStatus[src] = "error";
-        setStatus("error");
+        ping(Date.now());
     };
+
+    const status = loadStatus[src];
 
     return (
         <>
@@ -30,8 +32,8 @@ const ImageSmooth = ({ src, children }: Props) => {
                     src={src}
                     className="ImageSmooth"
                     style={{ opacity: status === "ok" ? 1 : 0 }}
-                    onLoad={onLoad}
-                    onError={onError}
+                    onError={status === undefined ? onError : undefined}
+                    onLoad={status === undefined ? onLoad : undefined}
                 />
             )}
         </>
