@@ -49,7 +49,7 @@ const MostUsed = (props: Props) => {
             (!props.filter || props.filter(c.index))
     );
     entries.sort((a, b) => b.value - a.value);
-    entries = entries.slice(0, 15);
+    entries = entries.slice(0, props.maxItems);
 
     // memo component
     const Item = useMemo(

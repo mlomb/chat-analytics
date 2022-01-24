@@ -3,6 +3,7 @@ import "@assets/styles/AnimatedBars.less";
 import CountUp from "react-countup";
 
 const ITEM_STRIDE = 40;
+const HEADER_HEIGHT = 27; // hmmm
 const formattingFn = (n: number) => n.toLocaleString();
 
 type Index = number;
@@ -63,7 +64,7 @@ const AnimatedBars = (props: Props) => {
     const maxValue = sortedByValue.reduce((max, entry) => Math.max(max, entry.value), 0);
 
     return (
-        <div className="AnimatedBars">
+        <div className="AnimatedBars" style={{ minHeight: ITEM_STRIDE * props.maxItems + HEADER_HEIGHT }}>
             <div className="AnimatedBars__header">
                 <div>{props.what}</div>
                 <div>{props.unit}</div>
@@ -79,6 +80,13 @@ const AnimatedBars = (props: Props) => {
                         colorHue={props.colorHue}
                     ></Item>
                 ))}
+            </div>
+            <div className="AnimatedBars__footer">
+                {sortedById.length === 0
+                    ? "No data to show"
+                    : sortedById.length < props.maxItems
+                    ? "No more entries to show"
+                    : ""}
             </div>
         </div>
     );
