@@ -28,7 +28,7 @@ export const MostMessagesAuthors = ({ data }: { data?: MessagesStats }) => (
         unit="Total messages"
         counts={data?.authorsCount || EmptyArray}
         itemComponent={AuthorLabel}
-        maxItems={15}
+        maxItems={Math.min(15, useDataProvider().database.authors.length)}
         colorHue={240}
     />
 );
@@ -38,7 +38,7 @@ export const MostRepliesAuthors = ({ data }: { data?: InteractionStats }) => (
         unit="Number of messages replied"
         counts={data?.authorsReplyCount || EmptyArray}
         itemComponent={AuthorLabel}
-        maxItems={15}
+        maxItems={Math.min(15, useDataProvider().database.authors.length)}
         colorHue={240}
     />
 );
@@ -52,7 +52,7 @@ export const MostMessagesChannels = ({ data }: { data?: MessagesStats }) => (
         unit="Total messages"
         counts={data?.channelsCount || EmptyArray}
         itemComponent={ChannelLabel}
-        maxItems={15}
+        maxItems={Math.min(15, useDataProvider().database.channels.length)}
         colorHue={266}
     />
 );
@@ -67,7 +67,7 @@ export const MostUsedWords = ({ data }: { data?: LanguageStats }) => (
         what="Word"
         unit="Times used"
         counts={data?.wordsCount || EmptyArray}
-        maxItems={15}
+        maxItems={Math.min(15, useDataProvider().database.words.length)}
         itemComponent={WordLabel}
         searchable
         searchPlaceholder="Filter words..."
@@ -102,7 +102,7 @@ export const MostUsedEmojis = ({ data, options }: { data?: EmojiStats; options: 
         unit={options[1] === 0 ? "Times used" : "Times reacted"}
         counts={data ? (options[1] === 0 ? data.inText.count : data.inReactions.count) : EmptyArray}
         filter={EmojiFilterFns[options[0] as unknown as keyof typeof EmojiFilterFns]}
-        maxItems={15}
+        maxItems={Math.min(15, useDataProvider().database.emojis.length)}
         itemComponent={EmojiLabel}
         searchable
         searchPlaceholder={EmojiFilterPlaceholders[options[0] as unknown as keyof typeof EmojiFilterPlaceholders]}
@@ -116,7 +116,10 @@ export const MostProducerEmojis = ({ data, options }: { data?: EmojiStats; optio
         what={options[0] === 0 ? "Author" : "Channel"}
         unit="Number of emojis used"
         counts={data ? (options[0] === 0 ? data?.inText.authorCount : data?.inText.channelCount) : EmptyArray}
-        maxItems={15}
+        maxItems={Math.min(
+            15,
+            Math.max(useDataProvider().database.authors.length, useDataProvider().database.channels.length)
+        )}
         itemComponent={options[0] === 0 ? AuthorLabel : ChannelLabel}
         colorHue={options[0] === 0 ? 240 : 266}
     />
@@ -127,7 +130,10 @@ export const MostGetterEmojis = ({ data, options }: { data?: EmojiStats; options
         what={options[0] === 0 ? "Author" : "Channel"}
         unit="Number of reactions received"
         counts={data ? (options[0] === 0 ? data?.inReactions.authorCount : data?.inReactions.channelCount) : EmptyArray}
-        maxItems={15}
+        maxItems={Math.min(
+            15,
+            Math.max(useDataProvider().database.authors.length, useDataProvider().database.channels.length)
+        )}
         itemComponent={options[0] === 0 ? AuthorLabel : ChannelLabel}
         colorHue={options[0] === 0 ? 240 : 266}
     />
@@ -143,7 +149,7 @@ export const MostLinkedDomains = ({ data }: { data?: ExternalStats }) => (
         what="Domain"
         unit="Times linked"
         counts={data?.domainsCount || EmptyArray}
-        maxItems={15}
+        maxItems={Math.min(15, useDataProvider().database.domains.length)}
         itemComponent={DomainLabel}
         searchable
         searchPlaceholder="Filter domains..."
@@ -164,7 +170,7 @@ export const MostMentioned = ({ data }: { data?: InteractionStats }) => (
         unit="Times mentioned"
         counts={data?.mentionsCount || EmptyArray}
         itemComponent={MentionLabel}
-        maxItems={16}
+        maxItems={Math.min(15, useDataProvider().database.mentions.length)}
         searchable
         searchPlaceholder="Filter @mentions..."
         indexOf={MentionsIndexOf}
