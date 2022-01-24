@@ -4,7 +4,7 @@ import { memo } from "react";
 
 import { Index } from "@pipeline/Types";
 import { useDataProvider } from "@report/DataProvider";
-import ImageSmooth from "@report/components/core/ImageSmooth";
+import LazyImage from "@report/components/core/LazyImage";
 
 import DefaultFaviconIcon from "@assets/images/icons/default-favicon.png";
 import LinkOutIcon from "@assets/images/icons/link-out-blue.svg";
@@ -93,7 +93,7 @@ const _AuthorLabel = ({ index }: LabelProps) => {
         placeholder = null;
     }
 
-    const avatar = avatarUrl ? <ImageSmooth src={avatarUrl} children={placeholder} /> : placeholder;
+    const avatar = avatarUrl ? <LazyImage src={avatarUrl} children={placeholder} /> : placeholder;
 
     return (
         <div className="Label" title={author.n}>
@@ -185,7 +185,7 @@ const _DomainLabel = ({ index }: LabelProps) => {
         <div className="Label Label-domain" title={domain}>
             <a href={`http://${domain}`} target="_blank" className="Label__name">
                 <div className="Label__icon">
-                    <ImageSmooth src={`https://icons.duckduckgo.com/ip3/${domain}.ico`} children={DefaultFavicon} />
+                    <LazyImage src={`https://icons.duckduckgo.com/ip3/${domain}.ico`} children={DefaultFavicon} />
                 </div>
                 {domain}
                 <img className="Label__linkout" src={LinkOutIcon} width={12} height={12} />
