@@ -28,7 +28,7 @@ export const MostMessagesAuthors = ({ data }: { data?: MessagesStats }) => (
         unit="Total messages"
         counts={data?.authorsCount || EmptyArray}
         itemComponent={AuthorLabel}
-        maxItems={16}
+        maxItems={15}
         colorHue={240}
     />
 );
@@ -38,7 +38,7 @@ export const MostRepliesAuthors = ({ data }: { data?: InteractionStats }) => (
         unit="Number of messages replied"
         counts={data?.authorsReplyCount || EmptyArray}
         itemComponent={AuthorLabel}
-        maxItems={16}
+        maxItems={15}
         colorHue={240}
     />
 );
@@ -52,7 +52,7 @@ export const MostMessagesChannels = ({ data }: { data?: MessagesStats }) => (
         unit="Total messages"
         counts={data?.channelsCount || EmptyArray}
         itemComponent={ChannelLabel}
-        maxItems={16}
+        maxItems={15}
         colorHue={266}
     />
 );
