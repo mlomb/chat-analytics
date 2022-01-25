@@ -176,23 +176,53 @@ export const genTimeKeys = (start: Day, end: Day): TimeKeysResult => {
     };
 };
 
-export type TimeFormat = "y" | "ym" | "ymd" | "ymdh" | "ymdhm" | "ymdhms";
+export type TimeFormat = "y" | "ym" | "ymd" | "symd" | "ymdh" | "ymdhm" | "ymdhms";
 
-export const formatTime = (format: TimeFormat, day: Day, seconds: number = 0): string => {
-    /*
+const f: Intl.DateTimeFormatOptions = {
+    year: "numeric",
+    month: "long",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+};
+
+const DateTimeFormatters: {
+    [key in TimeFormat]: Intl.DateTimeFormat;
+} = {
+    y: new Intl.DateTimeFormat(undefined, { year: f.year }),
+    ym: new Intl.DateTimeFormat(undefined, { year: f.year, month: f.month }),
+    ymd: new Intl.DateTimeFormat(undefined, { year: f.year, month: f.month, day: f.day }),
+    ymdh: new Intl.DateTimeFormat(undefined, {
+        year: f.year,
+        month: f.month,
+        day: f.day,
+        hour: f.hour,
+    }),
+    symd: new Intl.DateTimeFormat(undefined, {
+        year: "numeric",
+        month: "numeric",
+        day: "numeric",
+    }),
+    ymdhm: new Intl.DateTimeFormat(undefined, {
+        year: f.year,
+        month: f.month,
+        day: f.day,
+        hour: f.hour,
+        minute: f.minute,
+    }),
+    ymdhms: new Intl.DateTimeFormat(undefined, {
+        year: f.year,
+        month: f.month,
+        day: f.day,
+        hour: f.hour,
+        minute: f.minute,
+        second: f.second,
+    }),
+};
+
+export const formatTime = (format: TimeFormat, day: Day, secondsOfDay: number = 0): string => {
     const d = day.toDate();
-    d.setSeconds(seconds);
-    let str = "";
-    if (options.showDate && options.showTime) {
-        str = d.toLocaleString();
-    } else if (options.showDate) {
-        str = d.toLocaleDateString();
-    } else if (options.showTime) {
-        str = d.toLocaleTimeString();
-    }
-    if (options.showTime && options.hideSeconds) {
-        str = str.slice(0, -3);
-    }
-    */
-    return "pending format";
+    d.setSeconds(secondsOfDay);
+    return DateTimeFormatters[format].format(d);
 };

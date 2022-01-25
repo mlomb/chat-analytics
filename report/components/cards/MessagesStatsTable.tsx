@@ -137,17 +137,10 @@ const MessagesStatsTable = ({ data }: { data?: MessagesStats }) => {
         },
         {
             type: "text",
-            label: "hour ever",
+            label: "year ever",
             depth: 1,
-            value: data?.mostActive.hour.text,
-            tooltip: <>with {data?.mostActive.hour.messages.toLocaleString()} messages</>,
-        },
-        {
-            type: "text",
-            label: "day ever",
-            depth: 1,
-            value: data?.mostActive.day.text,
-            tooltip: <>with {data?.mostActive.day.messages.toLocaleString()} messages</>,
+            value: data?.mostActive.year.text,
+            tooltip: <>with {data?.mostActive.year.messages.toLocaleString()} messages</>,
         },
         {
             type: "text",
@@ -158,10 +151,17 @@ const MessagesStatsTable = ({ data }: { data?: MessagesStats }) => {
         },
         {
             type: "text",
-            label: "year ever",
+            label: "day ever",
             depth: 1,
-            value: data?.mostActive.year.text,
-            tooltip: <>with {data?.mostActive.year.messages.toLocaleString()} messages</>,
+            value: data?.mostActive.day.text,
+            tooltip: <>with {data?.mostActive.day.messages.toLocaleString()} messages</>,
+        },
+        {
+            type: "text",
+            label: "hour ever",
+            depth: 1,
+            value: data?.mostActive.hour.text,
+            tooltip: <>with {data?.mostActive.hour.messages.toLocaleString()} messages</>,
         },
     ];
 
