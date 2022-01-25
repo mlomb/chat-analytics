@@ -4,6 +4,8 @@ import { useState } from "react";
 import { BlockDataType, BlockInfo, BlockKey } from "@pipeline/aggregate/Blocks";
 import Block from "@report/components/Block";
 import ErrorBoundary from "@report/components/ErrorBoundary";
+import Tooltip from "@report/components/core/Tooltip";
+import InfoIcon from "@assets/images/icons/info.svg";
 
 type Title = string | (string | string[])[];
 
@@ -12,6 +14,7 @@ interface Props<K extends BlockKey> {
     title: Title;
     blockKey: K;
     children: (props: { data?: BlockDataType<K>; options: number[] }) => JSX.Element;
+    tooltip?: React.ReactElement | string;
 }
 
 const Card = <K extends BlockKey>(props: Props<K>) => {
@@ -72,7 +75,15 @@ const Card = <K extends BlockKey>(props: Props<K>) => {
                     {info.state === "error" && (
                         <div className="Card__error">Error ocurred, please check the console for more details</div>
                     )}
-                    <div className={"Card__title Card__title--" + info.state}>{elements}</div>
+                    <div className={"Card__title Card__title--" + info.state}>
+                        {elements}
+                        {props.tooltip ? (
+                            <Tooltip
+                                content={props.tooltip}
+                                children={<img src={InfoIcon} height={16} style={{ marginTop: 2 }} />}
+                            />
+                        ) : null}
+                    </div>
                     <div className={info.state !== "ready" ? "Card__gray" : ""}>
                         <props.children data={info.data || undefined} options={options} />
                     </div>

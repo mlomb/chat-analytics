@@ -16,8 +16,10 @@ interface Node {
 }
 
 export interface ConversationStats {
-    nodes: Node[];
+    numConversationsStarted: number;
     conversationsStarted: number[]; // indexed by author index
+
+    nodes: Node[];
 }
 
 const fn: BlockFn<ConversationStats> = (database, filters, common) => {
@@ -130,6 +132,7 @@ const fn: BlockFn<ConversationStats> = (database, filters, common) => {
     }
 
     return {
+        numConversationsStarted,
         conversationsStarted,
         nodes,
     };
