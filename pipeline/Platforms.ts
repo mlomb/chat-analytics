@@ -6,6 +6,7 @@ interface PlatformInformation {
     support: {
         stickers: boolean;
         reactions: boolean;
+        replies: boolean;
     };
 }
 
@@ -17,6 +18,7 @@ export const PlatformsInfo: {
         support: {
             stickers: false,
             reactions: true,
+            replies: true,
         },
     },
     telegram: {
@@ -24,6 +26,7 @@ export const PlatformsInfo: {
         support: {
             stickers: false,
             reactions: false,
+            replies: true,
         },
     },
     whatsapp: {
@@ -31,6 +34,7 @@ export const PlatformsInfo: {
         support: {
             stickers: true,
             reactions: false,
+            replies: false,
         },
     },
 };

@@ -17,6 +17,7 @@ import { LanguageStats } from "@pipeline/aggregate/blocks/LanguageStats";
 import { EmojiStats } from "@pipeline/aggregate/blocks/EmojiStats";
 import { InteractionStats } from "@pipeline/aggregate/blocks/InteractionStats";
 import { ExternalStats } from "@pipeline/aggregate/blocks/ExternalStats";
+import { ConversationStats } from "@pipeline/aggregate/blocks/ConversationStats";
 
 const EmptyArray: any[] = [];
 
@@ -38,6 +39,16 @@ export const MostRepliesAuthors = ({ data }: { data?: InteractionStats }) => (
         what="Author"
         unit="Number of messages replied"
         counts={data?.authorsReplyCount || EmptyArray}
+        itemComponent={AuthorLabel}
+        maxItems={Math.min(15, useDataProvider().database.authors.length)}
+        colorHue={240}
+    />
+);
+export const MostConversations = ({ data }: { data?: ConversationStats }) => (
+    <MostUsed
+        what="Author"
+        unit="Number of conversations started"
+        counts={data?.conversationsStarted || EmptyArray}
         itemComponent={AuthorLabel}
         maxItems={Math.min(15, useDataProvider().database.authors.length)}
         colorHue={240}
