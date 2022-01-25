@@ -24,6 +24,7 @@ import EmojiStats from "@pipeline/aggregate/blocks/EmojiStats";
 import InteractionStats from "@pipeline/aggregate/blocks/InteractionStats";
 import ExternalStats from "@pipeline/aggregate/blocks/ExternalStats";
 import SentimentPerCycle from "@pipeline/aggregate/blocks/SentimentPerCycle";
+import ConversationStats from "@pipeline/aggregate/blocks/ConversationStats";
 
 export const Blocks = {
     [MessagesPerCycle.key]: MessagesPerCycle,
@@ -33,6 +34,7 @@ export const Blocks = {
     [InteractionStats.key]: InteractionStats,
     [ExternalStats.key]: ExternalStats,
     [SentimentPerCycle.key]: SentimentPerCycle,
+    [ConversationStats.key]: ConversationStats,
 } as const;
 
 export type BlockKey = keyof typeof Blocks;

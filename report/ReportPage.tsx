@@ -17,7 +17,9 @@ import MessagesStatsTable from "@report/components/cards/MessagesStatsTable";
 import LanguageStatsTable from "@report/components/cards/LanguageStatsTable";
 import EmojiStatsTable from "@report/components/cards/EmojiStatsTable";
 import SentimentStatsTable from "@report/components/cards/SentimentStatsTable";
+import ConversationParticipation from "@report/components/viz/ConversationParticipation";
 import {
+    MostConversations,
     MostGetterEmojis,
     MostLinkedDomains,
     MostMentioned,
@@ -40,7 +42,7 @@ export interface Section {
 }
 
 const ReportDashboard = () => {
-    const [section, setSection] = useState("messages");
+    const [section, setSection] = useState("interaction");
 
     const sections: Section[] = useMemo(() => {
         const { database } = useDataProvider();
@@ -139,12 +141,30 @@ const ReportDashboard = () => {
                               ]
                             : []
                     )
+                    .concat(
+                        platformInfo.support.replies
+                            ? [
+                                  <Card
+                                      num={1}
+                                      title="Authors that reply the most messages"
+                                      blockKey="interaction-stats"
+                                      children={MostRepliesAuthors}
+                                  />,
+                              ]
+                            : []
+                    )
                     .concat([
                         <Card
+                            num={2}
+                            title="Participation in conversations"
+                            blockKey="conversation-stats"
+                            children={ConversationParticipation}
+                        />,
+                        <Card
                             num={1}
-                            title="Authors that reply the most messages"
-                            blockKey="interaction-stats"
-                            children={MostRepliesAuthors}
+                            title="Conversations started"
+                            blockKey="conversation-stats"
+                            children={MostConversations}
                         />,
                     ]),
             },
@@ -183,7 +203,7 @@ const ReportDashboard = () => {
                 value: "timeline",
                 cards: [],
             },
-        ];
+        ].filter(({ cards }) => env.isDev || cards.length > 0);
     }, []);
 
     return (
