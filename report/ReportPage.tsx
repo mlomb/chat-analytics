@@ -48,6 +48,14 @@ const ReportDashboard = () => {
         const { database } = useDataProvider();
         const platformInfo = PlatformsInfo[database.config.platform];
 
+        const conversationTooltip = (
+            <>
+                What counts as a conversation?
+                <br />
+                <b>Every group of messages separated by 30 minutes is considered a conversation</b>
+            </>
+        );
+
         return [
             {
                 name: "💬 Messages",
@@ -159,12 +167,14 @@ const ReportDashboard = () => {
                             title="Participation in conversations"
                             blockKey="conversation-stats"
                             children={ConversationParticipation}
+                            tooltip={conversationTooltip}
                         />,
                         <Card
                             num={1}
                             title="Conversations started"
                             blockKey="conversation-stats"
                             children={MostConversations}
+                            tooltip={conversationTooltip}
                         />,
                     ]),
             },
