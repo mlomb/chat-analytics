@@ -169,8 +169,8 @@ function createHeatmap(root: Root, container: Container, xField: string, yField:
     const heatLegend = chart.bottomAxesContainer.children.push(
         HeatLegend.new(root, {
             orientation: "horizontal",
-            startColor: MIN_COLOR,
-            endColor: MAX_COLOR,
+            startColor: MAX_COLOR,
+            endColor: MIN_COLOR,
         })
     );
 
