@@ -15,6 +15,12 @@ interface AttachmentCount {
     [type: string]: number;
 }
 
+interface ActivityEntry {
+    value: number;
+    hour: `${number}hs`;
+    weekday: "Mon" | "Tue" | "Wed" | "Thu" | "Fri" | "Sat" | "Sun";
+}
+
 export interface MessagesStats {
     total: number;
     numActiveDays: number;
@@ -28,6 +34,8 @@ export interface MessagesStats {
 
     authorsCount: number[];
     channelsCount: number[];
+
+    activity: ActivityEntry[];
 }
 
 const fn: BlockFn<MessagesStats> = (database, filters, common) => {
@@ -41,12 +49,16 @@ const fn: BlockFn<MessagesStats> = (database, filters, common) => {
     const attachmentsCount: AttachmentCount = { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0 };
     const numFiveMinBlocks = 24 * 12 * database.time.numDays;
     const fiveMinMessagesCount = new Array(numFiveMinBlocks).fill(0);
+    const activityCounts: number[] = new Array(7 * 24).fill(0);
 
     const processMessage = (msg: MessageView) => {
         total++;
         authorsCount[msg.authorIndex]++;
         channelsCount[msg.channelIndex]++;
         fiveMinMessagesCount[msg.dayIndex * 288 + Math.floor(msg.secondOfDay / 300)]++;
+
+        const dayOfWeek = Day.fromKey(dateKeys[msg.dayIndex]).toDate().getDay();
+        activityCounts[dayOfWeek * 24 + Math.floor(msg.secondOfDay / 3600)]++;
 
         const attachments = msg.getAttachments();
         if (attachments) {
@@ -99,6 +111,16 @@ const fn: BlockFn<MessagesStats> = (database, filters, common) => {
         }
     }
 
+    const activity: ActivityEntry[] = activityCounts.map((count, i) => {
+        const weekday = Math.floor(i / 24);
+        const hour = i % 24;
+        return <ActivityEntry>{
+            value: count,
+            hour: `${hour}hs`,
+            weekday: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][weekday],
+        };
+    });
+
     return {
         total,
         numActiveDays: filters.numActiveDays,
@@ -112,6 +134,8 @@ const fn: BlockFn<MessagesStats> = (database, filters, common) => {
 
         authorsCount,
         channelsCount,
+
+        activity,
     };
 };
 

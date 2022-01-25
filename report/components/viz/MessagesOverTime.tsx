@@ -129,7 +129,7 @@ const MessagesGraph = ({ data, options }: { data?: MessagesPerCycle; options: nu
                 marginLeft: 5,
                 marginBottom: 8,
             }}
-        ></div>
+        />
     );
 };
 
