@@ -103,8 +103,14 @@ const EmojisInFilter = (index: Index, filter: string) => useDataProvider().forma
 export const MostUsedEmojis = ({ data, options }: { data?: EmojiStats; options: number[] }) => (
     <MostUsed
         what="Emoji"
-        unit={options[1] === 0 ? "Times used" : "Times reacted"}
-        counts={data ? (options[1] === 0 ? data.inText.count : data.inReactions.count) : EmptyArray}
+        unit={options[1] === 0 || options[1] === undefined ? "Times used" : "Times reacted"}
+        counts={
+            data
+                ? options[1] === 0 || options[1] === undefined
+                    ? data.inText.count
+                    : data.inReactions.count
+                : EmptyArray
+        }
         filter={EmojiFilterFns[options[0] as unknown as keyof typeof EmojiFilterFns]}
         maxItems={Math.min(15, useDataProvider().database.emojis.length)}
         itemComponent={EmojiLabel}

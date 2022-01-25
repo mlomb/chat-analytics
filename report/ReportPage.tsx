@@ -3,6 +3,7 @@ import "@assets/styles/ReportPage.less";
 import { Fragment, useEffect, useMemo, useState } from "react";
 
 import { useDataProvider } from "@report/DataProvider";
+import { PlatformsInfo } from "@pipeline/Platforms";
 
 import Header from "@report/components/Header";
 import Footer from "@report/components/Footer";
@@ -42,6 +43,9 @@ const ReportDashboard = () => {
     const [section, setSection] = useState("messages");
 
     const sections: Section[] = useMemo(() => {
+        const { database } = useDataProvider();
+        const platformInfo = PlatformsInfo[database.config.platform];
+
         return [
             {
                 name: "💬 Messages",
@@ -98,12 +102,9 @@ const ReportDashboard = () => {
                 cards: [
                     <Card
                         num={1}
-                        title={[
-                            "Most used",
-                            ["emojis (all)", "regular emojis", "custom emojis"],
-                            "in",
-                            ["text", "reactions"],
-                        ]}
+                        title={["Most used", ["emojis (all)", "regular emojis", "custom emojis"]].concat(
+                            platformInfo.support.reactions ? ["in", ["text", "reactions"]] : []
+                        )}
                         blockKey="emoji-stats"
                         children={MostUsedEmojis}
                     />,
@@ -119,27 +120,33 @@ const ReportDashboard = () => {
             {
                 name: "🌀 Interaction",
                 value: "interaction",
-                cards: [
-                    <Card num={1} title="Most mentioned" blockKey="interaction-stats" children={MostMentioned} />,
-                    <Card
-                        num={1}
-                        title={["Top reacted messages", ["(total)", "(single)"]]}
-                        blockKey="interaction-stats"
-                        children={TopReacted}
-                    />,
-                    <Card
-                        num={1}
-                        title={[["Authors", "Channels"], "that get the most reactions"]}
-                        blockKey="emoji-stats"
-                        children={MostGetterEmojis}
-                    />,
-                    <Card
-                        num={1}
-                        title="Authors that reply the most messages"
-                        blockKey="interaction-stats"
-                        children={MostRepliesAuthors}
-                    />,
-                ],
+                cards: [<Card num={1} title="Most mentioned" blockKey="interaction-stats" children={MostMentioned} />]
+                    .concat(
+                        platformInfo.support.reactions
+                            ? [
+                                  <Card
+                                      num={1}
+                                      title={["Top reacted messages", ["(total)", "(single)"]]}
+                                      blockKey="interaction-stats"
+                                      children={TopReacted}
+                                  />,
+                                  <Card
+                                      num={1}
+                                      title={[["Authors", "Channels"], "that get the most reactions"]}
+                                      blockKey="emoji-stats"
+                                      children={MostGetterEmojis}
+                                  />,
+                              ]
+                            : []
+                    )
+                    .concat([
+                        <Card
+                            num={1}
+                            title="Authors that reply the most messages"
+                            blockKey="interaction-stats"
+                            children={MostRepliesAuthors}
+                        />,
+                    ]),
             },
             {
                 name: "💙 Sentiment",
