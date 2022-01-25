@@ -24,7 +24,7 @@ export class Day {
         return new Day(date.getFullYear(), date.getMonth() + 1, date.getDate());
     }
 
-    static fromKey(key: DateKey | MonthKey | WeekKey): Day {
+    static fromKey(key: DateKey | WeekKey | MonthKey | YearKey): Day {
         const arr = key.split("-").map(Number);
         if (arr.length === 1) {
             return new Day(arr[0], 1, 1);
@@ -176,15 +176,10 @@ export const genTimeKeys = (start: Day, end: Day): TimeKeysResult => {
     };
 };
 
-export const formatTime = (
-    day: Day,
-    seconds: number,
-    options = {
-        showDate: true, // day, month, year
-        showTime: true, // hour, minute, second
-        hideSeconds: true, // if true, removes seconds from showTime
-    }
-): string => {
+export type TimeFormat = "y" | "ym" | "ymd" | "ymdh" | "ymdhm" | "ymdhms";
+
+export const formatTime = (format: TimeFormat, day: Day, seconds: number = 0): string => {
+    /*
     const d = day.toDate();
     d.setSeconds(seconds);
     let str = "";
@@ -198,5 +193,6 @@ export const formatTime = (
     if (options.showTime && options.hideSeconds) {
         str = str.slice(0, -3);
     }
-    return str;
+    */
+    return "pending format";
 };

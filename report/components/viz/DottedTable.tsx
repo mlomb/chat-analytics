@@ -4,17 +4,32 @@ import Tooltip from "@report/components/core/Tooltip";
 
 import InfoIcon from "@assets/images/icons/info.svg";
 
+interface SeparatorLine {
+    type: "separator";
+}
+
+interface TitleLine {
+    type: "title";
+}
+
+interface TextLine {
+    type: "text";
+    value?: string;
+}
+
 interface NumberLine {
     type: "number";
     formatter: "integer" | "decimal" | "time";
     value?: number;
 }
 
-export type Line = NumberLine & {
-    label: string;
-    tooltip?: React.ReactElement | string;
-    depth?: number;
-};
+export type Line =
+    | SeparatorLine
+    | ((NumberLine | TextLine | TitleLine) & {
+          label: string;
+          tooltip?: React.ReactElement | string;
+          depth?: number;
+      });
 
 interface Props {
     lines: Line[];
@@ -57,10 +72,19 @@ const numberFormatterFns = {
 };
 
 const LineItem = ({ line }: { line: Line }) => {
+    if (line.type === "separator") {
+        return <div className="DottedTable__separator" />;
+    } else if (line.type === "title") {
+        return <span className="DottedTable__title" title={line.label} children={line.label} />;
+    }
+
     const depth = line.depth || 0;
 
     let value: JSX.Element;
     switch (line.type) {
+        case "text":
+            value = <>{line.value}</>;
+            break;
         case "number":
             value = (
                 <CountUp

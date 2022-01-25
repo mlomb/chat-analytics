@@ -39,8 +39,8 @@ export const MessageLabel = (props: { message?: FullMessage }) => {
     }
 
     const day = Day.fromKey(dp.database.time.minDate).nextDays(msg.day);
-    const date = formatTime(day, msg.secondOfDay, { showDate: true, showTime: false, hideSeconds: false });
-    const fullDateTime = formatTime(day, msg.secondOfDay);
+    const date = formatTime("ymd", day);
+    const fullDateTime = formatTime("ymdhms", day, msg.secondOfDay);
 
     const chips: ChipProps[] = ([] as ChipProps[])
         .concat(

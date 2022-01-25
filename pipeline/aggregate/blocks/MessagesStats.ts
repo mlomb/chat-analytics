@@ -18,7 +18,12 @@ interface AttachmentCount {
 interface ActivityEntry {
     value: number;
     hour: `${number}hs`;
-    weekday: "Mon" | "Tue" | "Wed" | "Thu" | "Fri" | "Sat" | "Sun";
+    weekday: "Sun" | "Mon" | "Tue" | "Wed" | "Thu" | "Fri" | "Sat";
+}
+
+interface MostActiveEntry {
+    messages: number;
+    text: string;
 }
 
 export interface MessagesStats {
@@ -36,10 +41,17 @@ export interface MessagesStats {
     channelsCount: number[];
 
     activity: ActivityEntry[];
+    mostActive: {
+        hour: MostActiveEntry;
+        day: MostActiveEntry;
+        month: MostActiveEntry;
+        year: MostActiveEntry;
+    };
 }
 
 const fn: BlockFn<MessagesStats> = (database, filters, common) => {
-    const { dateKeys } = common.timeKeys;
+    const { dateKeys, weekKeys, monthKeys, yearKeys, dateToWeekIndex, dateToMonthIndex, dateToYearIndex } =
+        common.timeKeys;
 
     let total = 0,
         withText = 0,
@@ -48,7 +60,13 @@ const fn: BlockFn<MessagesStats> = (database, filters, common) => {
     const channelsCount = new Array(database.channels.length).fill(0);
     const attachmentsCount: AttachmentCount = { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0 };
     const numFiveMinBlocks = 24 * 12 * database.time.numDays;
+
     const fiveMinMessagesCount = new Array(numFiveMinBlocks).fill(0);
+    const hourlyCounts: number[] = new Array(24 * database.time.numDays).fill(0);
+    const dailyCounts: number[] = new Array(database.time.numDays).fill(0);
+    const monthlyCounts: number[] = new Array(database.time.numMonths).fill(0);
+    const yearlyCounts: number[] = new Array(database.time.numYears).fill(0);
+
     const activityCounts: number[] = new Array(7 * 24).fill(0);
 
     const processMessage = (msg: MessageView) => {
@@ -56,6 +74,10 @@ const fn: BlockFn<MessagesStats> = (database, filters, common) => {
         authorsCount[msg.authorIndex]++;
         channelsCount[msg.channelIndex]++;
         fiveMinMessagesCount[msg.dayIndex * 288 + Math.floor(msg.secondOfDay / 300)]++;
+        hourlyCounts[msg.dayIndex * 24 + Math.floor(msg.secondOfDay / 3600)]++;
+        dailyCounts[msg.dayIndex]++;
+        monthlyCounts[dateToMonthIndex[msg.dayIndex]]++;
+        yearlyCounts[dateToYearIndex[msg.dayIndex]]++;
 
         const dayOfWeek = Day.fromKey(dateKeys[msg.dayIndex]).toDate().getDay();
         activityCounts[dayOfWeek * 24 + Math.floor(msg.secondOfDay / 3600)]++;
@@ -89,8 +111,8 @@ const fn: BlockFn<MessagesStats> = (database, filters, common) => {
                 const diff = (i - prevMessage) * 5;
                 if (diff > longestTimeWithoutMessages.minutes) {
                     longestTimeWithoutMessages.minutes = diff;
-                    longestTimeWithoutMessages.start = formatTime(Day.fromKey(dateKeys[Math.floor(prevMessage / 288)]), (prevMessage % 288) * 5 * 60); // prettier-ignore
-                    longestTimeWithoutMessages.end = formatTime(Day.fromKey(dateKeys[Math.floor(i / 288)]), (i % 288) * 5 * 60); // prettier-ignore
+                    longestTimeWithoutMessages.start = formatTime("ymdhm", Day.fromKey(dateKeys[Math.floor(prevMessage / 288)]), (prevMessage % 288) * 5 * 60); // prettier-ignore
+                    longestTimeWithoutMessages.end = formatTime("ymdhm", Day.fromKey(dateKeys[Math.floor(i / 288)]), (i % 288) * 5 * 60); // prettier-ignore
                 }
             }
             // set the last message as i
@@ -103,8 +125,8 @@ const fn: BlockFn<MessagesStats> = (database, filters, common) => {
             const diff = (i - startMessage + 1) * 5;
             if (diff > longestActiveConversation.minutes) {
                 longestActiveConversation.minutes = diff;
-                longestActiveConversation.start = formatTime(Day.fromKey(dateKeys[Math.floor(startMessage / 288)]), (startMessage % 288) * 5 * 60); // prettier-ignore
-                longestActiveConversation.end = formatTime(Day.fromKey(dateKeys[Math.floor(i / 288)]), (i % 288) * 5 * 60); // prettier-ignore
+                longestActiveConversation.start = formatTime("ymdhm", Day.fromKey(dateKeys[Math.floor(startMessage / 288)]), (startMessage % 288) * 5 * 60); // prettier-ignore
+                longestActiveConversation.end = formatTime("ymdhm", Day.fromKey(dateKeys[Math.floor(i / 288)]), (i % 288) * 5 * 60); // prettier-ignore
             }
         } else {
             startMessage = -1;
@@ -121,6 +143,18 @@ const fn: BlockFn<MessagesStats> = (database, filters, common) => {
         };
     });
 
+    const findMostActive = (counts: number[], formatFn: (index: number) => string): MostActiveEntry => {
+        let max = 0,
+            maxIndex = -1;
+        for (let i = 0; i < counts.length; i++) {
+            if (counts[i] > max) {
+                max = counts[i];
+                maxIndex = i;
+            }
+        }
+        return { messages: max, text: formatFn(maxIndex) };
+    };
+
     return {
         total,
         numActiveDays: filters.numActiveDays,
@@ -136,6 +170,13 @@ const fn: BlockFn<MessagesStats> = (database, filters, common) => {
         channelsCount,
 
         activity,
+        // prettier-ignore
+        mostActive: {
+            hour: findMostActive(hourlyCounts, (i) => formatTime("ymdh", Day.fromKey(dateKeys[Math.floor(i / 24)]), (i % 24) * 3600)),
+            day: findMostActive(dailyCounts, (i) => formatTime("ymd", Day.fromKey(dateKeys[i]))),
+            month: findMostActive(monthlyCounts, (i) => formatTime("ym", Day.fromKey(monthKeys[i]))),
+            year: findMostActive(yearlyCounts, (i) => formatTime("y", Day.fromKey(yearKeys[i]))),
+        },
     };
 };
 
