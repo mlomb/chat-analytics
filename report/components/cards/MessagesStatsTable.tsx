@@ -1,10 +1,12 @@
+import { PlatformsInfo } from "@pipeline/Platforms";
 import { AttachmentType } from "@pipeline/Types";
 import { MessagesStats } from "@pipeline/aggregate/blocks/MessagesStats";
-import DottedTable, { Line } from "@report/components/viz/DottedTable";
 import { useDataProvider } from "@report/DataProvider";
+import DottedTable, { Line } from "@report/components/viz/DottedTable";
 
 const MessagesStatsTable = ({ data }: { data?: MessagesStats }) => {
     const dataProvider = useDataProvider();
+    const platformInfo = PlatformsInfo[dataProvider.database.config.platform];
 
     const lines: Line[] = [
         {
@@ -54,10 +56,9 @@ const MessagesStatsTable = ({ data }: { data?: MessagesStats }) => {
             label: "🎉 with stickers",
             depth: 1,
             value: data?.attachmentsCount[AttachmentType.Sticker],
-            tooltip:
-                dataProvider.database.config.platform === "discord"
-                    ? "Discord exports do not include stickers for now."
-                    : undefined,
+            tooltip: platformInfo.support.stickers
+                ? undefined
+                : platformInfo.name + " does not support stickers or the information is not present in export files",
         },
         {
             type: "number",

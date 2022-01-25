@@ -44,11 +44,7 @@ const LanguageStatsTable = ({ data }: { data?: LanguageStats }) => {
         ) ?? []),
     ];
 
-    return (
-        <div>
-            <DottedTable lines={lines} />
-        </div>
-    );
+    return <DottedTable lines={lines} />;
 };
 
 export default LanguageStatsTable;
