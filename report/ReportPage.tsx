@@ -28,6 +28,7 @@ import {
     MostUsedWords,
 } from "@report/components/cards/MostCards";
 import { TopReacted } from "@report/components/cards/TopCards";
+import MessagesActivity from "@report/components/viz/MessagesActivity";
 
 const CardContainer = (props: { children: React.ReactNode }) => <div className="CardContainer">{props.children}</div>;
 
@@ -56,8 +57,8 @@ const ReportDashboard = () => {
                     <Card
                         num={1}
                         blockKey="messages-stats"
-                        title={["Peak Activity", ["overview", "heatmap"]]}
-                        children={() => <div>TO-DO</div>}
+                        title={["Activity by day & hour", ["(split)", "(combined)"]]}
+                        children={MessagesActivity}
                     />,
                     <Card
                         num={1}
