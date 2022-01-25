@@ -128,13 +128,44 @@ const MessagesStatsTable = ({ data }: { data?: MessagesStats }) => {
                 </>
             ),
         },
+        {
+            type: "separator",
+        },
+        {
+            type: "title",
+            label: "Most active...",
+        },
+        {
+            type: "text",
+            label: "hour ever",
+            depth: 1,
+            value: data?.mostActive.hour.text,
+            tooltip: <>with {data?.mostActive.hour.messages.toLocaleString()} messages</>,
+        },
+        {
+            type: "text",
+            label: "day ever",
+            depth: 1,
+            value: data?.mostActive.day.text,
+            tooltip: <>with {data?.mostActive.day.messages.toLocaleString()} messages</>,
+        },
+        {
+            type: "text",
+            label: "month ever",
+            depth: 1,
+            value: data?.mostActive.month.text,
+            tooltip: <>with {data?.mostActive.month.messages.toLocaleString()} messages</>,
+        },
+        {
+            type: "text",
+            label: "year ever",
+            depth: 1,
+            value: data?.mostActive.year.text,
+            tooltip: <>with {data?.mostActive.year.messages.toLocaleString()} messages</>,
+        },
     ];
 
-    return (
-        <div>
-            <DottedTable lines={lines} />
-        </div>
-    );
+    return <DottedTable lines={lines} />;
 };
 
 export default MessagesStatsTable;
