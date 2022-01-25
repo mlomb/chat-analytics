@@ -78,7 +78,12 @@ const ReportDashboard = () => {
                 name: "🅰️ Language",
                 value: "language",
                 cards: [
-                    <Card num={1} title="Most used words" blockKey="language-stats" children={MostUsedWords} />,
+                    <Card
+                        num={1}
+                        title={["Most used words", ["(as table)", "(as word cloud)"]]}
+                        blockKey="language-stats"
+                        children={MostUsedWords}
+                    />,
                     <Card
                         num={1}
                         title="Language statistics"

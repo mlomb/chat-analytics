@@ -10,6 +10,7 @@ import {
     DomainLabel,
     MentionLabel,
 } from "@report/components/core/Labels";
+import WordCloud from "@report/components/viz/WordCloud";
 
 import { MessagesStats } from "@pipeline/aggregate/blocks/MessagesStats";
 import { LanguageStats } from "@pipeline/aggregate/blocks/LanguageStats";
@@ -62,19 +63,22 @@ export const MostMessagesChannels = ({ data }: { data?: MessagesStats }) => (
 ///////////////////////////
 const WordsIndexOf = (value: string) => useDataProvider().formatCache.words.indexOf(value);
 const WordsInFilter = (index: number, filter: string) => useDataProvider().formatCache.words[index].startsWith(filter);
-export const MostUsedWords = ({ data }: { data?: LanguageStats }) => (
-    <MostUsed
-        what="Word"
-        unit="Times used"
-        counts={data?.wordsCount || EmptyArray}
-        maxItems={Math.min(15, useDataProvider().database.words.length)}
-        itemComponent={WordLabel}
-        searchable
-        searchPlaceholder="Filter words..."
-        indexOf={WordsIndexOf}
-        inFilter={WordsInFilter}
-    />
-);
+export const MostUsedWords = ({ data, options }: { data?: LanguageStats; options: number[] }) =>
+    options[0] === 1 ? (
+        <WordCloud wordsCount={data?.wordsCount || EmptyArray} />
+    ) : (
+        <MostUsed
+            what="Word"
+            unit="Times used"
+            counts={data?.wordsCount || EmptyArray}
+            maxItems={Math.min(15, useDataProvider().database.words.length)}
+            itemComponent={WordLabel}
+            searchable
+            searchPlaceholder="Filter words..."
+            indexOf={WordsIndexOf}
+            inFilter={WordsInFilter}
+        />
+    );
 
 ///////////////////////////
 /// EMOJIS
