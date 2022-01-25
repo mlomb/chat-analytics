@@ -395,7 +395,7 @@ export class DatabaseBuilder {
     public async getDatabase(): Promise<Database> {
         if (this.minDate === undefined || this.maxDate === undefined) throw new Error("No messages processed");
 
-        const { dateKeys, monthKeys } = genTimeKeys(this.minDate, this.maxDate);
+        const { dateKeys, monthKeys, yearKeys } = genTimeKeys(this.minDate, this.maxDate);
         const { newWords, newWordsMapping } = this.filterWords();
         const { authorsOrder, authorsBotCutoff } = this.sortAuthors();
 
@@ -456,6 +456,7 @@ export class DatabaseBuilder {
                 maxDate: this.maxDate.dateKey,
                 numDays: dateKeys.length,
                 numMonths: monthKeys.length,
+                numYears: yearKeys.length,
             },
             channels: this.channels.data,
             authors: this.authors.data,

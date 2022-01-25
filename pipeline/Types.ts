@@ -41,6 +41,7 @@ export interface Database {
         maxDate: DateKey;
         numDays: number;
         numMonths: number;
+        numYears: number;
     };
 
     channels: Channel[];
