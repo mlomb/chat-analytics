@@ -1,8 +1,8 @@
-import { SentimentPerCycle } from "@pipeline/aggregate/blocks/SentimentPerCycle";
+import { SentimentStats } from "@pipeline/aggregate/blocks/SentimentStats";
 import DottedTable, { Line } from "@report/components/viz/DottedTable";
-import { LanguageNames } from "@pipeline/Languages";
+import SentimentPieChart from "@report/components/viz/SentimentPieChart";
 
-const SentimentStatsTable = ({ data }: { data?: SentimentPerCycle }) => {
+const SentimentStatsTable = ({ data }: { data?: SentimentStats }) => {
     const lines: Line[] = [
         {
             type: "number",
@@ -25,9 +25,14 @@ const SentimentStatsTable = ({ data }: { data?: SentimentPerCycle }) => {
     ];
 
     return (
-        <div>
+        <>
             <DottedTable lines={lines} />
-        </div>
+            <SentimentPieChart
+                n={data?.negativeMessages || 0}
+                p={data?.positiveMessages || 0}
+                z={data?.neutralMessages || 0}
+            />
+        </>
     );
 };
 
