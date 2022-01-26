@@ -18,6 +18,7 @@ import LanguageStatsTable from "@report/components/cards/LanguageStatsTable";
 import EmojiStatsTable from "@report/components/cards/EmojiStatsTable";
 import SentimentStatsTable from "@report/components/cards/SentimentStatsTable";
 import ConversationParticipation from "@report/components/viz/ConversationParticipation";
+import GrowthOverTime from "@report/components/viz/GrowthOverTime";
 import {
     MostConversations,
     MostGetterEmojis,
@@ -42,7 +43,7 @@ export interface Section {
 }
 
 const ReportDashboard = () => {
-    const [section, setSection] = useState("interaction");
+    const [section, setSection] = useState("messages");
 
     const sections: Section[] = useMemo(() => {
         const { database } = useDataProvider();
@@ -211,7 +212,10 @@ const ReportDashboard = () => {
             {
                 name: "📅 Timeline",
                 value: "timeline",
-                cards: [],
+                cards: [
+                    <Card num={3} title="Active users over time" blockKey="timeline-stats" children={GrowthOverTime} />,
+                    <Card num={3} title="Server/group growth" blockKey="timeline-stats" children={GrowthOverTime} />,
+                ],
             },
         ].filter(({ cards }) => env.isDev || cards.length > 0);
     }, []);
