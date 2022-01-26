@@ -13,6 +13,7 @@ import { TabContainer } from "@report/components/Tabs";
 
 import MessagesOverTime from "@report/components/viz/MessagesOverTime";
 import SentimentOverTime from "@report/components/viz/SentimentOverTime";
+import ActiveAuthorsOverTime from "@report/components/viz/ActiveAuthorsOverTime";
 import MessagesStatsTable from "@report/components/cards/MessagesStatsTable";
 import LanguageStatsTable from "@report/components/cards/LanguageStatsTable";
 import EmojiStatsTable from "@report/components/cards/EmojiStatsTable";
@@ -213,11 +214,16 @@ const ReportDashboard = () => {
                 name: "📅 Timeline",
                 value: "timeline",
                 cards: [
-                    <Card num={3} title="Active users over time" blockKey="timeline-stats" children={GrowthOverTime} />,
+                    <Card
+                        num={3}
+                        title={["Active authors over time by month"]}
+                        blockKey="acitve-authors"
+                        children={ActiveAuthorsOverTime}
+                    />,
                     <Card
                         num={3}
                         title="Server/group growth"
-                        blockKey="timeline-stats"
+                        blockKey="growth"
                         children={GrowthOverTime}
                         tooltip="Only authors that sent at least one message are considered"
                     />,

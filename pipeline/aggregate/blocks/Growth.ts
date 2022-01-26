@@ -3,13 +3,13 @@ import { BlockDescription, BlockFn } from "@pipeline/aggregate/Blocks";
 import { parseAndFilterMessages } from "@pipeline/aggregate/Helpers";
 import { MessageView } from "@pipeline/serialization/MessageView";
 
-interface GrowthItem {
+interface Item {
     ts: number;
     value: number;
 }
 
 export interface TimelineStats {
-    growth: GrowthItem[];
+    growth: Item[];
 }
 
 const fn: BlockFn<TimelineStats> = (database, filters, common) => {
@@ -36,7 +36,7 @@ const fn: BlockFn<TimelineStats> = (database, filters, common) => {
             return acc;
         }, {});
 
-    const growth: GrowthItem[] = [];
+    const growth: Item[] = [];
     const newAuthorsInDayKeys = Object.keys(newAuthorsInDay);
     let accum = 0;
     for (let i = 0; i < newAuthorsInDayKeys.length; i++) {
@@ -58,7 +58,7 @@ const fn: BlockFn<TimelineStats> = (database, filters, common) => {
 };
 
 export default {
-    key: "timeline-stats",
+    key: "growth",
     triggers: ["authors", "channels"],
     fn,
-} as BlockDescription<"timeline-stats", TimelineStats>;
+} as BlockDescription<"growth", TimelineStats>;

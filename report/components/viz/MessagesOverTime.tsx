@@ -69,8 +69,8 @@ const MessagesGraph = ({ data, options }: { data?: MessagesPerCycle; options: nu
                     xAxis: xAxis,
                     yAxis: yAxis,
                     noRisers: true,
-                    stroke: Color.fromHex(0x479adb),
-                    fill: Color.fromHex(0x479adb),
+                    stroke: Color.fromHex(0x57b1ff),
+                    fill: Color.fromHex(0x57b1ff),
                 })
             );
             stepSeries.strokes.template.setAll({
