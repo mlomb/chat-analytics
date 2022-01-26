@@ -82,7 +82,16 @@ const SentimentPieChart = (props: Props) => {
         ]);
     }, [props.n, props.p, props.z]);
 
-    return <div ref={chartDiv} style={{ width: "100%", height: "100%", minHeight: 470 }}></div>;
+    return (
+        <div
+            ref={chartDiv}
+            style={{
+                minHeight: 477,
+                marginLeft: 5,
+                marginBottom: 8,
+            }}
+        ></div>
+    );
 };
 
 export default SentimentPieChart;
