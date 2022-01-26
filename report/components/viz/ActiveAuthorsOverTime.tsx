@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
-import { Root, Color, Label, p50 } from "@amcharts/amcharts5";
+import { Root, Color, Label, p50, Tooltip, Bullet, Circle } from "@amcharts/amcharts5";
 import {
     XYChart,
     DateAxis,
@@ -11,14 +11,16 @@ import {
     ColumnSeries,
     XYCursor,
     XYSeries,
+    LineSeries,
+    SmoothedXLineSeries,
 } from "@amcharts/amcharts5/xy";
 
 import { useDataProvider } from "@report/DataProvider";
-import { TimelineStats } from "@pipeline/aggregate/blocks/Growth";
+import { ActiveAuthors } from "@pipeline/aggregate/blocks/ActiveAuthors";
 import { Themes } from "./AmCharts5";
 import { TimeUnit } from "@amcharts/amcharts5/.internal/core/util/Time";
 
-const GrowthOverTime = ({ data, options }: { data?: TimelineStats; options: number[] }) => {
+const ActiveAuthorsOverTime = ({ data, options }: { data?: ActiveAuthors; options: number[] }) => {
     const dataProvider = useDataProvider();
     const chartDiv = useRef<HTMLDivElement>(null);
 
@@ -29,7 +31,11 @@ const GrowthOverTime = ({ data, options }: { data?: TimelineStats; options: numb
         const root = Root.new(chartDiv.current!);
         root.setThemes(Themes(root, false)); // Do not animate!
 
-        const chart = root.container.children.push(XYChart.new(root, {}));
+        const chart = root.container.children.push(
+            XYChart.new(root, {
+                layout: root.verticalLayout,
+            })
+        );
         chart.zoomOutButton.set("forceHidden", true);
 
         const xAxis = chart.xAxes.push(
@@ -41,39 +47,50 @@ const GrowthOverTime = ({ data, options }: { data?: TimelineStats; options: numb
         const yAxis = chart.yAxes.push(
             ValueAxis.new(root, {
                 renderer: AxisRendererY.new(root, {}),
+                // make sure we get the full scale
+                min: 0,
             })
         );
         yAxis.children.unshift(
             Label.new(root, {
                 rotation: -90,
-                text: "Total authors",
+                text: "Active users in period",
                 y: p50,
                 centerX: p50,
             })
         );
+        xAxisRef.current = xAxis;
 
-        const stepSeries = chart.series.push(
-            StepLineSeries.new(root, {
+        const series = chart.series.push(
+            SmoothedXLineSeries.new(root, {
                 valueXField: "ts",
                 valueYField: "value",
                 xAxis: xAxis,
                 yAxis: yAxis,
-                stroke: Color.fromHex(0x479adb),
-                fill: Color.fromHex(0x479adb),
+                stroke: Color.fromHex(0x57b1ff),
+                fill: Color.fromHex(0x57b1ff),
+                tooltip: Tooltip.new(root, {
+                    labelText: "{valueY}",
+                }),
             })
         );
-        stepSeries.strokes.template.setAll({
-            visible: true,
-            strokeWidth: 2,
-            strokeOpacity: 0.8,
-        });
-        stepSeries.fills.template.setAll({
+        series.fills.template.setAll({
             visible: true,
             fillOpacity: 0.2,
         });
+        series.bullets.push(function () {
+            return Bullet.new(root, {
+                locationY: 0,
+                sprite: Circle.new(root, {
+                    radius: 4,
+                    stroke: Color.fromHex(0x57b1ff),
+                    strokeWidth: 2,
+                    fill: Color.fromHex(0x1861a1),
+                }),
+            });
+        });
 
-        xAxisRef.current = xAxis;
-        seriesRef.current = stepSeries;
+        seriesRef.current = series;
 
         const onZoom = () => xAxis.zoomToDates(dataProvider.getActiveStartDate(), dataProvider.getActiveEndDate(), 0);
         dataProvider.on("trigger-time", onZoom);
@@ -89,10 +106,10 @@ const GrowthOverTime = ({ data, options }: { data?: TimelineStats; options: numb
     }, []);
 
     useEffect(() => {
-        xAxisRef.current?.set("baseInterval", { timeUnit: ["day", "week", "month"][options[0]] as TimeUnit, count: 1 });
         if (data) {
             // TODO: update efficient
-            seriesRef.current?.data.setAll(data.growth);
+            //seriesRef.current?.data.setAll([data.perDay, data.perWeek, data.perMonth][options[0]]);
+            seriesRef.current?.data.setAll(data.perMonth);
         }
     }, [seriesRef.current, data, options]);
 
@@ -108,4 +125,4 @@ const GrowthOverTime = ({ data, options }: { data?: TimelineStats; options: numb
     );
 };
 
-export default GrowthOverTime;
+export default ActiveAuthorsOverTime;
