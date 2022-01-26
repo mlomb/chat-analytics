@@ -48,6 +48,12 @@ const fn: BlockFn<TimelineStats> = (database, filters, common) => {
         });
     }
 
+    // last data point
+    growth.push({
+        ts: Day.fromKey(dateKeys[dateKeys.length - 1]).toTimestamp(),
+        value: accum,
+    });
+
     return { growth };
 };
 

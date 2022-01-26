@@ -214,7 +214,13 @@ const ReportDashboard = () => {
                 value: "timeline",
                 cards: [
                     <Card num={3} title="Active users over time" blockKey="timeline-stats" children={GrowthOverTime} />,
-                    <Card num={3} title="Server/group growth" blockKey="timeline-stats" children={GrowthOverTime} />,
+                    <Card
+                        num={3}
+                        title="Server/group growth"
+                        blockKey="timeline-stats"
+                        children={GrowthOverTime}
+                        tooltip="Only authors that sent at least one message are considered"
+                    />,
                 ],
             },
         ].filter(({ cards }) => env.isDev || cards.length > 0);
