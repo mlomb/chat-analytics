@@ -1,14 +1,19 @@
-import { useLayoutEffect, useRef } from "react";
+import { useEffect, useLayoutEffect, useRef } from "react";
 
 import { Root, Color, Percent, Tooltip } from "@amcharts/amcharts5";
 import { PieChart, PieSeries } from "@amcharts/amcharts5/percent";
 
 import { Themes } from "./AmCharts5";
 
-interface Props {}
+interface Props {
+    n: number; // -
+    p: number; // +
+    z: number;
+}
 
-const PieChartGraph = (props: Props) => {
+const SentimentPieChart = (props: Props) => {
     const chartDiv = useRef<HTMLDivElement>(null);
+    const seriesRef = useRef<PieSeries | null>(null);
 
     useLayoutEffect(() => {
         const root = Root.new(chartDiv.current!);
@@ -22,10 +27,9 @@ const PieChartGraph = (props: Props) => {
 
         const series = chart.series.push(
             PieSeries.new(root, {
-                name: "Series",
-                valueField: "sales",
-                categoryField: "country",
-                alignLabels: true,
+                valueField: "count",
+                categoryField: "tag",
+                alignLabels: false,
                 innerRadius: new Percent(50),
                 tooltip: Tooltip.new(root, {
                     forceHidden: true,
@@ -37,42 +41,48 @@ const PieChartGraph = (props: Props) => {
         });
         series.labels.template.setAll({
             textType: "circular",
-            inside: false,
+            centerX: 0,
+            centerY: 0,
         });
-        series.data.setAll([
+
+        seriesRef.current = series;
+
+        return () => {
+            seriesRef.current = null;
+            root.dispose();
+        };
+    }, []);
+
+    useEffect(() => {
+        seriesRef.current?.data.setAll([
             {
-                country: "Text",
-                sales: 78,
+                tag: "Positive",
+                count: props.p,
+                sliceSettings: {
+                    fill: seriesRef.current?.root.interfaceColors.get("positive")!,
+                    stroke: null,
+                },
+            },
+            {
+                tag: "Negative",
+                count: props.n,
+                sliceSettings: {
+                    fill: seriesRef.current?.root.interfaceColors.get("negative")!,
+                    stroke: null,
+                },
+            },
+            {
+                tag: "Neutral",
+                count: props.z,
                 sliceSettings: {
                     fill: Color.fromString("#00bcd4"),
                     stroke: null,
                 },
             },
-            {
-                country: "Media",
-                sales: 13,
-                sliceSettings: {
-                    fill: Color.fromString("#ff9800"),
-                    stroke: null,
-                },
-            },
-            {
-                country: "Other",
-                sales: 3,
-                sliceSettings: {
-                    fill: Color.fromString("#ccc"),
-                    stroke: null,
-                },
-                // stickers, etc
-            },
         ]);
+    }, [props.n, props.p, props.z]);
 
-        return () => {
-            root.dispose();
-        };
-    }, []);
-
-    return <div ref={chartDiv} style={{ width: "100%", height: "100%", minHeight: 700 }}></div>;
+    return <div ref={chartDiv} style={{ width: "100%", height: "100%", minHeight: 470 }}></div>;
 };
 
-export default PieChartGraph;
+export default SentimentPieChart;

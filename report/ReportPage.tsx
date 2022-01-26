@@ -195,7 +195,7 @@ const ReportDashboard = () => {
                     <Card
                         num={1}
                         title="Sentiment overview"
-                        blockKey="sentiment-per-cycle"
+                        blockKey="sentiment-stats"
                         children={SentimentStatsTable}
                     />,
                 ],
