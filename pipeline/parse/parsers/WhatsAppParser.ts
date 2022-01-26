@@ -88,6 +88,7 @@ export class WhatsAppParser extends Parser {
                 }
 
                 // TODO: handle "live location shared"
+                // TODO: handle deleted messages?
 
                 this.builder.addMessage({
                     id: this.messageIndex++,
