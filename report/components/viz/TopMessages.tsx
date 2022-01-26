@@ -16,6 +16,7 @@ export const TopMessages = (props: TopMessagesProps) => {
             {props.messages.map((msg, i) => (
                 <TopMessage msg={msg} i={i} key={i} title={props.title} />
             ))}
+            {props.messages.length === 0 && <div className="TopMessages__empty">No data to show</div>}
         </div>
     );
 };
