@@ -134,8 +134,8 @@ export interface TimeKeysResult {
 }
 
 export const genTimeKeys = (start: Day, end: Day): TimeKeysResult => {
-    // check start < end
-    console.assert(Day.lt(start, end));
+    // check start <= end
+    console.assert(Day.lt(start, end) || Day.eq(start, end));
 
     const onePastEnd = end.nextDay();
 
