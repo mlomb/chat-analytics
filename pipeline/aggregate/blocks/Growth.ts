@@ -22,7 +22,7 @@ const fn: BlockFn<TimelineStats> = (database, filters, common) => {
             firstMessageDay[msg.authorIndex] = msg.dayIndex;
     };
 
-    parseAndFilterMessages(processMessage, database, filters);
+    parseAndFilterMessages(processMessage, database, filters, { channels: true, authors: true, time: false });
 
     const newAuthorsInDay = Object.values(firstMessageDay)
         .filter((day) => day !== -1)

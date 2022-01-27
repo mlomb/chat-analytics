@@ -84,7 +84,7 @@ const fn: BlockFn<SentimentPerCycle> = (database, filters, common) => {
         }
     };
 
-    parseAndFilterMessages(processMessage, database, filters);
+    parseAndFilterMessages(processMessage, database, filters, { channels: true, authors: true, time: false });
 
     const post = (e: SentimentInDate) => {
         const p = Math.abs(e.p);

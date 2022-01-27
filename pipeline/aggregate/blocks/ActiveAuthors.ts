@@ -24,7 +24,7 @@ const fn: BlockFn<ActiveAuthors> = (database, filters, common) => {
         authorsPresentInMonth[dateToMonthIndex[msg.dayIndex]].add(msg.authorIndex);
     };
 
-    parseAndFilterMessages(processMessage, database, filters);
+    parseAndFilterMessages(processMessage, database, filters, { channels: true, authors: true, time: false });
 
     const res: ActiveAuthors = {
         perMonth: [],
