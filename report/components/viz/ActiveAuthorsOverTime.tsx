@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useLayoutEffect, useRef } from "react";
 
 import { Root, Color, Label, p50, Tooltip, Bullet, Circle } from "@amcharts/amcharts5";
 import {
@@ -7,18 +7,13 @@ import {
     ValueAxis,
     AxisRendererX,
     AxisRendererY,
-    StepLineSeries,
-    ColumnSeries,
-    XYCursor,
     XYSeries,
-    LineSeries,
     SmoothedXLineSeries,
 } from "@amcharts/amcharts5/xy";
 
 import { useDataProvider } from "@report/DataProvider";
 import { ActiveAuthors } from "@pipeline/aggregate/blocks/ActiveAuthors";
 import { Themes } from "./AmCharts5";
-import { TimeUnit } from "@amcharts/amcharts5/.internal/core/util/Time";
 
 const ActiveAuthorsOverTime = ({ data, options }: { data?: ActiveAuthors; options: number[] }) => {
     const dataProvider = useDataProvider();

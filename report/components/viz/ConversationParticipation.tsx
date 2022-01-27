@@ -1,7 +1,7 @@
-import { useEffect, useLayoutEffect, useRef } from "react";
+import { useLayoutEffect, useRef } from "react";
 
 import { Themes } from "./AmCharts5";
-import { Root, Percent, Tooltip } from "@amcharts/amcharts5";
+import { Root } from "@amcharts/amcharts5";
 import { Chord } from "@amcharts/amcharts5/flow";
 
 import { useDataProvider } from "@report/DataProvider";

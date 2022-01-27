@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 
 import { Themes } from "./AmCharts5";
 import { Root, Color, HeatLegend, Percent, Container, p100, p50, percent, Label, Tooltip } from "@amcharts/amcharts5";
