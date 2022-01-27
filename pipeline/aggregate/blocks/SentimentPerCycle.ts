@@ -6,16 +6,17 @@ import { MessageView } from "@pipeline/serialization/MessageView";
 export type SentimentInDate = {
     t: number; // timestamp
 
-    p: number; // tokens with positive sentiment
-    n: number; // tokens with negative sentiment
+    p: number; // messages with positive sentiment
+    n: number; // messages with negative sentiment
+    z: number; // messages with neutral sentiment
 
     // raw diff, one of the following is always 0
-    rawDiffP: number;
-    rawDiffN: number;
+    diffP: number;
+    diffN: number;
 
     // normalized diff, one of the following is always 0
-    percDiffP: number;
-    percDiffN: number;
+    percP: number;
+    percN: number;
 };
 
 export interface SentimentPerCycle {
@@ -44,10 +45,11 @@ const fn: BlockFn<SentimentPerCycle> = (database, filters, common) => {
             t: Day.fromKey(monthKey).toTimestamp(),
             p: 0,
             n: 0,
-            rawDiffP: 0,
-            rawDiffN: 0,
-            percDiffP: 0,
-            percDiffN: 0,
+            z: 0,
+            diffP: 0,
+            diffN: 0,
+            percP: 0,
+            percN: 0,
         });
     }
     for (const weekKey of weekKeys) {
@@ -55,10 +57,11 @@ const fn: BlockFn<SentimentPerCycle> = (database, filters, common) => {
             t: Day.fromKey(weekKey).toTimestamp(),
             p: 0,
             n: 0,
-            rawDiffP: 0,
-            rawDiffN: 0,
-            percDiffP: 0,
-            percDiffN: 0,
+            z: 0,
+            diffP: 0,
+            diffN: 0,
+            percP: 0,
+            percN: 0,
         });
     }
 
@@ -67,6 +70,8 @@ const fn: BlockFn<SentimentPerCycle> = (database, filters, common) => {
         if (sentiment !== undefined) {
             if (sentiment === 0) {
                 res.neutralMessages++;
+                res.perMonth[dateToMonthIndex[msg.dayIndex]].z += 1;
+                res.perWeek[dateToWeekIndex[msg.dayIndex]].z += 1;
             } else if (sentiment > 0) {
                 res.positiveMessages++;
                 res.perMonth[dateToMonthIndex[msg.dayIndex]].p += 1;
@@ -84,15 +89,15 @@ const fn: BlockFn<SentimentPerCycle> = (database, filters, common) => {
     const post = (e: SentimentInDate) => {
         const p = Math.abs(e.p);
         const n = Math.abs(e.n);
-        const total = p + n;
+        const total = p + n + e.z;
         const diff = p - n;
 
-        e.rawDiffP = Math.max(0, diff);
-        e.rawDiffN = Math.min(0, diff);
+        e.diffP = Math.max(0, diff);
+        e.diffN = Math.min(0, diff);
 
         if (total > 0) {
-            e.percDiffP = (Math.max(0, diff) / total) * 100;
-            e.percDiffN = (Math.min(0, diff) / total) * 100;
+            e.percP = (p / total) * 100;
+            e.percN = (-n / total) * 100;
         }
     };
 

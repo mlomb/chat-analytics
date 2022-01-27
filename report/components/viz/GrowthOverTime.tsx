@@ -88,7 +88,7 @@ const GrowthOverTime = ({ data, options }: { data?: TimelineStats; options: numb
         };
     }, []);
 
-    useEffect(() => {
+    useLayoutEffect(() => {
         xAxisRef.current?.set("baseInterval", { timeUnit: ["day", "week", "month"][options[0]] as TimeUnit, count: 1 });
         if (data) {
             // TODO: update efficient

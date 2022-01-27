@@ -105,7 +105,7 @@ const ActiveAuthorsOverTime = ({ data, options }: { data?: ActiveAuthors; option
         };
     }, []);
 
-    useEffect(() => {
+    useLayoutEffect(() => {
         if (data) {
             // TODO: update efficient
             //seriesRef.current?.data.setAll([data.perDay, data.perWeek, data.perMonth][options[0]]);

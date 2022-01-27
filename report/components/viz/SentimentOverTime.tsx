@@ -1,7 +1,15 @@
 import { useEffect, useLayoutEffect, useRef } from "react";
 
-import { Root, Color } from "@amcharts/amcharts5";
-import { XYChart, DateAxis, ValueAxis, AxisRendererX, AxisRendererY, ColumnSeries } from "@amcharts/amcharts5/xy";
+import { Root, Color, Tooltip } from "@amcharts/amcharts5";
+import {
+    XYChart,
+    DateAxis,
+    ValueAxis,
+    AxisRendererX,
+    AxisRendererY,
+    ColumnSeries,
+    XYCursor,
+} from "@amcharts/amcharts5/xy";
 
 import { useDataProvider } from "@report/DataProvider";
 import { SentimentInDate, SentimentPerCycle } from "@pipeline/aggregate/blocks/SentimentPerCycle";
@@ -26,6 +34,10 @@ const SentimentOverTime = ({ data, options }: { data?: SentimentPerCycle; option
         );
         chart.zoomOutButton.set("forceHidden", true);
 
+        const cursor = chart.set("cursor", XYCursor.new(root, {}));
+        cursor.lineX.set("visible", false);
+        cursor.lineY.set("visible", false);
+
         const xAxis = chart.xAxes.push(
             DateAxis.new(root, {
                 baseInterval: { timeUnit: "week", count: 1 },
@@ -47,14 +59,15 @@ const SentimentOverTime = ({ data, options }: { data?: SentimentPerCycle; option
                     valueYField: field,
                     fill: color,
                     stacked: true,
+                    tooltip: Tooltip.new(root, {}),
                 })
             );
 
             seriesRef.current.push(series);
         }
 
-        createSeries("p", root.interfaceColors.get("positive")!); // positive tokens
-        createSeries("n", root.interfaceColors.get("negative")!); // negative tokens
+        createSeries("p", root.interfaceColors.get("positive")!); // positive messages
+        createSeries("n", root.interfaceColors.get("negative")!); // negative messages
 
         xAxisRef.current = xAxis;
         yAxisRef.current = yAxis;
@@ -65,7 +78,11 @@ const SentimentOverTime = ({ data, options }: { data?: SentimentPerCycle; option
         };
         dataProvider.on("trigger-time", onZoom);
         // must wait to datavalidated before zooming
-        seriesRef.current.forEach((c) => c.events.once("datavalidated", onZoom));
+        seriesRef.current.forEach((c) => {
+            c.events.once("datavalidated", onZoom);
+            // See: https://github.com/amcharts/amcharts5/issues/236
+            c.events.on("datavalidated", () => yAxis.zoom(0, 1));
+        });
 
         return () => {
             dataProvider.off("trigger-time", onZoom);
@@ -76,7 +93,7 @@ const SentimentOverTime = ({ data, options }: { data?: SentimentPerCycle; option
         };
     }, []);
 
-    useEffect(() => {
+    useLayoutEffect(() => {
         xAxisRef.current?.set("baseInterval", { timeUnit: options[0] === 0 ? "week" : "month", count: 1 });
         // prettier-ignore
         yAxisRef.current?.setAll(options[1] === 0 ? {
@@ -91,17 +108,20 @@ const SentimentOverTime = ({ data, options }: { data?: SentimentPerCycle; option
         const series = seriesRef.current;
         if (series) {
             if (options[1] === 0) {
-                // % difference
-                series[0].set("valueYField", "percDiffP");
-                series[1].set("valueYField", "percDiffN");
+                series[0].set("valueYField", "percP");
+                series[1].set("valueYField", "percN");
+                series[0].get("tooltip")!.set("labelText", "{valueY}% positive messages sent");
+                series[1].get("tooltip")!.set("labelText", "{valueY}% negative messages sent");
             } else if (options[1] === 1) {
-                // raw difference
-                series[0].set("valueYField", "rawDiffP");
-                series[1].set("valueYField", "rawDiffN");
-            } else if (options[1] === 2) {
-                // raw tokens
                 series[0].set("valueYField", "p");
                 series[1].set("valueYField", "n");
+                series[0].get("tooltip")!.set("labelText", "{valueY} positive messages sent");
+                series[1].get("tooltip")!.set("labelText", "{valueY} negative messages sent");
+            } else if (options[1] === 2) {
+                series[0].set("valueYField", "diffP");
+                series[1].set("valueYField", "diffN");
+                series[0].get("tooltip")!.set("labelText", "{valueY} more positive messages than negative sent");
+                series[1].get("tooltip")!.set("labelText", "{valueY} more negative messages than positive sent");
             }
             if (data) {
                 series.forEach((s) => s.data.setAll([data.perWeek, data.perMonth][options[0]]));

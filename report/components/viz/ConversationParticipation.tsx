@@ -12,7 +12,7 @@ const ConversationParticipation = ({ data, options }: { data?: ConversationStats
     const chartDiv = useRef<HTMLDivElement>(null);
     const seriesRef = useRef<Chord | null>(null);
 
-    useEffect(() => {
+    useLayoutEffect(() => {
         const root = Root.new(chartDiv.current!);
         root.setThemes(Themes(root, true));
 
@@ -42,7 +42,7 @@ const ConversationParticipation = ({ data, options }: { data?: ConversationStats
         };
     }, []);
 
-    useEffect(() => {
+    useLayoutEffect(() => {
         if (data) {
             seriesRef.current?.nodes.data.clear();
             seriesRef.current?.data.clear();

@@ -44,7 +44,7 @@ const WordCloud = (props: Props) => {
         };
     }, []);
 
-    useEffect(() => {
+    useLayoutEffect(() => {
         const data = props.wordsCount
             .map((c, i) => ({
                 category: dataProvider.database.words[i],

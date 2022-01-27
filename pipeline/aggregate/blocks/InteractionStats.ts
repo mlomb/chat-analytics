@@ -35,7 +35,7 @@ const fn: BlockFn<InteractionStats> = (database, filters, common) => {
             }
             if (reactionCount > 0) {
                 if (
-                    topTotalReactions.length === 0 ||
+                    topTotalReactions.length < 3 ||
                     reactionCount > topTotalReactions[topTotalReactions.length - 1][1]
                 ) {
                     topTotalReactions.push([msg, reactionCount]);
@@ -44,7 +44,7 @@ const fn: BlockFn<InteractionStats> = (database, filters, common) => {
             }
             if (maxReactionCount > 0) {
                 if (
-                    topSingleReactions.length === 0 ||
+                    topSingleReactions.length < 3 ||
                     maxReactionCount > topSingleReactions[topSingleReactions.length - 1][1]
                 ) {
                     topSingleReactions.push([msg, maxReactionCount]);

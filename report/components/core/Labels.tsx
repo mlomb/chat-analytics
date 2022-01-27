@@ -32,6 +32,9 @@ interface LabelProps {
     index: Index;
 }
 
+// NOTE: this file is a bit messy, should be refactored
+// there is code that can be easily reused
+
 const _AuthorLabel = ({ index }: LabelProps) => {
     const dp = useDataProvider();
     const platform = dp.database.config.platform;
