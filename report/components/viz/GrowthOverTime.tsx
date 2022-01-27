@@ -39,6 +39,8 @@ const GrowthOverTime = ({ data, options }: { data?: TimelineStats; options: numb
         const yAxis = chart.yAxes.push(
             ValueAxis.new(root, {
                 renderer: AxisRendererY.new(root, {}),
+                maxPrecision: 0,
+                min: 0,
             })
         );
         yAxis.children.unshift(
@@ -77,6 +79,8 @@ const GrowthOverTime = ({ data, options }: { data?: TimelineStats; options: numb
         dataProvider.on("trigger-time", onZoom);
         // must wait to datavalidated before zooming
         seriesRef.current!.events.once("datavalidated", onZoom);
+        // See: https://github.com/amcharts/amcharts5/issues/236
+        seriesRef.current!.events.on("datavalidated", () => yAxis.zoom(0, 1));
 
         return () => {
             dataProvider.off("trigger-time", onZoom);

@@ -42,7 +42,7 @@ const ActiveAuthorsOverTime = ({ data, options }: { data?: ActiveAuthors; option
         const yAxis = chart.yAxes.push(
             ValueAxis.new(root, {
                 renderer: AxisRendererY.new(root, {}),
-                // make sure we get the full scale
+                maxPrecision: 0,
                 min: 0,
             })
         );
@@ -91,6 +91,8 @@ const ActiveAuthorsOverTime = ({ data, options }: { data?: ActiveAuthors; option
         dataProvider.on("trigger-time", onZoom);
         // must wait to datavalidated before zooming
         seriesRef.current!.events.once("datavalidated", onZoom);
+        // See: https://github.com/amcharts/amcharts5/issues/236
+        seriesRef.current!.events.on("datavalidated", () => yAxis.zoom(0, 1));
 
         return () => {
             dataProvider.off("trigger-time", onZoom);

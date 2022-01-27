@@ -51,7 +51,7 @@ const MessagesGraph = ({ data, options }: { data?: MessagesPerCycle; options: nu
         const yAxis = chart.yAxes.push(
             ValueAxis.new(root, {
                 renderer: AxisRendererY.new(root, {}),
-                // make sure we get the full scale
+                maxPrecision: 0,
                 min: 0,
             })
         );
