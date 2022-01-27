@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useLayoutEffect, useRef } from "react";
 
 import { Root, Color, Label, p50 } from "@amcharts/amcharts5";
 import {
@@ -8,8 +8,6 @@ import {
     AxisRendererX,
     AxisRendererY,
     StepLineSeries,
-    ColumnSeries,
-    XYCursor,
     XYSeries,
 } from "@amcharts/amcharts5/xy";
 

@@ -1,6 +1,6 @@
-import { useEffect, useLayoutEffect, useRef } from "react";
+import { useLayoutEffect, useRef } from "react";
 
-import { Root, Color, Percent, Tooltip, ColorSet } from "@amcharts/amcharts5";
+import { Root, ColorSet } from "@amcharts/amcharts5";
 import { WordCloud as am5WordCloud } from "@amcharts/amcharts5/wc";
 
 import { Themes } from "./AmCharts5";

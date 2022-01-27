@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef } from "react";
+import { useLayoutEffect, useRef } from "react";
 
 import { Root, Color, Tooltip } from "@amcharts/amcharts5";
 import {
