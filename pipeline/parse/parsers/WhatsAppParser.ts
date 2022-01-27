@@ -2,7 +2,7 @@ import { unzipSync } from "fflate";
 import { AttachmentType } from "@pipeline/Types";
 import { FileInput } from "@pipeline/File";
 import { Parser } from "@pipeline/parse/Parser";
-import { extractChatName, matchAttachmentType, removeBadChars } from "@pipeline/parse/parsers/WhatsApp";
+import { extractChatName, isGroupWelcome, matchAttachmentType, removeBadChars } from "@pipeline/parse/parsers/WhatsApp";
 
 /*
     There is a convenient parser already out there
@@ -72,6 +72,11 @@ export class WhatsAppParser extends Parser {
             const messageContent = removeBadChars(message.message);
 
             if (message.author !== "System") {
+                if (isGroupWelcome(messageContent)) {
+                    // Skip "Messages and calls are end-to-end encrypted..."
+                    continue;
+                }
+
                 const authorIndex = this.builder.addAuthor(message.author, {
                     n: message.author,
                 });

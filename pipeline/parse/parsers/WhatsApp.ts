@@ -28,6 +28,14 @@ export const extractChatName = (filename: string): string | undefined => {
 // some exports include those chars for some reason, remove them
 export const removeBadChars = (str: string) => str.replace(/[\u202a\u200e\u202c\xa0]/g, "");
 
+const WelcomePatterns = [
+    "Messages and calls are end-to-end encrypted. No one outside of this chat, not even WhatsApp, can read or listen to them.",
+    "Los mensajes y las llamadas están cifrados de extremo a extremo. Nadie fuera de este chat, ni siquiera WhatsApp, puede leerlos ni escucharlos.",
+];
+
+export const isGroupWelcome = (content: string) =>
+    WelcomePatterns.some((pattern) => content.toLocaleLowerCase().includes(pattern.toLocaleLowerCase()));
+
 type PatternType =
     // generic multimedia file (Android exports)
     | "media"
