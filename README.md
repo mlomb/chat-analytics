@@ -16,28 +16,12 @@ To generate reports using the web app, you need a browser with [ES6 support](htt
 <strong>*</strong>: not all languages are supported, check [WhatsApp.ts](pipeline/parse/parsers/WhatsApp.ts).
 
 You can't combine exports from different platforms.  
-The contribution of new platform parsers is always welcomed 🙂
+The contribution of [new platform parsers](pipeline/parse/parsers/README.md) is always welcomed 🙂
 
 ## Analysis support
 
 
 
-
-## Building and Testing
-
-The following npm scripts are available:
-
-* `build`: build `app/` and `report/` using webpack and writes it to `dist/`
-* `dev`: open a development server of `app/` and `report/` using webpack-serve
-* `test`: run pipeline tests in `tests/`
-
-## TO-DO
-
-add this links
-
-[Write a new parser](pipeline/parse/parsers/README.md)
-
----
 
 ### Acknowledgements
 
