@@ -2,7 +2,7 @@ import { useLayoutEffect, useRef } from "react";
 
 import { Themes } from "./AmCharts5";
 import { Root } from "@amcharts/amcharts5";
-import { Chord } from "@amcharts/amcharts5/flow";
+import { ChordDirected } from "@amcharts/amcharts5/flow";
 
 import { useDataProvider } from "@report/DataProvider";
 import { ConversationStats } from "@pipeline/aggregate/blocks/ConversationStats";
@@ -10,14 +10,14 @@ import { ConversationStats } from "@pipeline/aggregate/blocks/ConversationStats"
 const ConversationParticipation = ({ data, options }: { data?: ConversationStats; options: number[] }) => {
     const dataProvider = useDataProvider();
     const chartDiv = useRef<HTMLDivElement>(null);
-    const seriesRef = useRef<Chord | null>(null);
+    const seriesRef = useRef<ChordDirected | null>(null);
 
     useLayoutEffect(() => {
         const root = Root.new(chartDiv.current!);
         root.setThemes(Themes(root, true));
 
         const series = root.container.children.push(
-            Chord.new(root, {
+            ChordDirected.new(root, {
                 sourceIdField: "f",
                 targetIdField: "t",
                 valueField: "c",
