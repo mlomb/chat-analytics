@@ -205,7 +205,8 @@ const ReportDashboard = () => {
                                               {conversationTooltip}
                                               <br />
                                               <br />
-                                              <b>❓ Between the top:</b> only the top 20 users are shown here
+                                              <b>❓ Between the top:</b> only the 20 most active authors in the period
+                                              selected are shown here
                                           </>
                                       }
                                   />,
