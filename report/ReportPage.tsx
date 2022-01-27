@@ -77,7 +77,20 @@ const ReportDashboard = () => {
                         blockKey="messages-per-cycle"
                         children={MessagesOverTime}
                     />,
-                    <Card num={1} title="Message statistics" blockKey="messages-stats" children={MessagesStatsTable} />,
+                    <Card
+                        num={1}
+                        title="Message statistics"
+                        blockKey="messages-stats"
+                        children={MessagesStatsTable}
+                        tooltip={
+                            database.config.platform === "whatsapp" ? (
+                                <>
+                                    ⚠️ Note that if the chat has been exported from Android it may not contain
+                                    information about the media type (image, sticker, etc). iOS exports do.
+                                </>
+                            ) : undefined
+                        }
+                    />,
                     <Card
                         num={1}
                         blockKey="messages-stats"
