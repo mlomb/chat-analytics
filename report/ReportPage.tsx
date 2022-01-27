@@ -52,9 +52,17 @@ const ReportDashboard = () => {
 
         const conversationTooltip = (
             <>
-                What counts as a conversation?
+                <b>❓ Conversation:</b> Every group of messages separated by 30 minutes without messages is considered a
+                conversation
                 <br />
-                <b>Every group of messages separated by 30 minutes is considered a conversation</b>
+                This metric is computed per channel
+            </>
+        );
+
+        const stopwordsTooltip = (
+            <>
+                ⚠️ Note that stopwords (words that don't add meaningful information such as "the", "a", etc) are{" "}
+                <b>not</b> taken into account
             </>
         );
 
@@ -73,7 +81,7 @@ const ReportDashboard = () => {
                     <Card
                         num={1}
                         blockKey="messages-stats"
-                        title={["Activity by day & hour", ["(split)", "(combined)"]]}
+                        title={["Activity by week day & hour", ["(split)", "(combined)"]]}
                         children={MessagesActivity}
                     />,
                     <Card
@@ -99,12 +107,14 @@ const ReportDashboard = () => {
                         title={["Most used words", ["(as table)", "(as word cloud)"]]}
                         blockKey="language-stats"
                         children={MostUsedWords}
+                        tooltip={stopwordsTooltip}
                     />,
                     <Card
                         num={1}
                         title="Language statistics"
                         blockKey="language-stats"
                         children={LanguageStatsTable}
+                        tooltip={stopwordsTooltip}
                     />,
                 ],
             },
@@ -119,6 +129,11 @@ const ReportDashboard = () => {
                         )}
                         blockKey="emoji-stats"
                         children={MostUsedEmojis}
+                        tooltip={
+                            platformInfo.support.reactions
+                                ? "Reactions placed in messages written by the authors filtered"
+                                : undefined
+                        }
                     />,
                     <Card
                         num={1}
@@ -159,18 +174,32 @@ const ReportDashboard = () => {
                                       title="Authors that reply the most messages"
                                       blockKey="interaction-stats"
                                       children={MostRepliesAuthors}
+                                      tooltip={'This is clicking "Reply" in the app'}
+                                  />,
+                              ]
+                            : []
+                    )
+                    .concat(
+                        database.authors.length > 2
+                            ? [
+                                  <Card
+                                      num={2}
+                                      title="Participation in conversations between the top"
+                                      blockKey="conversation-stats"
+                                      children={ConversationParticipation}
+                                      tooltip={
+                                          <>
+                                              {conversationTooltip}
+                                              <br />
+                                              <br />
+                                              <b>❓ Between the top:</b> only the top 20 users are shown here
+                                          </>
+                                      }
                                   />,
                               ]
                             : []
                     )
                     .concat([
-                        <Card
-                            num={2}
-                            title="Participation in conversations"
-                            blockKey="conversation-stats"
-                            children={ConversationParticipation}
-                            tooltip={conversationTooltip}
-                        />,
                         <Card
                             num={1}
                             title="Conversations started"
@@ -189,7 +218,7 @@ const ReportDashboard = () => {
                         title={[
                             "Sentiment over time",
                             ["by week", "by month"],
-                            ["(% difference)", "(raw difference)", "(raw tokens)"],
+                            ["(% of total)", "(# messages)", "(# messages diff)"],
                         ]}
                         blockKey="sentiment-per-cycle"
                         children={SentimentOverTime}
@@ -219,6 +248,7 @@ const ReportDashboard = () => {
                         title={["Active authors over time by month"]}
                         blockKey="acitve-authors"
                         children={ActiveAuthorsOverTime}
+                        tooltip="Authors that have sent at least one message in the month"
                     />,
                     <Card
                         num={3}

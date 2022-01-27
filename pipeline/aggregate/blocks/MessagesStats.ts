@@ -152,7 +152,7 @@ const fn: BlockFn<MessagesStats> = (database, filters, common) => {
                 maxIndex = i;
             }
         }
-        return { messages: max, text: formatFn(maxIndex) };
+        return { messages: max, text: maxIndex === -1 ? "-" : formatFn(maxIndex) };
     };
 
     return {

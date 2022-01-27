@@ -1,8 +1,16 @@
 import { useEffect, useLayoutEffect, useRef } from "react";
 
 import { Themes } from "./AmCharts5";
-import { Root, Color, HeatLegend, Percent, Container, p100, p50, percent, Label } from "@amcharts/amcharts5";
-import { XYChart, AxisRendererX, AxisRendererY, CategoryAxis, ColumnSeries, ValueAxis } from "@amcharts/amcharts5/xy";
+import { Root, Color, HeatLegend, Percent, Container, p100, p50, percent, Label, Tooltip } from "@amcharts/amcharts5";
+import {
+    XYChart,
+    AxisRendererX,
+    AxisRendererY,
+    CategoryAxis,
+    ColumnSeries,
+    ValueAxis,
+    XYCursor,
+} from "@amcharts/amcharts5/xy";
 
 import { MessagesStats } from "@pipeline/aggregate/blocks/MessagesStats";
 
@@ -18,6 +26,9 @@ function createBarChart(root: Root, container: Container, xField: string) {
             wheelY: "none",
         })
     );
+    const cursor = chart.set("cursor", XYCursor.new(root, {}));
+    cursor.lineX.set("visible", false);
+    cursor.lineY.set("visible", false);
 
     const xAxis = chart.xAxes.push(
         CategoryAxis.new(root, {
@@ -56,6 +67,9 @@ function createBarChart(root: Root, container: Container, xField: string) {
             valueYField: "value",
             valueField: "value",
             calculateAggregates: true,
+            tooltip: Tooltip.new(root, {
+                labelText: "[bold]{categoryX}:[/] {valueY} messages sent",
+            }),
         })
     );
     series.columns.template.setAll({
@@ -64,7 +78,6 @@ function createBarChart(root: Root, container: Container, xField: string) {
         strokeOpacity: 0,
     });
 
-    // heatrule
     series.set("heatRules", [
         {
             target: series.columns.template,

@@ -53,7 +53,7 @@ const SentimentPieChart = (props: Props) => {
         };
     }, []);
 
-    useEffect(() => {
+    useLayoutEffect(() => {
         seriesRef.current?.data.setAll([
             {
                 tag: "Positive",

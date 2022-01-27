@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
-import { Root, Color, Label, p50 } from "@amcharts/amcharts5";
+import { Root, Color, Label, p50, Tooltip } from "@amcharts/amcharts5";
 import {
     XYChart,
     DateAxis,
@@ -38,6 +38,10 @@ const MessagesGraph = ({ data, options }: { data?: MessagesPerCycle; options: nu
         );
         chart.zoomOutButton.set("forceHidden", true);
 
+        const cursor = chart.set("cursor", XYCursor.new(root, {}));
+        cursor.lineX.set("visible", false);
+        cursor.lineY.set("visible", false);
+
         const xAxis = chart.xAxes.push(
             DateAxis.new(root, {
                 baseInterval: { timeUnit: "day", count: 1 },
@@ -71,6 +75,7 @@ const MessagesGraph = ({ data, options }: { data?: MessagesPerCycle; options: nu
                     noRisers: true,
                     stroke: Color.fromHex(0x57b1ff),
                     fill: Color.fromHex(0x57b1ff),
+                    tooltip: Tooltip.new(root, { labelText: "{valueY}" }),
                 })
             );
             stepSeries.strokes.template.setAll({
@@ -92,6 +97,7 @@ const MessagesGraph = ({ data, options }: { data?: MessagesPerCycle; options: nu
                     xAxis: xAxis,
                     yAxis: yAxis,
                     fill: Color.fromHex(0x479adb),
+                    tooltip: Tooltip.new(root, { labelText: "{valueY}" }),
                 })
             );
 
@@ -104,6 +110,8 @@ const MessagesGraph = ({ data, options }: { data?: MessagesPerCycle; options: nu
         dataProvider.on("trigger-time", onZoom);
         // must wait to datavalidated before zooming
         seriesRef.current!.events.once("datavalidated", onZoom);
+        // See: https://github.com/amcharts/amcharts5/issues/236
+        seriesRef.current!.events.on("datavalidated", () => yAxis.zoom(0, 1));
 
         return () => {
             dataProvider.off("trigger-time", onZoom);
@@ -113,11 +121,13 @@ const MessagesGraph = ({ data, options }: { data?: MessagesPerCycle; options: nu
         };
     }, [graphType]);
 
-    useEffect(() => {
+    useLayoutEffect(() => {
         xAxisRef.current?.set("baseInterval", { timeUnit: ["day", "week", "month"][options[0]] as TimeUnit, count: 1 });
-        if (data) {
-            // TODO: update efficient
-            seriesRef.current?.data.setAll([data.perDay, data.perWeek, data.perMonth][options[0]]);
+        if (seriesRef.current) {
+            if (data) {
+                // TODO: update efficient
+                seriesRef.current?.data.setAll([data.perDay, data.perWeek, data.perMonth][options[0]]);
+            }
         }
     }, [seriesRef.current, data, options]);
 
