@@ -13,8 +13,8 @@ Things pending or ideas. Don't expected them soon.
 * Currently the timezone is picked from the machine that generates the report, it should be an option.
 * Add configuration to reports:
    - Timezone
-   - Wether to filter Stopwords
-   - Wether to filter long words (currently filtering 1&lt;len&le;30)
+   - Whether to filter Stopwords
+   - Whether to filter long words (currently filtering 1&lt;len&le;30)
 * Detect mispelling of words (very hard)
 * fastText is using like 80% of the generation time, can it be optimized, replaced with something better?
 * If a channel is uploaded in several files, replies and other stuff breaks between them
