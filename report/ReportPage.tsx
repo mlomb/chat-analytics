@@ -256,22 +256,25 @@ const ReportDashboard = () => {
             {
                 name: "📅 Timeline",
                 value: "timeline",
-                cards: [
-                    <Card
-                        num={3}
-                        title={["Active authors over time by month"]}
-                        blockKey="acitve-authors"
-                        children={ActiveAuthorsOverTime}
-                        tooltip="Authors that have sent at least one message in the month"
-                    />,
-                    <Card
-                        num={3}
-                        title="Server/group growth"
-                        blockKey="growth"
-                        children={GrowthOverTime}
-                        tooltip="Only authors that sent at least one message are considered"
-                    />,
-                ],
+                cards:
+                    database.authors.length <= 2
+                        ? []
+                        : [
+                              <Card
+                                  num={3}
+                                  title={["Active authors over time by month"]}
+                                  blockKey="acitve-authors"
+                                  children={ActiveAuthorsOverTime}
+                                  tooltip="Authors that have sent at least one message in the month"
+                              />,
+                              <Card
+                                  num={3}
+                                  title="Server/group growth"
+                                  blockKey="growth"
+                                  children={GrowthOverTime}
+                                  tooltip="Only authors that sent at least one message are considered"
+                              />,
+                          ],
             },
         ].filter(({ cards }) => env.isDev || cards.length > 0);
     }, []);
