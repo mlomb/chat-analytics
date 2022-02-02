@@ -3,7 +3,7 @@
     In the end, it was replaced by a custom component because react-select uses too much memory.
 
     If you want to see the react-select version:
-    https://github.com/mlomb/chats-analyzer/blob/52648937d860412270290d45d3d3cdc93d065536/report/components/FilterSelect.tsx
+    https://github.com/mlomb/chat-analytics/blob/52648937d860412270290d45d3d3cdc93d065536/report/components/FilterSelect.tsx
 
     Doing this, we lost a lot of accesibility :'(  (I don't know how to do it properly)
 

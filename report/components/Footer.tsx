@@ -9,8 +9,8 @@ export default () => {
         <div className="Footer">
             <span>
                 <span>Generated with</span>
-                <a href="https://chatstbdtbd.app" target="_blank">
-                    https://chatstbdtbd.app
+                <a href="https://chatanalytics.app?utm_source=report" target="_blank">
+                    https://chatanalytics.app
                 </a>
             </span>
             <span>•</span>
