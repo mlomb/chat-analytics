@@ -1,4 +1,12 @@
-# PROJECT NAME
+<div align="center">
+
+![Logo-Dark](assets/docs/banner_dark.png#gh-dark-mode-only)
+![Logo-Light](assets/docs/banner_light.png#gh-light-mode-only)
+
+Generate in-depth chat analysis reports
+
+</div>
+
 
 ## Web App
 
