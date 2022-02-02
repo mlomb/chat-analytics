@@ -1,5 +1,5 @@
 export const plausible = (name: string, options: { url?: string; props?: { [key: string]: string } } = {}) => {
-    const plausibleURL = env.isProd ? "" : "http://localhost:8000";
+    const plausibleURL = env.isProd ? "https://p.chatanalytics.app" : "http://localhost:8000";
 
     const data: any = {
         domain: "chatanalytics.app",
