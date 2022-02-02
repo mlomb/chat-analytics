@@ -1,6 +1,6 @@
 {
-  "name": "chats-analyzer",
-  "version": "0.1.0",
+  "name": "chat-analytics",
+  "version": "1.0.0",
   "scripts": {
     "build": "webpack build --env production --progress",
     "stats": "webpack build --env production --profile --json > stats.json",

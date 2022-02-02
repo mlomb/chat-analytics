@@ -8,7 +8,7 @@ interface Props {
 const LoadingOverlay = (props: Props) => (
     <div className={`LoadingOverlay ${props.loading ? "" : "LoadingOverlay--hidden"}`}>
         <div className="LoadingOverlay__logo">
-            <img src={Logo} alt="chatstbdtbd.app logo" />
+            <img src={Logo} alt="chatanalytics.app logo" />
         </div>
         <div className="LoadingOverlay__spinner">
             <img src={Spinner} alt="spinner" />

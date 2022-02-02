@@ -18,7 +18,7 @@ const HomePage = () => {
     return (
         <div className="HomePage">
             <a href="/" className="HomePage__logo">
-                <img src={Logo} alt="chatstbdtbd.app logo" />
+                <img src={Logo} alt="chatanalytics.app logo" />
             </a>
             <div
                 className={["HomePage__container", index > 0 ? "HomePage__container--fade-out" : ""].join(" ")}

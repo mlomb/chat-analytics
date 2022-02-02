@@ -5,7 +5,7 @@ export const plausible = (name: string, options: { url?: string; props?: { [key:
         domain: "chatanalytics.app",
         name,
         url: options.url || window.location.href,
-        referrer: document.referrer,
+        referrer: document.referrer || null,
         screen_width: window.innerWidth,
     };
     if (options.props) {
