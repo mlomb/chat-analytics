@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import prettyBytes from "pretty-bytes";
 
+import { plausible } from "@assets/Plausible";
 import { ResultMessage } from "@app/WorkerApp";
 import Button from "@app/components/Button";
 
@@ -45,6 +46,9 @@ const ViewDownloadReport = ({ result }: Props) => {
         }
     }, [result]);
 
+    const onDownload = () => plausible("Download report");
+    const onOpenLocally = () => plausible("Open report");
+
     return (
         <div className="ViewDownloadReport">
             {result && (
@@ -57,11 +61,11 @@ const ViewDownloadReport = ({ result }: Props) => {
                 </div>
             )}
             <div className="ViewDownloadReport__buttons">
-                <Button hueColor={[258, 90, 61]} href={files.htmlURL} download={files.filename}>
+                <Button hueColor={[258, 90, 61]} href={files.htmlURL} download={files.filename} onClick={onDownload}>
                     <img src={Download} alt="Download" height={16} />
                     Download ({prettyBytes(files.htmlBlob?.size || 0)})
                 </Button>
-                <Button hueColor={[244, 90, 61]} href={files.htmlURL} target="_blank">
+                <Button hueColor={[244, 90, 61]} href={files.htmlURL} target="_blank" onClick={onOpenLocally}>
                     <img src={LinkOut} alt="Link out" height={16} />
                     View Locally
                 </Button>
