@@ -15,7 +15,7 @@ export default () => {
             </span>
             <span>•</span>
             <span>
-                <a href="https://github.com" target="_blank">
+                <a href="https://github.com/mlomb/chat-analytics" target="_blank">
                     <img src={GitHub} alt="GitHub" />
                 </a>
                 <Tooltip content={`Build date: ${env.build.date}`}>
