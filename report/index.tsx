@@ -1,5 +1,6 @@
 import { StrictMode } from "react";
 import ReactDOM from "react-dom";
+import { plausible } from "@assets/Plausible";
 
 import ReportPage from "@report/ReportPage";
 
@@ -12,10 +13,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         dataElem.remove();
 
         if (dataStr === "[[[DATA]]]") {
-            try {
-                // load from public/ folder
-                dataStr = await fetch("report_sample.data").then((res) => res.text());
-            } catch (err) {}
+            // load from public/ folder
+            dataStr = await fetch("report_sample.data").then((res) => res.text());
         }
 
         if (dataStr.length === 0 || dataStr === "[[[DATA]]]") {
@@ -40,3 +39,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 });
 
 console.log(env);
+
+plausible("pageview", {
+    url: document.location.pathname === "/demo" ? undefined : "https://chatanalytics.app/report",
+});

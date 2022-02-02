@@ -1,5 +1,6 @@
 import { StrictMode } from "react";
 import ReactDOM from "react-dom";
+import { plausible } from "@assets/Plausible";
 
 import HomePage from "@app/HomePage";
 
@@ -11,3 +12,5 @@ ReactDOM.render(
 );
 
 console.log(env);
+
+plausible("pageview");

@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Platform } from "@pipeline/Types";
 import { ProgressKeys, ProgressMessage, TaskInfo } from "@pipeline/Progress";
 import { InitMessage, ResultMessage } from "@app/WorkerApp";
+import { numberCategory, plausible, sizeCategory, timeCategory } from "@assets/Plausible";
 
 import Stepper from "@app/components/Stepper";
 import Button from "@app/components/Button";
@@ -53,6 +54,14 @@ const Steps = () => {
     });
 
     const startGeneration = () => {
+        plausible("Start generation", {
+            props: {
+                platform: state.platform as Platform,
+                files: state.files.length + "",
+                size: sizeCategory(state.files.reduce((acc, file) => acc + file.size, 0)),
+            },
+        });
+        const startTime = performance.now();
         // @ts-ignore
         const worker = new Worker(new URL("@app/WorkerApp.ts", import.meta.url));
         worker.onerror = (e) => {
@@ -98,6 +107,18 @@ const Steps = () => {
                         result: data,
                     }));
                 }, 1000);
+
+                const endTime = performance.now();
+                plausible("Finish generation", {
+                    props: {
+                        platform: state.platform as Platform,
+                        outputSize: sizeCategory(data.html.length),
+                        channels: numberCategory(data.counts.channels),
+                        authors: numberCategory(data.counts.authors),
+                        messages: numberCategory(data.counts.messages),
+                        time: timeCategory((endTime - startTime) / 1000),
+                    },
+                });
             }
         };
         // <InitMessage>
@@ -124,10 +145,15 @@ const Steps = () => {
         }
     };
 
+    const pickPlatform = (platform: Platform) => {
+        plausible("Pick platform", { props: { platform } });
+        setState({ ...state, currentStep: 1, platform });
+    };
+
     return (
         <div className="Steps">
             <Stepper step={state.currentStep} stepTitles={StepTitles} stepMaxHeights={StepMaxHeights}>
-                <PlatformSelect pickPlatform={(p) => setState({ ...state, currentStep: 1, platform: p })} />
+                <PlatformSelect pickPlatform={pickPlatform} />
                 <div>
                     <ExportInstructions platform={state.platform} />
                     <div className="Steps__nav">
