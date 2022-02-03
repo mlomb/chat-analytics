@@ -12,8 +12,8 @@
 
 ---
 
-Given a chat export from a supported platform, you can generate a single HTML file containing information, statistics and graphs about it.  
-To generate reports using the web app, you need a browser with [ES6 support](https://caniuse.com/es6).
+A web app that takes chat exports from supported platforms and generates a single HTML file containing information, statistics and graphs about them.  
+To generate reports you need a browser with [ES6 support](https://caniuse.com/es6).
 
 
 ## Chat platform support
@@ -35,12 +35,12 @@ The contribution of [new platform parsers](pipeline/parse/parsers/README.md) is 
 
 
 
-## Pipeline
+## Docs & Development
 
+You can read [DOCS.md](DOCS.md) for technical details.  
+In [TODO.md](TODO.md) you can find ideas and pending stuff to be implemented.
 
-
-
-### Acknowledgements
+## Acknowledgements
 
 * [FastText](https://fasttext.cc/), a library by Facebook for efficient sentence classification. MIT licensed.
 * [lid.176.ftz model](https://fasttext.cc/docs/en/language-identification.html), provided by FastText developers for language identification. Distributed under [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/).
