@@ -4,7 +4,7 @@ import { useState } from "react";
 import Landing from "@app/components/Landing";
 import Steps from "@app/components/Steps";
 
-import Logo from "@assets/images/logos/app.svg";
+import Logo from "@assets/images/logos/app_dark.svg";
 
 const HomePage = () => {
     const [index, setIndex] = useState(0);
