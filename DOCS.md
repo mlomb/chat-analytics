@@ -15,8 +15,8 @@ The following npm scripts are available:
 
 ## Developing
 
-Run `npm run dev` and head to [localhost:8080](localhost:8080), generate a report and you will see a green button that is not present in production "Download DATA". You should place the downloaded file in `assets/public` with the name `report_sample.data`.
-Now you can head to [localhost:8080/report.html](localhost:8080/report.html) to debug the report UI.
+Run `npm run dev` and head to [http://localhost:8080](http://localhost:8080), generate a report and you will see a green button that is not present in production "Download DATA". You should place the downloaded file in `assets/public` with the name `report_sample.data`.
+Now you can head to [http://localhost:8080/report.html](http://localhost:8080/report.html) to debug the report UI.
 
 ---
 

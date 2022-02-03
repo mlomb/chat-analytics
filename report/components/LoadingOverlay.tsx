@@ -1,4 +1,4 @@
-import Logo from "@assets/images/logos/app.svg";
+import Logo from "@assets/images/logos/app_dark.svg";
 import Spinner from "@assets/images/icons/spinner.svg";
 
 interface Props {

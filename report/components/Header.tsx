@@ -12,7 +12,7 @@ import { TabSwitch } from "@report/components/Tabs";
 import TimeSelector from "@report/components/TimeSelector";
 import FilterSelect, { FilterOption } from "@report/components/FilterSelect";
 
-import Logo from "@assets/images/logos/app.svg";
+import Logo from "@assets/images/logos/app_dark.svg";
 
 interface Props {
     section: string;

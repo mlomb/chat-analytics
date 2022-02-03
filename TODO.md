@@ -34,7 +34,8 @@ Things pending or ideas. Don't expected them soon.
   * Lexical diversity
   * Response time of authors
   * Edit message avg time and how many messages (in %) a author edits
+  * Most linker author
 * Data points at the end of the data should be marked as incomplete (with a distinct color, maybe dashed)
 * Maybe replace the reactions (which can be a lot) with a "XX reactions" and hover/click to see them all.
-* Being able to click words and show who said it the most, in what channels and maybe some messages containing the word (maybe also with emojis, mentions, etc)
+* Being able to click words (and emojis?) and show who said it the most, in what channels and maybe some messages containing the word (maybe also with emojis, mentions, etc)
 * Make the filter menu fixed and being able to show and collapse it
