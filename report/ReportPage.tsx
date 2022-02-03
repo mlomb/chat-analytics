@@ -281,6 +281,7 @@ const ReportDashboard = () => {
 
     return (
         <>
+            {demo ? <div className="Demo">This report is a demo</div> : null}
             <Header sections={sections} section={section} setSection={setSection} />
 
             {sections.map((s) => (
