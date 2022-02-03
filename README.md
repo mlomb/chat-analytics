@@ -1,8 +1,8 @@
 <div align="center">
 
-![Logo-Dark](assets/docs/banner_dark.png#gh-dark-mode-only)
-![Logo-Light](assets/docs/banner_light.png#gh-light-mode-only)
-  
+![Logo-Dark](assets/images/logos/app_dark.svg#gh-dark-mode-only)
+![Logo-Light](assets/images/logos/app_light.svg#gh-light-mode-only)
+
 <h4>Generate in-depth chat analysis reports</h4>
 
 [Open App](https://chatanalytics.app) • [View Demo](https://chatanalytics.app/demo)
