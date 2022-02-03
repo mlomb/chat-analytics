@@ -2,18 +2,23 @@
 
 ![Logo-Dark](assets/docs/banner_dark.png#gh-dark-mode-only)
 ![Logo-Light](assets/docs/banner_light.png#gh-light-mode-only)
+  
+<h4>Generate in-depth chat analysis reports</h4>
 
-Generate in-depth chat analysis reports
+[Open App](https://chatanalytics.app) • [View Demo](https://chatanalytics.app/demo)
+
 
 </div>
 
+---
 
-## Web App
-
+Given a chat export from a supported platform, you can generate a single HTML file containing information, statistics and graphs about it.  
 To generate reports using the web app, you need a browser with [ES6 support](https://caniuse.com/es6).
 
 
 ## Chat platform support
+
+You can generate reports from the following platforms:
 
 | Platform | Formats supported                                                                | Text content | Edits & Replies   | Attachment Types                                                                      | Reactions         | Profile picture         | Mentions     |
 | -------- | -------------------------------------------------------------------------------- | ------------ | ----------------- | ------------------------------------------------------------------------------------- | ----------------- | ----------------------- | ------------ |
@@ -27,6 +32,10 @@ You can't combine exports from different platforms.
 The contribution of [new platform parsers](pipeline/parse/parsers/README.md) is always welcomed 🙂
 
 ## Analysis support
+
+
+
+## Pipeline
 
 
 
