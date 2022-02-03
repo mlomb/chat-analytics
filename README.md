@@ -53,4 +53,4 @@ In [TODO.md](TODO.md) you can find ideas and pending stuff to be implemented.
 
 ## License
 
-TO-DO
+MIT. See [LICENSE](LICENSE).
