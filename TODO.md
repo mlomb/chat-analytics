@@ -1,4 +1,4 @@
-# TODO
+# TO-DO
 
 Things pending or ideas. Don't expected them soon.
 
