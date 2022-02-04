@@ -1,0 +1,1 @@
+This is a strip down version of [https://github.com/facebookresearch/fastText/tree/main/webassembly](https://github.com/facebookresearch/fastText/tree/main/webassembly)
