@@ -49,7 +49,7 @@ const ActiveAuthorsOverTime = ({ data, options }: { data?: ActiveAuthors; option
         yAxis.children.unshift(
             Label.new(root, {
                 rotation: -90,
-                text: "Active users in period",
+                text: "Active authors in period",
                 y: p50,
                 centerX: p50,
             })
@@ -72,6 +72,10 @@ const ActiveAuthorsOverTime = ({ data, options }: { data?: ActiveAuthors; option
         series.fills.template.setAll({
             visible: true,
             fillOpacity: 0.2,
+            templateField: "lineSettings",
+        });
+        series.strokes.template.setAll({
+            templateField: "lineSettings",
         });
         series.bullets.push(function () {
             return Bullet.new(root, {
@@ -104,8 +108,13 @@ const ActiveAuthorsOverTime = ({ data, options }: { data?: ActiveAuthors; option
 
     useLayoutEffect(() => {
         if (data) {
-            // TODO: update efficient
-            //seriesRef.current?.data.setAll([data.perDay, data.perWeek, data.perMonth][options[0]]);
+            if (data.perMonth.length > 1) {
+                // @ts-ignore
+                data.perMonth[data.perMonth.length - 2].lineSettings = {
+                    strokeDasharray: [3, 3],
+                    fillOpacity: 0.1,
+                };
+            }
             seriesRef.current?.data.setAll(data.perMonth);
         }
     }, [seriesRef.current, data, options]);
