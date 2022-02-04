@@ -7,6 +7,7 @@
 
 [Open App](https://chatanalytics.app) • [View Demo](https://chatanalytics.app/demo)
 
+[![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/donate/?hosted_button_id=NKHZJPKFJ34WJ)
 
 </div>
 
