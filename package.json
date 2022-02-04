@@ -13,16 +13,16 @@
   "author": "Martin Emiliano Lombardo <to@mlomb.me>",
   "license": "MIT",
   "devDependencies": {
-    "@amcharts/amcharts5": "^5.1.2",
+    "@amcharts/amcharts5": "^5.1.3",
     "@tippyjs/react": "^4.2.6",
     "@types/jest": "^27.4.0",
-    "@types/react": "^17.0.38",
+    "@types/react": "^17.0.39",
     "@types/react-dom": "^17.0.11",
     "@types/react-window": "^1.8.5",
     "@types/webpack-env": "^1.16.3",
     "autoprefixer": "^10.4.2",
     "copy-webpack-plugin": "^10.2.4",
-    "css-loader": "^6.5.1",
+    "css-loader": "^6.6.0",
     "cssnano": "^5.0.16",
     "emoji-regex": "^10.0.0",
     "fflate": "^0.7.3",
@@ -45,7 +45,7 @@
     "typescript": "^4.5.5",
     "webpack": "^5.68.0",
     "webpack-cli": "^4.9.2",
-    "webpack-dev-server": "^4.7.3",
+    "webpack-dev-server": "^4.7.4",
     "whatsapp-chat-parser": "^3.2.1"
   },
   "jest": {
