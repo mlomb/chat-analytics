@@ -14,7 +14,7 @@ interface Props {
 const Landing = ({ onStart }: Props) => {
     return (
         <div className="Landing">
-            <div className="Landing__title">Generate in-depth chat analysis reports</div>
+            <div className="Landing__title">Generate insightful chat analysis reports</div>
             <div className="Landing__desc">
                 <div className="Landing__sameline">
                     <span className="Landing__browser">Everything is processed in your browser.</span>
