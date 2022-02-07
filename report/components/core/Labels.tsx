@@ -104,7 +104,7 @@ const _AuthorLabel = ({ index }: LabelProps) => {
             <span className="Label__name">
                 {author.n}
                 {author.d !== undefined && (
-                    <span className="Label__discriminator">#{`${author.d}`.padStart(4, "0")}</span>
+                    <span className="Label__discriminator">#{`${demo ? 0 : author.d}`.padStart(4, "0")}</span>
                 )}
             </span>
         </div>
