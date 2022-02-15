@@ -24,6 +24,7 @@ import { normalizeText, matchFormat } from "@pipeline/Text";
 import { Emojis } from "@pipeline/process/Emojis";
 import { MessageBitConfig, readMessage, writeMessage } from "@pipeline/serialization/MessageSerialization";
 import { LanguageCodes } from "@pipeline/Languages";
+import prettyBytes from "pretty-bytes";
 
 // section in the bitstream
 type ChannelSection = {
@@ -445,7 +446,7 @@ export class DatabaseBuilder {
         }
         progress.done();
 
-        console.log("size", finalStream.offset / 8, "bytes", require("pretty-bytes")(finalStream.offset / 8));
+        console.log("size", finalStream.offset / 8, "bytes", prettyBytes(finalStream.offset / 8));
 
         return {
             config: this.config,
