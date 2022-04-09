@@ -1,6 +1,10 @@
-import React, { ErrorInfo } from "react";
+import React, { ErrorInfo, ReactNode } from "react";
 
-export default class ErrorBoundary extends React.Component {
+interface Props {
+    children: ReactNode;
+}
+
+export default class ErrorBoundary extends React.Component<Props> {
     state = {
         hasError: false,
     };
