@@ -24,7 +24,7 @@ const Matchers: Matcher[] = [
     {
         // match URLs
         // TODO: find a better regex, @dperini version (not this one ↓) is probably too restrictive for us
-        regex: /(?:https?:\/\/)(?:[\da-z\.-]+)\.(?:[a-z\.]{2,6})(?:[\/\w\.\-\?#=]*)*\/?/gi,
+        regex: /(?:https?:\/\/)(?:[\da-z\.-]+)\.(?:[a-z\.]{2,6})(?:[\/\w\.\-\?#=@]*)*\/?/gi,
         tag: "url",
     },
     // TODO: match emails, so they are not parsed as mentions (@gmail, @hotmail, etc)
