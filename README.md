@@ -30,7 +30,7 @@ You can generate reports from the following platforms:
 <strong>*</strong>: not all languages are supported, check [WhatsApp.ts](pipeline/parse/parsers/WhatsApp.ts).
 
 You can't combine exports from different platforms.  
-The contribution of [new platform parsers](pipeline/parse/parsers/README.md) is always welcomed 🙂
+The contribution of [new platform parsers](DOCS.md#writing-a-new-parser) is always welcomed 🙂
 
 ## Privacy & Analytics
 
