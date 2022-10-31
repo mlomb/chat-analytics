@@ -34,7 +34,7 @@ The contribution of [new platform parsers](DOCS.md#writing-a-new-parser) is alwa
 
 ## Privacy & Analytics
 
-Since all chat data always stays in the browser, there is zero risk of someone reading your chats. Note that **the report HTML file contains sensible information** (one may reconstruct message contents for every message), so share your reports with people you trust.
+Since all chat data always stays in the browser, there is zero risk of someone reading your chats. Note that **the report HTML file contains sensitive information** (one may reconstruct message contents for every message), so share your reports with people you trust.
 
 The site does not use cookies either and uses a self-hosted version of [Plausible](https://plausible.io). All events do not contain PII and information is segmented (i.e 1MB-10MB, etc). Since I want full transparency, you can check the [site analytics here](https://p.chatanalytics.app/chatanalytics.app).
 
