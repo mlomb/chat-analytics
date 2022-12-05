@@ -14,7 +14,7 @@ export type BitAddress = number;
 export type Timestamp = number;
 
 // available platforms
-export type Platform = "discord" | "messenger" | "telegram" | "whatsapp";
+export type Platform = "discord" | "messenger" | "slack" | "telegram" | "whatsapp";
 
 export enum AttachmentType {
     Image,

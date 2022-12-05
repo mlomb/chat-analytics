@@ -5,6 +5,7 @@ import { progress } from "@pipeline/Progress";
 import { Parser } from "@pipeline/parse/Parser";
 import { DiscordParser } from "@pipeline/parse/parsers/DiscordParser";
 import { MessengerParser } from "@pipeline/parse/parsers/MessengerParser";
+import { SlackParser } from "@pipeline/parse/parsers/SlackParser";
 import { TelegramParser } from "@pipeline/parse/parsers/TelegramParser";
 import { WhatsAppParser } from "@pipeline/parse/parsers/WhatsAppParser";
 import { DatabaseBuilder } from "@pipeline/process/DatabaseBuilder";
@@ -29,6 +30,9 @@ export const generateDatabase = async (files: FileInput[], config: ReportConfig)
             break;
         case "telegram":
             parser = new TelegramParser(builder);
+            break;
+        case "slack":
+            parser = new SlackParser(builder);
             break;
         default:
             throw new Error(`Unknown platform: ${config.platform}`);

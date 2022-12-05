@@ -4,6 +4,7 @@ import { Platform } from "@pipeline/Types";
 
 import DiscordLogo from "@assets/images/logos/discord.svg";
 import MessengerLogo from "@assets/images/logos/messenger.svg";
+import SlackLogo from "@assets/images/logos/slack.svg";
 import TelegramLogo from "@assets/images/logos/telegram.svg";
 import WhatsAppLogo from "@assets/images/logos/whatsapp.svg";
 
@@ -235,5 +236,13 @@ export const Platforms: {
         defaultFilename: "WhatsApp Chat with <chat name>.txt/zip",
         logo: <img src={WhatsAppLogo} alt="" />,
         instructions: <WhatsAppInstructions />,
+    },
+    {
+        platform: "slack",
+        title: "Slack",
+        color: [299, 56, 19],
+        defaultFilename: "<workspace> Slack export <start date> - <end date>.zip",
+        logo: <img src={SlackLogo} alt="" />,
+        instructions: <>write instructions here</>,
     },
 ];

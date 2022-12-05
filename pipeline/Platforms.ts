@@ -29,6 +29,14 @@ export const PlatformsInfo: {
             replies: false,
         },
     },
+    slack: {
+        name: "Slack",
+        support: {
+            stickers: false,
+            reactions: false,
+            replies: false,
+        },
+    },
     telegram: {
         name: "Telegram",
         support: {
