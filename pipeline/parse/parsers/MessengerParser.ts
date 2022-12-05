@@ -1,8 +1,6 @@
 import { Parser } from "@pipeline/parse/Parser";
 import { FileInput } from "@pipeline/File";
-
-import { JSONStream } from "@pipeline/parse/JSONStream";
-import { streamJSONFromFile } from "@pipeline/File";
+import { AttachmentType } from "@pipeline/Types";
 
 export class MessengerParser extends Parser {
     private messageIndex = 0;
@@ -33,10 +31,15 @@ export class MessengerParser extends Parser {
         // so we can just parse the whole file at once :)
         const fileContent = JSON.parse(textContent) as MessengerExportFile;
 
-        const assignedChannelIndex = this.builder.addChannel(0, {
+        const assignedChannelIndex = this.builder.addChannel(fileContent.thread_path, {
             n: fileContent.title,
         });
-        this.builder.setTitle(`Chat ${fileContent.title}`);
+
+        if (this.builder.numChannels === 1) {
+            this.builder.setTitle(`Chat ${fileContent.title}`);
+        } else {
+            this.builder.setTitle(`Messenger Chats`);
+        }
 
         // we iterate the messages in reverse order since we want to iterate from older to newer
         for (const message of fileContent.messages.reverse()) {
@@ -50,11 +53,34 @@ export class MessengerParser extends Parser {
                 authorIndex,
                 channelIndex: assignedChannelIndex,
                 content: message.content,
-                attachments: [],
+                attachments: this.parseAttachments(message),
                 reactions: [],
             });
 
             yield;
         }
+    }
+
+    parseAttachments(message: MessengerMessage): AttachmentType[] {
+        const attachments: AttachmentType[] = [];
+        if (message.photos) {
+            for (const photo of message.photos) {
+                attachments.push(AttachmentType.Image);
+            }
+        }
+        if (message.audio_files) {
+            for (const audio of message.audio_files) {
+                attachments.push(AttachmentType.Audio);
+            }
+        }
+        if (message.files) {
+            for (const file of message.files) {
+                attachments.push(AttachmentType.Other);
+            }
+        }
+        if (message.sticker) {
+            attachments.push(AttachmentType.Sticker);
+        }
+        return attachments;
     }
 }
