@@ -24,7 +24,7 @@ export const PlatformsInfo: {
     messenger: {
         name: "Messenger",
         support: {
-            stickers: false,
+            stickers: true,
             reactions: false,
             replies: false,
         },

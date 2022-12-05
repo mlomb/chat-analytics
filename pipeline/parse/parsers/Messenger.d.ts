@@ -21,5 +21,6 @@ interface MessengerMessage {
     files: any;
     photos: any;
     audio_files: any;
+    sticker: any;
     ip: string; // wtf
 }
