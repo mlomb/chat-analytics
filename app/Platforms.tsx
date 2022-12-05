@@ -3,6 +3,7 @@ import { ReactNode, useState } from "react";
 import { Platform } from "@pipeline/Types";
 
 import DiscordLogo from "@assets/images/logos/discord.svg";
+import MessengerLogo from "@assets/images/logos/messenger.svg";
 import TelegramLogo from "@assets/images/logos/telegram.svg";
 import WhatsAppLogo from "@assets/images/logos/whatsapp.svg";
 
@@ -165,6 +166,14 @@ export const Platforms: {
         defaultFilename: "<guild> - <channel> [ID].json",
         logo: <img src={DiscordLogo} alt="" />,
         instructions: <DiscordInstructions />,
+    },
+    {
+        platform: "messenger",
+        title: "Messenger",
+        color: [214, 89, 52],
+        defaultFilename: "message_<number>.json",
+        logo: <img src={MessengerLogo} alt="" />,
+        instructions: <>instructions here</>,
     },
     {
         platform: "telegram",

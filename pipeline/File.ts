@@ -6,6 +6,7 @@ import { AttachmentType } from "@pipeline/Types";
 export interface FileInput {
     name: string;
     size: number;
+    lastModified: number;
     slice(start?: number, end?: number): Promise<ArrayBuffer>;
 }
 
