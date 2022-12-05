@@ -11,6 +11,12 @@ import DiscordFormat from "@assets/images/platforms/discord/instructions/discord
 import DiscordExport from "@assets/images/platforms/discord/instructions/discord_export.gif";
 import DiscordChannels from "@assets/images/platforms/discord/instructions/discord_channels.png";
 
+import FacebookTab from "@assets/images/platforms/messenger/instructions/tab.png";
+import FacebookFormat from "@assets/images/platforms/messenger/instructions/format.png";
+import FacebookDeselect from "@assets/images/platforms/messenger/instructions/deselect.png";
+import FacebookMessages from "@assets/images/platforms/messenger/instructions/messages.png";
+import FacebookRequest from "@assets/images/platforms/messenger/instructions/request.png";
+
 import TelegramTreeDots from "@assets/images/platforms/telegram/instructions/telegram_dots.png";
 import TelegramNoMedia from "@assets/images/platforms/telegram/instructions/telegram_no_media.png";
 import TelegramFormat from "@assets/images/platforms/telegram/instructions/telegram_format.png";
@@ -54,6 +60,45 @@ const DiscordInstructions = () => {
                 <li>
                     Go ahead and <b>click Export</b>.
                     <img src={DiscordExport} />
+                </li>
+            </ol>
+        </>
+    );
+};
+
+const MessengerInstructions = () => {
+    return (
+        <>
+            <ol>
+                <li>
+                    Head to
+                    <b>
+                        {" "}
+                        <a href="https://www.facebook.com/dyi" target="_blank">
+                            https://www.facebook.com/dyi
+                        </a>
+                    </b>
+                    .
+                </li>
+                <li>
+                    In the "Request a download" tab, change the format to <b>JSON</b>, media quality to <b>Low</b>{" "}
+                    (since media files are not analyzed) and Date range to <b>All time</b> (if you want).
+                    <img src={FacebookTab} />
+                    <img src={FacebookFormat} />
+                </li>
+                <li>
+                    Click to deselect all, then only select <b>Messages</b>.
+                    <img src={FacebookDeselect} />
+                    <img src={FacebookMessages} />
+                </li>
+                <li>
+                    At the bottom of the page, click <b>Request a download</b>.
+                    <img src={FacebookRequest} />
+                </li>
+                <li>
+                    Now wait until the data is ready (may take a day or two), you can find it in the "Available files"
+                    tab. Extract the ZIP you downloaded and navigate to the folder <code>messages/inbox/</code> and find
+                    the chat you want to analyze.
                 </li>
             </ol>
         </>
@@ -173,7 +218,7 @@ export const Platforms: {
         color: [214, 89, 52],
         defaultFilename: "message_<number>.json",
         logo: <img src={MessengerLogo} alt="" />,
-        instructions: <>instructions here</>,
+        instructions: <MessengerInstructions />,
     },
     {
         platform: "telegram",
