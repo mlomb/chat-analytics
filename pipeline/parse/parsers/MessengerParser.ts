@@ -34,8 +34,9 @@ export class MessengerParser extends Parser {
         const fileContent = JSON.parse(textContent) as MessengerExportFile;
 
         const assignedChannelIndex = this.builder.addChannel(0, {
-            n: `Chat ${fileContent.title}`,
+            n: fileContent.title,
         });
+        this.builder.setTitle(`Chat ${fileContent.title}`);
 
         // we iterate the messages in reverse order since we want to iterate from older to newer
         for (const message of fileContent.messages.reverse()) {
