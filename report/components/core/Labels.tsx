@@ -10,6 +10,7 @@ import DefaultFaviconIcon from "@assets/images/icons/default-favicon.png";
 import LinkOutIcon from "@assets/images/icons/link-out-blue.svg";
 import Hashtag from "@assets/images/icons/hashtag.svg";
 import wpp_avatar from "@assets/images/platforms/whatsapp/default_avatar.png";
+import messenger_avatar from "@assets/images/platforms/messenger/default_avatar.png";
 import avatar_0 from "@assets/images/platforms/discord/avatars/avatar_0.png";
 import avatar_1 from "@assets/images/platforms/discord/avatars/avatar_1.png";
 import avatar_2 from "@assets/images/platforms/discord/avatars/avatar_2.png";
@@ -64,6 +65,16 @@ const _AuthorLabel = ({ index }: LabelProps) => {
         placeholder = (
             <img
                 src={wpp_avatar}
+                style={{
+                    width: "100%",
+                    height: "100%",
+                }}
+            />
+        );
+    } else if (platform === "messenger") {
+        placeholder = (
+            <img
+                src={messenger_avatar}
                 style={{
                     width: "100%",
                     height: "100%",
