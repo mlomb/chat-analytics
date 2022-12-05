@@ -7,6 +7,11 @@ import { FileInput, getAttachmentTypeFromFileName, streamJSONFromFile } from "@p
 export class DiscordParser extends Parser {
     private channelIndex?: Index;
 
+    sortFiles(files: FileInput[]): FileInput[] {
+        // we always keep the most recent information last (since the export is overwritting)
+        return files.sort((a, b) => (a.lastModified || 0) - (b.lastModified || 0));
+    }
+
     async *parse(file: FileInput) {
         const stream = new JSONStream();
 

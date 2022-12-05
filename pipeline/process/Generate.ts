@@ -4,6 +4,7 @@ import { progress } from "@pipeline/Progress";
 
 import { Parser } from "@pipeline/parse/Parser";
 import { DiscordParser } from "@pipeline/parse/parsers/DiscordParser";
+import { MessengerParser } from "@pipeline/parse/parsers/MessengerParser";
 import { TelegramParser } from "@pipeline/parse/parsers/TelegramParser";
 import { WhatsAppParser } from "@pipeline/parse/parsers/WhatsAppParser";
 import { DatabaseBuilder } from "@pipeline/process/DatabaseBuilder";
@@ -20,6 +21,9 @@ export const generateDatabase = async (files: FileInput[], config: ReportConfig)
         case "discord":
             parser = new DiscordParser(builder);
             break;
+        case "messenger":
+            parser = new MessengerParser(builder);
+            break;
         case "whatsapp":
             parser = new WhatsAppParser(builder);
             break;
@@ -29,6 +33,9 @@ export const generateDatabase = async (files: FileInput[], config: ReportConfig)
         default:
             throw new Error(`Unknown platform: ${config.platform}`);
     }
+
+    // sort files depending on platform's format
+    files = parser.sortFiles(files);
 
     // parse and process all files
     for (let i = 0; i < files.length; i++) {
