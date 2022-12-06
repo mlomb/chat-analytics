@@ -24,19 +24,16 @@ export interface ResultMessage {
 const wrapFile = (file: File): FileInput => ({
     name: file.name,
     size: file.size,
+    lastModified: file.lastModified,
     slice: (start, end) => (start !== undefined ? file.slice(start, end).arrayBuffer() : file.arrayBuffer()),
 });
 
 self.onmessage = async (ev: MessageEvent<InitMessage>) => {
-    // Sort files by lastModified
-    // ***Very important*** so we always keep the most recent information last (since we overwrite it)
-    const files = ev.data.files.sort((a, b) => (a.lastModified || 0) - (b.lastModified || 0));
-
     progress.reset();
     progress.on("update", (msg) => self.postMessage(msg));
 
     try {
-        const database = await generateDatabase(files.map(wrapFile), ev.data.config);
+        const database = await generateDatabase(ev.data.files.map(wrapFile), ev.data.config);
         if (env.isDev) console.log(database);
         const result = await generateReportSite(database);
         if (env.isDev) {
