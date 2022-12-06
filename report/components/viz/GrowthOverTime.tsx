@@ -91,12 +91,15 @@ const GrowthOverTime = ({ data, options }: { data?: TimelineStats; options: numb
     }, []);
 
     useLayoutEffect(() => {
-        xAxisRef.current?.set("baseInterval", { timeUnit: ["day", "week", "month"][options[0]] as TimeUnit, count: 1 });
+        xAxisRef.current?.set("baseInterval", {
+            timeUnit: "day" as TimeUnit,
+            count: 1,
+        });
         if (data) {
             // TODO: update efficient
             seriesRef.current?.data.setAll(data.growth);
         }
-    }, [seriesRef.current, data, options]);
+    }, [seriesRef.current, data]);
 
     return (
         <div

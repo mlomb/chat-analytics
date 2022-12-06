@@ -117,7 +117,7 @@ const ActiveAuthorsOverTime = ({ data, options }: { data?: ActiveAuthors; option
             }
             seriesRef.current?.data.setAll(data.perMonth);
         }
-    }, [seriesRef.current, data, options]);
+    }, [seriesRef.current, data]);
 
     return (
         <div
