@@ -21,6 +21,14 @@ export const PlatformsInfo: {
             replies: true,
         },
     },
+    messenger: {
+        name: "Messenger",
+        support: {
+            stickers: true,
+            reactions: false,
+            replies: false,
+        },
+    },
     telegram: {
         name: "Telegram",
         support: {
