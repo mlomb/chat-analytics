@@ -1,6 +1,6 @@
 # TO-DO
 
-Things pending or ideas. Don't expected them soon.
+Things pending or ideas. Don't expect them soon.
 
 ### Misc
 
@@ -10,12 +10,12 @@ Things pending or ideas. Don't expected them soon.
 
 * Handle english contractions (i.e combine "dont" and "don't")
 * Improve compression or give an option to disable it, since it crashes the browser when exports are too big
-* Currently the timezone is picked from the machine that generates the report, it should be an option.
+* Currently, the timezone is picked from the machine that generates the report, it should be an option.
 * Add configuration to reports:
    - Timezone
    - Whether to filter Stopwords
    - Whether to filter long words (currently filtering 1&lt;len&le;30)
-* Detect mispelling of words (very hard)
+* Detect misspelling of words (very hard)
 * fastText is using like 80% of the generation time, can it be optimized, replaced with something better?
 * If a channel is uploaded in several files, replies and other stuff breaks between them
 * Weeks are off, currently being calculated as `floor((dayOfMonth - 1) / 7)` which is wrong.
@@ -33,7 +33,7 @@ Things pending or ideas. Don't expected them soon.
   * Longest reply chain (don't know how to do it efficiently)
   * Lexical diversity
   * Response time of authors
-  * Edit message avg time and how many messages (in %) a author edits
+  * Edit message avg time and how many messages (in %) an author edits
   * Most linker author
   * Sentiment per user?
   * bigrams, trigrams, n-grams?
