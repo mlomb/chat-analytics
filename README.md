@@ -1,3 +1,4 @@
+<!--suppress HtmlDeprecatedAttribute -->
 <div align="center">
 
 ![Logo-Dark](assets/images/logos/app_dark.svg#gh-dark-mode-only)
@@ -21,12 +22,12 @@ To generate reports you need a browser with [ES6 support](https://caniuse.com/es
 
 You can generate reports from the following platforms:
 
-| Platform | Formats supported                                                                | Text content | Edits & Replies   | Attachment Types                                                                      | Reactions         | Profile picture         | Mentions     |
-| -------- | -------------------------------------------------------------------------------- | ------------ | ----------------- | ------------------------------------------------------------------------------------- | ----------------- | ----------------------- | ------------ |
-| Discord  | `json` from [DiscordChatExporter](https://github.com/Tyrrrz/DiscordChatExporter) | ✅           | ✅                | ✅ ([no stickers](https://github.com/Tyrrrz/DiscordChatExporter/issues/638))          | ✅                | ✅ (until link expires) | ✅ (as text) |
-| Messenger  | `json` from [Facebook DYI export](https://www.facebook.com/dyi) | ✅ | ❌ | ✅ | ❌ | ❌ | ✅ (as text) |
-| Telegram | `json` from [Telegram Desktop](https://desktop.telegram.org/)                    | ✅           | ✅                | ✅                                                                                    | ❌ (not provided) | ❌                      | ✅ (as text) |
-| WhatsApp | `txt` or `zip` exported from a phone                                             | ✅           | ❌ (not provided) | ✅<strong>*</strong> (if exported from iOS)<br>🟦 (generic if exported from Android) | N/A               | ❌                      | ✅ (as text) |
+| Platform  | Formats supported                                                                | Text content | Edits & Replies  | Attachment Types                                                                    | Reactions        | Profile picture        | Mentions    |
+|-----------|----------------------------------------------------------------------------------|--------------|------------------|-------------------------------------------------------------------------------------|------------------|------------------------|-------------|
+| Discord   | `json` from [DiscordChatExporter](https://github.com/Tyrrrz/DiscordChatExporter) | ✅            | ✅                | ✅ ([no stickers](https://github.com/Tyrrrz/DiscordChatExporter/issues/638))         | ✅                | ✅ (until link expires) | ✅ (as text) |
+| Messenger | `json` from [Facebook DYI export](https://www.facebook.com/dyi)                  | ✅            | ❌                | ✅                                                                                   | ❌                | ❌                      | ✅ (as text) |
+| Telegram  | `json` from [Telegram Desktop](https://desktop.telegram.org/)                    | ✅            | ✅                | ✅                                                                                   | ❌ (not provided) | ❌                      | ✅ (as text) |
+| WhatsApp  | `txt` or `zip` exported from a phone                                             | ✅            | ❌ (not provided) | ✅<strong>*</strong> (if exported from iOS)<br>🟦 (generic if exported from Android) | N/A              | ❌                      | ✅ (as text) |
 
 <strong>*</strong>: not all languages are supported, check [WhatsApp.ts](pipeline/parse/parsers/WhatsApp.ts).
 
