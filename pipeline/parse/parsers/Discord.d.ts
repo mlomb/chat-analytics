@@ -32,6 +32,7 @@ interface DiscordMessage {
         messageId: Snowflake;
     };
     attachments: DiscordAttachment[];
+    stickers: DiscordSticker[];
     reactions: DiscordReaction[];
     mentions: DiscordMention[];
 }
@@ -44,6 +45,12 @@ interface DiscordAuthor {
     color: string | null;
     isBot: boolean;
     avatarUrl: string;
+}
+
+interface DiscordSticker {
+    id: Snowflake;
+    name: string;
+    format: "Png" | "PngAnimated" | "Lottie";
 }
 
 interface DiscordReaction {
