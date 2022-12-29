@@ -30,31 +30,29 @@ const Item = (props: {
     itemComponent: ItemComponent;
     percent: number;
     rank: number;
-}) => {
-    return (
-        <div className="AnimatedBars__item" style={{ top: props.rank * ITEM_STRIDE + "px" }}>
-            <div
-                className="AnimatedBars__bar"
-                style={{
-                    width: props.percent + "%",
-                    backgroundColor:
-                        props.colorHue !== undefined ? `hsl(${props.colorHue}, 100%, 65%)` : `rgba(255, 255, 255, 0.1)`,
-                }}
-            ></div>
-            <div className="AnimatedBars__value">
-                <props.itemComponent index={props.entry.index} pin={props.entry.pin || false} />
-            </div>
-            <CountUp
-                className="AnimatedBars__unit"
-                preserveValue
-                delay={0}
-                duration={0.5}
-                end={props.entry.value}
-                formattingFn={formattingFn}
-            />
+}) => (
+    <div className="AnimatedBars__item" style={{ top: props.rank * ITEM_STRIDE + "px" }}>
+        <div
+            className="AnimatedBars__bar"
+            style={{
+                width: props.percent + "%",
+                backgroundColor:
+                    props.colorHue === undefined ? `rgba(255, 255, 255, 0.1)` : `hsl(${props.colorHue}, 100%, 65%)`,
+            }}
+        ></div>
+        <div className="AnimatedBars__value">
+            <props.itemComponent index={props.entry.index} pin={props.entry.pin || false} />
         </div>
-    );
-};
+        <CountUp
+            className="AnimatedBars__unit"
+            preserveValue
+            delay={0}
+            duration={0.5}
+            end={props.entry.value}
+            formattingFn={formattingFn}
+        />
+    </div>
+);
 
 const AnimatedBars = (props: Props) => {
     const sortedById = props.data.slice().sort((a, b) => (a.index > b.index ? 1 : -1));

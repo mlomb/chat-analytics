@@ -32,7 +32,7 @@ type ChannelSection = {
     end: BitAddress;
 };
 
-// Hand picked values, hoping they work well
+// hand-picked values, hoping they work well
 const DefaultBitConfig: MessageBitConfig = {
     dayBits: 21, // 12 + 4 + 5
     authorIdxBits: 21,
@@ -91,11 +91,7 @@ export class DatabaseBuilder {
             const data = (await downloadFile("/data/stopwords-iso.json", "json")) as StopwordsJSON;
 
             // combining all stopwords is a mistake?
-            this.stopwords = new Set(
-                Object.values(data)
-                    .reduce((acc, val) => acc.concat(val), [])
-                    .map((word) => matchFormat(word))
-            );
+            this.stopwords = new Set(Object.values(data).flatMap((val) => val.map((word) => matchFormat(word))));
             progress.done();
         }
 
@@ -170,21 +166,19 @@ export class DatabaseBuilder {
         if (this.messageQueue.length === 0) return;
 
         const len = this.messageQueue.length;
-        let l = 0,
-            r = 1;
         let currentAuthor: Index = this.messageQueue[0].authorIndex;
         // [ M M M M M M M M ... ]
         //       ↑ l     ↑ r  (a group)
-        while (r < len) {
-            const message = this.messageQueue[r];
-            if (message.authorIndex !== currentAuthor) {
+        let l = 0;
+        for (let r = 1; r < len; r++) {
+            const authorIndex = this.messageQueue[r].authorIndex;
+            if (authorIndex !== currentAuthor) {
                 // process group
                 const group = this.messageQueue.slice(l, r);
                 this.processGroup(group);
-                currentAuthor = message.authorIndex;
+                currentAuthor = authorIndex;
                 l = r;
             }
-            r++;
         }
 
         if (final) {
@@ -208,7 +202,7 @@ export class DatabaseBuilder {
         const channelSection = this.getChannelSection(messages[0].channelIndex);
 
         // normalize and tokenize messages
-        let tokenizations: Token[][] = [];
+        const tokenizations: Token[][] = [];
         for (const msg of messages) {
             if (msg.content && msg.content.length > 0) {
                 tokenizations.push(tokenize(normalizeText(msg.content)));
@@ -219,7 +213,7 @@ export class DatabaseBuilder {
 
         // detect language in the whole group
         let langIndex: number = 0;
-        let combined: string[] = [];
+        const combined: string[] = [];
         for (const tokens of tokenizations) {
             for (const token of tokens) {
                 // only keep words
@@ -321,19 +315,15 @@ export class DatabaseBuilder {
                         mentionsCount[mentionIdx] = (mentionsCount[mentionIdx] || 0) + 1;
                     } else if (tag === "url") {
                         // TODO: transform URL only messages to attachments
-                        try {
-                            const hostname = new URL(text).hostname.toLowerCase();
-                            let domainIdx = this.domains.getIndex(hostname);
-                            if (domainIdx === undefined) domainIdx = this.domains.set(hostname, hostname);
-                            domainsCount[domainIdx] = (domainsCount[domainIdx] || 0) + 1;
-                        } catch (ex) {}
+                        const hostname = new URL(text).hostname.toLowerCase();
+                        let domainIdx = this.domains.getIndex(hostname);
+                        if (domainIdx === undefined) domainIdx = this.domains.set(hostname, hostname);
+                        domainsCount[domainIdx] = (domainsCount[domainIdx] || 0) + 1;
                     }
                 }
 
                 // sentiment analysis
-                if (hasText) {
-                    sentiment = this.sentiment?.get(tokens, langIndex) || 0;
-                }
+                if (hasText) sentiment = this.sentiment?.get(tokens, langIndex) || 0;
             }
 
             // reply offset
@@ -342,11 +332,9 @@ export class DatabaseBuilder {
             let replyOffset = undefined;
             if (msg.replyTo) {
                 replyOffset = this.recentIDs.indexOf(msg.replyTo);
-                if (replyOffset === -1) {
+                if (replyOffset === -1)
                     replyOffset = 0; // message too far / message in another file (probably, not supported)
-                } else {
-                    replyOffset = this.recentIDs.length - replyOffset - 1;
-                }
+                else replyOffset = this.recentIDs.length - replyOffset - 1;
             }
             // only keep last 1020 messages in the window
             if (this.recentIDs.length > 1020) this.recentIDs.shift();
@@ -380,9 +368,8 @@ export class DatabaseBuilder {
     }
 
     private getChannelSection(channelIndex: Index): ChannelSection {
-        if (!(channelIndex in this.channelSections)) {
+        if (!(channelIndex in this.channelSections))
             this.channelSections[channelIndex] = [{ start: this.stream.offset, end: this.stream.offset }];
-        }
         const sections = this.channelSections[channelIndex];
         const lastSection = sections[sections.length - 1];
         if (lastSection.end === this.stream.offset) return lastSection;
@@ -427,12 +414,12 @@ export class DatabaseBuilder {
                     if (msg.words) {
                         const oldWords = msg.words;
                         msg.words = []; // empty words
-                        for (let i = 0; i < oldWords.length; i++) {
-                            const wordIdx = oldWords[i][0];
+                        for (const word of oldWords) {
+                            const wordIdx = word[0];
 
                             if (newWordsMapping[wordIdx] >= 0) {
                                 // push new mapping
-                                msg.words.push([newWordsMapping[wordIdx], oldWords[i][1]]);
+                                msg.words.push([newWordsMapping[wordIdx], word[1]]);
                             }
                         }
                     }
@@ -490,6 +477,7 @@ export class DatabaseBuilder {
 
         // only keep the profile picture of the 1000 most active authors
         // to save space (picture URLs are very big)
+        // noinspection ES6ConvertIndexedForToForOf
         for (let i = 1000; i < authorsOrder.length; i++) {
             this.authors.data[authorsOrder[i]].da = undefined;
         }

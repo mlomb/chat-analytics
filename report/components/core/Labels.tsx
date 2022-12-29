@@ -83,12 +83,7 @@ const _AuthorLabel = ({ index }: LabelProps) => {
         );
     } else if (platform === "telegram") {
         // TODO: two letters
-        let letter: string = "";
-        // iterate UTF-8 codepoints
-        for (const symbol of author.n) {
-            letter = symbol;
-            break;
-        }
+        const letter: string = author.n[0];
         const colors = TelegramBubbleColors[(1779033703 ^ index) % TelegramBubbleColors.length];
         placeholder = (
             <div
@@ -157,7 +152,6 @@ const _WordLabel = ({ index }: LabelProps) => {
 const _EmojiLabel = ({ index, hideNameIfPossible }: LabelProps & { hideNameIfPossible?: boolean }) => {
     const dp = useDataProvider();
     const emoji = dp.database.emojis[index];
-    hideNameIfPossible = hideNameIfPossible === true;
 
     if (emoji === undefined) {
         return <span>invalid emoji index {index}</span>;

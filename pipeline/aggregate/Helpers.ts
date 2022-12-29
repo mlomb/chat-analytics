@@ -1,4 +1,4 @@
-import { Database, Index } from "@pipeline/Types";
+import { Database } from "@pipeline/Types";
 import { BitStream } from "@pipeline/serialization/BitStream";
 import { Filters } from "@pipeline/aggregate/Filters";
 import { MessageView } from "@pipeline/serialization/MessageView";
@@ -26,7 +26,7 @@ export const parseAndFilterMessages = (
                 // filter time
                 if (!activeFilters.time || filters.inTime(message.dayIndex)) {
                     // make sure to preserve the offset, since reading an index array will overwrite it
-                    let prevOffset = stream.offset;
+                    const prevOffset = stream.offset;
                     fn(message);
                     stream.offset = prevOffset;
                 }

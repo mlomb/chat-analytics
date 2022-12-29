@@ -54,7 +54,7 @@ const isWhitespace = (c: number) =>
     It assumes the root is always an object
     Only keys on the root can be listened
 
-    This class expects well formed JSONs
+    This class expects well-formed JSONs
 */
 export class JSONStream {
     private objectCallbacks: Callbacks = {};
@@ -106,9 +106,8 @@ export class JSONStream {
                             // let VALUE consume the quote
                             this.valueStart = this.valueEnd = i;
                             continue; // (don't i++)
-                        } else {
-                            this.valueStart = this.valueEnd = i + 1;
                         }
+                        this.valueStart = this.valueEnd = i + 1;
                     } else if (c === Char.closeBrace) this.state = State.ROOT;
                     else if (!isWhitespace(c)) throw new Error('Expected ", comma or }');
                     break;
@@ -145,14 +144,14 @@ export class JSONStream {
                     if (
                         this.brackets === 0 &&
                         this.braces === 0 &&
-                        this.quotes === false &&
+                        !this.quotes &&
                         this.primitive &&
                         isPrimitiveTerminator(c)
                     ) {
                         // console.log("key", this.key, "value", this.value);
                         this.state = this.next;
                         this.next = State.INVALID;
-                        // dont consume the terminator, let the next state handle it
+                        // don't consume the terminator, let the next state handle it
                         continue; // (don't i++)
                     }
                     this.valueEnd = i;
@@ -238,8 +237,8 @@ export class JSONStream {
         const base = Math.min(i, this.valueStart);
         this.buffer = this.buffer.slice(base);
         this.index = i - base;
-        this.valueEnd = this.valueEnd - base;
-        this.valueStart = this.valueStart - base;
+        this.valueEnd -= base;
+        this.valueStart -= base;
     }
 
     // Object from the root which match the key will be emitted completely

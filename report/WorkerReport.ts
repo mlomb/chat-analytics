@@ -90,9 +90,7 @@ const request = async (msg: BlockRequestMessage) => {
         },
     };
 
-    try {
-        if (!(msg.blockKey in Blocks)) throw new Error("BlockFn not found");
-
+    if (msg.blockKey in Blocks) {
         console.time(msg.blockKey);
         const data = Blocks[msg.blockKey].fn(database, filters, common);
         console.timeEnd(msg.blockKey);
@@ -101,9 +99,7 @@ const request = async (msg: BlockRequestMessage) => {
             state: "ready",
             data,
         };
-    } catch (err) {
-        console.error(err);
-    }
+    } else console.error("BlockFn not found");
 
     self.postMessage(result);
 };

@@ -1,7 +1,6 @@
 import { Database, ReportConfig } from "@pipeline/Types";
 import { downloadFile, FileInput } from "@pipeline/File";
 import { progress } from "@pipeline/Progress";
-
 import { Parser } from "@pipeline/parse/Parser";
 import { DiscordParser } from "@pipeline/parse/parsers/DiscordParser";
 import { MessengerParser } from "@pipeline/parse/parsers/MessengerParser";
@@ -11,7 +10,7 @@ import { DatabaseBuilder } from "@pipeline/process/DatabaseBuilder";
 import { compress } from "@pipeline/compression/Compression";
 
 export const generateDatabase = async (files: FileInput[], config: ReportConfig): Promise<Database> => {
-    let builder: DatabaseBuilder = new DatabaseBuilder(config);
+    const builder: DatabaseBuilder = new DatabaseBuilder(config);
     // load data needed for processing
     await builder.init();
 
@@ -34,19 +33,15 @@ export const generateDatabase = async (files: FileInput[], config: ReportConfig)
             throw new Error(`Unknown platform: ${config.platform}`);
     }
 
-    // sort files depending on platform's format
-    files = parser.sortFiles(files);
-
     // parse and process all files
-    for (let i = 0; i < files.length; i++) {
-        progress.new("Processing", files[i].name);
+    for (const file of parser.sortFiles(files)) {
+        progress.new("Processing", file.name);
         try {
-            const gen = parser.parse(files[i]);
-            for await (const _ of gen) builder.process();
+            for await (const _ of parser.parse(file)) builder.process();
             builder.process(true);
         } catch (err) {
             if (err instanceof Error) {
-                const newErr = new Error(`Error parsing file "${files[i].name}":\n\n${err.message}`);
+                const newErr = new Error(`Error parsing file "${file.name}":\n\n${err.message}`);
                 newErr.stack = err.stack;
                 throw newErr;
             }

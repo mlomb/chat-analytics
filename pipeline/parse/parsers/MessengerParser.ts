@@ -11,8 +11,7 @@ export class MessengerParser extends Parser {
         // so if we have 4 files, we want to process them in this order: 4, 3, 2, 1
         const extractNumber = (name: string) => {
             const match = name.match(/message_(\d+)\.json/);
-            if (!match) return 0;
-            return parseInt(match[1]);
+            return match ? parseInt(match[1]) : 0;
         };
         return files.sort((a, b) => extractNumber(b.name) - extractNumber(a.name));
     }
@@ -22,12 +21,12 @@ export class MessengerParser extends Parser {
     // 1. there are many channels and users, combining them together would be a mess
     // 2. the ZIP files are very big, including lots of media files so loading the whole ZIP into memory is not feasible
     //
-    // so, we just assume the user will provide the appropiate "message_<number>.json" files
+    // so, we just assume the user will provide the appropriate "message_<number>.json" files
     async *parse(file: FileInput) {
         const fileBuffer = await file.slice();
         const textContent = new TextDecoder("utf-8").decode(fileBuffer);
 
-        // fortunately, there are only 10k messages per file
+        // fortunately, there are only 10k messages per file,
         // so we can just parse the whole file at once :)
         const fileContent = JSON.parse(textContent) as MessengerExportFile;
 
@@ -35,11 +34,8 @@ export class MessengerParser extends Parser {
             n: fileContent.title,
         });
 
-        if (this.builder.numChannels === 1) {
-            this.builder.setTitle(`Chat ${fileContent.title}`);
-        } else {
-            this.builder.setTitle(`Messenger Chats`);
-        }
+        if (this.builder.numChannels === 1) this.builder.setTitle(`Chat ${fileContent.title}`);
+        else this.builder.setTitle(`Messenger Chats`);
 
         // we iterate the messages in reverse order since we want to iterate from older to newer
         for (const message of fileContent.messages.reverse()) {

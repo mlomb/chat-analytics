@@ -77,8 +77,8 @@ const ActiveAuthorsOverTime = ({ data, options }: { data?: ActiveAuthors; option
         series.strokes.template.setAll({
             templateField: "lineSettings",
         });
-        series.bullets.push(function () {
-            return Bullet.new(root, {
+        series.bullets.push(() =>
+            Bullet.new(root, {
                 locationY: 0,
                 sprite: Circle.new(root, {
                     radius: 4,
@@ -86,8 +86,8 @@ const ActiveAuthorsOverTime = ({ data, options }: { data?: ActiveAuthors; option
                     strokeWidth: 2,
                     fill: Color.fromHex(0x1861a1),
                 }),
-            });
-        });
+            })
+        );
 
         seriesRef.current = series;
 

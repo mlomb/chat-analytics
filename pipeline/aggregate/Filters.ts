@@ -20,7 +20,7 @@ export class Filters {
     }
 
     hasChannel(channelIndex: number): boolean {
-        // there arent that many channels
+        // there aren't that many channels
         // no need to optimize
         return this.channels.indexOf(channelIndex) !== -1;
     }

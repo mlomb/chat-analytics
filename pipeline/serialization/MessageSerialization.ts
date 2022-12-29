@@ -4,6 +4,7 @@ import { readIndexArray, writeIndexArray } from "@pipeline/serialization/IndexSe
 
 // available message information
 // prettier-ignore
+// noinspection PointlessBitwiseExpressionJS
 export enum MessageFlags {
     None,
     Reply       = 1 << 0,
@@ -43,12 +44,10 @@ export const writeMessage = (message: Message, stream: BitStream, config: Messag
     stream.setBits(9, flags);
 
     if (flags & MessageFlags.Reply) stream.setBits(10, message.replyOffset!); // 1024
-
     if (flags & MessageFlags.Text) {
         stream.setBits(8, message.langIndex!); // 0-255
         stream.setBits(8, message.sentiment! + 128); // 0-255
     }
-
     if (flags & MessageFlags.Words) writeIndexArray(message.words!, stream, config.wordIdxBits);
     if (flags & MessageFlags.Emojis) writeIndexArray(message.emojis!, stream, config.emojiIdxBits);
     if (flags & MessageFlags.Attachments) writeIndexArray(message.attachments!, stream, 3);
@@ -70,12 +69,10 @@ export const readMessage = (stream: BitStream, config: MessageBitConfig): Messag
     };
 
     if (flags & MessageFlags.Reply) message.replyOffset = stream.getBits(10);
-
     if (flags & MessageFlags.Text) {
         message.langIndex = stream.getBits(8);
         message.sentiment = stream.getBits(8) - 128;
     }
-
     if (flags & MessageFlags.Words) message.words = readIndexArray(stream, config.wordIdxBits);
     if (flags & MessageFlags.Emojis) message.emojis = readIndexArray(stream, config.emojiIdxBits);
     if (flags & MessageFlags.Attachments) message.attachments = readIndexArray(stream, 3);

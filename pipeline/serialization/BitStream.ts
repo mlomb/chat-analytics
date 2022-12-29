@@ -50,8 +50,6 @@ export class BitStream {
 
         // check if we must grow the buffer
         if ((offset + bits) / 8 > this.buffer.byteLength - 4) this.grow();
-        // buffer may have grown
-        const buffer = this.buffer;
 
         // only keep the bits we need
         const mask = bits === 32 ? 0b11111111111111111111111111111111 : (1 << bits) - 1;
@@ -60,14 +58,15 @@ export class BitStream {
         const aligned32 = offset >>> 5;
         const delta = offset - (aligned32 << 5);
 
-        // TODO: try to do it branchless
+        // TODO: try to do it branch-less
         if (delta + bits > 32) {
             const corr = bits - (32 - delta);
-            buffer[aligned32] = (buffer[aligned32] & (~(mask >>> corr) >>> 0)) | (valueMasked >>> corr);
-            buffer[aligned32 + 1] = (buffer[aligned32 + 1] & ~(mask << (32 - corr))) | (valueMasked << (32 - corr));
+            this.buffer[aligned32] = (this.buffer[aligned32] & ~(mask >>> corr)) | (valueMasked >>> corr);
+            this.buffer[aligned32 + 1] =
+                (this.buffer[aligned32 + 1] & ~(mask << (32 - corr))) | (valueMasked << (32 - corr));
         } else {
             const corr = 32 - delta - bits;
-            buffer[aligned32] = (buffer[aligned32] & ~(mask << corr)) | (valueMasked << corr);
+            this.buffer[aligned32] = (this.buffer[aligned32] & ~(mask << corr)) | (valueMasked << corr);
         }
     }
 
@@ -81,19 +80,16 @@ export class BitStream {
         const value1 = buffer[aligned32];
         const value2 = buffer[aligned32 + 1];
 
-        // TODO: try to do it branchless
-        let value = 0;
+        // TODO: try to do it branch-less
         if (delta + bits > 32) {
             const aligned = (value1 << delta) | (value2 >>> (32 - delta));
-            value = aligned >>> (32 - bits);
-        } else {
-            value = (value1 << delta) >>> (32 - bits);
+            return aligned >>> (32 - bits);
         }
-        return value >>> 0;
+        return (value1 << delta) >>> (32 - bits);
     }
 
     // variable byte encode
-    writeVarint(value: number, maxBits: number = 32): void {
+    writeVarInt(value: number, maxBits: number = 32): void {
         if (maxBits < 10) {
             this.setBits(maxBits, value);
             return;
@@ -101,13 +97,13 @@ export class BitStream {
 
         while (value > 127) {
             this.setBits(8, (value & 127) | 128);
-            value = value >>> 7;
+            value >>>= 7;
         }
         this.setBits(8, value);
     }
 
     // variable byte decode
-    readVarint(maxBits: number = 32): number {
+    readVarInt(maxBits: number = 32): number {
         if (maxBits < 10) return this.getBits(maxBits);
 
         let value = 0;

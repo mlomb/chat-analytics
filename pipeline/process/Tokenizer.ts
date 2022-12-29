@@ -84,8 +84,7 @@ const tokenizeStep = (input: string, step: number): Token[] => {
 
     const result: Token[] = [];
     const list = matchOne(input, Matchers[step]);
-    for (let i = 0; i < list.length; i++) {
-        const t = list[i];
+    for (const t of list) {
         if (typeof t === "string") {
             // continue tokenizing
             result.push(...tokenizeStep(t, step + 1));

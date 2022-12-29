@@ -18,13 +18,9 @@ const fn: BlockFn<SentimentStats> = (database, filters, common) => {
     const processMessage = (msg: MessageView) => {
         const sentiment = msg.sentiment;
         if (sentiment !== undefined) {
-            if (sentiment === 0) {
-                res.neutralMessages++;
-            } else if (sentiment > 0) {
-                res.positiveMessages++;
-            } else {
-                res.negativeMessages++;
-            }
+            if (sentiment === 0) res.neutralMessages++;
+            else if (sentiment > 0) res.positiveMessages++;
+            else res.negativeMessages++;
         }
     };
 

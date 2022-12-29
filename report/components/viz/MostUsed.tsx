@@ -42,14 +42,15 @@ const MostUsed = (props: Props) => {
         value: c,
         pin: exactIndex === i,
     }));
+    // prettier-ignore
     entries = entries.filter(
         (c) =>
             c.value > 0 &&
             (filterFormatted.length === 0 || c.pin || (props.searchable && props.inFilter(c.index, filterFormatted))) &&
             (!props.filter || props.filter(c.index))
-    );
-    entries.sort((a, b) => b.value - a.value);
-    entries = entries.slice(0, props.maxItems);
+        )
+        .sort((a, b) => b.value - a.value)
+        .slice(0, props.maxItems);
 
     // memo component
     const Item = useMemo(

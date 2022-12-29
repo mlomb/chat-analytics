@@ -26,14 +26,15 @@ export class Day {
 
     static fromKey(key: DateKey | WeekKey | MonthKey | YearKey): Day {
         const arr = key.split("-").map(Number);
-        if (arr.length === 1) {
-            return new Day(arr[0], 1, 1);
-        } else if (arr.length === 2) {
-            return new Day(arr[0], arr[1], 1);
-        } else if (arr.length === 3) {
-            return new Day(arr[0], arr[1], arr[2]);
-        } else {
-            return new Day(arr[0], arr[1], arr[3] * 7 + 1);
+        switch (arr.length) {
+            case 1:
+                return new Day(arr[0], 1, 1);
+            case 2:
+                return new Day(arr[0], arr[1], 1);
+            case 3:
+                return new Day(arr[0], arr[1], arr[2]);
+            default:
+                return new Day(arr[0], arr[1], arr[3] * 7 + 1);
         }
     }
 
@@ -106,12 +107,12 @@ export class Day {
         );
     }
 
-    // min bettween two days (past)
+    // min between two days (past)
     static min(a: Day, b: Day): Day {
         return Day.lt(a, b) ? a : b;
     }
 
-    // max bettween two days (future)
+    // max between two days (future)
     static max(a: Day, b: Day): Day {
         return Day.gt(a, b) ? a : b;
     }

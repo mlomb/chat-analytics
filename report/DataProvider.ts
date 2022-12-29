@@ -60,7 +60,7 @@ export class DataProvider extends EventEmitter {
             // NOTE: data:application/javascript breaks
             const workerJs = document.getElementById("worker-script")!.textContent!;
             this.worker = new Worker(
-                "data:application/javascript;base64," + btoa(unescape(encodeURIComponent(workerJs)))
+                "data:application/javascript;base64," + btoa(decodeURI(encodeURIComponent(workerJs)))
             );
         }
         this.worker.onerror = this.onError.bind(this);
@@ -70,7 +70,7 @@ export class DataProvider extends EventEmitter {
 
     private onError(e: ErrorEvent) {
         console.log(e);
-        alert("An error ocurred creating the WebWorker.\n\n Error: " + e.message);
+        alert("An error occurred creating the WebWorker.\n\n Error: " + e.message);
         this.worker.terminate();
     }
 
@@ -184,7 +184,7 @@ export class DataProvider extends EventEmitter {
     private onWorkDone<K extends BlockKey>(blockKey: K, blockInfo: BlockInfo<K>) {
         console.assert(this.currentBlock === blockKey);
 
-        // make sure the block we were working hasnt been invalidated
+        // make sure the block we were working hasn't been invalidated
         if (this.currentBlockInvalidated) {
             // notify the UI
             this.emit(blockKey, {

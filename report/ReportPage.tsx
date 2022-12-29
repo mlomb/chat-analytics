@@ -1,6 +1,6 @@
 import "@assets/styles/ReportPage.less";
 
-import { Fragment, useEffect, useMemo, useState } from "react";
+import { Fragment, useEffect, useMemo, useState, ReactNode } from "react";
 
 import { useDataProvider } from "@report/DataProvider";
 import { PlatformsInfo } from "@pipeline/Platforms";
@@ -35,7 +35,7 @@ import {
 import { TopReacted } from "@report/components/cards/TopCards";
 import MessagesActivity from "@report/components/viz/MessagesActivity";
 
-const CardContainer = (props: { children: React.ReactNode }) => <div className="CardContainer">{props.children}</div>;
+const CardContainer = (props: { children: ReactNode }) => <div className="CardContainer">{props.children}</div>;
 
 export interface Section {
     name: string;
@@ -58,7 +58,6 @@ const ReportDashboard = () => {
                 This metric is computed per channel
             </>
         );
-
         const stopwordsTooltip = (
             <>
                 ⚠️ Note that stopwords (words that don't add meaningful information such as "the", "a", etc) are{" "}
@@ -263,7 +262,7 @@ const ReportDashboard = () => {
                               <Card
                                   num={3}
                                   title="Active authors over time by month"
-                                  blockKey="acitve-authors"
+                                  blockKey="active-authors"
                                   children={ActiveAuthorsOverTime}
                                   tooltip="Authors that have sent at least one message in the month"
                               />,

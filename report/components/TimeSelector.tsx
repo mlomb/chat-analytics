@@ -106,9 +106,7 @@ const TimeSelector = (props: { info: BlockInfo<"messages-per-cycle"> }) => {
         };
         scrollbarX.events.on("rangechanged", dateAxisChanged);
 
-        return () => {
-            root.dispose();
-        };
+        return () => root.dispose();
     }, []);
 
     useEffect(() => {

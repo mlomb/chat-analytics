@@ -4,9 +4,7 @@ import { FileInput } from "@pipeline/File";
 import { Parser } from "@pipeline/parse/Parser";
 import { extractChatName, isGroupWelcome, matchAttachmentType, removeBadChars } from "@pipeline/parse/parsers/WhatsApp";
 
-/*
-    There is a convenient parser already out there
-*/
+// There is a convenient parser already out there
 import { parseStringSync } from "whatsapp-chat-parser";
 
 export class WhatsAppParser extends Parser {
@@ -71,7 +69,9 @@ export class WhatsAppParser extends Parser {
             // NOTE: messages in ephemeral mode appear as empty messages
             const messageContent = removeBadChars(message.message);
 
-            if (message.author !== "System") {
+            if (message.author === "System") {
+                // parse system messages?
+            } else {
                 if (isGroupWelcome(messageContent)) {
                     // Skip "Messages and calls are end-to-end encrypted..."
                     continue;
@@ -88,9 +88,7 @@ export class WhatsAppParser extends Parser {
                 // examples:
                 // Ubicación: https://maps.google.com/?q=-XX.XXXXXX,-XX.XXXXXX
                 // location: https://maps.google.com/?q=-XX.XXXXXX,-XX.XXXXXX
-                if (messageContent.includes("https://maps.google.com/?q=")) {
-                    attachment = AttachmentType.Other;
-                }
+                if (messageContent.includes("https://maps.google.com/?q=")) attachment = AttachmentType.Other;
 
                 // TODO: handle "live location shared"
                 // TODO: handle deleted messages?
@@ -104,8 +102,6 @@ export class WhatsAppParser extends Parser {
                     attachments: attachment === undefined ? [] : [attachment],
                     reactions: [],
                 });
-            } else {
-                // parse system messages?
             }
         }
     }

@@ -1,4 +1,3 @@
-import { Index } from "@pipeline/Types";
 import { Day } from "@pipeline/Time";
 import { BlockDescription, BlockFn } from "@pipeline/aggregate/Blocks";
 import { parseAndFilterMessages } from "@pipeline/aggregate/Helpers";
@@ -26,7 +25,7 @@ const fn: BlockFn<ConversationStats> = (database, filters, common) => {
     const { dateKeys } = common.timeKeys;
 
     // first, find the MAX_AUTHORS authors with the most messages
-    let authorsCounts: number[] = new Array(database.authors.length).fill(0);
+    const authorsCounts: number[] = new Array(database.authors.length).fill(0);
     parseAndFilterMessages((msg) => authorsCounts[msg.authorIndex]++, database, filters);
 
     // sort authors by count
@@ -80,9 +79,7 @@ const fn: BlockFn<ConversationStats> = (database, filters, common) => {
                 for (let j = i + 1; j < M; j++) {
                     const a = participants[i];
                     const b = participants[j];
-                    if (a === undefined) {
-                        debugger;
-                    }
+                    if (a === undefined) debugger;
 
                     const k = Math.min(a, b);
                     const l = Math.max(a, b);
@@ -120,7 +117,7 @@ const fn: BlockFn<ConversationStats> = (database, filters, common) => {
     parseAndFilterMessages(processMessage, database, filters, { channels: true, authors: false, time: true });
 
     // generate the nodes
-    let nodes: Node[] = [];
+    const nodes: Node[] = [];
     for (let i = 0; i < N; i++) {
         for (let j = i + 1; j < N; j++) {
             const index = i * N - (i * (i + 1)) / 2 + j; // i <= j

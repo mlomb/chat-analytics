@@ -73,9 +73,7 @@ const SentimentOverTime = ({ data, options }: { data?: SentimentPerCycle; option
         yAxisRef.current = yAxis;
 
         // handle zoom
-        const onZoom = () => {
-            xAxis.zoomToDates(dataProvider.getActiveStartDate(), dataProvider.getActiveEndDate(), 0);
-        };
+        const onZoom = () => xAxis.zoomToDates(dataProvider.getActiveStartDate(), dataProvider.getActiveEndDate(), 0);
         dataProvider.on("trigger-time", onZoom);
         // must wait to datavalidated before zooming
         seriesRef.current.forEach((c) => {

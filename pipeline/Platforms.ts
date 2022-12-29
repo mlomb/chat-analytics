@@ -2,7 +2,6 @@ import { Platform } from "@pipeline/Types";
 
 interface PlatformInformation {
     name: string;
-
     support: {
         stickers: boolean;
         reactions: boolean;

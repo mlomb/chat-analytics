@@ -6,19 +6,17 @@ interface Props {
     placeholder?: string;
 }
 
-const SearchInput = ({ value, placeholder, onChange }: Props) => {
-    return (
-        <div className="SearchInput">
-            <div className="SearchInput__mag"></div>
-            <input
-                className="SearchInput__input"
-                type="text"
-                placeholder={placeholder}
-                value={value}
-                onChange={(e) => onChange(e.target.value)}
-            />
-        </div>
-    );
-};
+const SearchInput = ({ value, placeholder, onChange }: Props) => (
+    <div className="SearchInput">
+        <div className="SearchInput__mag"></div>
+        <input
+            className="SearchInput__input"
+            type="text"
+            placeholder={placeholder}
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+        />
+    </div>
+);
 
 export default SearchInput;

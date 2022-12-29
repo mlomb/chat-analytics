@@ -31,14 +31,14 @@ export function downloadFile(filepath: string, responseType: "text"): Promise<st
 export function downloadFile(filepath: string, responseType: "arraybuffer"): Promise<ArrayBuffer>;
 export function downloadFile(filepath: any, responseType: XMLHttpRequestResponseType): Promise<any> {
     return new Promise((resolve, reject) => {
-        let xhr = new XMLHttpRequest();
+        const xhr = new XMLHttpRequest();
         xhr.responseType = responseType;
         xhr.open("GET", filepath);
-        xhr.onload = function () {
+        xhr.onload = () => {
             if (xhr.status === 200) resolve(xhr.response);
             else reject(xhr.statusText);
         };
-        xhr.onerror = (e) => reject("XHR Error");
+        xhr.onerror = () => reject("XHR Error");
         xhr.onprogress = (e) => progress.progress("bytes", e.loaded || 0, e.total <= 0 ? undefined : e.total);
         xhr.send();
     });
@@ -56,9 +56,7 @@ export const getAttachmentTypeFromFileName = (filename: string): AttachmentType 
         [AttachmentType.Document]: ["doc", "docx", "odt", "pdf", "xls", "xlsx", "ods", "ppt", "pptx", "txt", "html"],
     };
     for (let type: AttachmentType = 0; type <= AttachmentType.Other; type++) {
-        if (mappings[type]?.includes(ext)) {
-            return type;
-        }
+        if (mappings[type]?.includes(ext)) return type;
     }
     // unknown or generic
     return AttachmentType.Other;
@@ -72,19 +70,21 @@ export const getAttachmentTypeFromMimeType = (mimeType: string): AttachmentType 
     if (mimeType.startsWith("video/")) return AttachmentType.Video;
     if (mimeType.startsWith("audio/")) return AttachmentType.Audio;
 
-    const docMimeTypes = [
-        "application/pdf",
-        "application/epub",
-        "application/epub+zip",
-        "text/html",
-        "application/rtf",
-        "application/msword",
-        "application/vnd.oasis.opendocument.spreadsheet",
-        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        "text/plain",
-    ];
-    if (docMimeTypes.includes(mimeType)) return AttachmentType.Document;
+    if (
+        [
+            "application/pdf",
+            "application/epub",
+            "application/epub+zip",
+            "text/html",
+            "application/rtf",
+            "application/msword",
+            "application/vnd.oasis.opendocument.spreadsheet",
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            "text/plain",
+        ].includes(mimeType)
+    )
+        return AttachmentType.Document;
 
     // console.log(`Unknown mime type: ${mimeType}`);
 

@@ -1,4 +1,3 @@
-import { Index } from "@pipeline/Types";
 import { BlockDescription, BlockFn, IndexEntry } from "@pipeline/aggregate/Blocks";
 import { parseAndFilterMessages } from "@pipeline/aggregate/Helpers";
 import { MessageView } from "@pipeline/serialization/MessageView";
