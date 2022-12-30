@@ -1,5 +1,5 @@
 import { StrictMode } from "react";
-import ReactDOM from "react-dom";
+import { createRoot } from "react-dom/client";
 import { plausible } from "@assets/Plausible";
 
 import ReportPage from "@report/ReportPage";
@@ -30,11 +30,10 @@ document.addEventListener("DOMContentLoaded", async () => {
         return;
     }
 
-    ReactDOM.render(
+    createRoot(document.getElementById("app") as HTMLElement).render(
         <StrictMode>
             <ReportPage />
-        </StrictMode>,
-        document.getElementById("app")
+        </StrictMode>
     );
 });
 
