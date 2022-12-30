@@ -30,6 +30,7 @@ export function downloadFile(filepath: string, responseType: "json"): Promise<an
 export function downloadFile(filepath: string, responseType: "text"): Promise<string>;
 export function downloadFile(filepath: string, responseType: "arraybuffer"): Promise<ArrayBuffer>;
 export function downloadFile(filepath: any, responseType: XMLHttpRequestResponseType): Promise<any> {
+    progress.new("Downloading file", filepath.split('/').pop());
     return new Promise((resolve, reject) => {
         let xhr = new XMLHttpRequest();
         xhr.responseType = responseType;

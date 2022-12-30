@@ -84,7 +84,6 @@ export class DatabaseBuilder {
     public async init() {
         // load stopwords
         {
-            progress.new("Downloading file", "stopwords-iso.json");
             interface StopwordsJSON {
                 [lang: string]: string[];
             }
@@ -104,7 +103,6 @@ export class DatabaseBuilder {
 
         // load emoji data
         {
-            progress.new("Downloading file", "emoji-data.json");
             const data = await downloadFile("/data/emoji-data.json", "json");
             this.emojisData = new Emojis(data);
             progress.done();
@@ -112,7 +110,6 @@ export class DatabaseBuilder {
 
         // load sentiment data
         {
-            progress.new("Downloading file", "AFINN.zip");
             const afinnZipBuffer = await downloadFile("/data/AFINN.zip", "arraybuffer");
             progress.done();
 
