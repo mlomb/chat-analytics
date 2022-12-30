@@ -6,7 +6,7 @@ import GitHub from "@assets/images/logos/github.svg";
 
 export default () => {
     return (
-        <div className="Footer">
+        <footer className="Footer">
             <span>
                 <span>Generated with</span>
                 <a href="https://chatanalytics.app?utm_source=report" target="_blank">
@@ -22,6 +22,6 @@ export default () => {
                     <span className="Footer__build">build {env.build.hash}</span>
                 </Tooltip>
             </span>
-        </div>
+        </footer>
     );
 };
