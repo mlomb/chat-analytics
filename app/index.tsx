@@ -1,14 +1,13 @@
 import { StrictMode } from "react";
-import ReactDOM from "react-dom";
+import { createRoot } from "react-dom/client";
 import { plausible } from "@assets/Plausible";
 
 import HomePage from "@app/HomePage";
 
-ReactDOM.render(
+createRoot(document.getElementById("app") as HTMLElement).render(
     <StrictMode>
         <HomePage />
-    </StrictMode>,
-    document.getElementById("app")
+    </StrictMode>
 );
 
 console.log(env);
