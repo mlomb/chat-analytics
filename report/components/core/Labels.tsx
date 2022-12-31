@@ -112,10 +112,6 @@ const _AuthorLabel = ({ index }: LabelProps) => {
 
     const avatar = avatarUrl ? <LazyImage src={avatarUrl} children={placeholder} /> : placeholder;
 
-    console.log(author.n);
-    console.log(avatar);
-    console.log();
-
     return (
         <div className="Label" title={author.n ? author.n : "Deleted User"}>
             <div className="Label__avatar">{avatar}</div>
