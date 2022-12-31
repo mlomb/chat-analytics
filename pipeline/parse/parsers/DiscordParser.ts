@@ -34,8 +34,9 @@ export class DiscordParser extends Parser {
         const timestamp = Date.parse(message.timestamp);
         const timestampEdit = message.timestampEdited ? Date.parse(message.timestampEdited) : undefined;
 
+        const isDeletedUser = message.author.nickname == "Deleted User";
         const author: IAuthor = {
-            n: message.author.nickname,
+            n: isDeletedUser ? undefined : message.author.nickname,
             d: parseInt(message.author.discriminator),
         };
         if (message.author.isBot) author.b = true;
@@ -44,10 +45,13 @@ export class DiscordParser extends Parser {
         // Can be:
         // - https://cdn.discordapp.com/avatars/user_id/user_avatar.png
         // - https://cdn.discordapp.com/embed/avatars/discriminator.png (must not set avatar, length is < 50)
-        if (message.author.avatarUrl && message.author.avatarUrl.length > 50) {
-            const avatar = message.author.avatarUrl.slice(35).split(".")[0];
+        const hasAvatar = message.author.avatarUrl && message.author.avatarUrl.length > 50;
+        if (hasAvatar) {
+            const avatar = message.author.avatarUrl.split(message.author.id+"/")[1].split(".")[0];
             author.da = (" " + avatar).substring(1); // avoid leak
         }
+
+        if (isDeletedUser || hasAvatar) author.di = message.author.id;
 
         // :)
         if (message.type == "Default" || message.type == "Reply") {

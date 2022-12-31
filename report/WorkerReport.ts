@@ -49,7 +49,7 @@ const init = (msg: InitMessage) => {
 
     console.time("Build format cache");
     const formatCache = {
-        authors: database.authors.map((author) => matchFormat(author.n)),
+        authors: database.authors.map((author) => author.n ? matchFormat(author.n) : "Deleted User"),
         channels: database.channels.map((channel) => matchFormat(channel.n)),
         words: database.words.map((word) => matchFormat(word)),
         emojis: database.emojis.map((emoji) => matchFormat(emoji.n)),

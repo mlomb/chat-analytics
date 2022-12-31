@@ -81,14 +81,16 @@ export interface Channel extends IChannel {
 
 // emitted by parsers
 export interface IAuthor {
-    // name
-    n: string;
+    // name (undefined if Discord user deleted)
+    n: undefined | string;
     // bot
     b?: undefined | true;
     // Discord discriminant (#XXXX)
     d?: number;
-    // Discord avatar (user_id/user_avatar)
+    // Discord user avatar
     da?: string;
+    // Discord user ID (only defined if the user is deleted or has an avatar)
+    di?: undefined | RawID
 }
 
 export interface Author extends IAuthor {

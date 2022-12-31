@@ -488,10 +488,14 @@ export class DatabaseBuilder {
         );
         const authorsBotCutoff: number = authorsOrder.findIndex((i) => this.authors.data[i].b);
 
-        // only keep the profile picture of the 1000 most active authors
+        // only keep the user avatar of the 1000 most active authors
         // to save space (picture URLs are very big)
         for (let i = 1000; i < authorsOrder.length; i++) {
             this.authors.data[authorsOrder[i]].da = undefined;
+            // the user ID is needed if the user was deleted, but otherwise that can be removed too
+            if (this.authors.data[authorsOrder[i]].n !== undefined) {
+                this.authors.data[authorsOrder[i]].da = undefined;
+            }
         }
 
         progress.done();
