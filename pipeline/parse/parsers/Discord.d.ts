@@ -32,7 +32,9 @@ interface DiscordMessage {
         messageId: Snowflake;
     };
     attachments: DiscordAttachment[];
-    stickers: DiscordSticker[];
+    // NOTE: we allow stickers to be undefined, because they were not supported until
+    // https://github.com/Tyrrrz/DiscordChatExporter/issues/638 was resolved
+    stickers?: DiscordSticker[];
     reactions: DiscordReaction[];
     mentions: DiscordMention[];
 }

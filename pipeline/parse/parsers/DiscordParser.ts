@@ -61,6 +61,9 @@ export class DiscordParser extends Parser {
                 content = content.split(`@${mention.name}`).join(` @${mention.nickname.replace(/\s/g, "_")} `);
             }
 
+            // stickers may be undefined if the export was before stickers were added to DCE
+            const stickers = message.stickers || [];
+
             this.builder.addMessage({
                 id: message.id,
                 replyTo: message.reference?.messageId,
@@ -69,8 +72,9 @@ export class DiscordParser extends Parser {
                 timestamp,
                 timestampEdit,
                 content: content.length > 0 ? content : undefined,
-                attachments: message.attachments.map((a) => getAttachmentTypeFromFileName(a.fileName))
-                  .concat(message.stickers.map(_ => AttachmentType.Sticker)),
+                attachments: message.attachments
+                    .map((a) => getAttachmentTypeFromFileName(a.fileName))
+                    .concat(stickers.map((_) => AttachmentType.Sticker)),
                 reactions: message.reactions.map((r) => [
                     {
                         n: r.emoji.name || r.emoji.id || "unknown",
