@@ -32,6 +32,9 @@ interface DiscordMessage {
         messageId: Snowflake;
     };
     attachments: DiscordAttachment[];
+    // NOTE: we allow stickers to be undefined, because they were not supported until
+    // https://github.com/Tyrrrz/DiscordChatExporter/issues/638 was resolved
+    stickers?: DiscordSticker[];
     reactions: DiscordReaction[];
     mentions: DiscordMention[];
 }
@@ -44,6 +47,13 @@ interface DiscordAuthor {
     color: string | null;
     isBot: boolean;
     avatarUrl: string;
+}
+
+interface DiscordSticker {
+    id: Snowflake;
+    name: string;
+    format: "Png" | "PngAnimated" | "Lottie";
+    sourceUrl: string;
 }
 
 interface DiscordReaction {
