@@ -30,16 +30,17 @@ export function downloadFile(filepath: string, responseType: "json"): Promise<an
 export function downloadFile(filepath: string, responseType: "text"): Promise<string>;
 export function downloadFile(filepath: string, responseType: "arraybuffer"): Promise<ArrayBuffer>;
 export function downloadFile(filepath: any, responseType: XMLHttpRequestResponseType): Promise<any> {
-    progress.new("Downloading file", filepath.split('/').pop());
+    progress.new("Downloading file", filepath.split("/").pop());
     return new Promise((resolve, reject) => {
         let xhr = new XMLHttpRequest();
         xhr.responseType = responseType;
         xhr.open("GET", filepath);
         xhr.onload = function () {
+            progress.done();
             if (xhr.status === 200) resolve(xhr.response);
             else reject(xhr.statusText);
         };
-        xhr.onerror = (e) => reject("XHR Error");
+        xhr.onerror = (e) => reject("XHR Error, check your internet connection");
         xhr.onprogress = (e) => progress.progress("bytes", e.loaded || 0, e.total <= 0 ? undefined : e.total);
         xhr.send();
     });

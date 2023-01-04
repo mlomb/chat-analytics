@@ -95,7 +95,6 @@ export class DatabaseBuilder {
                     .reduce((acc, val) => acc.concat(val), [])
                     .map((word) => matchFormat(word))
             );
-            progress.done();
         }
 
         // load language detector model
@@ -105,13 +104,11 @@ export class DatabaseBuilder {
         {
             const data = await downloadFile("/data/emoji-data.json", "json");
             this.emojisData = new Emojis(data);
-            progress.done();
         }
 
         // load sentiment data
         {
             const afinnZipBuffer = await downloadFile("/data/AFINN.zip", "arraybuffer");
-            progress.done();
 
             this.sentiment = new Sentiment(afinnZipBuffer, this.emojisData);
         }
