@@ -21,9 +21,7 @@ export const loadFastTextModel = async (modelName: string) => {
     const fastText = new fastTextModule.FastText();
     progress.done();
 
-    progress.new("Downloading model", modelName);
     const model = new Uint8Array(await downloadFile(`/data/${modelName}.ftz`, "arraybuffer"));
-    progress.done();
 
     progress.new("Loading model", modelName);
     const FS = fastTextModule.FS;
