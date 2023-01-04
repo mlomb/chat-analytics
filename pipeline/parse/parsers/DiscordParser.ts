@@ -1,4 +1,4 @@
-import { IAuthor, Index } from "@pipeline/Types";
+import { AttachmentType, IAuthor, Index } from "@pipeline/Types";
 import { Parser } from "@pipeline/parse/Parser";
 
 import { JSONStream } from "@pipeline/parse/JSONStream";
@@ -61,8 +61,8 @@ export class DiscordParser extends Parser {
                 content = content.split(`@${mention.name}`).join(` @${mention.nickname.replace(/\s/g, "_")} `);
             }
 
-            // NOTE: stickers right now are messages with empty content
-            //       see https://github.com/Tyrrrz/DiscordChatExporter/issues/638
+            // stickers may be undefined if the export was before stickers were added to DCE
+            const stickers = message.stickers || [];
 
             this.builder.addMessage({
                 id: message.id,
@@ -72,7 +72,9 @@ export class DiscordParser extends Parser {
                 timestamp,
                 timestampEdit,
                 content: content.length > 0 ? content : undefined,
-                attachments: message.attachments.map((a) => getAttachmentTypeFromFileName(a.fileName)),
+                attachments: message.attachments
+                    .map((a) => getAttachmentTypeFromFileName(a.fileName))
+                    .concat(stickers.map((_) => AttachmentType.Sticker)),
                 reactions: message.reactions.map((r) => [
                     {
                         n: r.emoji.name || r.emoji.id || "unknown",
