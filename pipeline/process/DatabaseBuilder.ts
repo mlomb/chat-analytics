@@ -84,7 +84,6 @@ export class DatabaseBuilder {
     public async init() {
         // load stopwords
         {
-            progress.new("Downloading file", "stopwords-iso.json");
             interface StopwordsJSON {
                 [lang: string]: string[];
             }
@@ -96,7 +95,6 @@ export class DatabaseBuilder {
                     .reduce((acc, val) => acc.concat(val), [])
                     .map((word) => matchFormat(word))
             );
-            progress.done();
         }
 
         // load language detector model
@@ -104,17 +102,13 @@ export class DatabaseBuilder {
 
         // load emoji data
         {
-            progress.new("Downloading file", "emoji-data.json");
             const data = await downloadFile("/data/emoji-data.json", "json");
             this.emojisData = new Emojis(data);
-            progress.done();
         }
 
         // load sentiment data
         {
-            progress.new("Downloading file", "AFINN.zip");
             const afinnZipBuffer = await downloadFile("/data/AFINN.zip", "arraybuffer");
-            progress.done();
 
             this.sentiment = new Sentiment(afinnZipBuffer, this.emojisData);
         }
