@@ -53,6 +53,7 @@ interface DiscordSticker {
     id: Snowflake;
     name: string;
     format: "Png" | "PngAnimated" | "Lottie";
+    sourceUrl: string;
 }
 
 interface DiscordReaction {
