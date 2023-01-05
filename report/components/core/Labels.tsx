@@ -59,7 +59,7 @@ const _AuthorLabel = ({ index }: LabelProps) => {
         );
         if (author.da) {
             // https://cdn.discordapp.com/avatars/user_id/user_avatar.png
-            avatarUrl = `https://cdn.discordapp.com/avatars/${author.di}/${author.da}.png?size=32`;
+            avatarUrl = `https://cdn.discordapp.com/avatars/${author.da}.png?size=32`;
         }
     } else if (platform === "whatsapp") {
         placeholder = (
@@ -84,9 +84,6 @@ const _AuthorLabel = ({ index }: LabelProps) => {
     } else if (platform === "telegram") {
         // TODO: two letters
         let letter: string = "";
-        if (author.n === undefined) {
-            throw new Error("Telegram author name undefined (only Discord name's can be undefined)");
-        }
         // iterate UTF-8 codepoints
         for (const symbol of author.n) {
             letter = symbol;
@@ -111,17 +108,15 @@ const _AuthorLabel = ({ index }: LabelProps) => {
     }
 
     const avatar = avatarUrl ? <LazyImage src={avatarUrl} children={placeholder} /> : placeholder;
+    const isDeletedUser = author.n.startsWith("Deleted User");
 
     return (
-        <div className="Label" title={author.n ? author.n : "Deleted User"}>
+        <div className="Label" title={author.n}>
             <div className="Label__avatar">{avatar}</div>
             <span className="Label__name">
-                {author.n ? author.n : "Deleted User"}
-                {author.d !== undefined && (
+                {author.n}
+                {author.d !== undefined && !isDeletedUser && (
                     <span className="Label__discriminator">#{`${demo ? 0 : author.d}`.padStart(4, "0")}</span>
-                )}
-                {author.n === undefined && (
-                    <span className="Label__userid">(ID: {author.di})</span>
                 )}
             </span>
         </div>

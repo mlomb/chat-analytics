@@ -492,10 +492,6 @@ export class DatabaseBuilder {
         // to save space (picture URLs are very big)
         for (let i = 1000; i < authorsOrder.length; i++) {
             this.authors.data[authorsOrder[i]].da = undefined;
-            // the user ID is needed if the user was deleted, but otherwise that can be removed too
-            if (this.authors.data[authorsOrder[i]].n !== undefined) {
-                this.authors.data[authorsOrder[i]].da = undefined;
-            }
         }
 
         progress.done();

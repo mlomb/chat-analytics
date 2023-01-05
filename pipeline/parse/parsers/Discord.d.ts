@@ -40,7 +40,7 @@ interface DiscordAuthor {
     id: Snowflake;
     name: string;
     discriminator: string;
-    nickname: string;
+    nickname: "Deleted User" | string;
     color: string | null;
     isBot: boolean;
     avatarUrl: string;
