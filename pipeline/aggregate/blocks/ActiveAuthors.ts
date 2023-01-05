@@ -20,9 +20,8 @@ const fn: BlockFn<ActiveAuthors> = (database, filters, common) => {
     const authorsPresentInMonth: Set<Index>[] = [];
     for (const _ of monthKeys) authorsPresentInMonth.push(new Set());
 
-    const processMessage = (msg: MessageView) => {
+    const processMessage = (msg: MessageView) =>
         authorsPresentInMonth[dateToMonthIndex[msg.dayIndex]].add(msg.authorIndex);
-    };
 
     parseAndFilterMessages(processMessage, database, filters, { channels: true, authors: true, time: false });
 
@@ -41,7 +40,7 @@ const fn: BlockFn<ActiveAuthors> = (database, filters, common) => {
 };
 
 export default {
-    key: "acitve-authors",
+    key: "active-authors",
     triggers: ["authors", "channels"],
     fn,
-} as BlockDescription<"acitve-authors", ActiveAuthors>;
+} as BlockDescription<"active-authors", ActiveAuthors>;

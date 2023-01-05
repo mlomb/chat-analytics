@@ -91,7 +91,7 @@ describe("writing", () => {
     ];
 
     test.each(cases)("%p offset=%p bits=%p", async (_, offset, bits, input, initial, expected) => {
-        let s = new BitStream(new ArrayBuffer(1024));
+        const s = new BitStream(new ArrayBuffer(1024));
         s.buffer[0] = initial[0];
         s.buffer[1] = initial[1];
         s.offset = offset;
@@ -171,7 +171,7 @@ describe("reading", () => {
     ];
 
     test.each(cases)("%p offset=%p bits=%p", async (_, offset, bits, expected, a, b) => {
-        let s = new BitStream(new ArrayBuffer(4 * 2));
+        const s = new BitStream(new ArrayBuffer(4 * 2));
         s.offset = offset;
         s.buffer[0] = a;
         s.buffer[1] = b;
@@ -180,7 +180,7 @@ describe("reading", () => {
     });
 
     test.each(cases)("%p (negated) offset=%p bits=%p", async (_, offset, bits, expected, a, b) => {
-        let s = new BitStream(new ArrayBuffer(4 * 2));
+        const s = new BitStream(new ArrayBuffer(4 * 2));
         s.offset = offset;
         s.buffer[0] = ~a;
         s.buffer[1] = ~b;
@@ -192,8 +192,8 @@ describe("reading", () => {
 });
 
 test("read then write", () => {
-    let s = new BitStream();
-    let bits = [],
+    const s = new BitStream();
+    const bits = [],
         values = [];
     for (let k = 0; k < 100; k++) {
         for (let i = 1; i <= 32; i++) {
@@ -216,8 +216,8 @@ describe("varint", () => {
     test.each(cases)("%p", async (value) => {
         let s = new BitStream();
         s.offset = 0;
-        s.writeVarint(value);
+        s.writeVarInt(value);
         s.offset = 0;
-        expect(s.readVarint()).toBe(value);
+        expect(s.readVarInt()).toBe(value);
     });
 });

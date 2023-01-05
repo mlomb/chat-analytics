@@ -48,7 +48,7 @@ class Progress extends EventEmitter {
 
     // adds a new task to the stack
     new(title: string, subject?: string) {
-        console.assert(this.errored === false, "Can't continue after an error");
+        console.assert(!this.errored, "Can't continue after an error");
         const task: TaskInfo = {
             status: "processing",
             title,
@@ -91,7 +91,7 @@ class Progress extends EventEmitter {
     // marks the last task as finished and removes it from the stack
     done() {
         if (!this.active) {
-            console.assert(false, "No active task");
+            console.assert(this.active, "No active task");
             return;
         }
         this.active.status = "success";
@@ -128,7 +128,7 @@ class Progress extends EventEmitter {
         let ts: number = 0;
 
         // throttle
-        if (emit === false && this.active && this.active.progress) {
+        if (!emit && this.active && this.active.progress) {
             // try by %
             if (this.active.progress.total !== undefined) {
                 const onePercent = this.active.progress.total * 0.01;
@@ -137,7 +137,7 @@ class Progress extends EventEmitter {
 
             // try by time
             // (check time every 100 items)
-            if (emit === false /* && this.active.progress.actual - this.lastCount > 100*/) {
+            if (!emit /* && this.active.progress.actual - this.lastCount > 100*/) {
                 ts = Date.now();
                 emit = ts - this.lastTs > 15;
             }
@@ -155,6 +155,6 @@ class Progress extends EventEmitter {
     }
 }
 
-// Global progress object
-// Can be used anywhere but be careful
+// global progress object
+// can be used anywhere but be careful
 export const progress = new Progress();

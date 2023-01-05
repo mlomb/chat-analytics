@@ -32,15 +32,15 @@ export function downloadFile(filepath: string, responseType: "arraybuffer"): Pro
 export function downloadFile(filepath: any, responseType: XMLHttpRequestResponseType): Promise<any> {
     progress.new("Downloading file", filepath.split("/").pop());
     return new Promise((resolve, reject) => {
-        let xhr = new XMLHttpRequest();
+        const xhr = new XMLHttpRequest();
         xhr.responseType = responseType;
         xhr.open("GET", filepath);
-        xhr.onload = function () {
+        xhr.onload = () => {
             progress.done();
             if (xhr.status === 200) resolve(xhr.response);
             else reject(xhr.statusText);
         };
-        xhr.onerror = (e) => reject("XHR Error, check your internet connection");
+        xhr.onerror = () => reject("XHR Error, check your internet connection");
         xhr.onprogress = (e) => progress.progress("bytes", e.loaded || 0, e.total <= 0 ? undefined : e.total);
         xhr.send();
     });
@@ -58,9 +58,7 @@ export const getAttachmentTypeFromFileName = (filename: string): AttachmentType 
         [AttachmentType.Document]: ["doc", "docx", "odt", "pdf", "xls", "xlsx", "ods", "ppt", "pptx", "txt", "html"],
     };
     for (let type: AttachmentType = 0; type <= AttachmentType.Other; type++) {
-        if (mappings[type]?.includes(ext)) {
-            return type;
-        }
+        if (mappings[type]?.includes(ext)) return type;
     }
     // unknown or generic
     return AttachmentType.Other;

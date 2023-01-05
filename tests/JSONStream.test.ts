@@ -56,7 +56,7 @@ describe("full object", () => {
 it("emit correct array objects", async () => {
     const stream = new JSONStream();
 
-    let nums: number[] = [],
+    const nums: number[] = [],
         objs: { a: number }[] = [];
 
     stream.onArrayItem<number>("arrVals", (got) => void nums.push(got));
@@ -78,39 +78,29 @@ it("emit correct array objects", async () => {
     expect(objs).toEqual([{ a: 1 }, { b: 2 }, { c: 3 }]);
 });
 
-describe("escaping", () => {
+describe("escaping", () =>
     test.each([`\\\\`, `\\n`, `\\"`, `\\u00f8`])("escape with %p", async (esc) => {
         new JSONStream().push(`{ "a${esc}b": "c" }`);
         new JSONStream().push(`{ "a": "b${esc}c" }`);
         new JSONStream().push(`{ "a": { "c": "d${esc}e" } }`);
-    });
-});
+    }));
 
-it("string with brackets", async () => {
-    new JSONStream().push(`{ "a": "c{}{[][}{[!}{}[<}{]\\n][]]]}[>[][" }`);
-});
+it("string with brackets", () => void new JSONStream().push(`{ "a": "c{}{[][}{[!}{}[<}{]\\n][]]]}[>[][" }`));
 
-it("string with unicode characters", async () => {
-    new JSONStream().push(`{ "a": "◄💩💩💩💩►", "b": "◄💩💩💩💩►", "c": "normal☰☰☰" }`);
-});
+it("string with unicode characters", () =>
+    void new JSONStream().push(`{ "a": "◄💩💩💩💩►", "b": "◄💩💩💩💩►", "c": "normal☰☰☰" }`));
 
 async function expectCrash(input: string) {
     const stream = new JSONStream();
-    try {
-        stream.push(input);
-        // should have crashed
-        expect(true).toBe(false);
-    } catch (_) {
-        // expected
-    }
+    expect(() => stream.push(input)).toThrow();
 }
 
-it("crash on invalid input", async () => expectCrash(`{ "a": "b", { "a": 1 }, }`));
-it("crash when the input is an array", async () => expectCrash(`[1, 2, 3]`));
-it("crash when the input is a number", async () => expectCrash(`5`));
-it("crash when the input is null", async () => expectCrash(`null`));
-it("crash when the input is a boolean", async () => expectCrash(`true`));
-it("crash when the input is a string", async () => expectCrash(`"foo"`));
+it("crash on invalid input", () => expectCrash(`{ "a": "b", { "a": 1 }, }`));
+it("crash when the input is an array", () => expectCrash(`[1, 2, 3]`));
+it("crash when the input is a number", () => expectCrash(`5`));
+it("crash when the input is null", () => expectCrash(`null`));
+it("crash when the input is a boolean", () => expectCrash(`true`));
+it("crash when the input is a string", () => expectCrash(`"foo"`));
 
 it("crash when using onArray on something other than an array", async () => {
     const stream = new JSONStream();

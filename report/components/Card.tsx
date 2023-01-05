@@ -1,6 +1,6 @@
 import "@assets/styles/Card.less";
 
-import { useState } from "react";
+import { useState, ReactElement } from "react";
 import { BlockDataType, BlockInfo, BlockKey } from "@pipeline/aggregate/Blocks";
 import Block from "@report/components/Block";
 import ErrorBoundary from "@report/components/ErrorBoundary";
@@ -14,7 +14,7 @@ interface Props<K extends BlockKey> {
     title: Title;
     blockKey: K;
     children: (props: { data?: BlockDataType<K>; options: number[] }) => JSX.Element;
-    tooltip?: React.ReactElement | string;
+    tooltip?: ReactElement | string;
 }
 
 const Card = <K extends BlockKey>(props: Props<K>) => {
@@ -34,7 +34,7 @@ const Card = <K extends BlockKey>(props: Props<K>) => {
                 elements.push(<span key={entry}>{entry}</span>);
             } else {
                 // select with options
-                let localOptionIndex = optionIndex;
+                const localOptionIndex = optionIndex;
                 elements.push(
                     // use first option as key
                     <select
@@ -73,7 +73,7 @@ const Card = <K extends BlockKey>(props: Props<K>) => {
                         }
                     ></div>
                     {info.state === "error" && (
-                        <div className="Card__error">Error ocurred, please check the console for more details</div>
+                        <div className="Card__error">Error occurred, please check the console for more details</div>
                     )}
                     <div className={"Card__title Card__title--" + info.state}>
                         {elements}
@@ -84,7 +84,7 @@ const Card = <K extends BlockKey>(props: Props<K>) => {
                             />
                         ) : null}
                     </div>
-                    <div className={info.state !== "ready" ? "Card__gray" : ""}>
+                    <div className={info.state === "ready" ? "" : "Card__gray"}>
                         <props.children data={info.data || undefined} options={options} />
                     </div>
                 </ErrorBoundary>

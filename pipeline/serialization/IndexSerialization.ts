@@ -30,7 +30,7 @@ import { BitStream } from "@pipeline/serialization/BitStream";
 //   - 39.205400% of sum of counts are below 3
 //   - 30.442545% of sum of counts are exactly 1
 //
-// So, whith this data in mind, we can choose between four strategies:
+// So, with this data in mind, we can choose between four strategies:
 //   - (0b00) Single Index (only if total === 1): [Index]
 //   - (0b01) Double Index (only if total === 2): [Index, Index]
 //   - (0b10) Serial: [Sum of counts, Index, Index, Index, Index]

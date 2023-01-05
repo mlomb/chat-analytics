@@ -21,14 +21,12 @@ export const TopMessages = (props: TopMessagesProps) => {
     );
 };
 
-const TopMessage = ({ msg, i, title }: { msg: FullMessage; i: number; title: TitleFn }) => {
-    return (
-        <div className="TopMessage">
-            <div>
-                <span className="TopMessage__pos">#{i + 1}</span>
-                {title(msg)}
-            </div>
-            <MessageLabel message={msg} />
+const TopMessage = ({ msg, i, title }: { msg: FullMessage; i: number; title: TitleFn }) => (
+    <div className="TopMessage">
+        <div>
+            <span className="TopMessage__pos">#{i + 1}</span>
+            {title(msg)}
         </div>
-    );
-};
+        <MessageLabel message={msg} />
+    </div>
+);

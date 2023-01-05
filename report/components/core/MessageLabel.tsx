@@ -24,11 +24,8 @@ const order = ["attachment", "link", "mention", "word", "emoji"];
 const sortFn = (a: ChipProps, b: ChipProps) => {
     if (a.type === b.type) {
         // if type is the same, sort by count, then alphabetically
-        if (a.count !== b.count) {
-            return b.count - a.count;
-        } else {
-            return a.text && b.text ? a.text.localeCompare(b.text) : a.text ? 1 : -1;
-        }
+        if (a.count !== b.count) return b.count - a.count;
+        return a.text && b.text ? a.text.localeCompare(b.text) : a.text ? 1 : -1;
     } else {
         // if type is different, sort by order
         return order.indexOf(a.type) - order.indexOf(b.type);
@@ -53,7 +50,7 @@ export const MessageLabel = (props: { message?: FullMessage }) => {
             msg.words?.map((x) => ({ type: "word", index: x[0], count: x[1], text: dp.database.words[x[0]] })) || [],
             msg.emojis?.map((x) => ({ type: "emoji", index: x[0], count: x[1] })) || [],
             // prettier-ignore
-            msg.mentions?.map((x) => ({ type: "mention", index: x[0], count: x[1], text: dp.database.mentions[x[0]] })) || [],
+            msg.mentions?.map(x => ({ type: "mention", index: x[0], count: x[1], text: dp.database.mentions[x[0]] })) || [],
             msg.domains?.map((x) => ({ type: "link", index: x[0], count: x[1], text: dp.database.domains[x[0]] })) || []
         )
         .sort(sortFn);

@@ -1,5 +1,4 @@
-import { Index } from "@pipeline/Types";
-import { BlockDescription, BlockFn, IndexEntry } from "@pipeline/aggregate/Blocks";
+import { BlockDescription, BlockFn } from "@pipeline/aggregate/Blocks";
 import { parseAndFilterMessages } from "@pipeline/aggregate/Helpers";
 import { MessageView } from "@pipeline/serialization/MessageView";
 import { Day, formatTime } from "@pipeline/Time";
@@ -119,9 +118,7 @@ const fn: BlockFn<MessagesStats> = (database, filters, common) => {
             prevMessage = i;
 
             // [longestActiveConversation]
-            if (startMessage === -1) {
-                startMessage = i;
-            }
+            if (startMessage === -1) startMessage = i;
             const diff = (i - startMessage + 1) * 5;
             if (diff > longestActiveConversation.minutes) {
                 longestActiveConversation.minutes = diff;
@@ -172,10 +169,10 @@ const fn: BlockFn<MessagesStats> = (database, filters, common) => {
         activity,
         // prettier-ignore
         mostActive: {
-            hour: findMostActive(hourlyCounts, (i) => formatTime("ymdh", Day.fromKey(dateKeys[Math.floor(i / 24)]), (i % 24) * 3600)),
-            day: findMostActive(dailyCounts, (i) => formatTime("ymd", Day.fromKey(dateKeys[i]))),
-            month: findMostActive(monthlyCounts, (i) => formatTime("ym", Day.fromKey(monthKeys[i]))),
-            year: findMostActive(yearlyCounts, (i) => formatTime("y", Day.fromKey(yearKeys[i]))),
+            hour: findMostActive(hourlyCounts, i => formatTime("ymdh", Day.fromKey(dateKeys[Math.floor(i / 24)]), (i % 24) * 3600)),
+            day: findMostActive(dailyCounts, i => formatTime("ymd", Day.fromKey(dateKeys[i]))),
+            month: findMostActive(monthlyCounts, i => formatTime("ym", Day.fromKey(monthKeys[i]))),
+            year: findMostActive(yearlyCounts, i => formatTime("y", Day.fromKey(yearKeys[i]))),
         },
     };
 };

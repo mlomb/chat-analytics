@@ -53,34 +53,36 @@ const SentimentPieChart = (props: Props) => {
         };
     }, []);
 
-    useLayoutEffect(() => {
-        seriesRef.current?.data.setAll([
-            {
-                tag: "Positive",
-                count: props.p,
-                sliceSettings: {
-                    fill: seriesRef.current?.root.interfaceColors.get("positive")!,
-                    stroke: null,
+    useLayoutEffect(
+        () =>
+            seriesRef.current?.data.setAll([
+                {
+                    tag: "Positive",
+                    count: props.p,
+                    sliceSettings: {
+                        fill: seriesRef.current?.root.interfaceColors.get("positive")!,
+                        stroke: null,
+                    },
                 },
-            },
-            {
-                tag: "Negative",
-                count: props.n,
-                sliceSettings: {
-                    fill: seriesRef.current?.root.interfaceColors.get("negative")!,
-                    stroke: null,
+                {
+                    tag: "Negative",
+                    count: props.n,
+                    sliceSettings: {
+                        fill: seriesRef.current?.root.interfaceColors.get("negative")!,
+                        stroke: null,
+                    },
                 },
-            },
-            {
-                tag: "Neutral",
-                count: props.z,
-                sliceSettings: {
-                    fill: Color.fromString("#00bcd4"),
-                    stroke: null,
+                {
+                    tag: "Neutral",
+                    count: props.z,
+                    sliceSettings: {
+                        fill: Color.fromString("#00bcd4"),
+                        stroke: null,
+                    },
                 },
-            },
-        ]);
-    }, [props.n, props.p, props.z]);
+            ]),
+        [props.n, props.p, props.z]
+    );
 
     return (
         <div

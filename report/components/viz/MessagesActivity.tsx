@@ -156,7 +156,7 @@ function createHeatmap(root: Root, container: Container, xField: string, yField:
         height: new Percent(100),
     });
 
-    series.columns.template.events.on("pointerover", function (event) {
+    series.columns.template.events.on("pointerover", (event) => {
         const di = event.target.dataItem;
         if (di) {
             // @ts-ignore
@@ -164,7 +164,7 @@ function createHeatmap(root: Root, container: Container, xField: string, yField:
         }
     });
 
-    series.events.on("datavalidated", function () {
+    series.events.on("datavalidated", () => {
         heatLegend.set("startValue", series.getPrivate("valueHigh"));
         heatLegend.set("endValue", series.getPrivate("valueLow"));
     });
@@ -219,7 +219,7 @@ const MessageActivity = ({ data, options }: { data?: MessagesStats; options: num
         const root = Root.new(chartDiv.current!);
         root.setThemes(Themes(root, false));
 
-        let container = root.container.children.push(
+        const container = root.container.children.push(
             Container.new(root, {
                 width: p100,
                 height: p100,

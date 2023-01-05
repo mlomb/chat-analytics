@@ -1,6 +1,6 @@
 import { gzipSync, gunzipSync } from "fflate";
-import { base91decode, base91encode } from "@pipeline/compression/Base91";
 
+import { base91decode, base91encode } from "@pipeline/compression/Base91";
 import { Database } from "@pipeline/Types";
 
 /*

@@ -1,6 +1,6 @@
 import { useLayoutEffect, useRef } from "react";
 
-import { Root, ColorSet } from "@amcharts/amcharts5";
+import { ColorSet, Root } from "@amcharts/amcharts5";
 import { WordCloud as am5WordCloud } from "@amcharts/amcharts5/wc";
 
 import { Themes } from "./AmCharts5";
@@ -20,7 +20,7 @@ const WordCloud = (props: Props) => {
         const root = Root.new(chartDiv.current!);
         root.setThemes(Themes(root, false));
 
-        const series = root.container.children.push(
+        seriesRef.current = root.container.children.push(
             am5WordCloud.new(root, {
                 minFontSize: 10,
                 maxFontSize: 80,
@@ -36,7 +36,6 @@ const WordCloud = (props: Props) => {
                 marginTop: 0,
             })
         );
-        seriesRef.current = series;
 
         return () => {
             seriesRef.current = null;

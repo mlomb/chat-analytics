@@ -145,7 +145,7 @@ export const MostProducerEmojis = ({ data, options }: { data?: EmojiStats; optio
         colorHue={options[0] === 0 ? 240 : 266}
     />
 );
-// at this point in the project, I just can't came up with new names
+// at this point in the project, I just can't come up with new names
 export const MostGetterEmojis = ({ data, options }: { data?: EmojiStats; options: number[] }) => (
     <MostUsed
         what={options[0] === 0 ? "Author" : "Channel"}

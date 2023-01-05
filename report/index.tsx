@@ -26,7 +26,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         initDataProvider(dataStr);
     } catch (err) {
         // set basic error message
-        document.querySelector(".basic")!.textContent = "Error ocurred: " + (err as Error).message;
+        document.querySelector(".basic")!.textContent = "Error occurred: " + (err as Error).message;
         return;
     }
 

@@ -66,11 +66,9 @@ export class Sentiment {
         for (let i = 0, len = tokens.length; i < len; i++) {
             const token = tokens[i];
 
-            // non words reset the negator
+            // non-words reset the negator
             // also if we are too far
-            if (token.tag !== "word" || nearNegatorDist > 5) {
-                nearNegator = false;
-            }
+            if (token.tag !== "word" || nearNegatorDist > 5) nearNegator = false;
             nearNegatorDist++;
 
             if (token.tag === "emoji") {
@@ -79,19 +77,20 @@ export class Sentiment {
             }
 
             // only handle words
-            if (token.tag !== "word") continue;
-            const slice = tokens.slice(i);
+            if (token.tag == "word") {
+                const slice = tokens.slice(i);
 
-            const negatorMatch = langDb.negators.match(slice);
-            if (negatorMatch) {
-                nearNegator = true;
-                nearNegatorDist = 0;
-                continue;
-            }
+                const negatorMatch = langDb.negators.match(slice);
+                if (negatorMatch) {
+                    nearNegator = true;
+                    nearNegatorDist = 0;
+                    continue;
+                }
 
-            const afinnMatch = langDb.afinn.match(slice);
-            if (afinnMatch) {
-                score += afinnMatch.value * (nearNegator ? -1 : 1);
+                const afinnMatch = langDb.afinn.match(slice);
+                if (afinnMatch) {
+                    score += afinnMatch.value * (nearNegator ? -1 : 1);
+                }
             }
         }
 
