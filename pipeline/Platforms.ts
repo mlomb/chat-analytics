@@ -15,7 +15,7 @@ export const PlatformsInfo: {
     discord: {
         name: "Discord",
         support: {
-            stickers: false,
+            stickers: true,
             reactions: true,
             replies: true,
         },
