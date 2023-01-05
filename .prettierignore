@@ -1,10 +1,10 @@
 .github/*
 .vscode/*
-dist/*
-node_modules/*
-*.md
 *.html
-assets/fasttext/*
+*.json
+*.md
 assets/data/*
 assets/demo/*
-stats.json
+assets/fasttext/*
+dist/*
+node_modules/*
