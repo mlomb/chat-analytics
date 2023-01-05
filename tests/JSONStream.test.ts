@@ -92,13 +92,7 @@ it("string with unicode characters", () =>
 
 async function expectCrash(input: string) {
     const stream = new JSONStream();
-    try {
-        stream.push(input);
-        // should have crashed
-        expect(true).toBe(false);
-    } catch (_) {
-        // expected
-    }
+    expect(() => stream.push(input)).toThrow();
 }
 
 it("crash on invalid input", () => expectCrash(`{ "a": "b", { "a": 1 }, }`));
