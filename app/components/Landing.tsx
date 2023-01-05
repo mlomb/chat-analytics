@@ -14,18 +14,17 @@ interface Props {
 const Landing = ({ onStart }: Props) => {
     return (
         <div className="Landing">
-            <div className="Landing__title">Generate insightful chat analysis reports</div>
+            <h1 className="Landing__title">Generate insightful chat analysis reports</h1>
             <div className="Landing__desc">
                 <div className="Landing__sameline">
-                    <span className="Landing__browser">Everything is processed in your browser.</span>
+                    <p className="Landing__browser">Everything is processed in your browser.</p>
                     <span className="Landing__secure">
                         <img src={Lock} alt="Lock" />
-                        No data leaves your device.
+                        <p>No data leaves your device.</p>
                     </span>
                 </div>
                 <br />
-                Free and <span>open source</span>.
-                <br />
+                <p>Free and open source.</p>
                 <br />
                 <div className="Landing__platforms-line">
                     <span>Supports</span>
