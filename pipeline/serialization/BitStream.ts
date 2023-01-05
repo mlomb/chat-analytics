@@ -60,10 +60,10 @@ export class BitStream {
         const aligned32 = offset >>> 5;
         const delta = offset - (aligned32 << 5);
 
-        // TODO: try to do it branchless
+        // TODO: try to do it branch-less
         if (delta + bits > 32) {
             const corr = bits - (32 - delta);
-            buffer[aligned32] = (buffer[aligned32] & (~(mask >>> corr) >>> 0)) | (valueMasked >>> corr);
+            buffer[aligned32] = (buffer[aligned32] & ~(mask >>> corr)) | (valueMasked >>> corr);
             buffer[aligned32 + 1] = (buffer[aligned32 + 1] & ~(mask << (32 - corr))) | (valueMasked << (32 - corr));
         } else {
             const corr = 32 - delta - bits;
@@ -81,7 +81,7 @@ export class BitStream {
         const value1 = buffer[aligned32];
         const value2 = buffer[aligned32 + 1];
 
-        // TODO: try to do it branchless
+        // TODO: try to do it branch-less
         let value = 0;
         if (delta + bits > 32) {
             const aligned = (value1 << delta) | (value2 >>> (32 - delta));
@@ -93,7 +93,7 @@ export class BitStream {
     }
 
     // variable byte encode
-    writeVarint(value: number, maxBits: number = 32): void {
+    writeVarInt(value: number, maxBits: number = 32): void {
         if (maxBits < 10) {
             this.setBits(maxBits, value);
             return;
@@ -107,7 +107,7 @@ export class BitStream {
     }
 
     // variable byte decode
-    readVarint(maxBits: number = 32): number {
+    readVarInt(maxBits: number = 32): number {
         if (maxBits < 10) return this.getBits(maxBits);
 
         let value = 0;

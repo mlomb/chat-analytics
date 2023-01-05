@@ -1,6 +1,5 @@
 import { AttachmentType, IAuthor, Index } from "@pipeline/Types";
 import { Parser } from "@pipeline/parse/Parser";
-
 import { JSONStream } from "@pipeline/parse/JSONStream";
 import { FileInput, getAttachmentTypeFromFileName, streamJSONFromFile } from "@pipeline/File";
 
@@ -8,7 +7,7 @@ export class DiscordParser extends Parser {
     private channelIndex?: Index;
 
     sortFiles(files: FileInput[]): FileInput[] {
-        // we always keep the most recent information last (since the export is overwritting)
+        // we always keep the most recent information last (since the export is overwriting)
         return files.sort((a, b) => (a.lastModified || 0) - (b.lastModified || 0));
     }
 
@@ -85,11 +84,6 @@ export class DiscordParser extends Parser {
                     r.count,
                 ]),
             });
-        } else if (message.type == "ChannelPinnedMessage") {
-        } else if (message.type == "GuildMemberJoin") {
-        } else {
-            // "8", "9", "20" ?
-            // console.warn("Unhandled message type", message.type, message);
         }
     }
 }

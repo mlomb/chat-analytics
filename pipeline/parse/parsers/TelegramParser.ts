@@ -1,6 +1,5 @@
 import { AttachmentType, Index, RawID } from "@pipeline/Types";
 import { Parser } from "@pipeline/parse/Parser";
-
 import { JSONStream } from "@pipeline/parse/JSONStream";
 import { FileInput, getAttachmentTypeFromMimeType, streamJSONFromFile } from "@pipeline/File";
 
@@ -83,39 +82,33 @@ export class TelegramParser extends Parser {
     }
 
     private parseTextArray(input: string | TextArray | TextArray[]): string {
-        if (typeof input === "string") {
-            return input;
-        } else if (Array.isArray(input)) {
-            return input.map(this.parseTextArray.bind(this)).join("");
-        } else {
-            switch (input.type) {
-                case "bot_command":
-                    // remove slash and split potential @
-                    // examples:
-                    // /command → command
-                    // /command@bot → command @bot
-                    return input.text.replace("/", "").replace("@", " @");
+        if (typeof input === "string") return input;
+        if (Array.isArray(input)) return input.map(this.parseTextArray.bind(this)).join("");
+        switch (input.type) {
+            // remove slash and split potential @
+            // examples:
+            // /command → command
+            // /command@bot → command @bot
+            case "bot_command":
+                return input.text.replace("/", "").replace("@", " @");
 
-                case "hashtag":
-                    // remove #
-                    return input.text.replace("#", "");
+            // remove #
+            case "hashtag":
+                return input.text.replace("#", "");
 
-                case "link":
-                case "mention":
-                    // add redundant spaces to the sides to make sure it will be tokenized correctly
-                    return ` ${input.text} `;
+            // add redundant spaces to the sides to make sure it will be tokenized correctly
+            case "link":
+            case "mention":
+            case "text_link":
+                return ` ${input.text} `;
 
-                case "text_link":
-                    return ` ${input.text} `;
+            // emails are removed
+            case "email":
+                return "";
 
-                case "email":
-                    // emails are removed
-                    return "";
-
-                default:
-                    // by default just return the text
-                    return input.text;
-            }
+            // by default just return the text
+            default:
+                return input.text;
         }
     }
 }

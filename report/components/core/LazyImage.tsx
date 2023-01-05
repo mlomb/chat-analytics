@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { ReactNode, useState } from "react";
 
 interface Props {
     src: string;
-    children: React.ReactNode; // placeholder
+    children: ReactNode; // placeholder
 }
 
 // NOTE: store loading status to avoid flickering in some conditions

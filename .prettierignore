@@ -1,6 +1,10 @@
-*.html
-*.json
-*.yml
-*.md
-assets/fasttext/*
+.github/*
+.vscode/*
 dist/*
+node_modules/*
+*.md
+*.html
+assets/fasttext/*
+assets/data/*
+assets/demo/*
+stats.json

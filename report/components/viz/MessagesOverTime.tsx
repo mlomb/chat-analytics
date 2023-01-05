@@ -1,14 +1,14 @@
 import { useLayoutEffect, useRef } from "react";
 
-import { Root, Color, Label, p50, Tooltip } from "@amcharts/amcharts5";
+import { Color, Label, p50, Root, Tooltip } from "@amcharts/amcharts5";
 import {
-    XYChart,
-    DateAxis,
-    ValueAxis,
     AxisRendererX,
     AxisRendererY,
-    StepLineSeries,
     ColumnSeries,
+    DateAxis,
+    StepLineSeries,
+    ValueAxis,
+    XYChart,
     XYCursor,
     XYSeries,
 } from "@amcharts/amcharts5/xy";
@@ -90,7 +90,7 @@ const MessagesGraph = ({ data, options }: { data?: MessagesPerCycle; options: nu
 
             seriesRef.current = stepSeries;
         } else {
-            const columnSeries = chart.series.push(
+            seriesRef.current = chart.series.push(
                 ColumnSeries.new(root, {
                     valueXField: "d",
                     valueYField: "m",
@@ -100,13 +100,9 @@ const MessagesGraph = ({ data, options }: { data?: MessagesPerCycle; options: nu
                     tooltip: Tooltip.new(root, { labelText: "{valueY}" }),
                 })
             );
-
-            seriesRef.current = columnSeries;
         }
 
-        const onZoom = () => {
-            xAxis.zoomToDates(dataProvider.getActiveStartDate(), dataProvider.getActiveEndDate(), 0);
-        };
+        const onZoom = () => xAxis.zoomToDates(dataProvider.getActiveStartDate(), dataProvider.getActiveEndDate(), 0);
         dataProvider.on("trigger-time", onZoom);
         // must wait to datavalidated before zooming
         seriesRef.current!.events.once("datavalidated", onZoom);

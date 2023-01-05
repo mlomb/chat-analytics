@@ -5,9 +5,9 @@
     If you want to see the react-select version:
     https://github.com/mlomb/chat-analytics/blob/52648937d860412270290d45d3d3cdc93d065536/report/components/FilterSelect.tsx
 
-    Doing this, we lost a lot of accesibility :'(  (I don't know how to do it properly)
+    Doing this, we lost a lot of accessibility :'(  (I don't know how to do it properly)
 
-    Also this component was rushed in two days, it may not be pretty
+    Also, this component was rushed in two days, it may not be pretty
 
     react-select: https://github.com/JedWatson/react-select
 */
@@ -154,9 +154,9 @@ export default class FilterSelect extends PureComponent<Props, State> {
         selectedOffset: -1,
     };
 
-    private menuRef: React.RefObject<HTMLDivElement>;
-    private menuListRef: React.RefObject<FixedSizeList>;
-    private inputRef: React.RefObject<HTMLInputElement>;
+    private readonly menuRef: React.RefObject<HTMLDivElement>;
+    private readonly menuListRef: React.RefObject<FixedSizeList>;
+    private readonly inputRef: React.RefObject<HTMLInputElement>;
 
     private activeOptions: Index[] = [];
     private activeFilterOptions: FilterOption[] = [];
@@ -329,7 +329,7 @@ export default class FilterSelect extends PureComponent<Props, State> {
 
         if (totalFocusableOptions === 0) return;
         let nextFocus = 0; // handles 'first'
-        let focusedIndex = selectedOffset;
+        const focusedIndex = selectedOffset;
 
         if (direction === "up") {
             nextFocus = focusedIndex > 0 ? focusedIndex - 1 : totalFocusableOptions - 1;
@@ -412,19 +412,17 @@ export default class FilterSelect extends PureComponent<Props, State> {
     // Focus Handlers
     // ==============================
 
-    handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) =>
         this.setState({
             menuIsOpen: true,
             inputValue: event.currentTarget.value.toLocaleLowerCase(),
             // reset, so the first option is focused
             selectedOffset: -1,
         });
-    };
-    onInputFocus = (event: React.FocusEvent<HTMLInputElement>) => {
+    onInputFocus = (event: React.FocusEvent<HTMLInputElement>) =>
         this.setState({
             isFocused: true,
         });
-    };
     onInputBlur = (event: React.FocusEvent<HTMLInputElement>) => {
         if (this.menuRef.current && this.menuRef.current.contains(document.activeElement)) {
             this.inputRef.current?.focus();

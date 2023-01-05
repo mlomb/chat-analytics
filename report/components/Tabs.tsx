@@ -1,15 +1,13 @@
-export const TabContainer = (props: { currentValue: string; value: string; children: JSX.Element }) => {
-    return (
-        <div
-            style={{
-                display: props.currentValue === props.value ? "block" : "none",
-            }}
-            role="tabpanel"
-        >
-            {props.children}
-        </div>
-    );
-};
+export const TabContainer = (props: { currentValue: string; value: string; children: JSX.Element }) => (
+    <div
+        style={{
+            display: props.currentValue === props.value ? "block" : "none",
+        }}
+        role="tabpanel"
+    >
+        {props.children}
+    </div>
+);
 
 export const TabSwitch = (props: {
     currentValue: string;

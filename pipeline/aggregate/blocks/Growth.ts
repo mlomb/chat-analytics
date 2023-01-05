@@ -28,19 +28,15 @@ const fn: BlockFn<TimelineStats> = (database, filters, common) => {
         .filter((day) => day !== -1)
         .sort((a, b) => a - b)
         .reduce<{ [key: string]: number }>((acc: any, day: number) => {
-            if (day in acc) {
-                acc[day]++;
-            } else {
-                acc[day] = 1;
-            }
+            if (day in acc) acc[day]++;
+            else acc[day] = 1;
             return acc;
         }, {});
 
     const growth: Item[] = [];
     const newAuthorsInDayKeys = Object.keys(newAuthorsInDay);
     let accum = 0;
-    for (let i = 0; i < newAuthorsInDayKeys.length; i++) {
-        const dayIndex = newAuthorsInDayKeys[i];
+    for (const dayIndex of newAuthorsInDayKeys) {
         accum += newAuthorsInDay[dayIndex];
         growth.push({
             ts: Day.fromKey(dateKeys[dayIndex as unknown as number]).toTimestamp(),

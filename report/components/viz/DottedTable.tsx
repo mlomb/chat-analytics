@@ -3,6 +3,7 @@ import CountUp from "react-countup";
 import Tooltip from "@report/components/core/Tooltip";
 
 import InfoIcon from "@assets/images/icons/info.svg";
+import { ReactElement } from "react";
 
 interface SeparatorLine {
     type: "separator";
@@ -27,7 +28,7 @@ export type Line =
     | SeparatorLine
     | ((NumberLine | TextLine | TitleLine) & {
           label: string;
-          tooltip?: React.ReactElement | string;
+          tooltip?: ReactElement | string;
           depth?: number;
       });
 
@@ -113,16 +114,14 @@ const LineItem = ({ line }: { line: Line }) => {
     );
 };
 
-const DottedTable = (props: Props) => {
-    return (
-        <div className="DottedTable">
-            <ul>
-                {props.lines.map((line, i) => (
-                    <LineItem key={i} line={line} />
-                ))}
-            </ul>
-        </div>
-    );
-};
+const DottedTable = (props: Props) => (
+    <div className="DottedTable">
+        <ul>
+            {props.lines.map((line, i) => (
+                <LineItem key={i} line={line} />
+            ))}
+        </ul>
+    </div>
+);
 
 export default DottedTable;

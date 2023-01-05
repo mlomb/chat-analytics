@@ -1,5 +1,5 @@
 import { Index } from "@pipeline/Types";
-import { BlockDescription, BlockFn, IndexEntry } from "@pipeline/aggregate/Blocks";
+import { BlockDescription, BlockFn } from "@pipeline/aggregate/Blocks";
 import { parseAndFilterMessages } from "@pipeline/aggregate/Helpers";
 import { MessageView } from "@pipeline/serialization/MessageView";
 
@@ -56,11 +56,8 @@ const fn: BlockFn<EmojiStats> = (database, filters, common) => {
         emojiGroup.count[index] += count;
         emojiGroup.authorCount[authorIndex] += count;
         emojiGroup.channelCount[channelIndex] += count;
-        if (database.emojis[index].c === undefined) {
-            emojiGroup.custom += count;
-        } else {
-            emojiGroup.regular += count;
-        }
+        if (database.emojis[index].c === undefined) emojiGroup.custom += count;
+        else emojiGroup.regular += count;
         emojiGroup.set!.add(index);
     };
 

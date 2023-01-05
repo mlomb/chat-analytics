@@ -12,7 +12,7 @@ export const plausible = (name: string, options: { url?: string; props?: { [key:
         data.props = JSON.stringify(options.props);
     }
 
-    var xhr = new XMLHttpRequest();
+    const xhr = new XMLHttpRequest();
     xhr.open("POST", `${plausibleURL}/api/event`, true);
     xhr.setRequestHeader("Content-Type", "text/plain");
     xhr.send(JSON.stringify(data));
