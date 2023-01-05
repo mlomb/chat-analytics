@@ -72,21 +72,19 @@ export const getAttachmentTypeFromMimeType = (mimeType: string): AttachmentType 
     if (mimeType.startsWith("video/")) return AttachmentType.Video;
     if (mimeType.startsWith("audio/")) return AttachmentType.Audio;
 
-    if (
-        [
-            "application/pdf",
-            "application/epub",
-            "application/epub+zip",
-            "text/html",
-            "application/rtf",
-            "application/msword",
-            "application/vnd.oasis.opendocument.spreadsheet",
-            "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-            "text/plain",
-        ].includes(mimeType)
-    )
-        return AttachmentType.Document;
+    const docMimeTypes = [
+        "application/pdf",
+        "application/epub",
+        "application/epub+zip",
+        "text/html",
+        "application/rtf",
+        "application/msword",
+        "application/vnd.oasis.opendocument.spreadsheet",
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "text/plain",
+    ];
+    if (docMimeTypes.includes(mimeType)) return AttachmentType.Document;
 
     // console.log(`Unknown mime type: ${mimeType}`);
 

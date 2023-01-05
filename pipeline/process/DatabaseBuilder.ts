@@ -167,8 +167,9 @@ export class DatabaseBuilder {
         let currentAuthor: Index = this.messageQueue[0].authorIndex;
         // [ M M M M M M M M ... ]
         //       ↑ l     ↑ r  (a group)
-        let l = 0;
-        for (let r = 1; r < len; r++) {
+        let l = 0,
+            r = 1;
+        while (r < len) {
             const authorIndex = this.messageQueue[r].authorIndex;
             if (authorIndex !== currentAuthor) {
                 // process group
@@ -177,6 +178,7 @@ export class DatabaseBuilder {
                 currentAuthor = authorIndex;
                 l = r;
             }
+            r++;
         }
 
         if (final) {
@@ -313,15 +315,21 @@ export class DatabaseBuilder {
                         mentionsCount[mentionIdx] = (mentionsCount[mentionIdx] || 0) + 1;
                     } else if (tag === "url") {
                         // TODO: transform URL only messages to attachments
-                        const hostname = new URL(text).hostname.toLowerCase();
-                        let domainIdx = this.domains.getIndex(hostname);
-                        if (domainIdx === undefined) domainIdx = this.domains.set(hostname, hostname);
-                        domainsCount[domainIdx] = (domainsCount[domainIdx] || 0) + 1;
+                        try {
+                            const hostname = new URL(text).hostname.toLowerCase();
+
+                            let domainIdx = this.domains.getIndex(hostname);
+                            if (domainIdx === undefined) domainIdx = this.domains.set(hostname, hostname);
+
+                            domainsCount[domainIdx] = (domainsCount[domainIdx] || 0) + 1;
+                        } catch (ex) {}
                     }
                 }
 
                 // sentiment analysis
-                if (hasText) sentiment = this.sentiment?.get(tokens, langIndex) || 0;
+                if (hasText) {
+                    sentiment = this.sentiment?.get(tokens, langIndex) || 0;
+                }
             }
 
             // reply offset
@@ -366,8 +374,9 @@ export class DatabaseBuilder {
     }
 
     private getChannelSection(channelIndex: Index): ChannelSection {
-        if (!(channelIndex in this.channelSections))
+        if (!(channelIndex in this.channelSections)) {
             this.channelSections[channelIndex] = [{ start: this.stream.offset, end: this.stream.offset }];
+        }
         const sections = this.channelSections[channelIndex];
         const lastSection = sections[sections.length - 1];
         if (lastSection.end === this.stream.offset) return lastSection;
@@ -475,7 +484,6 @@ export class DatabaseBuilder {
 
         // only keep the profile picture of the 1000 most active authors
         // to save space (picture URLs are very big)
-        // noinspection ES6ConvertIndexedForToForOf
         for (let i = 1000; i < authorsOrder.length; i++) {
             this.authors.data[authorsOrder[i]].da = undefined;
         }

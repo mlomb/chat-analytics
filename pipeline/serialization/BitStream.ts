@@ -50,6 +50,8 @@ export class BitStream {
 
         // check if we must grow the buffer
         if ((offset + bits) / 8 > this.buffer.byteLength - 4) this.grow();
+        // buffer may have grown
+        const buffer = this.buffer;
 
         // only keep the bits we need
         const mask = bits === 32 ? 0b11111111111111111111111111111111 : (1 << bits) - 1;
@@ -61,12 +63,11 @@ export class BitStream {
         // TODO: try to do it branch-less
         if (delta + bits > 32) {
             const corr = bits - (32 - delta);
-            this.buffer[aligned32] = (this.buffer[aligned32] & ~(mask >>> corr)) | (valueMasked >>> corr);
-            this.buffer[aligned32 + 1] =
-                (this.buffer[aligned32 + 1] & ~(mask << (32 - corr))) | (valueMasked << (32 - corr));
+            buffer[aligned32] = (buffer[aligned32] & ~(mask >>> corr)) | (valueMasked >>> corr);
+            buffer[aligned32 + 1] = (buffer[aligned32 + 1] & ~(mask << (32 - corr))) | (valueMasked << (32 - corr));
         } else {
             const corr = 32 - delta - bits;
-            this.buffer[aligned32] = (this.buffer[aligned32] & ~(mask << corr)) | (valueMasked << corr);
+            buffer[aligned32] = (buffer[aligned32] & ~(mask << corr)) | (valueMasked << corr);
         }
     }
 
@@ -81,11 +82,14 @@ export class BitStream {
         const value2 = buffer[aligned32 + 1];
 
         // TODO: try to do it branch-less
+        let value = 0;
         if (delta + bits > 32) {
             const aligned = (value1 << delta) | (value2 >>> (32 - delta));
-            return aligned >>> (32 - bits);
+            value = aligned >>> (32 - bits);
+        } else {
+            value = (value1 << delta) >>> (32 - bits);
         }
-        return (value1 << delta) >>> (32 - bits);
+        return value >>> 0;
     }
 
     // variable byte encode
@@ -97,7 +101,7 @@ export class BitStream {
 
         while (value > 127) {
             this.setBits(8, (value & 127) | 128);
-            value >>>= 7;
+            value = value >>> 7;
         }
         this.setBits(8, value);
     }

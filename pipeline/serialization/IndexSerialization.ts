@@ -56,6 +56,7 @@ export const writeIndexArray = (counts: [Index, number][], stream: BitStream, bi
     if (total === 1) {
         stream.setBits(2, 0b00); // 0b00=single index
         stream.setBits(bitsPerIndex, counts[0][0]);
+        return;
     } else if (total === 2) {
         stream.setBits(2, 0b01); // 0b01=double index
         if (counts.length === 1) {
@@ -67,54 +68,55 @@ export const writeIndexArray = (counts: [Index, number][], stream: BitStream, bi
             stream.setBits(bitsPerIndex, counts[0][0]);
             stream.setBits(bitsPerIndex, counts[1][0]);
         }
+        return;
+    }
+
+    // bits needed to store maxCount
+    const bitsPerCount = 32 - Math.clz32(maxCount);
+    // prevent overflow of total
+    const realTotal = Math.min(total, 1023);
+    // prevent overflow of len
+    const realLen = Math.min(len, 127);
+
+    const serialBits =
+        // sum of counts, below 2^10=1024 (99.99%)
+        10 +
+        // index * total
+        bitsPerIndex * realTotal;
+
+    const rleBits =
+        // length of counts, below 2^7=128 (99.99%)
+        7 +
+        // num bits for counts, up to 2^5=32
+        5 +
+        // (index + count) * len
+        (bitsPerIndex + bitsPerCount) * realLen;
+
+    if (serialBits < rleBits) {
+        // use serial encoding
+        stream.setBits(2, 0b10); // 0b10=serial
+        stream.setBits(10, realTotal);
+
+        let written = 0;
+        let lastIndex = 0;
+        for (let i = 0; i < len; i++) {
+            for (let j = 0; j < counts[i][1] && written < realTotal; j++) {
+                const diff = counts[i][0] - lastIndex;
+                // delta encoding
+                stream.setBits(bitsPerIndex, diff);
+                lastIndex += diff;
+                written++;
+            }
+        }
     } else {
-        // bits needed to store maxCount
-        const bitsPerCount = 32 - Math.clz32(maxCount);
-        // prevent overflow of total
-        const realTotal = Math.min(total, 1023);
-        // prevent overflow of len
-        const realLen = Math.min(len, 127);
+        // use RLE
+        stream.setBits(2, 0b11); // 0b11=RLE
+        stream.setBits(7, realLen);
+        stream.setBits(5, bitsPerCount - 1); // since 0 is not possible, we can squeeze one more value
 
-        const serialBits =
-            // sum of counts, below 2^10=1024 (99.99%)
-            10 +
-            // index * total
-            bitsPerIndex * realTotal;
-
-        const rleBits =
-            // length of counts, below 2^7=128 (99.99%)
-            7 +
-            // num bits for counts, up to 2^5=32
-            5 +
-            // (index + count) * len
-            (bitsPerIndex + bitsPerCount) * realLen;
-
-        if (serialBits < rleBits) {
-            // use serial encoding
-            stream.setBits(2, 0b10); // 0b10=serial
-            stream.setBits(10, realTotal);
-
-            let written = 0;
-            let lastIndex = 0;
-            for (let i = 0; i < len; i++) {
-                for (let j = 0; j < counts[i][1] && written < realTotal; j++) {
-                    const diff = counts[i][0] - lastIndex;
-                    // delta encoding
-                    stream.setBits(bitsPerIndex, diff);
-                    lastIndex += diff;
-                    written++;
-                }
-            }
-        } else {
-            // use RLE
-            stream.setBits(2, 0b11); // 0b11=RLE
-            stream.setBits(7, realLen);
-            stream.setBits(5, bitsPerCount - 1); // since 0 is not possible, we can squeeze one more value
-
-            for (let i = 0; i < realLen; i++) {
-                stream.setBits(bitsPerIndex, counts[i][0]);
-                stream.setBits(bitsPerCount, counts[i][1]);
-            }
+        for (let i = 0; i < realLen; i++) {
+            stream.setBits(bitsPerIndex, counts[i][0]);
+            stream.setBits(bitsPerCount, counts[i][1]);
         }
     }
 };

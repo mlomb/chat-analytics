@@ -106,8 +106,9 @@ export class JSONStream {
                             // let VALUE consume the quote
                             this.valueStart = this.valueEnd = i;
                             continue; // (don't i++)
+                        } else {
+                            this.valueStart = this.valueEnd = i + 1;
                         }
-                        this.valueStart = this.valueEnd = i + 1;
                     } else if (c === Char.closeBrace) this.state = State.ROOT;
                     else if (!isWhitespace(c)) throw new Error('Expected ", comma or }');
                     break;
@@ -144,7 +145,7 @@ export class JSONStream {
                     if (
                         this.brackets === 0 &&
                         this.braces === 0 &&
-                        !this.quotes &&
+                        this.quotes === false &&
                         this.primitive &&
                         isPrimitiveTerminator(c)
                     ) {

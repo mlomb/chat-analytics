@@ -83,7 +83,12 @@ const _AuthorLabel = ({ index }: LabelProps) => {
         );
     } else if (platform === "telegram") {
         // TODO: two letters
-        const letter: string = author.n[0];
+        let letter: string = "";
+        // iterate UTF-8 codepoints
+        for (const symbol of author.n) {
+            letter = symbol;
+            break;
+        }
         const colors = TelegramBubbleColors[(1779033703 ^ index) % TelegramBubbleColors.length];
         placeholder = (
             <div

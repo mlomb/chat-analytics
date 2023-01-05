@@ -75,7 +75,10 @@ class Progress extends EventEmitter {
             this.tasks.push(prevTaskCopy);
             this.active = prevTaskCopy;
         }
-        if (!this.active) return console.assert(false, "No active task");
+        if (!this.active) {
+            console.assert(false, "No active task");
+            return;
+        }
         this.active.progress = {
             actual,
             total,
@@ -87,7 +90,10 @@ class Progress extends EventEmitter {
 
     // marks the last task as finished and removes it from the stack
     done() {
-        if (!this.active) return console.assert(false, "No active task");
+        if (!this.active) {
+            console.assert(this.active, "No active task");
+            return;
+        }
         this.active.status = "success";
         if (this.active.progress && this.active.progress.total) {
             // make sure to top out the progress
@@ -131,7 +137,7 @@ class Progress extends EventEmitter {
 
             // try by time
             // (check time every 100 items)
-            if (!emit /*&& this.active.progress.actual - this.lastCount > 100*/) {
+            if (!emit /* && this.active.progress.actual - this.lastCount > 100*/) {
                 ts = Date.now();
                 emit = ts - this.lastTs > 15;
             }

@@ -4,7 +4,6 @@ import { readIndexArray, writeIndexArray } from "@pipeline/serialization/IndexSe
 
 // available message information
 // prettier-ignore
-// noinspection PointlessBitwiseExpressionJS
 export enum MessageFlags {
     None,
     Reply       = 1 << 0,

@@ -1,4 +1,5 @@
 import { gzipSync, gunzipSync } from "fflate";
+
 import { base91decode, base91encode } from "@pipeline/compression/Base91";
 import { Database } from "@pipeline/Types";
 
@@ -22,7 +23,7 @@ function compress(database: Database): string {
     // Raw buffer format: <json buffer length> <serialized data length> <json buffer> <serialized data buffer>
     // TODO: avoid generating a new buffer, instead use streaming
     let rawBuffer = new Uint8Array(4 * 2 + jsonBuffer.length + serializedBuffer.byteLength);
-    const rawView = new DataView(rawBuffer.buffer);
+    let rawView = new DataView(rawBuffer.buffer);
 
     rawView.setUint32(0, jsonBuffer.length);
     rawView.setUint32(4, serializedBuffer.byteLength);
@@ -35,7 +36,7 @@ function compress(database: Database): string {
 
     let zippedBuffer = gzipSync(rawBuffer);
     (rawBuffer as any) = undefined;
-    const encoded = base91encode(zippedBuffer);
+    let encoded = base91encode(zippedBuffer);
     (zippedBuffer as any) = undefined;
 
     return encoded;

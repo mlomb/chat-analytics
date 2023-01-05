@@ -99,8 +99,6 @@ export class TelegramParser extends Parser {
             // add redundant spaces to the sides to make sure it will be tokenized correctly
             case "link":
             case "mention":
-                return ` ${input.text} `;
-
             case "text_link":
                 return ` ${input.text} `;
 

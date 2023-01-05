@@ -79,7 +79,6 @@ const fn: BlockFn<ConversationStats> = (database, filters, common) => {
                 for (let j = i + 1; j < M; j++) {
                     const a = participants[i];
                     const b = participants[j];
-                    if (a === undefined) debugger;
 
                     const k = Math.min(a, b);
                     const l = Math.max(a, b);

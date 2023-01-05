@@ -60,7 +60,7 @@ export class DataProvider extends EventEmitter {
             // NOTE: data:application/javascript breaks
             const workerJs = document.getElementById("worker-script")!.textContent!;
             this.worker = new Worker(
-                "data:application/javascript;base64," + btoa(decodeURI(encodeURIComponent(workerJs)))
+                "data:application/javascript;base64," + btoa(unescape(encodeURIComponent(workerJs)))
             );
         }
         this.worker.onerror = this.onError.bind(this);
