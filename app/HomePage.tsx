@@ -17,9 +17,11 @@ const HomePage = () => {
 
     return (
         <div className="HomePage">
-            <a href="/" className="HomePage__logo">
-                <img src={Logo} alt="chatanalytics.app logo" />
-            </a>
+            <header className="HomePage__logo">
+                <a href="/">
+                    <img src={Logo} alt="chatanalytics.app logo" />
+                </a>
+            </header>
             <div
                 className={["HomePage__container", index > 0 ? "HomePage__container--fade-out" : ""].join(" ")}
                 style={{ display: index >= 2 ? "none" : "block" }}

@@ -83,7 +83,7 @@ const Header = (props: Props) => {
 
     return (
         <div className="Header">
-            <div className="Header__info">
+            <header className="Header__info">
                 <span className="Header__title">
                     <h1>{dataProvider.database.title}</h1>
                     <h2>chat analysis report</h2>
@@ -93,7 +93,7 @@ const Header = (props: Props) => {
                         <img src={Logo} alt="chatanalytics.app logo" height="60" />
                     </a>
                 </div>
-            </div>
+            </header>
             <div className="Filters">
                 <div className="Filters__Filter">
                     <label htmlFor="channels">Channels</label>
@@ -128,7 +128,7 @@ const Header = (props: Props) => {
                     <TimeSelector />
                 </div>
             </div>
-            <div className="Header__Tabs" role="tablist">
+            <nav className="Header__Tabs" role="tablist">
                 {sections.map((t) => (
                     <TabSwitch
                         key={t.value}
@@ -138,7 +138,7 @@ const Header = (props: Props) => {
                         children={t.name}
                     />
                 ))}
-            </div>
+            </nav>
         </div>
     );
 };
