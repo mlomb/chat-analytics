@@ -37,7 +37,7 @@ export class DiscordParser extends Parser {
         const isDeletedUser = message.author.nickname == "Deleted User";
         const author: IAuthor = {
             n: message.author.nickname + (isDeletedUser ? " #" + message.author.id : ""),
-            d: parseInt(message.author.discriminator),
+            d: isDeletedUser ? undefined : parseInt(message.author.discriminator),
         };
         if (message.author.isBot) author.b = true;
 

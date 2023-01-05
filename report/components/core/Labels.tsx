@@ -108,14 +108,13 @@ const _AuthorLabel = ({ index }: LabelProps) => {
     }
 
     const avatar = avatarUrl ? <LazyImage src={avatarUrl} children={placeholder} /> : placeholder;
-    const isDeletedUser = author.n.startsWith("Deleted User");
 
     return (
         <div className="Label" title={author.n}>
             <div className="Label__avatar">{avatar}</div>
             <span className="Label__name">
                 {author.n}
-                {author.d !== undefined && !isDeletedUser && (
+                {author.d !== undefined && (
                     <span className="Label__discriminator">#{`${demo ? 0 : author.d}`.padStart(4, "0")}</span>
                 )}
             </span>
