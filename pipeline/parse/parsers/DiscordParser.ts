@@ -1,7 +1,7 @@
 import { AttachmentType, IAuthor, Index } from "@pipeline/Types";
 import { Parser } from "@pipeline/parse/Parser";
 import { JSONStream } from "@pipeline/parse/JSONStream";
-import { FileInput, getAttachmentTypeFromFileName } from "@pipeline/File";
+import { FileInput, getAttachmentTypeFromFileName, streamJSONFromFile } from "@pipeline/File";
 
 export class DiscordParser extends Parser {
     private channelIndex?: Index;
@@ -12,11 +12,13 @@ export class DiscordParser extends Parser {
     }
 
     async *parse(file: FileInput) {
-        yield* new JSONStream()
-            .onObject<DiscordGuild>("guild", (guild) => this.builder.setTitle(guild.name))
-            .onObject<DiscordChannel>("channel", this.parseChannel.bind(this))
-            .onArrayItem<DiscordMessage>("messages", this.parseMessage.bind(this))
-            .fromFile(file);
+        yield* streamJSONFromFile(
+            new JSONStream()
+                .onObject<DiscordGuild>("guild", (guild) => this.builder.setTitle(guild.name))
+                .onObject<DiscordChannel>("channel", this.parseChannel.bind(this))
+                .onArrayItem<DiscordMessage>("messages", this.parseMessage.bind(this)),
+            file
+        );
 
         this.channelIndex = undefined;
     }
