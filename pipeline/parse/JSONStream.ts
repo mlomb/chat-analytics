@@ -81,8 +81,7 @@ export class JSONStream {
     private primitive = true;
 
     private parseValue(): string {
-        const x = this.buffer.slice(this.valueStart, this.valueEnd + 1);
-        return JSON.parse(x);
+        return JSON.parse(this.buffer.slice(this.valueStart, this.valueEnd + 1));
     }
 
     public async *fromFile(file: FileInput): AsyncGenerator<void> {
