@@ -263,12 +263,14 @@ export class JSONStream {
     }
 
     // Object from the root which match the key will be emitted completely
-    public onObject<T>(key: string, callback: CallbackFn<T>) {
+    public onObject<T>(key: string, callback: CallbackFn<T>): JSONStream {
         this.objectCallbacks[key] = callback;
+        return this;
     }
 
     // Arrays from the root which match the key will be emitted element by element
-    public onArrayItem<T>(key: string, callback: CallbackFn<T>) {
+    public onArrayItem<T>(key: string, callback: CallbackFn<T>): JSONStream {
         this.arrayCallbacks[key] = callback;
+        return this;
     }
 }
