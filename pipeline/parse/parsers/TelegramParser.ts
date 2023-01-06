@@ -1,7 +1,7 @@
 import { AttachmentType, Index, RawID } from "@pipeline/Types";
 import { Parser } from "@pipeline/parse/Parser";
 import { JSONStream } from "@pipeline/parse/JSONStream";
-import { FileInput, getAttachmentTypeFromMimeType, streamJSONFromFile } from "@pipeline/File";
+import { FileInput, getAttachmentTypeFromMimeType } from "@pipeline/File";
 
 export class TelegramParser extends Parser {
     private channelName?: string;
@@ -14,7 +14,7 @@ export class TelegramParser extends Parser {
         stream.onObject<RawID>("id", this.onChannelId.bind(this));
         stream.onArrayItem<TelegramMessage>("messages", this.parseMessage.bind(this));
 
-        yield* streamJSONFromFile(stream, file);
+        yield* stream.fromFile(file);
 
         this.channelName = undefined;
         this.channelIndex = undefined;

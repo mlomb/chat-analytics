@@ -65,7 +65,7 @@ const stream = new JSONStream();
 stream.onObject<MyObject>("info", this.parseInfo.bind(this));
 stream.onArrayItem<MyMessageItem>("messages", this.parseMessage.bind(this));
 
-yield* streamJSONFromFile(stream, file);
+yield* stream.fromFile(file);
 ```
 
 

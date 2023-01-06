@@ -1,3 +1,6 @@
+import { progress } from "@pipeline/Progress";
+import { FileInput } from "@pipeline/File";
+
 export type CallbackFn<T> = (object: T) => void;
 
 type Callbacks = { [key: string]: CallbackFn<any> };
@@ -20,6 +23,9 @@ const Char = {
     openBrace           : 0x7B,     // {
     closeBrace          : 0x7D,     // }
 };
+
+const CHUNK_SIZE = 1024 * 1024 * 2; // 2MB
+const TEXT_DECODER = new TextDecoder("utf-8");
 
 enum State {
     INVALID,
@@ -78,6 +84,20 @@ export class JSONStream {
         const x = this.buffer.slice(this.valueStart, this.valueEnd + 1);
         return JSON.parse(x);
     }
+
+    public async *fromFile(file: FileInput): AsyncGenerator<void> {
+        const fileSize = file.size;
+
+        let receivedLength = 0;
+        while (receivedLength < fileSize) {
+            const buffer = await file.slice(receivedLength, receivedLength + CHUNK_SIZE);
+            const str = TEXT_DECODER.decode(buffer, { stream: true });
+            receivedLength += buffer.byteLength;
+            this.push(str);
+            progress.progress("bytes", receivedLength, fileSize);
+            yield;
+        }
+    };
 
     public push(chunk: string) {
         this.buffer += chunk;
