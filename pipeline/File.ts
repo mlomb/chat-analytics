@@ -46,9 +46,7 @@ export function downloadFile(filepath: any, responseType: XMLHttpRequestResponse
     });
 }
 
-export const getAttachmentTypeFromFileName = (filename: string): AttachmentType => {
-    const ext = (filename.split(".").pop() || "").toLocaleLowerCase();
-    const mappings: {
+const ATTACHMENT_EXTS: {
         [key in AttachmentType]?: string[];
     } = {
         [AttachmentType.Image]: ["png", "jpg", "jpeg", "webp", "bmp", "tiff", "tif", "svg", "ico", "psd"],
@@ -57,22 +55,16 @@ export const getAttachmentTypeFromFileName = (filename: string): AttachmentType 
         [AttachmentType.Audio]: ["mp3", "ogg", "wav", "flac", "m4a"],
         [AttachmentType.Document]: ["doc", "docx", "odt", "pdf", "xls", "xlsx", "ods", "ppt", "pptx", "txt", "html"],
     };
+export const getAttachmentTypeFromFileName = (filename: string): AttachmentType => {
+    const ext = (filename.split(".").pop() || "").toLocaleLowerCase();
     for (let type: AttachmentType = 0; type <= AttachmentType.Other; type++) {
-        if (mappings[type]?.includes(ext)) return type;
+        if (ATTACHMENT_EXTS[type]?.includes(ext)) return type;
     }
     // unknown or generic
     return AttachmentType.Other;
 };
 
-export const getAttachmentTypeFromMimeType = (mimeType: string): AttachmentType => {
-    mimeType = mimeType.toLocaleLowerCase();
-
-    if (mimeType.startsWith("image/gif")) return AttachmentType.ImageAnimated;
-    if (mimeType.startsWith("image/")) return AttachmentType.Image;
-    if (mimeType.startsWith("video/")) return AttachmentType.Video;
-    if (mimeType.startsWith("audio/")) return AttachmentType.Audio;
-
-    const docMimeTypes = [
+const DOC_MIME_TYPES: string[] = [
         "application/pdf",
         "application/epub",
         "application/epub+zip",
@@ -84,7 +76,15 @@ export const getAttachmentTypeFromMimeType = (mimeType: string): AttachmentType 
         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         "text/plain",
     ];
-    if (docMimeTypes.includes(mimeType)) return AttachmentType.Document;
+export const getAttachmentTypeFromMimeType = (mimeType: string): AttachmentType => {
+    mimeType = mimeType.toLocaleLowerCase();
+
+    if (mimeType.startsWith("image/gif")) return AttachmentType.ImageAnimated;
+    if (mimeType.startsWith("image/")) return AttachmentType.Image;
+    if (mimeType.startsWith("video/")) return AttachmentType.Video;
+    if (mimeType.startsWith("audio/")) return AttachmentType.Audio;
+
+    if (DOC_MIME_TYPES.includes(mimeType)) return AttachmentType.Document;
 
     // console.log(`Unknown mime type: ${mimeType}`);
 
