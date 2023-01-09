@@ -27,8 +27,9 @@ const SearchInput = ({ onChange, placeholder, allowRegex }: Props) => {
                 onChange(expr);
                 setError(false);
             } catch (e) {
-                // invalid regex, pass random string and show error
-                onChange("--invalid-regex--" + Math.random());
+                // invalid regex
+                // pass never matching regex and show error
+                onChange(/[]/);
                 setError(true);
             }
         } else {
