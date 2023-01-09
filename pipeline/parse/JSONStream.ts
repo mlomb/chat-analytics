@@ -75,8 +75,7 @@ export class JSONStream {
     private primitive = true;
 
     private parseValue(): string {
-        const x = this.buffer.slice(this.valueStart, this.valueEnd + 1);
-        return JSON.parse(x);
+        return JSON.parse(this.buffer.slice(this.valueStart, this.valueEnd + 1));
     }
 
     public push(chunk: string) {
@@ -243,12 +242,14 @@ export class JSONStream {
     }
 
     // Object from the root which match the key will be emitted completely
-    public onObject<T>(key: string, callback: CallbackFn<T>) {
+    public onObject<T>(key: string, callback: CallbackFn<T>): JSONStream {
         this.objectCallbacks[key] = callback;
+        return this;
     }
 
     // Arrays from the root which match the key will be emitted element by element
-    public onArrayItem<T>(key: string, callback: CallbackFn<T>) {
+    public onArrayItem<T>(key: string, callback: CallbackFn<T>): JSONStream {
         this.arrayCallbacks[key] = callback;
+        return this;
     }
 }

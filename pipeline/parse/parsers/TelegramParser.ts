@@ -8,11 +8,10 @@ export class TelegramParser extends Parser {
     private channelIndex?: Index;
 
     async *parse(file: FileInput) {
-        const stream = new JSONStream();
-
-        stream.onObject<string>("name", this.onChannelName.bind(this));
-        stream.onObject<RawID>("id", this.onChannelId.bind(this));
-        stream.onArrayItem<TelegramMessage>("messages", this.parseMessage.bind(this));
+        const stream = new JSONStream()
+            .onObject<string>("name", this.onChannelName.bind(this))
+            .onObject<RawID>("id", this.onChannelId.bind(this))
+            .onArrayItem<TelegramMessage>("messages", this.parseMessage.bind(this));
 
         yield* streamJSONFromFile(stream, file);
 
