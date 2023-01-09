@@ -54,7 +54,7 @@ const SearchInput = ({ onChange, placeholder, allowRegex }: Props) => {
                 className={[
                     "SearchInput__input",
                     allowRegex ? "SearchInput__input--regex" : "",
-                    error === true ? "SearchInput__input--error" : "",
+                    error ? "SearchInput__input--error" : "",
                 ].join(" ")}
                 type="text"
                 placeholder={placeholder}
