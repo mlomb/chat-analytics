@@ -73,7 +73,10 @@ export const MostMessagesChannels = ({ data }: { data?: MessagesStats }) => (
 /// WORDS
 ///////////////////////////
 const WordsIndexOf = (value: string) => useDataProvider().formatCache.words.indexOf(value);
-const WordsInFilter = (index: number, filter: RegExp) => filter.test(useDataProvider().formatCache.words[index]);
+const WordsInFilter = (index: number, filter: string | RegExp) => {
+    const word = useDataProvider().formatCache.words[index];
+    return filter instanceof RegExp ? filter.test(word) : word.startsWith(filter);
+};
 export const MostUsedWords = ({ data, options }: { data?: LanguageStats; options: number[] }) =>
     options[0] === 1 ? (
         <WordCloud wordsCount={data?.wordsCount || EmptyArray} />
@@ -85,7 +88,7 @@ export const MostUsedWords = ({ data, options }: { data?: LanguageStats; options
             maxItems={Math.min(15, useDataProvider().database.words.length)}
             itemComponent={WordLabel}
             searchable
-            regexable
+            allowRegex
             searchPlaceholder="Filter words..."
             indexOf={WordsIndexOf}
             inFilter={WordsInFilter}
@@ -111,7 +114,7 @@ const EmojisIndexOf = (value: string) => {
     if (rawEmoji === -1) return useDataProvider().formatCache.emojis.indexOf(value);
     return rawEmoji;
 };
-const EmojisInFilter = (index: Index, filter: RegExp) => filter.test(useDataProvider().formatCache.emojis[index]);
+const EmojisInFilter = (index: Index, filter: string) => useDataProvider().formatCache.emojis[index].includes(filter);
 export const MostUsedEmojis = ({ data, options }: { data?: EmojiStats; options: number[] }) => (
     <MostUsed
         what="Emoji"
@@ -165,7 +168,7 @@ export const MostGetterEmojis = ({ data, options }: { data?: EmojiStats; options
 /// DOMAINS
 ///////////////////////////
 const DomainsIndexOf = (value: string) => useDataProvider().database.domains.indexOf(value);
-const DomainsInFilter = (index: number, filter: RegExp) => filter.test(useDataProvider().database.domains[index]);
+const DomainsInFilter = (index: number, filter: string) => useDataProvider().database.domains[index].includes(filter);
 export const MostLinkedDomains = ({ data }: { data?: ExternalStats }) => (
     <MostUsed
         what="Domain"
@@ -184,7 +187,8 @@ export const MostLinkedDomains = ({ data }: { data?: ExternalStats }) => (
 /// MENTIONS
 ///////////////////////////
 const MentionsIndexOf = (value: string) => useDataProvider().formatCache.mentions.indexOf(value);
-const MentionsInFilter = (index: number, filter: RegExp) => filter.test(useDataProvider().formatCache.mentions[index]);
+const MentionsInFilter = (index: number, filter: string) =>
+    useDataProvider().formatCache.mentions[index].includes(filter);
 export const MostMentioned = ({ data }: { data?: InteractionStats }) => (
     <MostUsed
         what="Who"

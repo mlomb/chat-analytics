@@ -23,13 +23,20 @@
         border-color: #1ac6ff;
     }
 }
+.SearchInput__input--regex {
+    padding-right: 30px;
+}
 .SearchInput__input--error {
-    color: red;
+    color: #ff4b4b;
+}
+
+.SearchInput__regex {
+    appearance: none;
+    cursor: pointer;
 }
 
 .SearchInput__mag,
-.SearchInput__regex-toggle,
-.SearchInput__regex-toggle:before {
+.SearchInput__regex {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
@@ -43,22 +50,12 @@
     left: 10px;
     background-image: ~"url(@assets/images/icons/search.svg)";
 }
-
-.SearchInput__regex,
-.SearchInput__regex-toggle {
+.SearchInput__regex {
+    display: block;
     right: 10px;
-}
+    background-image: ~"url(@assets/images/icons/regex-grayed.svg)";
 
-.SearchInput__regex-toggle {
-    visibility: hidden;
-    cursor: pointer;
-
-    &:before {
-        visibility: visible;
-        content: "";
-        background-image: ~"url(@assets/images/icons/regexUnsel.svg)";
-    }
-    &:checked:before {
-        background-image: ~"url(@assets/images/icons/regexSel.svg)";
+    &:checked {
+        background-image: ~"url(@assets/images/icons/regex.svg)";
     }
 }
