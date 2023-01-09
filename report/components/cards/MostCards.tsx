@@ -73,7 +73,10 @@ export const MostMessagesChannels = ({ data }: { data?: MessagesStats }) => (
 /// WORDS
 ///////////////////////////
 const WordsIndexOf = (value: string) => useDataProvider().formatCache.words.indexOf(value);
-const WordsInFilter = (index: number, filter: string) => useDataProvider().formatCache.words[index].startsWith(filter);
+const WordsInFilter = (index: number, filter: string | RegExp) => {
+    const word = useDataProvider().formatCache.words[index];
+    return filter instanceof RegExp ? filter.test(word) : word.startsWith(filter);
+};
 export const MostUsedWords = ({ data, options }: { data?: LanguageStats; options: number[] }) =>
     options[0] === 1 ? (
         <WordCloud wordsCount={data?.wordsCount || EmptyArray} />
@@ -85,6 +88,7 @@ export const MostUsedWords = ({ data, options }: { data?: LanguageStats; options
             maxItems={Math.min(15, useDataProvider().database.words.length)}
             itemComponent={WordLabel}
             searchable
+            allowRegex
             searchPlaceholder="Filter words..."
             indexOf={WordsIndexOf}
             inFilter={WordsInFilter}

@@ -24,30 +24,38 @@ interface SearchProps extends BaseProps {
     searchPlaceholder: string;
     transformFilter?: (filter: string) => string;
     indexOf: (value: string) => number | -1;
-    inFilter(index: Index, filter: string): boolean;
+    inFilter(index: Index, filter: string | RegExp): boolean;
+    allowRegex?: boolean;
 }
 
 type Props = SimpleProps | SearchProps;
 
 const MostUsed = (props: Props) => {
-    const [filter, setFilter] = useState<string>("");
+    const [filter, setFilter] = useState<string | RegExp>("");
 
-    const filterFormatted = matchFormat(
-        props.searchable && props.transformFilter ? props.transformFilter(filter) : filter
-    );
-    let exactIndex =
-        filterFormatted.length > 0 && props.counts.length > 0 && props.searchable ? props.indexOf(filterFormatted) : -1;
-    let entries: AnimatedBarEntry[] = props.counts.map((c, i) => ({
-        index: i,
-        value: c,
-        pin: exactIndex === i,
-    }));
-    // prettier-ignore
-    entries = entries.filter(
-        (c) =>
-            c.value > 0 &&
-            (filterFormatted.length === 0 || c.pin || (props.searchable && props.inFilter(c.index, filterFormatted))) &&
-            (!props.filter || props.filter(c.index))
+    let finalFilter: string | RegExp = filter;
+    let exactIndex: number = -1;
+
+    if (props.searchable && !(filter instanceof RegExp)) {
+        // string
+        finalFilter = matchFormat(props.transformFilter ? props.transformFilter(filter) : filter);
+        exactIndex = props.indexOf(finalFilter);
+    }
+
+    let entries: AnimatedBarEntry[] = [];
+    for (const [i, c] of props.counts.entries()) {
+        entries.push({
+            index: i,
+            value: c,
+            pin: exactIndex === i,
+        });
+    }
+    entries = entries
+        .filter(
+            (c) =>
+                c.value > 0 &&
+                (filter === "" || c.pin || (props.searchable && props.inFilter(c.index, finalFilter))) &&
+                (!props.filter || props.filter(c.index))
         )
         .sort((a, b) => b.value - a.value)
         .slice(0, props.maxItems);
@@ -70,7 +78,7 @@ const MostUsed = (props: Props) => {
     return (
         <>
             {props.searchable === true && (
-                <SearchInput placeholder={props.searchPlaceholder} value={filter} onChange={setFilter} />
+                <SearchInput placeholder={props.searchPlaceholder} onChange={setFilter} allowRegex={props.allowRegex} />
             )}
             <AnimatedBars
                 what={props.what}
