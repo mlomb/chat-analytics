@@ -11,14 +11,14 @@ export interface FileInput {
 }
 
 const JSON_CHUNK_SIZE = 1024 * 1024 * 2; // 2MB
-const JSON_TEXT_DECODER = new TextDecoder("utf-8");
 export const streamJSONFromFile = async function* (stream: JSONStream, file: FileInput): AsyncGenerator<void> {
     const fileSize = file.size;
+    const textDecoder = new TextDecoder("utf-8");
 
     let receivedLength = 0;
     while (receivedLength < fileSize) {
         const buffer = await file.slice(receivedLength, receivedLength + JSON_CHUNK_SIZE);
-        const str = JSON_TEXT_DECODER.decode(buffer, { stream: true });
+        const str = textDecoder.decode(buffer, { stream: true });
         receivedLength += buffer.byteLength;
         stream.push(str);
         progress.progress("bytes", receivedLength, fileSize);
