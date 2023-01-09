@@ -12,13 +12,12 @@ export class DiscordParser extends Parser {
     }
 
     async *parse(file: FileInput) {
-        yield* streamJSONFromFile(
-            new JSONStream()
-                .onObject<DiscordGuild>("guild", (guild) => this.builder.setTitle(guild.name))
-                .onObject<DiscordChannel>("channel", this.parseChannel.bind(this))
-                .onArrayItem<DiscordMessage>("messages", this.parseMessage.bind(this)),
-            file
-        );
+        const stream = new JSONStream()
+            .onObject<DiscordGuild>("guild", (guild) => this.builder.setTitle(guild.name))
+            .onObject<DiscordChannel>("channel", this.parseChannel.bind(this))
+            .onArrayItem<DiscordMessage>("messages", this.parseMessage.bind(this));
+
+        yield* streamJSONFromFile(stream, file);
 
         this.channelIndex = undefined;
     }
