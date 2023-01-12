@@ -2,15 +2,16 @@ import "@assets/styles/Header.less";
 
 import { useCallback, useLayoutEffect, useMemo, useState } from "react";
 
-import { Database, Index } from "@pipeline/Types";
 import { matchFormat } from "@pipeline/Text";
+import { Database, Index } from "@pipeline/Types";
 import { useDataProvider } from "@report/DataProvider";
 
-import { Section } from "@report/ReportPage";
-import { AuthorLabel, ChannelLabel } from "@report/components/core/Labels";
+import { ChannelLabel } from "@report/components/core/Labels";
+import { AuthorLabel } from "@report/components/core/labels/AuthorLabel";
+import FilterSelect, { FilterOption } from "@report/components/FilterSelect";
 import { TabSwitch } from "@report/components/Tabs";
 import TimeSelector from "@report/components/TimeSelector";
-import FilterSelect, { FilterOption } from "@report/components/FilterSelect";
+import { Section } from "@report/ReportPage";
 
 import Logo from "@assets/images/logos/app_dark.svg";
 
