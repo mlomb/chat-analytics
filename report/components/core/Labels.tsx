@@ -9,118 +9,10 @@ import LazyImage from "@report/components/core/LazyImage";
 import DefaultFaviconIcon from "@assets/images/icons/default-favicon.png";
 import LinkOutIcon from "@assets/images/icons/link-out-blue.svg";
 import Hashtag from "@assets/images/icons/hashtag.svg";
-import wpp_avatar from "@assets/images/platforms/whatsapp/default_avatar.png";
-import messenger_avatar from "@assets/images/platforms/messenger/default_avatar.png";
-import avatar_0 from "@assets/images/platforms/discord/avatars/avatar_0.png";
-import avatar_1 from "@assets/images/platforms/discord/avatars/avatar_1.png";
-import avatar_2 from "@assets/images/platforms/discord/avatars/avatar_2.png";
-import avatar_3 from "@assets/images/platforms/discord/avatars/avatar_3.png";
-import avatar_4 from "@assets/images/platforms/discord/avatars/avatar_4.png";
-const DiscordDefaultAvatars = [avatar_0, avatar_1, avatar_2, avatar_3, avatar_4];
-
-const TelegramBubbleColors = [
-    ["ff885e", "ff516a"],
-    ["ffcd6a", "ffa85c"],
-    ["82b1ff", "665fff"],
-    ["a0de7e", "54cb68"],
-    ["53edd6", "28c9b7"],
-    ["72d5fd", "2a9ef1"],
-    ["e0a2f3", "d669ed"],
-];
-
-// common props for all labels
-interface LabelProps {
-    index: Index;
-}
+import { LabelProps } from "./labels/BaseLabel";
 
 // NOTE: this file is a bit messy, should be refactored
 // there is code that can be easily reused
-
-const _AuthorLabel = ({ index }: LabelProps) => {
-    const dp = useDataProvider();
-    const platform = dp.database.config.platform;
-    const author = dp.database.authors[index];
-
-    if (author === undefined) {
-        return <span>invalid author index {index}</span>;
-    }
-
-    let avatarUrl: string | undefined;
-    let placeholder: JSX.Element | null;
-    if (platform === "discord") {
-        placeholder = (
-            <img
-                src={DiscordDefaultAvatars[(author.d || 0) % 5]}
-                style={{
-                    width: "100%",
-                    height: "100%",
-                }}
-            />
-        );
-        if (author.da) {
-            // https://cdn.discordapp.com/avatars/user_id/user_avatar.png
-            avatarUrl = `https://cdn.discordapp.com/avatars/${author.da}.png?size=32`;
-        }
-    } else if (platform === "whatsapp") {
-        placeholder = (
-            <img
-                src={wpp_avatar}
-                style={{
-                    width: "100%",
-                    height: "100%",
-                }}
-            />
-        );
-    } else if (platform === "messenger") {
-        placeholder = (
-            <img
-                src={messenger_avatar}
-                style={{
-                    width: "100%",
-                    height: "100%",
-                }}
-            />
-        );
-    } else if (platform === "telegram") {
-        // TODO: two letters
-        let letter: string = "";
-        // iterate UTF-8 codepoints
-        for (const symbol of author.n) {
-            letter = symbol;
-            break;
-        }
-        const colors = TelegramBubbleColors[(1779033703 ^ index) % TelegramBubbleColors.length];
-        placeholder = (
-            <div
-                style={{
-                    background: `linear-gradient(#${colors[0]}, #${colors[1]})`,
-                    textAlign: "center",
-                    lineHeight: "20px",
-                    color: "#fff",
-                    fontSize: 10,
-                }}
-            >
-                {letter}
-            </div>
-        );
-    } else {
-        placeholder = null;
-    }
-
-    const avatar = avatarUrl ? <LazyImage src={avatarUrl} children={placeholder} /> : placeholder;
-
-    return (
-        <div className="Label" title={author.n}>
-            <div className="Label__avatar">{avatar}</div>
-            <span className="Label__name">
-                {author.n}
-                {author.d !== undefined && (
-                    <span className="Label__discriminator">#{`${demo ? 0 : author.d}`.padStart(4, "0")}</span>
-                )}
-            </span>
-        </div>
-    );
-};
 
 const _ChannelLabel = ({ index }: LabelProps) => {
     const dp = useDataProvider();
@@ -232,7 +124,6 @@ const _MentionLabel = ({ index }: LabelProps) => {
 };
 
 // memoize labels
-export const AuthorLabel = memo(_AuthorLabel) as typeof _AuthorLabel;
 export const ChannelLabel = memo(_ChannelLabel) as typeof _ChannelLabel;
 export const WordLabel = memo(_WordLabel) as typeof _WordLabel;
 export const EmojiLabel = memo(_EmojiLabel) as typeof _EmojiLabel;
