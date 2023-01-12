@@ -23,3 +23,22 @@ jobs:
           node-version: 14.x
       - run: npm ci
       - run: npm run format-check
+
+  deploy-site:
+    runs-on: ubuntu-latest
+    needs: [build-test, format-check]
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: 14.x
+      - run: npm ci
+      - run: npm run build
+      - name: Publish
+        uses: cloudflare/pages-action@1
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          projectName: chat-analytics
+          directory: dist
+          gitHubToken: ${{ secrets.GH_ACCESS_TOKEN }}
