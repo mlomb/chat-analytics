@@ -4,8 +4,10 @@ import {
     Channel,
     Database,
     Emoji,
+    Guild,
     IAuthor,
     IChannel,
+    IGuild,
     IMessage,
     Index,
     Message,
@@ -47,6 +49,7 @@ export class DatabaseBuilder {
     private minDate: Day | undefined;
     private maxDate: Day | undefined;
 
+    private guilds = new IndexedData<RawID, Guild>();
     private channels = new IndexedData<RawID, Channel>();
     private authors = new IndexedData<RawID, Author>();
     private words = new IndexedData<string, string>();
@@ -128,6 +131,14 @@ export class DatabaseBuilder {
 
     public setTitle(title: string) {
         this.title = title;
+    }
+
+    public addGuild(rawId: RawID, guild: IGuild): Index {
+        let index = this.guilds.getIndex(rawId);
+        if (index === undefined) {
+            index = this.guilds.set(rawId, guild);
+        }
+        return index;
     }
 
     public addChannel(rawId: RawID, channel: IChannel): Index {
@@ -453,6 +464,7 @@ export class DatabaseBuilder {
                 numMonths: monthKeys.length,
                 numYears: yearKeys.length,
             },
+            guilds: this.guilds.data,
             channels: this.channels.data,
             authors: this.authors.data,
             words: newWords,

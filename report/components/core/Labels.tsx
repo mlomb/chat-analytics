@@ -1,6 +1,6 @@
 import "@assets/styles/Labels.less";
 
-import { memo } from "react";
+import { memo, ReactElement } from "react";
 
 import { Index } from "@pipeline/Types";
 import { useDataProvider } from "@report/DataProvider";
@@ -131,10 +131,16 @@ const _ChannelLabel = ({ index }: LabelProps) => {
         return <span>invalid channel index {index}</span>;
     }
 
+    let guild: ReactElement | undefined = undefined;
+    if (dp.database.guilds.length >= 2) {
+        guild = <>{dp.database.guilds[channel.guildIndex].name}</>;
+    }
+
     return (
-        <div className="Label" title={channel.n}>
+        <div className="Label" title={channel.name}>
+            {guild}
             {platform === "discord" && <img src={Hashtag} height={16} />}
-            <span className="Label__name">{channel.n}</span>
+            <span className="Label__name">{channel.name}</span>
         </div>
     );
 };
