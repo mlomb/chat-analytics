@@ -60,7 +60,8 @@ export class WhatsAppParser extends Parser {
 
         const channelIndex = this.channelIndex++;
         const assignedChannelIndex = this.builder.addChannel(channelIndex, {
-            n: name || `Channel #${channelIndex}`,
+            name: name || `Channel #${channelIndex}`,
+            guildIndex: 0,
         });
 
         for (const message of parsed) {

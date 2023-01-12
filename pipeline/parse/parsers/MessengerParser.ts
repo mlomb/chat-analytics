@@ -31,7 +31,8 @@ export class MessengerParser extends Parser {
         const fileContent = JSON.parse(textContent) as MessengerExportFile;
 
         const assignedChannelIndex = this.builder.addChannel(fileContent.thread_path, {
-            n: fileContent.title,
+            name: fileContent.title,
+            guildIndex: 0,
         });
 
         if (this.builder.numChannels === 1) this.builder.setTitle(`Chat ${fileContent.title}`);

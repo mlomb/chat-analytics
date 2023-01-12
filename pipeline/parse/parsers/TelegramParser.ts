@@ -25,7 +25,10 @@ export class TelegramParser extends Parser {
     }
 
     private onChannelId(rawChannelId: RawID) {
-        this.channelIndex = this.builder.addChannel(rawChannelId, { n: this.channelName || "default" });
+        this.channelIndex = this.builder.addChannel(rawChannelId, {
+            name: this.channelName || "default",
+            guildIndex: 0,
+        });
     }
 
     private parseMessage(message: TelegramMessage) {
