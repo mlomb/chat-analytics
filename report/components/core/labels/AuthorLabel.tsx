@@ -1,7 +1,7 @@
 import { memo } from "react";
 
 import { Author, Index, Platform } from "@pipeline/Types";
-import BaseLabel, { LabelAvatar, LabelProps } from "@report/components/core/labels/BaseLabel";
+import { BaseLabel, LabelAvatar, LabelProps } from "@report/components/core/labels/BaseLabel";
 import { useDataProvider } from "@report/DataProvider";
 
 import discord_avatar_0 from "@assets/images/platforms/discord/avatars/avatar_0.png";

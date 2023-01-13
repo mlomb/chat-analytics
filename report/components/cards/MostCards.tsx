@@ -2,8 +2,9 @@ import { Index } from "@pipeline/Types";
 import MostUsed from "@report/components/viz/MostUsed";
 import { useDataProvider } from "@report/DataProvider";
 
-import { ChannelLabel, DomainLabel, EmojiLabel, MentionLabel, WordLabel } from "@report/components/core/Labels";
+import { DomainLabel, EmojiLabel, MentionLabel, WordLabel } from "@report/components/core/Labels";
 import { AuthorLabel } from "@report/components/core/labels/AuthorLabel";
+import { ChannelLabel } from "@report/components/core/labels/ChannelLabel";
 import WordCloud from "@report/components/viz/WordCloud";
 
 import { ConversationStats } from "@pipeline/aggregate/blocks/ConversationStats";

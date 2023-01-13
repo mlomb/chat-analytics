@@ -3,8 +3,9 @@ import "@assets/styles/Labels.less";
 import { Day, formatTime } from "@pipeline/Time";
 import { AttachmentType, FullMessage } from "@pipeline/Types";
 import Tooltip from "@report/components/core/Tooltip";
-import { ChannelLabel, DomainLabel, EmojiLabel, MentionLabel, WordLabel } from "@report/components/core/Labels";
+import { DomainLabel, EmojiLabel, MentionLabel, WordLabel } from "@report/components/core/Labels";
 import { AuthorLabel } from "@report/components/core/labels/AuthorLabel";
+import { ChannelLabel } from "@report/components/core/labels/ChannelLabel";
 import { useDataProvider } from "@report/DataProvider";
 
 interface ChipProps {

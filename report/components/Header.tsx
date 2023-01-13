@@ -6,8 +6,8 @@ import { matchFormat } from "@pipeline/Text";
 import { Database, Index } from "@pipeline/Types";
 import { useDataProvider } from "@report/DataProvider";
 
-import { ChannelLabel } from "@report/components/core/Labels";
 import { AuthorLabel } from "@report/components/core/labels/AuthorLabel";
+import { ChannelLabel } from "@report/components/core/labels/ChannelLabel";
 import FilterSelect, { FilterOption } from "@report/components/FilterSelect";
 import { TabSwitch } from "@report/components/Tabs";
 import TimeSelector from "@report/components/TimeSelector";
