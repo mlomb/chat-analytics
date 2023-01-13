@@ -25,7 +25,7 @@ type ItemComponent = (props: { index: Index }) => JSX.Element;
 type FocusDirection = "up" | "down" | "pageup" | "pagedown" | "first" | "last";
 
 export interface FilterOption {
-    name: string;
+    name: string | ReactElement;
     options: Index[];
 }
 
