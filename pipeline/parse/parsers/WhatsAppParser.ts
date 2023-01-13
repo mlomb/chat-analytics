@@ -50,10 +50,15 @@ export class WhatsAppParser extends Parser {
         // if the chat is not a group, add "Chat with " to the name
         if (name && !isGroup) name = `Chat with ${name}`;
 
+        name = name || `Chat #${this.channelIndex}`;
+
         const channelIndex = this.channelIndex++;
+        const guildIndex = this.builder.addGuild(channelIndex, {
+            name,
+        });
         const assignedChannelIndex = this.builder.addChannel(channelIndex, {
-            name: name || `Channel #${channelIndex}`,
-            guildIndex: 0,
+            name,
+            guildIndex: guildIndex,
         });
 
         for (const message of parsed) {

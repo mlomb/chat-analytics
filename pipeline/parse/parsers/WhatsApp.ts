@@ -22,6 +22,10 @@ export const extractChatName = (filename: string): string | undefined => {
             break;
         }
     }
+    if (name !== undefined) {
+        // replace occasional _ that appear in the name by spaces
+        name = name.replace("_", " ").trim();
+    }
     return name;
 };
 
