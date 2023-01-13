@@ -87,14 +87,12 @@ const _AuthorLabel = ({ index }: LabelProps) => {
     const platform = dp.database.config.platform;
     const author = dp.database.authors[index];
 
-    const title = author.n + (author.d !== undefined ? `#${author.d}` : "");
+    const title = author.n + (author.d ? `#${author.d}` : "");
     const avatar = AuthorAvatar[platform](author, index);
     const name = (
         <>
             {author.n}
-            {author.d !== undefined && (
-                <span className="Label__discriminator">#{`${demo ? 0 : author.d}`.padStart(4, "0")}</span>
-            )}
+            {author.d && <span className="Label__discriminator">#{`${demo ? 0 : author.d}`.padStart(4, "0")}</span>}
         </>
     );
 

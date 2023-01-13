@@ -19,9 +19,9 @@ export interface LabelImageProps {
 
 interface BaseLabelProps {
     title: string;
-    name: string | ReactElement;
+    name?: string | ReactElement;
     avatar?: LabelImageProps;
-    icon?: LabelImageProps;
+    icon?: LabelImageProps | ReactElement;
     link?: string;
 }
 
@@ -30,16 +30,8 @@ const LabelImage = ({ url, placeholder }: LabelImageProps) =>
 
 const BaseLabel = ({ title, name, avatar, icon, link }: BaseLabelProps) => (
     <div className={["Label", link ? "Label-link" : ""].join(" ")} title={title}>
-        {avatar && (
-            <div className="Label__avatar">
-                <LabelImage {...avatar} />
-            </div>
-        )}
-        {icon && (
-            <div className="Label__icon">
-                <LabelImage {...icon} />
-            </div>
-        )}
+        {avatar && <div className="Label__avatar" children={<LabelImage {...avatar} />} />}
+        {icon && <div className="Label__icon" children={"placeholder" in icon ? <LabelImage {...icon} /> : icon} />}
         {link ? (
             <a href={link} target="_blank" className="Label__name" children={name} />
         ) : (

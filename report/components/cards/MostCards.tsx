@@ -2,10 +2,12 @@ import { Index } from "@pipeline/Types";
 import MostUsed from "@report/components/viz/MostUsed";
 import { useDataProvider } from "@report/DataProvider";
 
-import { EmojiLabel, MentionLabel, WordLabel } from "@report/components/core/Labels";
 import { AuthorLabel } from "@report/components/core/labels/AuthorLabel";
 import { ChannelLabel } from "@report/components/core/labels/ChannelLabel";
 import { DomainLabel } from "@report/components/core/labels/DomainLabel";
+import { MentionLabel } from "@report/components/core/labels/MentionLabel";
+import { EmojiLabel } from "@report/components/core/labels/EmojiLabel";
+import { WordLabel } from "@report/components/core/labels/WordLabel";
 import WordCloud from "@report/components/viz/WordCloud";
 
 import { ConversationStats } from "@pipeline/aggregate/blocks/ConversationStats";
