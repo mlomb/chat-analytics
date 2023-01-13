@@ -35,9 +35,6 @@ export class MessengerParser extends Parser {
             guildIndex: 0,
         });
 
-        if (this.builder.numChannels === 1) this.builder.setTitle(`Chat ${fileContent.title}`);
-        else this.builder.setTitle(`Messenger Chats`);
-
         // we iterate the messages in reverse order since we want to iterate from older to newer
         for (const message of fileContent.messages.reverse()) {
             const authorIndex = this.builder.addAuthor(message.sender_name, {

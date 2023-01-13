@@ -45,7 +45,6 @@ const DefaultBitConfig: MessageBitConfig = {
 };
 
 export class DatabaseBuilder {
-    private title: string = "Chat";
     private minDate: Day | undefined;
     private maxDate: Day | undefined;
 
@@ -127,10 +126,6 @@ export class DatabaseBuilder {
             iso639: code,
             index: LanguageCodes.indexOf(code),
         };
-    }
-
-    public setTitle(title: string) {
-        this.title = title;
     }
 
     public addGuild(rawId: RawID, guild: IGuild): Index {
@@ -456,7 +451,6 @@ export class DatabaseBuilder {
         return {
             config: this.config,
             bitConfig: finalBitConfig,
-            title: this.title,
             time: {
                 minDate: this.minDate.dateKey,
                 maxDate: this.maxDate.dateKey,
