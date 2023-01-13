@@ -12,7 +12,7 @@ const _ChannelLabel = ({ index }: LabelProps) => {
     const channel = dp.database.channels[index];
     const guild = dp.database.guilds[channel.guildIndex];
 
-    const title = guild.name + " > " + channel.name;
+    let title = channel.name;
     const name = channel.name;
 
     let icon: ReactNode | undefined;
@@ -21,6 +21,8 @@ const _ChannelLabel = ({ index }: LabelProps) => {
     if (platform === "discord") {
         // show a # before channel names because Discord does it
         icon = <img src={Hashtag} height={12} />;
+        // prepend the guild name to the channel name
+        title = guild.name + " > " + name;
     }
 
     if (dp.database.guilds.length >= 2) {

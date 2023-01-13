@@ -30,9 +30,12 @@ export class MessengerParser extends Parser {
         // so we can just parse the whole file at once :)
         const fileContent = JSON.parse(textContent) as MessengerExportFile;
 
+        const guildIndex = this.builder.addGuild(fileContent.thread_path, {
+            name: fileContent.title,
+        });
         const assignedChannelIndex = this.builder.addChannel(fileContent.thread_path, {
             name: fileContent.title,
-            guildIndex: 0,
+            guildIndex: guildIndex,
         });
 
         // we iterate the messages in reverse order since we want to iterate from older to newer
