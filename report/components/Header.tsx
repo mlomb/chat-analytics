@@ -1,6 +1,6 @@
 import "@assets/styles/Header.less";
 
-import { useCallback, useLayoutEffect, useMemo, useState } from "react";
+import { CSSProperties, useCallback, useLayoutEffect, useMemo, useState } from "react";
 
 import { matchFormat } from "@pipeline/Text";
 import { Database, Index } from "@pipeline/Types";
@@ -8,6 +8,7 @@ import { useDataProvider } from "@report/DataProvider";
 
 import { AuthorLabel } from "@report/components/core/labels/AuthorLabel";
 import { ChannelLabel } from "@report/components/core/labels/ChannelLabel";
+import { GuildLabel } from "@report/components/core/labels/GuildLabel";
 import FilterSelect, { FilterOption } from "@report/components/FilterSelect";
 import { TabSwitch } from "@report/components/Tabs";
 import TimeSelector from "@report/components/TimeSelector";
@@ -21,15 +22,41 @@ interface Props {
     sections: Section[];
 }
 
-const channelsFilterOptionsFn: (db: Database) => FilterOption[] = (db) => [
-    {
-        name: "Select all channels",
-        options: db.channels
-            .map((c, i) => [c.msgCount, i])
-            .sort((a, b) => b[0] - a[0])
-            .map((c) => c[1]),
-    },
-];
+const channelsFilterOptionsFn: (db: Database) => FilterOption[] = (db) => {
+    const twoOrMoreGuildsPresent = db.guilds.length >= 2;
+    const options: FilterOption[] = [
+        {
+            name: "Select all channels",
+            options: db.channels
+                .map((c, i) => [c.msgCount, i])
+                .sort((a, b) => b[0] - a[0])
+                .map((c) => c[1]),
+        },
+    ];
+    if (twoOrMoreGuildsPresent) {
+        for (let index = 0; index < db.guilds.length; index++) {
+            options.push({
+                name: (
+                    <div style={{ display: "flex", whiteSpace: "nowrap", alignItems: "center", gap: 6 }}>
+                        Select all channels in
+                        <div
+                            className="FilterSelect__option-list FilterSelect__option-list--selected"
+                            style={{ "--hue": 0 } as CSSProperties}
+                        >
+                            <GuildLabel index={index} />
+                        </div>
+                    </div>
+                ),
+                options: db.channels
+                    .map((c, i) => [c.guildIndex, i])
+                    .filter((c) => c[0] === index)
+                    .map((c) => c[1]),
+            });
+        }
+    }
+
+    return options;
+};
 
 const authorsFilterOptionsFn: (db: Database) => FilterOption[] = (db) => {
     const botsPresent = db.authorsBotCutoff >= 0;
