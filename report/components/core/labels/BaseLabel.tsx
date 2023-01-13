@@ -15,6 +15,7 @@ export interface LabelProps {
 export interface LabelImageProps {
     url?: string;
     placeholder: ReactElement;
+    size?: number;
 }
 
 interface BaseLabelProps {
@@ -25,13 +26,25 @@ interface BaseLabelProps {
     link?: string;
 }
 
-const LabelImage = ({ url, placeholder }: LabelImageProps) =>
-    url ? <LazyImage src={url} children={placeholder} /> : placeholder;
+const LabelImage = ({ image, className }: { image: LabelImageProps | ReactElement; className: string }) => {
+    let content: ReactElement;
+    let size: number | undefined;
+
+    if ("placeholder" in image) {
+        content = image.url ? <LazyImage src={image.url} children={image.placeholder} /> : image.placeholder;
+        size = image.size;
+    } else {
+        // custom icon provided
+        content = image;
+    }
+
+    return <div className={className} style={{ width: size, height: size }} children={content} />;
+};
 
 const BaseLabel = ({ title, name, avatar, icon, link }: BaseLabelProps) => (
     <div className={["Label", link ? "Label-link" : ""].join(" ")} title={title}>
-        {avatar && <div className="Label__avatar" children={<LabelImage {...avatar} />} />}
-        {icon && <div className="Label__icon" children={"placeholder" in icon ? <LabelImage {...icon} /> : icon} />}
+        {avatar && <LabelImage image={avatar} className="Label__avatar" />}
+        {icon && <LabelImage image={icon} className="Label__icon" />}
         {link ? (
             <a href={link} target="_blank" className="Label__name" children={name} />
         ) : (
