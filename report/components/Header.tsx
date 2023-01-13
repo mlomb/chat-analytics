@@ -1,6 +1,6 @@
 import "@assets/styles/Header.less";
 
-import { CSSProperties, useCallback, useLayoutEffect, useMemo, useState } from "react";
+import { CSSProperties, ReactNode, useCallback, useLayoutEffect, useMemo, useState } from "react";
 
 import { matchFormat } from "@pipeline/Text";
 import { Database, Index } from "@pipeline/Types";
@@ -9,6 +9,7 @@ import { useDataProvider } from "@report/DataProvider";
 import { AuthorLabel } from "@report/components/core/labels/AuthorLabel";
 import { ChannelLabel } from "@report/components/core/labels/ChannelLabel";
 import { GuildLabel } from "@report/components/core/labels/GuildLabel";
+import { PlatformLabel } from "@report/components/core/labels/PlatformLabel";
 import FilterSelect, { FilterOption } from "@report/components/FilterSelect";
 import { TabSwitch } from "@report/components/Tabs";
 import TimeSelector from "@report/components/TimeSelector";
@@ -109,13 +110,20 @@ const Header = (props: Props) => {
         [dataProvider]
     );
 
+    let title: ReactNode;
+    if (dataProvider.database.guilds.length === 1) {
+        // single guild, just show the guild in the title
+        title = <GuildLabel index={0} />;
+    } else {
+        // multiple guilds, show the platform name and the logo
+        title = <PlatformLabel />;
+    }
+
     return (
         <div className="Header">
             <header className="Header__info">
                 <span className="Header__title">
-                    <h1>
-                        <GuildLabel index={0} />
-                    </h1>
+                    <h1>{title}</h1>
                     <h2>chat analysis report</h2>
                 </span>
                 <div className="Header__link">
