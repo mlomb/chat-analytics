@@ -1,6 +1,7 @@
 import { memo } from "react";
 
-import { BaseLabel, LabelImageProps, LabelProps } from "@report/components/core/labels/BaseLabel";
+import { BaseLabel, LabelProps } from "@report/components/core/labels/BaseLabel";
+import { LazyImage } from "@report/components/core/LazyImage";
 import { useDataProvider } from "@report/DataProvider";
 
 import DefaultFaviconIcon from "@assets/images/icons/default-favicon.png";
@@ -17,15 +18,20 @@ const _DomainLabel = ({ index }: LabelProps) => {
     // https://www.google.com/s2/favicons?domain=google.com
     // but you know... privacy
 
-    const title = domain;
-    const icon: LabelImageProps = {
-        url: `https://icons.duckduckgo.com/ip3/${domain}.ico`,
-        placeholder: DefaultFavicon,
-        size: 16,
-    };
-    const name = domain;
-
-    return <BaseLabel title={title} icon={icon} name={name} link={`http://${domain}`} />;
+    return (
+        <BaseLabel
+            title={domain}
+            icon={
+                <LazyImage
+                    src={`https://icons.duckduckgo.com/ip3/${domain}.ico`}
+                    placeholder={DefaultFavicon}
+                    height={16}
+                />
+            }
+            name={domain}
+            link={`http://${domain}`}
+        />
+    );
 };
 
 export const DomainLabel = memo(_DomainLabel) as typeof _DomainLabel;

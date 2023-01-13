@@ -46,7 +46,7 @@ self.onmessage = async (ev: MessageEvent<InitMessage>) => {
             type: "result",
             data: env.isDev ? result.data : "",
             html: result.html,
-            title: database.title,
+            title: "TODO: title",
             counts: {
                 authors: database.authors.length,
                 channels: database.channels.length,

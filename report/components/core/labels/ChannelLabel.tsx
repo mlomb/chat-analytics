@@ -1,7 +1,8 @@
-import { memo } from "react";
+import { memo, ReactNode } from "react";
 
-import { BaseLabel, LabelImageProps, LabelProps } from "@report/components/core/labels/BaseLabel";
+import { BaseLabel, LabelProps } from "@report/components/core/labels/BaseLabel";
 import { useDataProvider } from "@report/DataProvider";
+import { GuildAvatar } from "@report/components/core/avatars/GuildAvatar";
 
 import Hashtag from "@assets/images/icons/hashtag.svg";
 
@@ -14,21 +15,18 @@ const _ChannelLabel = ({ index }: LabelProps) => {
     const title = guild.name + " > " + channel.name;
     const name = channel.name;
 
-    let icon: LabelImageProps | undefined;
-    let avatar: LabelImageProps | undefined;
+    let icon: ReactNode | undefined;
+    let avatar: ReactNode | undefined;
 
     if (platform === "discord") {
         // show a # before channel names because Discord does it
-        icon = { placeholder: <img src={Hashtag} height={12} /> };
+        icon = <img src={Hashtag} height={12} />;
     }
 
     if (dp.database.guilds.length >= 2) {
         // if there are more than two guild in the report, show the guild avatar
         // so users can distinguish between channels with the same name
-        avatar = {
-            url: guild.iconUrl,
-            placeholder: <>TO-DO</>,
-        };
+        avatar = <GuildAvatar index={channel.guildIndex} />;
     }
 
     return <BaseLabel title={title} name={name} avatar={avatar} icon={icon} />;

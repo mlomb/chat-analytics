@@ -113,7 +113,9 @@ const Header = (props: Props) => {
         <div className="Header">
             <header className="Header__info">
                 <span className="Header__title">
-                    <h1>{dataProvider.database.title}</h1>
+                    <h1>
+                        <GuildLabel index={0} />
+                    </h1>
                     <h2>chat analysis report</h2>
                 </span>
                 <div className="Header__link">

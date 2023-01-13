@@ -4,8 +4,8 @@ import { JSONStream } from "@pipeline/parse/JSONStream";
 import { FileInput, getAttachmentTypeFromMimeType, streamJSONFromFile } from "@pipeline/File";
 
 export class TelegramParser extends Parser {
-    private channelName?: string;
-    private channelIndex?: Index;
+    private lastChannelName?: string;
+    private lastChannelIndex?: Index;
 
     async *parse(file: FileInput) {
         const stream = new JSONStream()
@@ -15,24 +15,30 @@ export class TelegramParser extends Parser {
 
         yield* streamJSONFromFile(stream, file);
 
-        this.channelName = undefined;
-        this.channelIndex = undefined;
+        this.lastChannelName = undefined;
+        this.lastChannelIndex = undefined;
     }
 
     private onChannelName(channelName: string) {
-        this.channelName = channelName;
-        this.builder.setTitle(this.builder.numChannels === 0 ? channelName : "Telegram Chats");
+        this.lastChannelName = channelName;
     }
 
     private onChannelId(rawChannelId: RawID) {
-        this.channelIndex = this.builder.addChannel(rawChannelId, {
-            name: this.channelName || "default",
-            guildIndex: 0,
+        // In Telegram, Guild=Channel
+        const name = this.lastChannelName || "Telegram chat";
+
+        const guildIndex = this.builder.addGuild(rawChannelId, {
+            name,
+        });
+
+        this.lastChannelIndex = this.builder.addChannel(rawChannelId, {
+            name,
+            guildIndex,
         });
     }
 
     private parseMessage(message: TelegramMessage) {
-        if (this.channelIndex === undefined) throw new Error("Missing channel ID");
+        if (this.lastChannelIndex === undefined) throw new Error("Missing channel ID");
 
         const rawId: RawID = message.id + "";
         const rawAuthorId: RawID = message.from_id + "";
@@ -72,7 +78,7 @@ export class TelegramParser extends Parser {
                 id: rawId,
                 replyTo: rawReplyToId,
                 authorIndex,
-                channelIndex: this.channelIndex,
+                channelIndex: this.lastChannelIndex,
                 timestamp,
                 timestampEdit,
                 content,

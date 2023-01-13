@@ -25,7 +25,6 @@ export class DiscordParser extends Parser {
     }
 
     private parseGuild(guild: DiscordGuild) {
-        this.builder.setTitle(guild.name);
         this.lastGuildIndex = this.builder.addGuild(guild.id, { name: guild.name, iconUrl: guild.iconUrl });
     }
 

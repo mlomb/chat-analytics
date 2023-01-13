@@ -1,94 +1,15 @@
 import { memo } from "react";
 
-import { Author, Index, Platform } from "@pipeline/Types";
-import { BaseLabel, LabelImageProps, LabelProps } from "@report/components/core/labels/BaseLabel";
+import { AuthorAvatar } from "@report/components/core/avatars/AuthorAvatar";
+import { BaseLabel, LabelProps } from "@report/components/core/labels/BaseLabel";
 import { useDataProvider } from "@report/DataProvider";
-
-import discord_avatar_0 from "@assets/images/platforms/discord/avatars/avatar_0.png";
-import discord_avatar_1 from "@assets/images/platforms/discord/avatars/avatar_1.png";
-import discord_avatar_2 from "@assets/images/platforms/discord/avatars/avatar_2.png";
-import discord_avatar_3 from "@assets/images/platforms/discord/avatars/avatar_3.png";
-import discord_avatar_4 from "@assets/images/platforms/discord/avatars/avatar_4.png";
-import messenger_avatar from "@assets/images/platforms/messenger/default_avatar.png";
-import wpp_avatar from "@assets/images/platforms/whatsapp/default_avatar.png";
-
-const DiscordDefaultAvatars = [
-    discord_avatar_0,
-    discord_avatar_1,
-    discord_avatar_2,
-    discord_avatar_3,
-    discord_avatar_4,
-];
-
-const TelegramBubbleColors = [
-    ["ff885e", "ff516a"],
-    ["ffcd6a", "ffa85c"],
-    ["82b1ff", "665fff"],
-    ["a0de7e", "54cb68"],
-    ["53edd6", "28c9b7"],
-    ["72d5fd", "2a9ef1"],
-    ["e0a2f3", "d669ed"],
-];
-
-const RawImg = (src: any) => (
-    <img
-        src={src}
-        style={{
-            width: "100%",
-            height: "100%",
-        }}
-    />
-);
-
-const AuthorAvatar: {
-    [platform in Platform]: (author: Author, index: Index) => LabelImageProps | undefined;
-} = {
-    discord: (author) => ({
-        // https://cdn.discordapp.com/avatars/{user_id}/{user_avatar}.png
-        url: author.da ?? `https://cdn.discordapp.com/avatars/${author.da}.png?size=32`,
-        placeholder: RawImg(DiscordDefaultAvatars[(author.d || 0) % 5]),
-    }),
-    whatsapp: () => ({
-        placeholder: RawImg(wpp_avatar),
-    }),
-    messenger: () => ({
-        placeholder: RawImg(messenger_avatar),
-    }),
-    telegram: (author, index) => {
-        // TODO: two letters
-        let letter: string = "";
-        // iterate UTF-8 codepoints
-        for (const symbol of author.n) {
-            letter = symbol;
-            break;
-        }
-
-        const colors = TelegramBubbleColors[(1779033703 ^ index) % TelegramBubbleColors.length];
-        const placeholder = (
-            <div
-                style={{
-                    background: `linear-gradient(#${colors[0]}, #${colors[1]})`,
-                    textAlign: "center",
-                    lineHeight: "20px",
-                    color: "#fff",
-                    fontSize: 10,
-                }}
-            >
-                {letter}
-            </div>
-        );
-
-        return { placeholder };
-    },
-};
 
 const _AuthorLabel = ({ index }: LabelProps) => {
     const dp = useDataProvider();
-    const platform = dp.database.config.platform;
     const author = dp.database.authors[index];
 
     const title = author.n + (author.d ? `#${author.d}` : "");
-    const avatar = AuthorAvatar[platform](author, index);
+    const avatar = <AuthorAvatar index={index} />;
     const name = (
         <>
             {author.n}
