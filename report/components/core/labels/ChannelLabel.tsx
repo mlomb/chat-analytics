@@ -1,4 +1,4 @@
-import { memo, ReactElement } from "react";
+import { memo } from "react";
 
 import { BaseLabel, LabelImageProps, LabelProps } from "@report/components/core/labels/BaseLabel";
 import { useDataProvider } from "@report/DataProvider";
@@ -19,7 +19,7 @@ const _ChannelLabel = ({ index }: LabelProps) => {
 
     if (platform === "discord") {
         // show a # before channel names because Discord does it
-        icon = { placeholder: <img src={Hashtag} height={16} /> };
+        icon = { placeholder: <img src={Hashtag} height={12} /> };
     }
 
     if (dp.database.guilds.length >= 2) {
