@@ -2,10 +2,11 @@ import "@assets/styles/Labels.less";
 
 import { Day, formatTime } from "@pipeline/Time";
 import { AttachmentType, FullMessage } from "@pipeline/Types";
-import Tooltip from "@report/components/core/Tooltip";
-import { DomainLabel, EmojiLabel, MentionLabel, WordLabel } from "@report/components/core/Labels";
+import { EmojiLabel, MentionLabel, WordLabel } from "@report/components/core/Labels";
 import { AuthorLabel } from "@report/components/core/labels/AuthorLabel";
 import { ChannelLabel } from "@report/components/core/labels/ChannelLabel";
+import { DomainLabel } from "@report/components/core/labels/DomainLabel";
+import Tooltip from "@report/components/core/Tooltip";
 import { useDataProvider } from "@report/DataProvider";
 
 interface ChipProps {

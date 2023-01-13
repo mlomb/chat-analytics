@@ -1,7 +1,7 @@
 import { memo } from "react";
 
 import { Author, Index, Platform } from "@pipeline/Types";
-import { BaseLabel, LabelAvatar, LabelProps } from "@report/components/core/labels/BaseLabel";
+import { BaseLabel, LabelImageProps, LabelProps } from "@report/components/core/labels/BaseLabel";
 import { useDataProvider } from "@report/DataProvider";
 
 import discord_avatar_0 from "@assets/images/platforms/discord/avatars/avatar_0.png";
@@ -41,7 +41,7 @@ const RawImg = (src: any) => (
 );
 
 const AuthorAvatar: {
-    [platform in Platform]: (author: Author, index: Index) => LabelAvatar | undefined;
+    [platform in Platform]: (author: Author, index: Index) => LabelImageProps | undefined;
 } = {
     discord: (author) => ({
         // https://cdn.discordapp.com/avatars/{user_id}/{user_avatar}.png
@@ -87,6 +87,7 @@ const _AuthorLabel = ({ index }: LabelProps) => {
     const platform = dp.database.config.platform;
     const author = dp.database.authors[index];
 
+    const title = author.n + (author.d !== undefined ? `#${author.d}` : "");
     const avatar = AuthorAvatar[platform](author, index);
     const name = (
         <>
@@ -97,7 +98,7 @@ const _AuthorLabel = ({ index }: LabelProps) => {
         </>
     );
 
-    return <BaseLabel title={author.n} name={name} avatar={avatar} />;
+    return <BaseLabel title={title} name={name} avatar={avatar} />;
 };
 
 export const AuthorLabel = memo(_AuthorLabel) as typeof _AuthorLabel;
