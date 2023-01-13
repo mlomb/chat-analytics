@@ -43,9 +43,10 @@ export class DiscordParser extends Parser {
         const timestamp = Date.parse(message.timestamp);
         const timestampEdit = message.timestampEdited ? Date.parse(message.timestampEdited) : undefined;
 
+        const name = message.author.nickname || message.author.name;
         const isDeletedUser = message.author.nickname == "Deleted User";
         const author: IAuthor = {
-            n: message.author.nickname + (isDeletedUser ? " #" + message.author.id : ""),
+            n: name + (isDeletedUser ? " #" + message.author.id : ""),
             d: isDeletedUser ? undefined : parseInt(message.author.discriminator),
         };
         if (message.author.isBot) author.b = true;
