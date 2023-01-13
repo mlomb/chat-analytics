@@ -1,6 +1,6 @@
 import { memo, ReactElement } from "react";
 
-import { BaseLabel, LabelAvatar, LabelProps } from "@report/components/core/labels/BaseLabel";
+import { BaseLabel, LabelImageProps, LabelProps } from "@report/components/core/labels/BaseLabel";
 import { useDataProvider } from "@report/DataProvider";
 
 import Hashtag from "@assets/images/icons/hashtag.svg";
@@ -14,12 +14,12 @@ const _ChannelLabel = ({ index }: LabelProps) => {
     const title = guild.name + " > " + channel.name;
     const name = channel.name;
 
-    let icon: ReactElement | undefined;
-    let avatar: LabelAvatar | undefined;
+    let icon: LabelImageProps | undefined;
+    let avatar: LabelImageProps | undefined;
 
     if (platform === "discord") {
         // show a # before channel names because Discord does it
-        icon = <img src={Hashtag} height={16} />;
+        icon = { placeholder: <img src={Hashtag} height={16} /> };
     }
 
     if (dp.database.guilds.length >= 2) {

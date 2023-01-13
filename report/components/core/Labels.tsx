@@ -3,10 +3,6 @@ import "@assets/styles/Labels.less";
 import { memo, ReactElement } from "react";
 
 import { useDataProvider } from "@report/DataProvider";
-import LazyImage from "@report/components/core/LazyImage";
-
-import DefaultFaviconIcon from "@assets/images/icons/default-favicon.png";
-import LinkOutIcon from "@assets/images/icons/link-out-blue.svg";
 import { LabelProps } from "./labels/BaseLabel";
 
 // NOTE: this file is a bit messy, should be refactored
@@ -52,34 +48,6 @@ const _EmojiLabel = ({ index, hideNameIfPossible }: LabelProps & { hideNameIfPos
     );
 };
 
-const DefaultFavicon = <img src={DefaultFaviconIcon} width={16} height={16} />;
-
-const _DomainLabel = ({ index }: LabelProps) => {
-    const dp = useDataProvider();
-    const domain = dp.database.domains[index];
-
-    if (domain === undefined) {
-        return <span>invalid domain index {index}</span>;
-    }
-
-    // NOTE: we use the icon provided by DuckDuckGo:
-    // https://icons.duckduckgo.com/ip3/google.com.ico
-    // we could also use the icon provided by Google:
-    // https://www.google.com/s2/favicons?domain=google.com
-
-    return (
-        <div className="Label Label-domain" title={domain}>
-            <a href={`http://${domain}`} target="_blank" className="Label__name">
-                <div className="Label__icon">
-                    <LazyImage src={`https://icons.duckduckgo.com/ip3/${domain}.ico`} children={DefaultFavicon} />
-                </div>
-                {domain}
-                <img className="Label__linkout" src={LinkOutIcon} width={12} height={12} />
-            </a>
-        </div>
-    );
-};
-
 const _MentionLabel = ({ index }: LabelProps) => {
     const dp = useDataProvider();
     const mention = dp.database.mentions[index];
@@ -101,5 +69,4 @@ const _MentionLabel = ({ index }: LabelProps) => {
 // memoize labels
 export const WordLabel = memo(_WordLabel) as typeof _WordLabel;
 export const EmojiLabel = memo(_EmojiLabel) as typeof _EmojiLabel;
-export const DomainLabel = memo(_DomainLabel) as typeof _DomainLabel;
 export const MentionLabel = memo(_MentionLabel) as typeof _MentionLabel;

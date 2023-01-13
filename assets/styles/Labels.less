@@ -2,15 +2,6 @@
     width: 100%;
     display: flex;
     align-items: center;
-
-    svg {
-        width: 16px;
-        height: 16px;
-    }
-
-    * + span {
-        margin-left: 3px;
-    }
 }
 
 .Label__avatar {
@@ -20,6 +11,7 @@
     overflow: hidden;
     border-radius: 50%;
     flex-shrink: 0;
+    margin-right: 3px;
 }
 
 .Label__name {
@@ -28,7 +20,14 @@
     text-overflow: ellipsis;
     overflow: hidden;
     font-weight: 600;
-    line-height: 20px; /* not sure if this is correct */
+    margin-bottom: 2px;
+}
+
+.Label__icon {
+    position: relative;
+    width: 16px;
+    height: 16px;
+    margin-right: 3px;
 }
 
 .Label__discriminator {
@@ -39,23 +38,20 @@
     margin-left: 3px;
 }
 
-.Label-domain {
+.Label__linkout {
+    margin-left: 5px;
+}
+
+.Label-link {
+    .Label__icon {
+        margin-right: 5px;
+    }
     .Label__name {
         color: #7ed0ff;
         cursor: pointer;
         text-decoration: none;
         display: flex;
         align-items: center;
-    }
-
-    .Label__icon {
-        position: relative;
-        width: 16px;
-        height: 16px;
-        margin-right: 6px;
-    }
-    .Label__linkout {
-        margin-left: 5px;
     }
 }
 
