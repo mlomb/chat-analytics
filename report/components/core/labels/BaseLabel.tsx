@@ -17,19 +17,21 @@ export interface LabelAvatar {
 
 interface BaseLabelProps {
     title: string;
-    name: ReactElement;
+    name: string | ReactElement;
+    icon?: ReactElement;
     avatar?: LabelAvatar;
 }
 
-const BaseLabel = ({ title, name, avatar }: BaseLabelProps) => (
+const BaseLabel = ({ title, name, avatar, icon }: BaseLabelProps) => (
     <div className="Label" title={title}>
-        {avatar ? (
+        {avatar && (
             <div className="Label__avatar">
                 {avatar.url ? <LazyImage src={avatar.url} children={avatar.placeholder} /> : avatar.placeholder}
             </div>
-        ) : null}
+        )}
+        {icon}
         <span className="Label__name">{name}</span>
     </div>
 );
 
-export default BaseLabel;
+export { BaseLabel };

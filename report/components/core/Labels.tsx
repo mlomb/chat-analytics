@@ -2,40 +2,15 @@ import "@assets/styles/Labels.less";
 
 import { memo, ReactElement } from "react";
 
-import { Index } from "@pipeline/Types";
 import { useDataProvider } from "@report/DataProvider";
 import LazyImage from "@report/components/core/LazyImage";
 
 import DefaultFaviconIcon from "@assets/images/icons/default-favicon.png";
 import LinkOutIcon from "@assets/images/icons/link-out-blue.svg";
-import Hashtag from "@assets/images/icons/hashtag.svg";
 import { LabelProps } from "./labels/BaseLabel";
 
 // NOTE: this file is a bit messy, should be refactored
 // there is code that can be easily reused
-
-const _ChannelLabel = ({ index }: LabelProps) => {
-    const dp = useDataProvider();
-    const platform = dp.database.config.platform;
-    const channel = dp.database.channels[index];
-
-    if (channel === undefined) {
-        return <span>invalid channel index {index}</span>;
-    }
-
-    let guild: ReactElement | undefined = undefined;
-    if (dp.database.guilds.length >= 2) {
-        guild = <>{dp.database.guilds[channel.guildIndex].name}</>;
-    }
-
-    return (
-        <div className="Label" title={channel.name}>
-            {guild}
-            {platform === "discord" && <img src={Hashtag} height={16} />}
-            <span className="Label__name">{channel.name}</span>
-        </div>
-    );
-};
 
 const _WordLabel = ({ index }: LabelProps) => {
     const dp = useDataProvider();
@@ -124,7 +99,6 @@ const _MentionLabel = ({ index }: LabelProps) => {
 };
 
 // memoize labels
-export const ChannelLabel = memo(_ChannelLabel) as typeof _ChannelLabel;
 export const WordLabel = memo(_WordLabel) as typeof _WordLabel;
 export const EmojiLabel = memo(_EmojiLabel) as typeof _EmojiLabel;
 export const DomainLabel = memo(_DomainLabel) as typeof _DomainLabel;
