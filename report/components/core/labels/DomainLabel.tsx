@@ -21,6 +21,7 @@ const _DomainLabel = ({ index }: LabelProps) => {
     const icon: LabelImageProps = {
         url: `https://icons.duckduckgo.com/ip3/${domain}.ico`,
         placeholder: DefaultFavicon,
+        size: 16,
     };
     const name = domain;
 
