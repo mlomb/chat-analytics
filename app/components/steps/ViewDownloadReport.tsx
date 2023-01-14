@@ -53,11 +53,27 @@ const ViewDownloadReport = ({ result }: Props) => {
         <div className="ViewDownloadReport">
             {result && (
                 <div className="ViewDownloadReport__stats">
-                    Your report <b>"{result.title}"</b> is ready!
+                    {result.title === undefined ? (
+                        <>Your multi-guild report is ready!</>
+                    ) : (
+                        <>
+                            Your report <b>"{result.title}"</b> is ready!
+                        </>
+                    )}
                     <br />
                     It contains <b>{result.counts.messages.toLocaleString()}</b> message{ts(result.counts.messages)}{" "}
-                    from <b>{result.counts.authors.toLocaleString()}</b> author{ts(result.counts.authors)} in{" "}
-                    <b>{result.counts.channels.toLocaleString()}</b> channel{ts(result.counts.channels)}.
+                    from <b>{result.counts.authors.toLocaleString()}</b> author{ts(result.counts.authors)}
+                    {result.counts.channels > 1 && (
+                        <>
+                            in <b>{result.counts.channels.toLocaleString()}</b> channels
+                        </>
+                    )}
+                    {result.counts.guilds > 1 && (
+                        <>
+                            in <b>{result.counts.guilds.toLocaleString()}</b> guilds
+                        </>
+                    )}
+                    .
                 </div>
             )}
             <div className="ViewDownloadReport__buttons">
