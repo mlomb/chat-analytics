@@ -1,4 +1,4 @@
-import { LettersAvatar } from "@report/components/core/avatars/LettersAvatar";
+import { TextAvatar } from "@report/components/core/avatars/TextAvatar";
 import { PlatformAvatar } from "@report/components/core/avatars/PlatformAvatar";
 import { BackgroundForTelegramAvatar } from "@report/components/core/avatars/Telegram";
 import { LazyImage } from "@report/components/core/LazyImage";
@@ -11,15 +11,22 @@ export const GuildAvatar = ({ index }: { index: number }) => {
 
     switch (platform) {
         case "discord":
-            let placeholder = <LettersAvatar text={guild.name} background="#36393f" color="#DCDDDE" />;
+            let placeholder = <TextAvatar text={guild.name} background="#36393f" color="#DCDDDE" />;
 
             return (
                 <div className="Avatar">
-                    <LazyImage src={guild.iconUrl} placeholder={placeholder} />;
+                    <LazyImage src={guild.iconUrl} placeholder={placeholder} />
                 </div>
             );
         case "telegram":
-            return <LettersAvatar text={guild.name} background={BackgroundForTelegramAvatar(index)} color="#fff" />;
+            return (
+                <TextAvatar
+                    text={guild.name}
+                    background={BackgroundForTelegramAvatar(index)}
+                    color="#fff"
+                    useInitials={2}
+                />
+            );
         case "messenger":
         case "whatsapp":
             return <PlatformAvatar />;
