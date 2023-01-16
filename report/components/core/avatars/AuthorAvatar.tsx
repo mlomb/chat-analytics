@@ -1,6 +1,5 @@
 import { ReactNode } from "react";
 
-import { AvatarProps, BaseAvatar } from "@report/components/core/avatars/BaseAvatar";
 import { LettersAvatar } from "@report/components/core/avatars/LettersAvatar";
 import { BackgroundForTelegramAvatar } from "@report/components/core/avatars/Telegram";
 import { LazyImage } from "@report/components/core/LazyImage";
@@ -32,7 +31,7 @@ const RawImg = (src: any) => (
     />
 );
 
-export const AuthorAvatar = ({ index }: AvatarProps) => {
+export const AuthorAvatar = ({ index }: { index: number }) => {
     const dp = useDataProvider();
     const platform = dp.database.config.platform;
     const author = dp.database.authors[index];
@@ -46,10 +45,7 @@ export const AuthorAvatar = ({ index }: AvatarProps) => {
             placeholder = RawImg(DiscordDefaultAvatars[(author.d || 0) % 5]);
             break;
         case "telegram":
-            placeholder = (
-                <LettersAvatar text={author.n} background={BackgroundForTelegramAvatar(index)} color="#fff" />
-            );
-            break;
+            return <LettersAvatar text={author.n} background={BackgroundForTelegramAvatar(index)} color="#fff" />;
         case "messenger":
             placeholder = RawImg(messenger_avatar);
             break;
@@ -58,5 +54,9 @@ export const AuthorAvatar = ({ index }: AvatarProps) => {
             break;
     }
 
-    return <BaseAvatar>{url ? <LazyImage src={url} placeholder={placeholder} height={20} /> : placeholder}</BaseAvatar>;
+    return (
+        <div className="Avatar">
+            <LazyImage src={url} placeholder={placeholder} />
+        </div>
+    );
 };

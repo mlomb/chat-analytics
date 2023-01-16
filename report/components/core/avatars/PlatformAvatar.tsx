@@ -1,4 +1,3 @@
-import { BaseAvatar } from "@report/components/core/avatars/BaseAvatar";
 import { useDataProvider } from "@report/DataProvider";
 
 import DiscordLogo from "@assets/images/logos/discord.svg";
@@ -36,13 +35,13 @@ export const PlatformAvatar = () => {
     const p = Platforms[dp.database.config.platform];
 
     return (
-        <BaseAvatar>
+        <div className="Avatar">
             <div
                 className="PlatformAvatar"
                 style={{ backgroundColor: `hsl(${p.color[0]}, ${p.color[1]}%, ${p.color[2]}%)` }}
             >
                 <img src={p.logo} alt="" />
             </div>
-        </BaseAvatar>
+        </div>
     );
 };
