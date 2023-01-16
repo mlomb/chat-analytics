@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 
-import { LettersAvatar } from "@report/components/core/avatars/LettersAvatar";
+import { TextAvatar } from "@report/components/core/avatars/TextAvatar";
 import { BackgroundForTelegramAvatar } from "@report/components/core/avatars/Telegram";
 import { LazyImage } from "@report/components/core/LazyImage";
 import { useDataProvider } from "@report/DataProvider";
@@ -45,7 +45,14 @@ export const AuthorAvatar = ({ index }: { index: number }) => {
             placeholder = RawImg(DiscordDefaultAvatars[(author.d || 0) % 5]);
             break;
         case "telegram":
-            return <LettersAvatar text={author.n} background={BackgroundForTelegramAvatar(index)} color="#fff" />;
+            return (
+                <TextAvatar
+                    text={author.n}
+                    background={BackgroundForTelegramAvatar(index)}
+                    color="#fff"
+                    useInitials={2}
+                />
+            );
         case "messenger":
             placeholder = RawImg(messenger_avatar);
             break;

@@ -35,9 +35,10 @@ export const LazyImage = ({ src, placeholder }: Props) => {
             {status !== "ok" && placeholder}
             {status !== "error" && (
                 <img
+                    className="LazyImage"
+                    style={{ opacity: status === "ok" ? undefined : 0 }}
                     loading="lazy"
                     src={src}
-                    style={{ opacity: status === "ok" ? undefined : 0, width: "100%", height: "100%" }}
                     onError={status === undefined ? onError : undefined}
                     onLoad={status === undefined ? onLoad : undefined}
                 />
