@@ -21,13 +21,7 @@ const _DomainLabel = ({ index }: LabelProps) => {
     return (
         <BaseLabel
             title={domain}
-            icon={
-                <LazyImage
-                    src={`https://icons.duckduckgo.com/ip3/${domain}.ico`}
-                    placeholder={DefaultFavicon}
-                    height={16}
-                />
-            }
+            icon={<LazyImage src={`https://icons.duckduckgo.com/ip3/${domain}.ico`} placeholder={DefaultFavicon} />}
             name={domain}
             link={`http://${domain}`}
         />

@@ -1,6 +1,42 @@
 .Avatar {
     width: 100%;
     height: 100%;
+    border-radius: 50%;
+    overflow: hidden;
+}
+
+.AvatarStack {
+    &__item {
+        position: relative;
+        height: 100%;
+        display: inline-block;
+        aspect-ratio: 1/1;
+
+        &:not(:first-child) {
+            @overlap: 20px;
+            @border: 2%;
+            @threshold: 50% + @border;
+
+            margin-left: -@overlap;
+
+            // we can't use circle because it only supports <length>
+            // ellipse supports <length-percentage>
+            mask: radial-gradient(
+                ellipse 100% 100% at calc(-50% + @overlap) 50%; transparent @threshold; #fff (@threshold+1)
+            );
+        }
+    }
+}
+
+.LettersAvatar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    user-select: none;
+    font-size: 0.85em;
+    white-space: nowrap;
 }
 
 .PlatformAvatar {

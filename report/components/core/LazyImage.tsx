@@ -3,7 +3,6 @@ import { ReactNode, useState } from "react";
 interface Props {
     src?: string;
     placeholder: ReactNode;
-    height?: number;
 }
 
 // NOTE: store loading status to avoid flickering in some conditions
@@ -14,7 +13,7 @@ interface Props {
 // undefined: loading, keep the img with opacity 0 so onLoad and onError fire
 const loadStatus: { [url: string]: "ok" | "error" | undefined } = {};
 
-export const LazyImage = ({ src, placeholder, height }: Props) => {
+export const LazyImage = ({ src, placeholder }: Props) => {
     // convenient to allow src to be undefined
     if (src === undefined) return <>{placeholder}</>;
 
@@ -38,10 +37,9 @@ export const LazyImage = ({ src, placeholder, height }: Props) => {
                 <img
                     loading="lazy"
                     src={src}
-                    style={{ opacity: status === "ok" ? 1 : 0 }}
+                    style={{ opacity: status === "ok" ? undefined : 0, width: "100%", height: "100%" }}
                     onError={status === undefined ? onError : undefined}
                     onLoad={status === undefined ? onLoad : undefined}
-                    height={height}
                 />
             )}
         </>
