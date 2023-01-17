@@ -27,7 +27,7 @@ You can generate reports from the following platforms:
 | Discord   | `json` from [DiscordChatExporter](https://github.com/Tyrrrz/DiscordChatExporter) | ✅            | ✅                | ✅                                                                                   | ✅                | ✅ (until link expires) | ✅ (as text) |
 | Messenger | `json` from [Facebook DYI export](https://www.facebook.com/dyi)                  | ✅            | ❌                | ✅                                                                                   | ❌                | ❌                      | ✅ (as text) |
 | Telegram  | `json` from [Telegram Desktop](https://desktop.telegram.org/)                    | ✅            | ✅                | ✅                                                                                   | ❌ (not provided) | ❌                      | ✅ (as text) |
-| WhatsApp  | `txt` or `zip` exported from a phone                                             | ✅            | ❌ (not provided) | ✅<strong>*</strong> (if exported from iOS)<br>🟦 (generic if exported from Android) | N/A              | ❌                      | ✅ (as text) |
+| WhatsApp  | `txt` or `zip` exported from a phone                                             | ✅            | ❌ (not provided) | ✅<strong>*</strong> (if exported from iOS)<br>🟦 (generic if exported from Android) | ❌ (not provided) | ❌                      | ✅ (as text) |
 
 <strong>*</strong>: not all languages are supported, check [WhatsApp.ts](pipeline/parse/parsers/WhatsApp.ts).
 
