@@ -23,7 +23,6 @@ interface Props {
 }
 
 const channelsFilterOptionsFn: (db: Database) => FilterOption[] = (db) => {
-    const twoOrMoreGuildsPresent = db.guilds.length >= 2;
     const options: FilterOption[] = [
         {
             name: "Select all channels",
@@ -33,7 +32,9 @@ const channelsFilterOptionsFn: (db: Database) => FilterOption[] = (db) => {
                 .map((c) => c[1]),
         },
     ];
-    if (twoOrMoreGuildsPresent) {
+
+    // let users filter channels by guild
+    if (db.guilds.length >= 2) {
         for (let index = 0; index < db.guilds.length; index++) {
             options.push({
                 name: (

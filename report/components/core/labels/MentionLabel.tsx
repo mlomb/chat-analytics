@@ -7,17 +7,14 @@ const _MentionLabel = ({ index }: LabelProps) => {
     const dp = useDataProvider();
     const mention = dp.database.mentions[index];
 
-    return (
-        <BaseLabel
-            title={mention}
-            name={
-                <>
-                    <span style={{ color: "#eded3d" }}>@</span>
-                    {mention}
-                </>
-            }
-        />
+    const name = (
+        <>
+            <span style={{ color: "#eded3d" }}>@</span>
+            {mention}
+        </>
     );
+
+    return <BaseLabel title={mention} name={name} />;
 };
 
 export const MentionLabel = memo(_MentionLabel) as typeof _MentionLabel;

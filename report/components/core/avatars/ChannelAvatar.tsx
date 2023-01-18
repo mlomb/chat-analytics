@@ -57,6 +57,7 @@ export const ChannelAvatar = ({ index }: { index: number }) => {
         let src: any = undefined;
 
         if (platform === "discord") {
+            // Discord uses the timestamp part of the channel snowflake to determine which group avatar to use
             const timestamp = parseInt((BigInt(channel.discordId!) >> BigInt(22)).toString());
             src = DiscordDefaultGroupAvatars[timestamp % DiscordDefaultGroupAvatars.length];
         } else if (platform === "whatsapp") {
