@@ -54,7 +54,7 @@ export const ChannelAvatar = ({ index }: { index: number }) => {
             );
         }
 
-        let src: any;
+        let src: any = undefined;
 
         if (platform === "discord") {
             const timestamp = parseInt((BigInt(channel.discordId!) >> BigInt(22)).toString());
@@ -63,17 +63,19 @@ export const ChannelAvatar = ({ index }: { index: number }) => {
             src = wpp_group_avatar;
         }
 
-        return (
-            <div className="Avatar">
-                <img
-                    src={src}
-                    style={{
-                        width: "100%",
-                        height: "100%",
-                    }}
-                />
-            </div>
-        );
+        if (src) {
+            return (
+                <div className="Avatar">
+                    <img
+                        src={src}
+                        style={{
+                            width: "100%",
+                            height: "100%",
+                        }}
+                    />
+                </div>
+            );
+        }
     }
 
     return <GuildAvatar index={channel.guildIndex} />;

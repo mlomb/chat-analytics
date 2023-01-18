@@ -85,7 +85,11 @@ export const Title = () => {
 
             return <BaseLabel title={name} name={name} avatar={<AvatarStack avatars={avatars} />} />;
         }
-    } else if (db.config.platform === "whatsapp" || db.config.platform === "telegram") {
+    } else if (
+        db.config.platform === "whatsapp" ||
+        db.config.platform === "telegram" ||
+        db.config.platform === "messenger"
+    ) {
         /*
         We assume there is always only one guild.
 
