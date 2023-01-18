@@ -11,6 +11,7 @@ import discord_group_avatar_4 from "@assets/images/platforms/discord/avatars/gro
 import discord_group_avatar_5 from "@assets/images/platforms/discord/avatars/group_avatar_5.png";
 import discord_group_avatar_6 from "@assets/images/platforms/discord/avatars/group_avatar_6.png";
 import discord_group_avatar_7 from "@assets/images/platforms/discord/avatars/group_avatar_7.png";
+import wpp_group_avatar from "@assets/images/platforms/whatsapp/group_placeholder.png";
 
 const DiscordDefaultGroupAvatars = [
     discord_group_avatar_0,
@@ -28,13 +29,20 @@ export const ChannelAvatar = ({ index }: { index: number }) => {
     const platform = dp.database.config.platform;
     const channel = dp.database.channels[index];
 
-    if (channel.type === "group" && platform === "discord") {
-        const timestamp = parseInt((BigInt(channel.discordId!) >> BigInt(22)).toString());
+    if (channel.type === "group") {
+        let src: any;
+
+        if (platform === "discord") {
+            const timestamp = parseInt((BigInt(channel.discordId!) >> BigInt(22)).toString());
+            src = DiscordDefaultGroupAvatars[timestamp % DiscordDefaultGroupAvatars.length];
+        } else if (platform === "whatsapp") {
+            src = wpp_group_avatar;
+        }
 
         return (
             <div className="Avatar">
                 <img
-                    src={DiscordDefaultGroupAvatars[timestamp % DiscordDefaultGroupAvatars.length]}
+                    src={src}
                     style={{
                         width: "100%",
                         height: "100%",
