@@ -15,6 +15,9 @@ export const parseAndFilterMessages = (
         if (activeFilters.channels && !filters.hasChannel(i)) continue;
         const channel = database.channels[i];
 
+        if (channel.msgAddr === undefined) continue;
+        if (channel.msgCount === undefined) continue;
+
         // seek
         stream.offset = channel.msgAddr;
 

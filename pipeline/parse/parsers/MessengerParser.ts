@@ -36,6 +36,7 @@ export class MessengerParser extends Parser {
         const assignedChannelIndex = this.builder.addChannel(fileContent.thread_path, {
             name: fileContent.title,
             guildIndex: guildIndex,
+            type: "group", // TODO!
         });
 
         // we iterate the messages in reverse order since we want to iterate from older to newer

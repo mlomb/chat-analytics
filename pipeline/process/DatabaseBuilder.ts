@@ -1,3 +1,15 @@
+import { downloadFile } from "@pipeline/File";
+import { LanguageCodes } from "@pipeline/Languages";
+import { Emojis } from "@pipeline/process/Emojis";
+import { FastTextModel, loadFastTextModel } from "@pipeline/process/FastTextModel";
+import { IndexedData } from "@pipeline/process/IndexedData";
+import { Sentiment } from "@pipeline/process/Sentiment";
+import { Token, tokenize } from "@pipeline/process/Tokenizer";
+import { progress } from "@pipeline/Progress";
+import { BitStream } from "@pipeline/serialization/BitStream";
+import { MessageBitConfig, readMessage, writeMessage } from "@pipeline/serialization/MessageSerialization";
+import { matchFormat, normalizeText } from "@pipeline/Text";
+import { Day, genTimeKeys } from "@pipeline/Time";
 import {
     Author,
     BitAddress,
@@ -5,27 +17,12 @@ import {
     Database,
     Emoji,
     Guild,
-    IAuthor,
-    IChannel,
-    IGuild,
     IMessage,
     Index,
     Message,
     RawID,
     ReportConfig,
 } from "@pipeline/Types";
-import { Day, genTimeKeys } from "@pipeline/Time";
-import { downloadFile } from "@pipeline/File";
-import { progress } from "@pipeline/Progress";
-import { BitStream } from "@pipeline/serialization/BitStream";
-import { IndexedData } from "@pipeline/process/IndexedData";
-import { Token, tokenize } from "@pipeline/process/Tokenizer";
-import { Sentiment } from "@pipeline/process/Sentiment";
-import { FastTextModel, loadFastTextModel } from "@pipeline/process/FastTextModel";
-import { normalizeText, matchFormat } from "@pipeline/Text";
-import { Emojis } from "@pipeline/process/Emojis";
-import { MessageBitConfig, readMessage, writeMessage } from "@pipeline/serialization/MessageSerialization";
-import { LanguageCodes } from "@pipeline/Languages";
 import prettyBytes from "pretty-bytes";
 
 // section in the bitstream
@@ -128,7 +125,7 @@ export class DatabaseBuilder {
         };
     }
 
-    public addGuild(rawId: RawID, guild: IGuild): Index {
+    public addGuild(rawId: RawID, guild: Guild): Index {
         let index = this.guilds.getIndex(rawId);
         if (index === undefined) {
             index = this.guilds.set(rawId, guild);
@@ -136,7 +133,7 @@ export class DatabaseBuilder {
         return index;
     }
 
-    public addChannel(rawId: RawID, channel: IChannel): Index {
+    public addChannel(rawId: RawID, channel: Channel): Index {
         let index = this.channels.getIndex(rawId);
         if (index === undefined) {
             index = this.channels.set(rawId, {
@@ -149,7 +146,7 @@ export class DatabaseBuilder {
         return index;
     }
 
-    public addAuthor(rawId: RawID, author: IAuthor): Index {
+    public addAuthor(rawId: RawID, author: Author): Index {
         let index = this.authors.getIndex(rawId);
         if (index === undefined) {
             index = this.authors.set(rawId, author);
@@ -206,6 +203,18 @@ export class DatabaseBuilder {
     // more accurate (in general).
     private processGroup(messages: Readonly<IMessage>[]) {
         const channelSection = this.getChannelSection(messages[0].channelIndex);
+
+        // if this channel is a DM, store author IDs
+        const channel = this.channels.get(messages[0].channelIndex);
+        if (channel.type === "dm") {
+            const authorIdx = messages[0].authorIndex;
+
+            if (channel.dmAuthorIndexes === undefined) {
+                channel.dmAuthorIndexes = [authorIdx];
+            } else if (!channel.dmAuthorIndexes.includes(authorIdx)) {
+                channel.dmAuthorIndexes.push(authorIdx);
+            }
+        }
 
         // normalize and tokenize messages
         const tokenizations: Token[][] = [];
@@ -440,13 +449,20 @@ export class DatabaseBuilder {
                     // write final message
                     writeMessage(msg, finalStream, finalBitConfig);
                     progress.progress("number", messagesWritten++, this.totalMessages);
-                    this.channels.data[channelIndex].msgCount++;
+                    this.channels.data[channelIndex].msgCount!++;
                 }
             }
         }
         progress.done();
 
         console.log("size", finalStream.offset / 8, "bytes", prettyBytes(finalStream.offset / 8));
+
+        // overwrite name for DM channels
+        for (const channel of this.channels.data) {
+            if (channel.type === "dm") {
+                channel.name = "Chat of " + channel.dmAuthorIndexes!.map((i) => this.authors.get(i).n).join(" & ");
+            }
+        }
 
         return {
             config: this.config,

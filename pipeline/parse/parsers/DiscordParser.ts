@@ -1,4 +1,4 @@
-import { AttachmentType, IAuthor, Index } from "@pipeline/Types";
+import { AttachmentType, Author, ChannelType, Index } from "@pipeline/Types";
 import { Parser } from "@pipeline/parse/Parser";
 import { JSONStream } from "@pipeline/parse/JSONStream";
 import { FileInput, getAttachmentTypeFromFileName, streamJSONFromFile } from "@pipeline/File";
@@ -31,9 +31,16 @@ export class DiscordParser extends Parser {
     private parseChannel(channel: DiscordChannel) {
         if (this.lastGuildIndex === undefined) throw new Error("Missing guild ID");
 
+        let type: ChannelType = "text";
+
+        if (channel.type == "DirectTextChat") type = "dm";
+        else if (channel.type == "DirectGroupTextChat") type = "group";
+
         this.lastChannelIndex = this.builder.addChannel(channel.id, {
             name: channel.name,
             guildIndex: this.lastGuildIndex,
+            type,
+            discordId: channel.id,
         });
     }
 
@@ -45,7 +52,7 @@ export class DiscordParser extends Parser {
 
         const name = message.author.nickname || message.author.name;
         const isDeletedUser = message.author.nickname == "Deleted User";
-        const author: IAuthor = {
+        const author: Author = {
             n: name + (isDeletedUser ? " #" + message.author.id : ""),
             d: isDeletedUser ? undefined : parseInt(message.author.discriminator),
         };

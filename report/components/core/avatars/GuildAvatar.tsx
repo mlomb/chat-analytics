@@ -1,6 +1,6 @@
-import { TextAvatar } from "@report/components/core/avatars/TextAvatar";
 import { PlatformAvatar } from "@report/components/core/avatars/PlatformAvatar";
 import { BackgroundForTelegramAvatar } from "@report/components/core/avatars/Telegram";
+import { TextAvatar } from "@report/components/core/avatars/TextAvatar";
 import { LazyImage } from "@report/components/core/LazyImage";
 import { useDataProvider } from "@report/DataProvider";
 
@@ -11,7 +11,7 @@ export const GuildAvatar = ({ index }: { index: number }) => {
 
     switch (platform) {
         case "discord":
-            let placeholder = <TextAvatar text={guild.name} background="#36393f" color="#DCDDDE" />;
+            let placeholder = <TextAvatar text={guild.name} background="#36393f" color="#DCDDDE" useInitials={11} />;
 
             return (
                 <div className="Avatar">
