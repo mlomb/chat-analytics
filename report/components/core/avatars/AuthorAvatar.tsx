@@ -11,7 +11,7 @@ import discord_author_avatar_2 from "@assets/images/platforms/discord/avatars/au
 import discord_author_avatar_3 from "@assets/images/platforms/discord/avatars/author_avatar_3.png";
 import discord_author_avatar_4 from "@assets/images/platforms/discord/avatars/author_avatar_4.png";
 import messenger_avatar from "@assets/images/platforms/messenger/default_avatar.png";
-import wpp_avatar from "@assets/images/platforms/whatsapp/default_avatar.png";
+import wpp_avatar from "@assets/images/platforms/whatsapp/avatar_placeholder.png";
 
 const DiscordDefaultDMAvatars = [
     discord_author_avatar_0,
