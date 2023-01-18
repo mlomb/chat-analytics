@@ -242,7 +242,8 @@ export class DataProvider extends EventEmitter {
     }
 
     public getActiveEndDate(): Date {
-        return this.activeEndDate!.toDate();
+        // we add one day because zoomToDates is [start, end)
+        return this.activeEndDate!.nextDay().toDate();
     }
 
     public getBlockInfo<K extends BlockKey>(blockKey: K): BlockInfo<K> {
