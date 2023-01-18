@@ -1,6 +1,8 @@
 import { AuthorAvatar } from "@report/components/core/avatars/AuthorAvatar";
 import { AvatarStack } from "@report/components/core/avatars/AvatarStack";
 import { GuildAvatar } from "@report/components/core/avatars/GuildAvatar";
+import { BackgroundForTelegramAvatar } from "@report/components/core/avatars/Telegram";
+import { TextAvatar } from "@report/components/core/avatars/TextAvatar";
 import { useDataProvider } from "@report/DataProvider";
 
 import discord_group_avatar_0 from "@assets/images/platforms/discord/avatars/group_avatar_0.png";
@@ -29,7 +31,29 @@ export const ChannelAvatar = ({ index }: { index: number }) => {
     const platform = dp.database.config.platform;
     const channel = dp.database.channels[index];
 
+    if (channel.type === "dm") {
+        // if the channel is a DM, show the avatar of the authors
+        return (
+            <AvatarStack
+                avatars={channel.dmAuthorIndexes!.map((i) => (
+                    <AuthorAvatar index={i} key={i} />
+                ))}
+            />
+        );
+    }
+
     if (channel.type === "group") {
+        if (platform === "telegram") {
+            return (
+                <TextAvatar
+                    text={channel.name}
+                    background={BackgroundForTelegramAvatar(index)}
+                    color="#fff"
+                    useInitials={2}
+                />
+            );
+        }
+
         let src: any;
 
         if (platform === "discord") {
@@ -49,15 +73,6 @@ export const ChannelAvatar = ({ index }: { index: number }) => {
                     }}
                 />
             </div>
-        );
-    } else if (channel.type === "dm") {
-        // if the channel is a DM, show the avatar of the authors
-        return (
-            <AvatarStack
-                avatars={channel.dmAuthorIndexes!.map((i) => (
-                    <AuthorAvatar index={i} key={i} />
-                ))}
-            />
         );
     }
 

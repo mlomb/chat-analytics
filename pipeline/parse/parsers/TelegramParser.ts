@@ -5,11 +5,13 @@ import { FileInput, getAttachmentTypeFromMimeType, streamJSONFromFile } from "@p
 
 export class TelegramParser extends Parser {
     private lastChannelName?: string;
+    private lastChannelType?: TelegramChannelType;
     private lastChannelIndex?: Index;
 
     async *parse(file: FileInput) {
         const stream = new JSONStream()
             .onObject<string>("name", this.onChannelName.bind(this))
+            .onObject<TelegramChannelType>("type", this.onChannelType.bind(this))
             .onObject<RawID>("id", this.onChannelId.bind(this))
             .onArrayItem<TelegramMessage>("messages", this.parseMessage.bind(this));
 
@@ -23,18 +25,19 @@ export class TelegramParser extends Parser {
         this.lastChannelName = channelName;
     }
 
-    private onChannelId(rawChannelId: RawID) {
-        // In Telegram, Guild=Channel
-        const name = this.lastChannelName || "Telegram chat";
+    private onChannelType(channelType: TelegramChannelType) {
+        this.lastChannelType = channelType;
+    }
 
-        const guildIndex = this.builder.addGuild(rawChannelId, {
-            name,
+    private onChannelId(rawChannelId: RawID) {
+        const guildIndex = this.builder.addGuild("Default", {
+            name: "Telegram Chats",
         });
 
         this.lastChannelIndex = this.builder.addChannel(rawChannelId, {
-            name,
+            name: this.lastChannelName || "Telegram chat",
             guildIndex,
-            type: "group", // TODO!
+            type: ["personal_chat", "bot_chat"].includes(this.lastChannelType || "") ? "dm" : "group",
         });
     }
 

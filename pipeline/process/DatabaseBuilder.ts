@@ -460,7 +460,7 @@ export class DatabaseBuilder {
         // overwrite name for DM channels
         for (const channel of this.channels.data) {
             if (channel.type === "dm") {
-                channel.name = "Chat of " + channel.dmAuthorIndexes!.map((i) => this.authors.get(i).n).join(" & ");
+                channel.name = channel.dmAuthorIndexes!.map((i) => this.authors.get(i).n).join(" & ");
             }
         }
 
