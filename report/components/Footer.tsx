@@ -1,6 +1,6 @@
 import "@assets/styles/Footer.less";
 
-import Tooltip from "@report/components/core/Tooltip";
+import { Tooltip } from "@report/components/core/Tooltip";
 
 import GitHub from "@assets/images/logos/github.svg";
 

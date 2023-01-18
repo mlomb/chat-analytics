@@ -1,5 +1,4 @@
 import { PlatformAvatar } from "@report/components/core/avatars/PlatformAvatar";
-import { BackgroundForTelegramAvatar } from "@report/components/core/avatars/Telegram";
 import { TextAvatar } from "@report/components/core/avatars/TextAvatar";
 import { LazyImage } from "@report/components/core/LazyImage";
 import { useDataProvider } from "@report/DataProvider";

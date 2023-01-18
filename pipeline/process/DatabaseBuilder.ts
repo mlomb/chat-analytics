@@ -467,6 +467,9 @@ export class DatabaseBuilder {
         return {
             config: this.config,
             bitConfig: finalBitConfig,
+
+            title: this.buildTitle(),
+
             time: {
                 minDate: this.minDate.dateKey,
                 maxDate: this.maxDate.dateKey,
@@ -546,5 +549,48 @@ export class DatabaseBuilder {
                 .map((_, i) => i);
             return { newWords, newWordsMapping };
         }
+    }
+
+    private buildTitle(): string {
+        // See report/components/Title.tsx
+
+        if (this.config.platform === "discord") {
+            if (this.guilds.size === 1) {
+                const guild = this.guilds.data[0];
+
+                if (guild.name === "Direct Messages") {
+                    if (this.channels.size === 1) {
+                        return this.channels.data[0].name;
+                    } else {
+                        const allDMs = this.channels.data.every((c) => c.type === "dm");
+                        const allGroups = this.channels.data.every((c) => c.type === "group");
+
+                        if (allDMs) {
+                            return "Discord DMs";
+                        } else if (allGroups) {
+                            return "Discord Groups";
+                        } else {
+                            return "Discord Chats";
+                        }
+                    }
+                } else {
+                    return guild.name;
+                }
+            } else {
+                const hasDMs = this.guilds.data.some((g) => g.name === "Direct Messages");
+
+                return hasDMs ? "Discord Servers and DMs" : "Discord Servers";
+            }
+        } else {
+            // We assume there is always only one guild.
+
+            if (this.channels.size === 1) {
+                return this.channels.data[0].name;
+            } else {
+                return this.guilds.data[0].name;
+            }
+        }
+
+        return "Chats";
     }
 }
