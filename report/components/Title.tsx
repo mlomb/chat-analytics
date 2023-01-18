@@ -85,13 +85,13 @@ export const Title = () => {
 
             return <BaseLabel title={name} name={name} avatar={<AvatarStack avatars={avatars} />} />;
         }
-    } else if (db.config.platform === "whatsapp") {
+    } else if (db.config.platform === "whatsapp" || db.config.platform === "telegram") {
         /*
         We assume there is always only one guild.
 
-        1 DM channel: [two default wpp avatars] ... [A] & [B]
+        1 DM channel: [two default platform avatars] ... [A] & [B]
         1 Group channel: [icon of the group] [Group name]
-        2+ channels: [wpp logo] WhatsApp Chats
+        2+ channels: [platform logo] [Platform name] Chats
         */
         if (db.channels.length === 1) {
             return <ChannelLabel index={0} />;

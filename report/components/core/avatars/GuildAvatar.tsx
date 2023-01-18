@@ -19,14 +19,6 @@ export const GuildAvatar = ({ index }: { index: number }) => {
                 </div>
             );
         case "telegram":
-            return (
-                <TextAvatar
-                    text={guild.name}
-                    background={BackgroundForTelegramAvatar(index)}
-                    color="#fff"
-                    useInitials={2}
-                />
-            );
         case "messenger":
         case "whatsapp":
             return <PlatformAvatar />;
