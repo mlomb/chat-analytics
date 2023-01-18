@@ -34,6 +34,7 @@ export class TelegramParser extends Parser {
         this.lastChannelIndex = this.builder.addChannel(rawChannelId, {
             name,
             guildIndex,
+            type: "group", // TODO!
         });
     }
 

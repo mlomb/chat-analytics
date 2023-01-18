@@ -29,7 +29,7 @@ const channelsFilterOptionsFn: (db: Database) => FilterOption[] = (db) => {
         {
             name: "Select all channels",
             options: db.channels
-                .map((c, i) => [c.msgCount, i])
+                .map((c, i) => [c.msgCount || 0, i])
                 .sort((a, b) => b[0] - a[0])
                 .map((c) => c[1]),
         },
@@ -39,7 +39,7 @@ const channelsFilterOptionsFn: (db: Database) => FilterOption[] = (db) => {
             options.push({
                 name: (
                     <div style={{ display: "flex", whiteSpace: "nowrap", alignItems: "center", gap: 6 }}>
-                        Select all channels in
+                        Select only channels in
                         <div
                             className="FilterSelect__option-list FilterSelect__option-list--selected"
                             style={{ "--hue": 0 } as CSSProperties}
@@ -70,11 +70,11 @@ const authorsFilterOptionsFn: (db: Database) => FilterOption[] = (db) => {
     if (botsPresent) {
         options.push(
             {
-                name: "Select all non-bot authors (🧍)",
+                name: "Select only non-bot authors (🧍)",
                 options: db.authorsOrder.slice(0, db.authorsBotCutoff),
             },
             {
-                name: "Select all bot authors (🤖)",
+                name: "Select only bot authors (🤖)",
                 options: db.authorsOrder.slice(db.authorsBotCutoff),
             }
         );

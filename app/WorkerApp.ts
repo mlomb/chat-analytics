@@ -52,7 +52,7 @@ self.onmessage = async (ev: MessageEvent<InitMessage>) => {
                 authors: database.authors.length,
                 channels: database.channels.length,
                 guilds: database.guilds.length,
-                messages: Object.values(database.channels).reduce((acc, val) => acc + val.msgCount, 0),
+                messages: Object.values(database.channels).reduce((acc, ch) => acc + (ch.msgCount ?? 0), 0),
             },
         });
     } catch (ex) {
