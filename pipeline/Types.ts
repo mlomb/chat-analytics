@@ -40,6 +40,9 @@ export interface ReportConfig {
 export interface Database {
     config: ReportConfig;
     bitConfig: MessageBitConfig;
+
+    title: string;
+
     time: {
         minDate: DateKey;
         maxDate: DateKey;

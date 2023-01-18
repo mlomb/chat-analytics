@@ -1,6 +1,6 @@
 import "@assets/styles/DottedTable.less";
 import CountUp from "react-countup";
-import Tooltip from "@report/components/core/Tooltip";
+import { Tooltip } from "@report/components/core/Tooltip";
 
 import InfoIcon from "@assets/images/icons/info.svg";
 import { ReactElement } from "react";

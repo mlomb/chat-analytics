@@ -4,7 +4,6 @@ import { AuthorAvatar } from "@report/components/core/avatars/AuthorAvatar";
 import { AvatarStack } from "@report/components/core/avatars/AvatarStack";
 import { ChannelAvatar } from "@report/components/core/avatars/ChannelAvatar";
 import { GuildAvatar } from "@report/components/core/avatars/GuildAvatar";
-import { PlatformAvatar } from "@report/components/core/avatars/PlatformAvatar";
 import { BaseLabel } from "@report/components/core/labels/BaseLabel";
 import { ChannelLabel } from "@report/components/core/labels/ChannelLabel";
 import { GuildLabel } from "@report/components/core/labels/GuildLabel";

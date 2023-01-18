@@ -13,7 +13,7 @@ export interface ResultMessage {
     type: "result";
     data?: string;
     html: string;
-    title?: string;
+    title: string;
     counts: {
         authors: number;
         channels: number;
@@ -47,7 +47,7 @@ self.onmessage = async (ev: MessageEvent<InitMessage>) => {
             type: "result",
             data: env.isDev ? result.data : "",
             html: result.html,
-            title: database.guilds.length === 1 ? database.guilds[0].name : undefined,
+            title: database.title,
             counts: {
                 authors: database.authors.length,
                 channels: database.channels.length,
