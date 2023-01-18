@@ -41,4 +41,3 @@ jobs:
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           projectName: chat-analytics
           directory: dist
-          gitHubToken: ${{ secrets.GH_ACCESS_TOKEN }}
