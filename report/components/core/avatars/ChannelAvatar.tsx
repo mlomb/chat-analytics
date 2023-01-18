@@ -49,17 +49,9 @@ export const ChannelAvatar = ({ index }: { index: number }) => {
                 avatars={channel.dmAuthorIndexes!.map((i) => (
                     <AuthorAvatar index={i} key={i} />
                 ))}
-                size={20}
             />
         );
     }
 
-    if (dp.database.guilds.length >= 2) {
-        // if there are more than two guild in the report, show the guild avatar
-        // so users can distinguish between channels with the same name
-        return <GuildAvatar index={channel.guildIndex} />;
-    }
-
-    // dont show an avatar
-    return null;
+    return <GuildAvatar index={channel.guildIndex} />;
 };
