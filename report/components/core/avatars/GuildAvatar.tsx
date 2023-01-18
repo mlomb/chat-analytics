@@ -10,6 +10,10 @@ export const GuildAvatar = ({ index }: { index: number }) => {
 
     switch (platform) {
         case "discord":
+            if (guild.name === "Direct Messages") {
+                return <PlatformAvatar />;
+            }
+
             let placeholder = <TextAvatar text={guild.name} background="#36393f" color="#DCDDDE" useInitials={11} />;
 
             return (
