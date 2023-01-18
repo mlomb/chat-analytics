@@ -25,7 +25,15 @@ export class DiscordParser extends Parser {
     }
 
     private parseGuild(guild: DiscordGuild) {
-        this.lastGuildIndex = this.builder.addGuild(guild.id, { name: guild.name, iconUrl: guild.iconUrl });
+        let iconUrl: string | undefined = guild.iconUrl;
+
+        if (iconUrl === "https://cdn.discordapp.com/embed/avatars/0.png") {
+            // default icon means no icon
+            // I think this is DCE's fault but I'm not sure
+            iconUrl = undefined;
+        }
+
+        this.lastGuildIndex = this.builder.addGuild(guild.id, { name: guild.name, iconUrl });
     }
 
     private parseChannel(channel: DiscordChannel) {
