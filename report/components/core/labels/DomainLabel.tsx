@@ -18,18 +18,13 @@ const _DomainLabel = ({ index }: LabelProps) => {
     // https://www.google.com/s2/favicons?domain=google.com
     // but you know... privacy
 
-    return (
-        <BaseLabel
-            title={domain}
-            icon={
-                <div style={{ width: 16, height: 16 }}>
-                    <LazyImage src={`https://icons.duckduckgo.com/ip3/${domain}.ico`} placeholder={DefaultFavicon} />
-                </div>
-            }
-            name={domain}
-            link={`http://${domain}`}
-        />
+    const icon = (
+        <div style={{ width: 16, height: 16 }}>
+            <LazyImage src={`https://icons.duckduckgo.com/ip3/${domain}.ico`} placeholder={DefaultFavicon} />
+        </div>
     );
+
+    return <BaseLabel title={domain} icon={icon} name={domain} link={`http://${domain}`} />;
 };
 
 export const DomainLabel = memo(_DomainLabel) as typeof _DomainLabel;

@@ -1,11 +1,12 @@
+import { Platform } from "@pipeline/Types";
 import { useDataProvider } from "@report/DataProvider";
 
 import DiscordLogo from "@assets/images/logos/discord.svg";
 import MessengerLogo from "@assets/images/logos/messenger.svg";
 import TelegramLogo from "@assets/images/logos/telegram.svg";
 import WhatsAppLogo from "@assets/images/logos/whatsapp.svg";
-import { Platform } from "@pipeline/Types";
 
+// TODO: This data should centralized somewhere else
 const Platforms: {
     [platform in Platform]: {
         logo: any;

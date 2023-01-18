@@ -14,7 +14,7 @@
 
 import "@assets/styles/FilterSelect.less";
 
-import React, { PureComponent, ReactElement } from "react";
+import React, { PureComponent, ReactNode } from "react";
 import { FixedSizeList, ListChildComponentProps } from "react-window";
 
 const OPTION_HEIGHT = 35;
@@ -25,7 +25,7 @@ type ItemComponent = (props: { index: Index }) => JSX.Element;
 type FocusDirection = "up" | "down" | "pageup" | "pagedown" | "first" | "last";
 
 export interface FilterOption {
-    name: string | ReactElement;
+    name: ReactNode;
     options: Index[];
 }
 
@@ -107,7 +107,7 @@ const Item = ({ index, style, data }: ListChildComponentProps<ItemData>) => {
     const { filterOptions, itemComponent, onChange, onToggle, options, selected, selectedOffset } = data;
 
     const isFilter = index < filterOptions.length;
-    let children: ReactElement;
+    let children: ReactNode;
 
     if (isFilter) {
         children = <span>{filterOptions[index].name}</span>;
