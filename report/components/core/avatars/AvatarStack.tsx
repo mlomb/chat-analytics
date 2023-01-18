@@ -5,11 +5,10 @@ import { ReactNode } from "react";
 
 interface Props {
     avatars: ReactNode[];
-    size?: number;
     limit?: number;
 }
 
-export const AvatarStack = ({ avatars, size, limit }: Props) => {
+export const AvatarStack = ({ avatars, limit }: Props) => {
     let left = 0;
 
     if (limit !== undefined) {
@@ -18,7 +17,7 @@ export const AvatarStack = ({ avatars, size, limit }: Props) => {
     }
 
     return (
-        <div className="AvatarStack" style={{ height: size }}>
+        <div className="AvatarStack">
             {avatars.map((item, i) => (
                 <div className="AvatarStack__item" key={i}>
                     {item}

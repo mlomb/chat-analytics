@@ -16,7 +16,7 @@ const _ChannelLabel = ({ index }: LabelProps) => {
 
     let title = "";
     let name: ReactNode = channel.name;
-    let avatar: ReactNode = <ChannelAvatar index={index} />;
+    let avatar: ReactNode;
     let icon: ReactNode | undefined;
 
     if (platform === "discord") {
@@ -27,6 +27,16 @@ const _ChannelLabel = ({ index }: LabelProps) => {
             // show a # before channel names because Discord does it
             icon = <img src={Hashtag} height={12} />;
         }
+    }
+
+    const showAvatar =
+        channel.type !== "text" ||
+        // if there are more than two guilds in the report, show the guild avatar
+        // so users can distinguish between channels with the same name
+        dp.database.guilds.length >= 2;
+
+    if (showAvatar) {
+        avatar = <ChannelAvatar index={index} />;
     }
 
     return <BaseLabel title={title} name={name} icon={icon} avatar={avatar} />;
