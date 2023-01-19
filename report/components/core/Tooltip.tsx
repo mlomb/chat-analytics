@@ -9,9 +9,7 @@ interface Props {
     placement?: "top" | "bottom" | "left" | "right";
 }
 
-const Tooltip = ({ content, placement, children }: Props) => {
+export const Tooltip = ({ content, placement, children }: Props) => {
     const wrapper = <div style={{ textAlign: "center" }}>{content}</div>;
     return <Tippy content={wrapper} placement={placement} children={children} theme="translucent" />;
 };
-
-export default Tooltip;

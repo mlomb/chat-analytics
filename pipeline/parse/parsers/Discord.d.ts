@@ -5,6 +5,33 @@
 
 type Snowflake = string;
 
+type DiscordChannelType =
+    | "GuildTextChat"
+    | "DirectTextChat"
+    | "GuildVoiceChat"
+    | "DirectGroupTextChat"
+    | "GuildCategory"
+    | "GuildNews"
+    | "GuildNewsThread"
+    | "GuildPublicThread"
+    | "GuildPrivateThread"
+    | "GuildStageVoice"
+    | "GuildDirectory"
+    | "GuildForum"
+    | string;
+
+type DiscordMessageType =
+    | "Default"
+    | "RecipientAdd"
+    | "RecipientRemove"
+    | "Call"
+    | "ChannelNameChange"
+    | "ChannelIconChange"
+    | "ChannelPinnedMessage"
+    | "GuildMemberJoin"
+    | "Reply"
+    | string;
+
 interface DiscordGuild {
     id: Snowflake;
     name: string;
@@ -13,13 +40,13 @@ interface DiscordGuild {
 
 interface DiscordChannel {
     id: Snowflake;
-    type: "GuildTextChat" | unknown;
+    type: DiscordChannelType;
     name: string;
 }
 
 interface DiscordMessage {
     id: Snowflake;
-    type: "Default" | "Reply" | "ChannelPinnedMessage" | "GuildMemberJoin" | unknown;
+    type: DiscordMessageType;
     timestamp: string;
     timestampEdited: string;
     callEndedTimestamp: string;

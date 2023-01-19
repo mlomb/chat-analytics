@@ -50,17 +50,16 @@ export class WhatsAppParser extends Parser {
         // if the chat is not a group, add "Chat with " to the name
         if (name && !isGroup) name = `Chat with ${name}`;
 
-        // if we have a name and this is the first channel, set as the report title
-        if (name && this.channelIndex === 0) {
-            this.builder.setTitle(name);
-        } else {
-            // set default report name
-            this.builder.setTitle(`WhatsApp chat${this.channelIndex > 0 ? "s" : ""}`);
-        }
+        name = name || `Chat #${this.channelIndex}`;
 
         const channelIndex = this.channelIndex++;
+        const guildIndex = this.builder.addGuild("Default", {
+            name: "WhatsApp Chats",
+        });
         const assignedChannelIndex = this.builder.addChannel(channelIndex, {
-            n: name || `Channel #${channelIndex}`,
+            name,
+            guildIndex: guildIndex,
+            type: numAuthors > 2 ? "group" : "dm",
         });
 
         for (const message of parsed) {

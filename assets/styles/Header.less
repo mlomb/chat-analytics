@@ -67,6 +67,7 @@
         text-overflow: ellipsis;
         white-space: nowrap;
         overflow: hidden;
+        margin-bottom: 4px;
     }
     h2 {
         color: #636b77;
@@ -83,6 +84,15 @@
 
 .Header__title {
     min-width: 0;
+
+    .Label__avatar {
+        min-width: 45px;
+        height: 45px;
+        margin-right: 6px;
+    }
+    .Label__name {
+        font-weight: inherit;
+    }
 }
 
 .Header__link {
@@ -107,7 +117,7 @@
     justify-content: center;
     flex-wrap: wrap;
     margin-bottom: 10px;
-    margin-top: 15px;
+    margin-top: 12px;
 
     .Filters__Filter {
         flex: 1;
