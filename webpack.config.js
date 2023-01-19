@@ -122,7 +122,8 @@ module.exports = (env) => {
                 patterns: [
                     resolve("assets/public"),
                     { from: resolve("assets/demo/demo_html"), to: "demo.html" }, // this is to avoid skewing the language count in GitHub
-                    { from: resolve("assets/data/models"), to: "data" },
+                    { from: resolve("assets/fasttext"), to: "fasttext" },
+                    { from: resolve("assets/data/models"), to: "data/models" },
                     { from: resolve("assets/data/text"), to: "data" },
                     { from: resolve("assets/data/emojis/emoji-data.json"), to: "data" },
                 ],
