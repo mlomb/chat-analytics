@@ -50,7 +50,7 @@ const init = (msg: InitMessage) => {
     console.time("Build format cache");
     const formatCache = {
         authors: database.authors.map((author) => matchFormat(author.n)),
-        channels: database.channels.map((channel) => matchFormat(channel.n)),
+        channels: database.channels.map((channel) => matchFormat(channel.name)),
         words: database.words.map((word) => matchFormat(word)),
         emojis: database.emojis.map((emoji) => matchFormat(emoji.n)),
         mentions: database.mentions.map((mention) => matchFormat(mention)),

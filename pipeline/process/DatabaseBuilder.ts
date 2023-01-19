@@ -1,29 +1,28 @@
+import { downloadFile } from "@pipeline/File";
+import { LanguageCodes } from "@pipeline/Languages";
+import { Emojis } from "@pipeline/process/Emojis";
+import { FastTextModel, loadFastTextModel } from "@pipeline/process/FastTextModel";
+import { IndexedData } from "@pipeline/process/IndexedData";
+import { Sentiment } from "@pipeline/process/Sentiment";
+import { Token, tokenize } from "@pipeline/process/Tokenizer";
+import { progress } from "@pipeline/Progress";
+import { BitStream } from "@pipeline/serialization/BitStream";
+import { MessageBitConfig, readMessage, writeMessage } from "@pipeline/serialization/MessageSerialization";
+import { matchFormat, normalizeText } from "@pipeline/Text";
+import { Day, genTimeKeys } from "@pipeline/Time";
 import {
     Author,
     BitAddress,
     Channel,
     Database,
     Emoji,
-    IAuthor,
-    IChannel,
+    Guild,
     IMessage,
     Index,
     Message,
     RawID,
     ReportConfig,
 } from "@pipeline/Types";
-import { Day, genTimeKeys } from "@pipeline/Time";
-import { downloadFile } from "@pipeline/File";
-import { progress } from "@pipeline/Progress";
-import { BitStream } from "@pipeline/serialization/BitStream";
-import { IndexedData } from "@pipeline/process/IndexedData";
-import { Token, tokenize } from "@pipeline/process/Tokenizer";
-import { Sentiment } from "@pipeline/process/Sentiment";
-import { FastTextModel, loadFastTextModel } from "@pipeline/process/FastTextModel";
-import { normalizeText, matchFormat } from "@pipeline/Text";
-import { Emojis } from "@pipeline/process/Emojis";
-import { MessageBitConfig, readMessage, writeMessage } from "@pipeline/serialization/MessageSerialization";
-import { LanguageCodes } from "@pipeline/Languages";
 import prettyBytes from "pretty-bytes";
 
 // section in the bitstream
@@ -43,10 +42,10 @@ const DefaultBitConfig: MessageBitConfig = {
 };
 
 export class DatabaseBuilder {
-    private title: string = "Chat";
     private minDate: Day | undefined;
     private maxDate: Day | undefined;
 
+    private guilds = new IndexedData<RawID, Guild>();
     private channels = new IndexedData<RawID, Channel>();
     private authors = new IndexedData<RawID, Author>();
     private words = new IndexedData<string, string>();
@@ -126,11 +125,15 @@ export class DatabaseBuilder {
         };
     }
 
-    public setTitle(title: string) {
-        this.title = title;
+    public addGuild(rawId: RawID, guild: Guild): Index {
+        let index = this.guilds.getIndex(rawId);
+        if (index === undefined) {
+            index = this.guilds.set(rawId, guild);
+        }
+        return index;
     }
 
-    public addChannel(rawId: RawID, channel: IChannel): Index {
+    public addChannel(rawId: RawID, channel: Channel): Index {
         let index = this.channels.getIndex(rawId);
         if (index === undefined) {
             index = this.channels.set(rawId, {
@@ -143,7 +146,7 @@ export class DatabaseBuilder {
         return index;
     }
 
-    public addAuthor(rawId: RawID, author: IAuthor): Index {
+    public addAuthor(rawId: RawID, author: Author): Index {
         let index = this.authors.getIndex(rawId);
         if (index === undefined) {
             index = this.authors.set(rawId, author);
@@ -200,6 +203,18 @@ export class DatabaseBuilder {
     // more accurate (in general).
     private processGroup(messages: Readonly<IMessage>[]) {
         const channelSection = this.getChannelSection(messages[0].channelIndex);
+
+        // if this channel is a DM, store author IDs
+        const channel = this.channels.get(messages[0].channelIndex);
+        if (channel.type === "dm") {
+            const authorIdx = messages[0].authorIndex;
+
+            if (channel.dmAuthorIndexes === undefined) {
+                channel.dmAuthorIndexes = [authorIdx];
+            } else if (!channel.dmAuthorIndexes.includes(authorIdx)) {
+                channel.dmAuthorIndexes.push(authorIdx);
+            }
+        }
 
         // normalize and tokenize messages
         const tokenizations: Token[][] = [];
@@ -434,7 +449,7 @@ export class DatabaseBuilder {
                     // write final message
                     writeMessage(msg, finalStream, finalBitConfig);
                     progress.progress("number", messagesWritten++, this.totalMessages);
-                    this.channels.data[channelIndex].msgCount++;
+                    this.channels.data[channelIndex].msgCount!++;
                 }
             }
         }
@@ -442,10 +457,19 @@ export class DatabaseBuilder {
 
         console.log("size", finalStream.offset / 8, "bytes", prettyBytes(finalStream.offset / 8));
 
+        // overwrite name for DM channels
+        for (const channel of this.channels.data) {
+            if (channel.type === "dm") {
+                channel.name = channel.dmAuthorIndexes!.map((i) => this.authors.get(i).n).join(" & ");
+            }
+        }
+
         return {
             config: this.config,
             bitConfig: finalBitConfig,
-            title: this.title,
+
+            title: this.buildTitle(),
+
             time: {
                 minDate: this.minDate.dateKey,
                 maxDate: this.maxDate.dateKey,
@@ -453,6 +477,7 @@ export class DatabaseBuilder {
                 numMonths: monthKeys.length,
                 numYears: yearKeys.length,
             },
+            guilds: this.guilds.data,
             channels: this.channels.data,
             authors: this.authors.data,
             words: newWords,
@@ -524,5 +549,48 @@ export class DatabaseBuilder {
                 .map((_, i) => i);
             return { newWords, newWordsMapping };
         }
+    }
+
+    private buildTitle(): string {
+        // See report/components/Title.tsx
+
+        if (this.config.platform === "discord") {
+            if (this.guilds.size === 1) {
+                const guild = this.guilds.data[0];
+
+                if (guild.name === "Direct Messages") {
+                    if (this.channels.size === 1) {
+                        return this.channels.data[0].name;
+                    } else {
+                        const allDMs = this.channels.data.every((c) => c.type === "dm");
+                        const allGroups = this.channels.data.every((c) => c.type === "group");
+
+                        if (allDMs) {
+                            return "Discord DMs";
+                        } else if (allGroups) {
+                            return "Discord Groups";
+                        } else {
+                            return "Discord Chats";
+                        }
+                    }
+                } else {
+                    return guild.name;
+                }
+            } else {
+                const hasDMs = this.guilds.data.some((g) => g.name === "Direct Messages");
+
+                return hasDMs ? "Discord Servers and DMs" : "Discord Servers";
+            }
+        } else {
+            // We assume there is always only one guild.
+
+            if (this.channels.size === 1) {
+                return this.channels.data[0].name;
+            } else {
+                return this.guilds.data[0].name;
+            }
+        }
+
+        return "Chats";
     }
 }

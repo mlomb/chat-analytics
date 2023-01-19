@@ -1,10 +1,11 @@
-import { AttachmentType, IAuthor, Index } from "@pipeline/Types";
+import { AttachmentType, Author, ChannelType, Index } from "@pipeline/Types";
 import { Parser } from "@pipeline/parse/Parser";
 import { JSONStream } from "@pipeline/parse/JSONStream";
 import { FileInput, getAttachmentTypeFromFileName, streamJSONFromFile } from "@pipeline/File";
 
 export class DiscordParser extends Parser {
-    private channelIndex?: Index;
+    private lastGuildIndex?: Index;
+    private lastChannelIndex?: Index;
 
     sortFiles(files: FileInput[]): FileInput[] {
         // we always keep the most recent information last (since the export is overwriting)
@@ -13,28 +14,54 @@ export class DiscordParser extends Parser {
 
     async *parse(file: FileInput) {
         const stream = new JSONStream()
-            .onObject<DiscordGuild>("guild", (guild) => this.builder.setTitle(guild.name))
+            .onObject<DiscordGuild>("guild", this.parseGuild.bind(this))
             .onObject<DiscordChannel>("channel", this.parseChannel.bind(this))
             .onArrayItem<DiscordMessage>("messages", this.parseMessage.bind(this));
 
         yield* streamJSONFromFile(stream, file);
 
-        this.channelIndex = undefined;
+        this.lastChannelIndex = undefined;
+        this.lastGuildIndex = undefined;
+    }
+
+    private parseGuild(guild: DiscordGuild) {
+        let iconUrl: string | undefined = guild.iconUrl;
+
+        if (iconUrl === "https://cdn.discordapp.com/embed/avatars/0.png") {
+            // default icon means no icon
+            // I think this is DCE's fault but I'm not sure
+            iconUrl = undefined;
+        }
+
+        this.lastGuildIndex = this.builder.addGuild(guild.id, { name: guild.name, iconUrl });
     }
 
     private parseChannel(channel: DiscordChannel) {
-        this.channelIndex = this.builder.addChannel(channel.id, { n: channel.name });
+        if (this.lastGuildIndex === undefined) throw new Error("Missing guild ID");
+
+        let type: ChannelType = "text";
+
+        if (channel.type == "DirectTextChat") type = "dm";
+        else if (channel.type == "DirectGroupTextChat") type = "group";
+
+        this.lastChannelIndex = this.builder.addChannel(channel.id, {
+            name: channel.name,
+            guildIndex: this.lastGuildIndex,
+            type,
+            discordId: channel.id,
+        });
     }
 
     private parseMessage(message: DiscordMessage) {
-        if (this.channelIndex === undefined) throw new Error("Missing channel ID");
+        if (this.lastChannelIndex === undefined) throw new Error("Missing channel ID");
 
         const timestamp = Date.parse(message.timestamp);
         const timestampEdit = message.timestampEdited ? Date.parse(message.timestampEdited) : undefined;
 
+        const name = message.author.nickname || message.author.name;
         const isDeletedUser = message.author.nickname == "Deleted User";
-        const author: IAuthor = {
-            n: message.author.nickname + (isDeletedUser ? " #" + message.author.id : ""),
+        const author: Author = {
+            n: name + (isDeletedUser ? " #" + message.author.id : ""),
             d: isDeletedUser ? undefined : parseInt(message.author.discriminator),
         };
         if (message.author.isBot) author.b = true;
@@ -68,7 +95,7 @@ export class DiscordParser extends Parser {
                 id: message.id,
                 replyTo: message.reference?.messageId,
                 authorIndex,
-                channelIndex: this.channelIndex,
+                channelIndex: this.lastChannelIndex,
                 timestamp,
                 timestampEdit,
                 content: content.length > 0 ? content : undefined,

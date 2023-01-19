@@ -1,20 +1,17 @@
-import { useEffect, useState } from "react";
 import prettyBytes from "pretty-bytes";
+import { useEffect, useState } from "react";
 
-import { plausible } from "@assets/Plausible";
-import { ResultMessage } from "@app/WorkerApp";
 import Button from "@app/components/Button";
+import { ResultMessage } from "@app/WorkerApp";
+import { plausible } from "@assets/Plausible";
 
-import LinkOut from "@assets/images/icons/link-out.svg";
 import Download from "@assets/images/icons/download.svg";
+import LinkOut from "@assets/images/icons/link-out.svg";
 import Refresh from "@assets/images/icons/refresh.svg";
 
 interface Props {
     result: ResultMessage | null;
 }
-
-// trailing s
-const ts = (n: number) => (n === 1 ? "" : "s");
 
 const ViewDownloadReport = ({ result }: Props) => {
     const [files, setFiles] = useState<{
@@ -41,7 +38,7 @@ const ViewDownloadReport = ({ result }: Props) => {
                 dataURL: URL.createObjectURL(dataBlob),
                 htmlBlob,
                 htmlURL: URL.createObjectURL(htmlBlob),
-                filename: `${result?.title}-${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}.html`,
+                filename: `${result.title}-${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}.html`,
             });
         }
     }, [result]);
@@ -49,16 +46,65 @@ const ViewDownloadReport = ({ result }: Props) => {
     const onDownload = () => plausible("Download report");
     const onOpenLocally = () => plausible("Open report");
 
+    const Stats = ({ result }: { result: ResultMessage }) => {
+        const stats = [
+            {
+                prefix: "It contains",
+                value: result.counts.messages,
+                name: "message",
+                hue: 61,
+                alwaysShow: true,
+            },
+            {
+                prefix: "from",
+                value: result.counts.authors,
+                name: "author",
+                hue: 240,
+                alwaysShow: true,
+            },
+            {
+                prefix: "in",
+                value: result.counts.channels,
+                name: "channel",
+                hue: 266,
+                alwaysShow: false,
+            },
+            {
+                prefix: "in",
+                value: result.counts.guilds,
+                name: "guild",
+                hue: 0,
+                alwaysShow: false,
+            },
+        ].filter((stat) => stat.alwaysShow || stat.value > 1);
+
+        // trailing s
+        const ts = (n: number) => (n === 1 ? "" : "s");
+
+        return (
+            <>
+                {stats.map((stat, i) => (
+                    <span key={i}>
+                        {i > 0 ? " " : ""}
+                        {stat.prefix}{" "}
+                        <b style={{ color: `hsl(${stat.hue}, 100%, 74%)` }}>
+                            {stat.value.toLocaleString() + " " + stat.name + ts(stat.value)}
+                        </b>
+                    </span>
+                ))}
+                .
+            </>
+        );
+    };
+
     return (
         <div className="ViewDownloadReport">
             {result && (
-                <div className="ViewDownloadReport__stats">
+                <>
                     Your report <b>"{result.title}"</b> is ready!
                     <br />
-                    It contains <b>{result.counts.messages.toLocaleString()}</b> message{ts(result.counts.messages)}{" "}
-                    from <b>{result.counts.authors.toLocaleString()}</b> author{ts(result.counts.authors)} in{" "}
-                    <b>{result.counts.channels.toLocaleString()}</b> channel{ts(result.counts.channels)}.
-                </div>
+                    <Stats result={result} />
+                </>
             )}
             <div className="ViewDownloadReport__buttons">
                 <Button hueColor={[258, 90, 61]} href={files.htmlURL} download={files.filename} onClick={onDownload}>

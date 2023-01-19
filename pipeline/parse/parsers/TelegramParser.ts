@@ -4,32 +4,45 @@ import { JSONStream } from "@pipeline/parse/JSONStream";
 import { FileInput, getAttachmentTypeFromMimeType, streamJSONFromFile } from "@pipeline/File";
 
 export class TelegramParser extends Parser {
-    private channelName?: string;
-    private channelIndex?: Index;
+    private lastChannelName?: string;
+    private lastChannelType?: TelegramChannelType;
+    private lastChannelIndex?: Index;
 
     async *parse(file: FileInput) {
         const stream = new JSONStream()
             .onObject<string>("name", this.onChannelName.bind(this))
+            .onObject<TelegramChannelType>("type", this.onChannelType.bind(this))
             .onObject<RawID>("id", this.onChannelId.bind(this))
             .onArrayItem<TelegramMessage>("messages", this.parseMessage.bind(this));
 
         yield* streamJSONFromFile(stream, file);
 
-        this.channelName = undefined;
-        this.channelIndex = undefined;
+        this.lastChannelName = undefined;
+        this.lastChannelIndex = undefined;
     }
 
     private onChannelName(channelName: string) {
-        this.channelName = channelName;
-        this.builder.setTitle(this.builder.numChannels === 0 ? channelName : "Telegram Chats");
+        this.lastChannelName = channelName;
+    }
+
+    private onChannelType(channelType: TelegramChannelType) {
+        this.lastChannelType = channelType;
     }
 
     private onChannelId(rawChannelId: RawID) {
-        this.channelIndex = this.builder.addChannel(rawChannelId, { n: this.channelName || "default" });
+        const guildIndex = this.builder.addGuild("Default", {
+            name: "Telegram Chats",
+        });
+
+        this.lastChannelIndex = this.builder.addChannel(rawChannelId, {
+            name: this.lastChannelName || "Telegram chat",
+            guildIndex,
+            type: ["personal_chat", "bot_chat"].includes(this.lastChannelType || "") ? "dm" : "group",
+        });
     }
 
     private parseMessage(message: TelegramMessage) {
-        if (this.channelIndex === undefined) throw new Error("Missing channel ID");
+        if (this.lastChannelIndex === undefined) throw new Error("Missing channel ID");
 
         const rawId: RawID = message.id + "";
         const rawAuthorId: RawID = message.from_id + "";
@@ -69,7 +82,7 @@ export class TelegramParser extends Parser {
                 id: rawId,
                 replyTo: rawReplyToId,
                 authorIndex,
-                channelIndex: this.channelIndex,
+                channelIndex: this.lastChannelIndex,
                 timestamp,
                 timestampEdit,
                 content,

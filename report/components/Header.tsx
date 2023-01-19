@@ -1,16 +1,18 @@
 import "@assets/styles/Header.less";
 
-import { useCallback, useLayoutEffect, useMemo, useState } from "react";
+import { CSSProperties, useCallback, useLayoutEffect, useMemo, useState } from "react";
 
-import { Database, Index } from "@pipeline/Types";
 import { matchFormat } from "@pipeline/Text";
-import { useDataProvider } from "@report/DataProvider";
-
-import { Section } from "@report/ReportPage";
-import { AuthorLabel, ChannelLabel } from "@report/components/core/Labels";
+import { Database, Index } from "@pipeline/Types";
+import { AuthorLabel } from "@report/components/core/labels/AuthorLabel";
+import { ChannelLabel } from "@report/components/core/labels/ChannelLabel";
+import { GuildLabel } from "@report/components/core/labels/GuildLabel";
+import FilterSelect, { FilterOption } from "@report/components/FilterSelect";
 import { TabSwitch } from "@report/components/Tabs";
 import TimeSelector from "@report/components/TimeSelector";
-import FilterSelect, { FilterOption } from "@report/components/FilterSelect";
+import { Title } from "@report/components/Title";
+import { useDataProvider } from "@report/DataProvider";
+import { Section } from "@report/ReportPage";
 
 import Logo from "@assets/images/logos/app_dark.svg";
 
@@ -20,15 +22,42 @@ interface Props {
     sections: Section[];
 }
 
-const channelsFilterOptionsFn: (db: Database) => FilterOption[] = (db) => [
-    {
-        name: "Select all channels",
-        options: db.channels
-            .map((c, i) => [c.msgCount, i])
-            .sort((a, b) => b[0] - a[0])
-            .map((c) => c[1]),
-    },
-];
+const channelsFilterOptionsFn: (db: Database) => FilterOption[] = (db) => {
+    const options: FilterOption[] = [
+        {
+            name: "Select all channels",
+            options: db.channels
+                .map((c, i) => [c.msgCount || 0, i])
+                .sort((a, b) => b[0] - a[0])
+                .map((c) => c[1]),
+        },
+    ];
+
+    // let users filter channels by guild
+    if (db.guilds.length >= 2) {
+        for (let index = 0; index < db.guilds.length; index++) {
+            options.push({
+                name: (
+                    <div style={{ display: "flex", whiteSpace: "nowrap", alignItems: "center", gap: 6 }}>
+                        Select only channels in
+                        <div
+                            className="FilterSelect__option-list FilterSelect__option-list--selected"
+                            style={{ "--hue": 0 } as CSSProperties}
+                        >
+                            <GuildLabel index={index} />
+                        </div>
+                    </div>
+                ),
+                options: db.channels
+                    .map((c, i) => [c.guildIndex, i])
+                    .filter((c) => c[0] === index)
+                    .map((c) => c[1]),
+            });
+        }
+    }
+
+    return options;
+};
 
 const authorsFilterOptionsFn: (db: Database) => FilterOption[] = (db) => {
     const botsPresent = db.authorsBotCutoff >= 0;
@@ -41,11 +70,11 @@ const authorsFilterOptionsFn: (db: Database) => FilterOption[] = (db) => {
     if (botsPresent) {
         options.push(
             {
-                name: "Select all non-bot authors (🧍)",
+                name: "Select only non-bot authors (🧍)",
                 options: db.authorsOrder.slice(0, db.authorsBotCutoff),
             },
             {
-                name: "Select all bot authors (🤖)",
+                name: "Select only bot authors (🤖)",
                 options: db.authorsOrder.slice(db.authorsBotCutoff),
             }
         );
@@ -85,7 +114,9 @@ const Header = (props: Props) => {
         <div className="Header">
             <header className="Header__info">
                 <span className="Header__title">
-                    <h1>{dataProvider.database.title}</h1>
+                    <h1>
+                        <Title />
+                    </h1>
                     <h2>chat analysis report</h2>
                 </span>
                 <div className="Header__link">

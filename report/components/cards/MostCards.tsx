@@ -1,23 +1,21 @@
 import { Index } from "@pipeline/Types";
-import { useDataProvider } from "@report/DataProvider";
 import MostUsed from "@report/components/viz/MostUsed";
+import { useDataProvider } from "@report/DataProvider";
 
-import {
-    AuthorLabel,
-    ChannelLabel,
-    WordLabel,
-    EmojiLabel,
-    DomainLabel,
-    MentionLabel,
-} from "@report/components/core/Labels";
+import { AuthorLabel } from "@report/components/core/labels/AuthorLabel";
+import { ChannelLabel } from "@report/components/core/labels/ChannelLabel";
+import { DomainLabel } from "@report/components/core/labels/DomainLabel";
+import { MentionLabel } from "@report/components/core/labels/MentionLabel";
+import { EmojiLabel } from "@report/components/core/labels/EmojiLabel";
+import { WordLabel } from "@report/components/core/labels/WordLabel";
 import WordCloud from "@report/components/viz/WordCloud";
 
-import { MessagesStats } from "@pipeline/aggregate/blocks/MessagesStats";
-import { LanguageStats } from "@pipeline/aggregate/blocks/LanguageStats";
-import { EmojiStats } from "@pipeline/aggregate/blocks/EmojiStats";
-import { InteractionStats } from "@pipeline/aggregate/blocks/InteractionStats";
-import { ExternalStats } from "@pipeline/aggregate/blocks/ExternalStats";
 import { ConversationStats } from "@pipeline/aggregate/blocks/ConversationStats";
+import { EmojiStats } from "@pipeline/aggregate/blocks/EmojiStats";
+import { ExternalStats } from "@pipeline/aggregate/blocks/ExternalStats";
+import { InteractionStats } from "@pipeline/aggregate/blocks/InteractionStats";
+import { LanguageStats } from "@pipeline/aggregate/blocks/LanguageStats";
+import { MessagesStats } from "@pipeline/aggregate/blocks/MessagesStats";
 
 const EmptyArray: any[] = [];
 

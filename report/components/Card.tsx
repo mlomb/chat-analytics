@@ -4,7 +4,7 @@ import { useState, ReactElement } from "react";
 import { BlockDataType, BlockInfo, BlockKey } from "@pipeline/aggregate/Blocks";
 import Block from "@report/components/Block";
 import ErrorBoundary from "@report/components/ErrorBoundary";
-import Tooltip from "@report/components/core/Tooltip";
+import { Tooltip } from "@report/components/core/Tooltip";
 import InfoIcon from "@assets/images/icons/info.svg";
 
 type Title = string | (string | string[])[];
