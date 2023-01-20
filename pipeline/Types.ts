@@ -34,6 +34,7 @@ export type ChannelType = "dm" | "group" | "text";
 // configuration, set in the UI
 export interface ReportConfig {
     platform: Platform;
+    demo?: boolean;
 }
 
 // the generated object after processing

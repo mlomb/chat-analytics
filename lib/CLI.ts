@@ -8,6 +8,7 @@ import { hideBin } from "yargs/helpers";
 
 import { generateDatabase, generateReportSite } from "@lib/index";
 import { loadFile } from "@lib/NodeEnv";
+import { ReportConfig } from "@pipeline/Types";
 
 const argv = yargs(hideBin(process.argv))
     .scriptName("chat-analytics")
@@ -32,6 +33,11 @@ const argv = yargs(hideBin(process.argv))
         type: "string",
         default: "report.html",
     })
+    .option("demo", {
+        description: "Mark the report as a demo",
+        type: "boolean",
+        default: false,
+    })
     .epilogue(
         `For more information visit: https://github.com/mlomb/chat-analytics\nOr use the app online: https://chatanalytics.app`
     )
@@ -40,6 +46,7 @@ const argv = yargs(hideBin(process.argv))
 const files = glob.sync(argv.inputs, { nodir: true });
 
 console.log("Target platform:", argv.platform);
+console.log("Demo: " + argv.demo);
 console.log("Output file:", argv.output);
 console.log("Input files:");
 for (const file of files) {
@@ -47,8 +54,9 @@ for (const file of files) {
 }
 
 // run
-const config = {
+const config: ReportConfig = {
     platform: argv.platform,
+    demo: argv.demo,
 };
 
 (async () => {
