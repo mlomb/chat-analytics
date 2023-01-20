@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import fs from "fs";
-import glob from "glob";
+import glob from "fast-glob";
 import prettyBytes from "pretty-bytes";
 import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
@@ -42,13 +42,10 @@ const argv = yargs(hideBin(process.argv))
     )
     .parseSync();
 
-console.log("inputs", argv.inputs);
-
-let files = argv.inputs.map((i) => glob.sync(`${i}`, { nodir: true })).flat();
-console.log("interm", files);
-files = [...new Set(files)];
-
-console.log("files", files);
+const files = glob.sync(
+    argv.inputs.map((i) => i + ""),
+    { onlyFiles: true }
+);
 
 console.log("Target platform:", argv.platform);
 console.log("Demo: " + argv.demo);
