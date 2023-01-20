@@ -2,6 +2,7 @@
 
 import fs from "fs";
 import glob from "glob";
+import prettyBytes from "pretty-bytes";
 import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
 
@@ -53,12 +54,15 @@ const config = {
 (async () => {
     console.log("Generating report...");
 
+    console.time("Done");
     const db = await generateDatabase(files.map(loadFile), config);
     const result = await generateReportSite(db);
+    console.timeEnd("Done");
 
     fs.writeFileSync(argv.output, result.html, "utf8");
 
-    console.log("Done!");
+    console.log("Report data size: " + prettyBytes(result.data.length));
+    console.log("Report HTML size: " + prettyBytes(result.html.length));
     console.log("The report contains:");
     console.log(` [*] ${db.channels.reduce((c, ch) => c + (ch.msgCount || 0), 0)} messages`);
     console.log(` [*] ${db.authors.length} authors`);
