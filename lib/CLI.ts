@@ -12,7 +12,7 @@ import { ReportConfig } from "@pipeline/Types";
 
 const argv = yargs(hideBin(process.argv))
     .scriptName("chat-analytics")
-    .usage("Usage: $0 -p <platform> <input files>")
+    .usage("Usage: $0 -p <platform> -i <input files>")
     .option("platform", {
         alias: "p",
         description: "The platform to generate for",
@@ -42,8 +42,15 @@ const argv = yargs(hideBin(process.argv))
     )
     .parseSync();
 
+console.log(argv.inputs);
+
 let files = argv.inputs.map((i) => glob.sync(`${i}`, { nodir: true })).flat();
+
+console.log(files);
+
 files = [...new Set(files)];
+
+console.log(files);
 
 console.log("Target platform:", argv.platform);
 console.log("Demo: " + argv.demo);
