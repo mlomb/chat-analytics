@@ -24,7 +24,6 @@ const argv = yargs(hideBin(process.argv))
         alias: "i",
         description: "The input file(s) to use (glob)",
         type: "array",
-        coerce: (arg) => `${arg}`,
         demandOption: true,
     })
     .option("output", {
@@ -43,7 +42,8 @@ const argv = yargs(hideBin(process.argv))
     )
     .parseSync();
 
-const files = glob.sync(argv.inputs, { nodir: true });
+let files = argv.inputs.map((i) => glob.sync(`${i}`, { nodir: true })).flat();
+files = [...new Set(files)];
 
 console.log("Target platform:", argv.platform);
 console.log("Demo: " + argv.demo);
