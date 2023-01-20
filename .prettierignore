@@ -8,3 +8,6 @@ assets/demo/*
 assets/fasttext/*
 dist/*
 node_modules/*
+coverage/
+dist/
+dist_web/
