@@ -4,7 +4,6 @@
 *.json
 *.md
 assets/data/*
-assets/demo/*
 assets/fasttext/*
 dist/*
 node_modules/*
