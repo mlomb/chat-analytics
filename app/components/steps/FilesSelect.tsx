@@ -21,20 +21,16 @@ const FilesSelect = ({ platform, files, onFilesUpdate }: Props) => {
     const mergeFiles = (newFiles: File[]) => {
         const merged: File[] = [...files];
         newFiles.forEach((file) => {
-            let found = false;
-            for (let existingFile of merged) {
+            for (const existingFile of merged) {
                 if (
                     existingFile.name === file.name &&
                     existingFile.size === file.size &&
                     existingFile.lastModified === file.lastModified
                 ) {
-                    found = true;
-                    break;
+                    return;
                 }
             }
-            if (!found) {
-                merged.push(file);
-            }
+            merged.push(file);
         });
         onFilesUpdate(merged);
     };
