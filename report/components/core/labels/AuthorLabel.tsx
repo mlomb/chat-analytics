@@ -6,6 +6,7 @@ import { useDataProvider } from "@report/DataProvider";
 
 const _AuthorLabel = ({ index }: LabelProps) => {
     const dp = useDataProvider();
+    const isDemo = dp.database.config.demo;
     const author = dp.database.authors[index];
 
     const title = author.n + (author.d ? `#${author.d}` : "");
@@ -13,7 +14,7 @@ const _AuthorLabel = ({ index }: LabelProps) => {
     const name = (
         <>
             {author.n}
-            {author.d && <span className="Label__discriminator">#{`${demo ? 0 : author.d}`.padStart(4, "0")}</span>}
+            {author.d && <span className="Label__discriminator">#{`${isDemo ? 0 : author.d}`.padStart(4, "0")}</span>}
         </>
     );
 

@@ -278,9 +278,11 @@ const ReportDashboard = () => {
         ].filter(({ cards }) => env.isDev || cards.length > 0);
     }, []);
 
+    const isDemo = useDataProvider().database.config.demo;
+
     return (
         <>
-            {demo ? <div className="Demo">This report is a demo</div> : null}
+            {isDemo ? <div className="Demo">This report is a demo</div> : null}
             <Header sections={sections} section={section} setSection={setSection} />
 
             {sections.map((s) => (

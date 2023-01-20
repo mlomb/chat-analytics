@@ -18,4 +18,3 @@ declare const env: {
         date: string;
     };
 };
-declare const demo: boolean;
