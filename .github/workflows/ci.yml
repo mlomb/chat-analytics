@@ -39,7 +39,7 @@ jobs:
       - name: Download demo input files
         run: |
           curl -s -L "https://drive.google.com/uc?export=download&confirm=yes&id=${{ secrets.GDRIVE_DEMO_ID }}" -o export.zip
-          unzip -qq export.zip -d export
+          unzip -qq -O utf8 export.zip -d export
       - name: Generate demo report
         run: |
           chat-analytics --input export/*.json --output dist_web/demo.html --demo
