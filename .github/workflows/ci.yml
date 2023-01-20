@@ -42,7 +42,8 @@ jobs:
           unzip -qq -O utf8 export.zip -d export
       - name: Generate demo report
         run: |
-          chat-analytics -p discord -i export/*.json -o dist_web/demo.html --demo
+          ls
+          chat-analytics -p discord -i ./export/*.json -o ./dist_web/demo.html --demo
       - name: Publish
         uses: cloudflare/pages-action@1
         with:
