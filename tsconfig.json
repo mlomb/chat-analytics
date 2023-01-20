@@ -2,20 +2,20 @@
   "compilerOptions": {
     "target": "ES2015",
     "module": "CommonJS",
-    "sourceMap": true,
     "jsx": "react-jsx",
+
     "strict": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
+    
     "baseUrl": "./",
     "paths": {
+      "@lib/*": ["lib/*"],
       "@app/*": ["app/*"],
       "@assets/*": ["assets/*"],
       "@pipeline/*": ["pipeline/*"],
       "@report/*": ["report/*"]
     }
   },
-  "exclude": [
-    "node_modules"
-  ]
+  "exclude": ["node_modules", "dist"]
 }

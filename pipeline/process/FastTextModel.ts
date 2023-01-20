@@ -1,5 +1,5 @@
+import { Env } from "@pipeline/Env";
 import { progress } from "@pipeline/Progress";
-import { downloadFile } from "@pipeline/File";
 
 interface FastTextModelClass {
     loadModel: (path: string) => void;
@@ -27,14 +27,14 @@ export class FastTextModel {
         return res;
     }
 }
-export const loadFastTextModel = async (modelName: string) => {
-    const fastTextModuleJs = await downloadFile(`/fasttext/fasttext_wasm.js`, "text");
+export const loadFastTextModel = async (modelName: string, env: Env) => {
+    const fastTextModuleJs = await env.loadAsset(`/fasttext/fasttext_wasm.js`, "text");
     const fastTextModuleFn = new Function(fastTextModuleJs + `; return Module;`)();
     const fastTextModule = (await fastTextModuleFn({
-        wasmBinary: await downloadFile(`/fasttext/fasttext_wasm.wasm`, "arraybuffer"),
+        wasmBinary: await env.loadAsset(`/fasttext/fasttext_wasm.wasm`, "arraybuffer"),
     })) as FastTextModule;
 
-    const model = new Uint8Array(await downloadFile(`/data/models/${modelName}.ftz`, "arraybuffer"));
+    const model = new Uint8Array(await env.loadAsset(`/data/models/${modelName}.ftz`, "arraybuffer"));
 
     // NOTE: writeFile is not available since the closure compiler optimized it out (but we still have open, write and close)
     // we could configure CC to keep it but it's not worth it, this works
@@ -45,7 +45,6 @@ export const loadFastTextModel = async (modelName: string) => {
 
     const fastText = new fastTextModule.FastText();
     fastText.loadModel("model.bin");
-    progress.done();
 
     return new FastTextModel(fastText);
 };

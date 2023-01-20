@@ -10,6 +10,19 @@ export interface FileInput {
     slice(start?: number, end?: number): Promise<ArrayBuffer>;
 }
 
+// Wraps a string into our file abstraction
+// Convinient for testing
+export const wrapStringAsFile = (content: string): FileInput => {
+    const buffer = new TextEncoder().encode(content);
+
+    return {
+        name: "file" + content.length,
+        size: content.length,
+        lastModified: Date.now(),
+        slice: async (start: number, end: number) => buffer.slice(start, end),
+    };
+};
+
 const JSON_CHUNK_SIZE = 1024 * 1024 * 2; // 2MB
 export const streamJSONFromFile = async function* (stream: JSONStream, file: FileInput): AsyncGenerator<void> {
     const fileSize = file.size;
@@ -25,26 +38,6 @@ export const streamJSONFromFile = async function* (stream: JSONStream, file: Fil
         yield;
     }
 };
-
-export function downloadFile(filepath: string, responseType: "json"): Promise<any>;
-export function downloadFile(filepath: string, responseType: "text"): Promise<string>;
-export function downloadFile(filepath: string, responseType: "arraybuffer"): Promise<ArrayBuffer>;
-export function downloadFile(filepath: any, responseType: XMLHttpRequestResponseType): Promise<any> {
-    progress.new("Downloading file", filepath.split("/").pop());
-    return new Promise((resolve, reject) => {
-        const xhr = new XMLHttpRequest();
-        xhr.responseType = responseType;
-        xhr.open("GET", filepath);
-        xhr.onload = () => {
-            progress.done();
-            if (xhr.status === 200) resolve(xhr.response);
-            else reject(xhr.statusText);
-        };
-        xhr.onerror = () => reject("XHR Error, check your internet connection");
-        xhr.onprogress = (e) => progress.progress("bytes", e.loaded || 0, e.total <= 0 ? undefined : e.total);
-        xhr.send();
-    });
-}
 
 const ATTACHMENT_EXTS: {
     [key in AttachmentType]?: string[];
