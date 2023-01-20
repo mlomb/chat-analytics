@@ -70,11 +70,11 @@ const Timer = (props: { active: boolean }) => {
     const ref = useRef<HTMLSpanElement>(null);
 
     useEffect(() => {
-        let start = Date.now();
+        const start = Date.now();
         const formatDiff = () => {
-            let seconds = Math.floor((Date.now() - start) / 1000);
-            let s = seconds % 60;
-            let m = Math.floor(seconds / 60);
+            const seconds = Math.floor((Date.now() - start) / 1000);
+            const s = seconds % 60;
+            const m = Math.floor(seconds / 60);
             return (m + "").padStart(2, "0") + ":" + (s + "").padStart(2, "0");
         };
         if (props.active) {
