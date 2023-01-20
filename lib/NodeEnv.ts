@@ -27,7 +27,7 @@ const loadAsset: LoadAssetFn = async (filepath: string, type: "json" | "text" | 
     }
 
     // hardcode the report.html file
-    // we probably want to not do this, but because all assets live inside the assets folder
+    // we probably don't want to do this, but because all assets live inside the assets folder
     // but the report is generated in dist_web/ is a bit of a pain
     if (filepath.endsWith("report.html")) {
         // we assume we don't test with the report.html file
