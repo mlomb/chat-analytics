@@ -18,6 +18,16 @@ The following npm scripts are available:
 Run `npm run dev` and head to [http://localhost:8080](http://localhost:8080), generate a report, and you will see a green button that is not present in production "Download DATA". You should place the downloaded file in `assets/public` with the name `report_sample.data`.
 Now you can head to [http://localhost:8080/report.html](http://localhost:8080/report.html) to debug the report UI.
 
+## Demo generation
+
+The [demo](https://chatanalytics.app/demo) is an export from the [DefleMask](https://www.deflemask.com) server which is from a friend of mine who gave me permission to use it as a demo. The input files are stored in a Google Drive zip and later downloaded during CI to build the demo HTML automatically using the CLI (with `--demo`). It is updated manually by me using:
+
+```sh
+docker run --rm -it -v $PWD/out:/out tyrrrz/discordchatexporter:stable exportguild -f json -g 253601524398293010 -t <token>
+```
+
+Zipping and then replacing the file in Google Drive.
+
 ---
 
 ## Pipeline
