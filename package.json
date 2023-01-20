@@ -68,8 +68,12 @@
     "yargs": "^17.6.2"
   },
   "jest": {
-    "roots": [
-      "<rootDir>/tests"
+    "collectCoverageFrom": [
+        "lib/**",
+        "!lib/CLI.ts",
+        "pipeline/**",
+        "!**/node_modules/**",
+        "!**/vendor/**"
     ],
     "moduleNameMapper": {
       "^@lib/(.*)$": "<rootDir>/lib/$1",
@@ -85,9 +89,6 @@
           "tsconfig": "tsconfig.node.json"
         }
       ]
-    },
-    "transformIgnorePatterns": [
-      "/node_modules/(?!pretty-bytes)"
-    ]
+    }
   }
 }
