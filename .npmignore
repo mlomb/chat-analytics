@@ -1,0 +1,22 @@
+.github/
+.gitignore
+.prettierignore
+.prettierrc
+.vscode/
+*.md
+app/
+assets/
+coverage/
+lib/
+pipeline/
+report/
+tests/
+tsconfig*.json
+webpack.config.js
+
+# exlude web output
+# in package.json files, we whitelist the report HTML
+dist_web/
+
+# pack build
+chat-analytics-*.tgz

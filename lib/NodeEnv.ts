@@ -18,7 +18,13 @@ export const loadFile = (filepath: string): FileInput => {
 };
 
 const loadAsset: LoadAssetFn = async (filepath: string, type: "json" | "text" | "arraybuffer") => {
-    filepath = path.join(__dirname, "..", "assets", filepath);
+    if (process.env.NODE_ENV === "test") {
+        // during tests, the tests are run from the original .ts files
+        filepath = path.join(__dirname, "..", "assets", filepath);
+    } else {
+        // used when the package is deployed in dist/
+        filepath = path.join(__dirname, "..", "..", "assets", filepath);
+    }
 
     const content = fs.readFileSync(filepath);
 
