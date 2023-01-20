@@ -9,7 +9,7 @@
         "allowJs": true,
         "types": ["node", "jest"],
 
-        "outDir": "./dist_node",
+        "outDir": "./dist",
         "declaration": true
     },
     "include": [
