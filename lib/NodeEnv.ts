@@ -26,6 +26,14 @@ const loadAsset: LoadAssetFn = async (filepath: string, type: "json" | "text" | 
         filepath = path.join(__dirname, "..", "..", "assets", filepath);
     }
 
+    // hardcode the report.html file
+    // we probably want to not do this, but because all assets live inside the assets folder
+    // but the report is generated in dist_web/ is a bit of a pain
+    if (filepath.endsWith("report.html")) {
+        // we assume we don't test with the report.html file
+        filepath = path.join(__dirname, "..", "..", "dist_web", "report.html");
+    }
+
     const content = fs.readFileSync(filepath);
 
     if (type === "text") return content.toString("utf-8");
