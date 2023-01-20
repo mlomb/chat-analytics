@@ -1,6 +1,8 @@
-import { downloadFile } from "@pipeline/File";
+import prettyBytes from "pretty-bytes";
+
+import { Env } from "@pipeline/Env";
 import { LanguageCodes } from "@pipeline/Languages";
-import { Emojis } from "@pipeline/process/Emojis";
+import { Emojis, EmojisData } from "@pipeline/process/Emojis";
 import { FastTextModel, loadFastTextModel } from "@pipeline/process/FastTextModel";
 import { IndexedData } from "@pipeline/process/IndexedData";
 import { Sentiment } from "@pipeline/process/Sentiment";
@@ -23,7 +25,6 @@ import {
     RawID,
     ReportConfig,
 } from "@pipeline/Types";
-import prettyBytes from "pretty-bytes";
 
 // section in the bitstream
 type ChannelSection = {
@@ -77,7 +78,7 @@ export class DatabaseBuilder {
     private emojisData: Emojis | null = null;
     private sentiment: Sentiment | null = null;
 
-    constructor(private readonly config: ReportConfig) {}
+    constructor(private readonly config: ReportConfig, private readonly env: Env) {}
 
     // download static data
     public async init() {
@@ -86,7 +87,7 @@ export class DatabaseBuilder {
             interface StopwordsJSON {
                 [lang: string]: string[];
             }
-            const data = (await downloadFile("/data/stopwords-iso.json", "json")) as StopwordsJSON;
+            const data = await this.env.loadAsset<StopwordsJSON>("/data/text/stopwords-iso.json", "json");
 
             // combining all stopwords is a mistake?
             this.stopwords = new Set(
@@ -97,18 +98,17 @@ export class DatabaseBuilder {
         }
 
         // load language detector model
-        this.langPredictModel = await loadFastTextModel("lid.176");
+        this.langPredictModel = await loadFastTextModel("lid.176", this.env);
 
         // load emoji data
         {
-            const data = await downloadFile("/data/emoji-data.json", "json");
+            const data = await this.env.loadAsset<EmojisData>("/data/emojis/emoji-data.json", "json");
             this.emojisData = new Emojis(data);
         }
 
         // load sentiment data
         {
-            const afinnZipBuffer = await downloadFile("/data/AFINN.zip", "arraybuffer");
-
+            const afinnZipBuffer = await this.env.loadAsset("/data/text/AFINN.zip", "arraybuffer");
             this.sentiment = new Sentiment(afinnZipBuffer, this.emojisData);
         }
     }
@@ -455,7 +455,7 @@ export class DatabaseBuilder {
         }
         progress.done();
 
-        console.log("size", finalStream.offset / 8, "bytes", prettyBytes(finalStream.offset / 8));
+        // console.log("size", finalStream.offset / 8, "bytes", prettyBytes(finalStream.offset / 8));
 
         // overwrite name for DM channels
         for (const channel of this.channels.data) {

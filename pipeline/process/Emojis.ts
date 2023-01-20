@@ -1,4 +1,4 @@
-interface EmojisData {
+export interface EmojisData {
     [emoji: string]: {
         // name
         n: string;

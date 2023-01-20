@@ -1,0 +1,14 @@
+{
+  "extends": "./tsconfig.json",
+
+  "compilerOptions": {
+    "sourceMap": true
+  },
+
+  "include": [
+    "app/**/*",
+    "pipeline/**/*",
+    "report/**/*",
+    "assets/Types.d.ts"
+  ]
+}

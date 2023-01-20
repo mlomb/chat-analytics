@@ -1,5 +1,5 @@
 import { Database, ReportConfig } from "@pipeline/Types";
-import { downloadFile, FileInput } from "@pipeline/File";
+import { FileInput } from "@pipeline/File";
 import { progress } from "@pipeline/Progress";
 import { Parser } from "@pipeline/parse/Parser";
 import { DiscordParser } from "@pipeline/parse/parsers/DiscordParser";
@@ -8,9 +8,10 @@ import { TelegramParser } from "@pipeline/parse/parsers/TelegramParser";
 import { WhatsAppParser } from "@pipeline/parse/parsers/WhatsAppParser";
 import { DatabaseBuilder } from "@pipeline/process/DatabaseBuilder";
 import { compress } from "@pipeline/compression/Compression";
+import { Env } from "@pipeline/Env";
 
-export const generateDatabase = async (files: FileInput[], config: ReportConfig): Promise<Database> => {
-    const builder: DatabaseBuilder = new DatabaseBuilder(config);
+export const generateDatabase = async (files: FileInput[], config: ReportConfig, env: Env): Promise<Database> => {
+    const builder: DatabaseBuilder = new DatabaseBuilder(config, env);
     // load data needed for processing
     await builder.init();
 
@@ -59,7 +60,8 @@ export const generateDatabase = async (files: FileInput[], config: ReportConfig)
 
 // Returns the final data and HTML code
 export const generateReportSite = async (
-    database: Database
+    database: Database,
+    env: Env
 ): Promise<{
     data: string;
     html: string;
@@ -69,7 +71,7 @@ export const generateReportSite = async (
     const encodedData = compress(database);
     progress.done();
 
-    const html = await downloadFile("/report.html", "text");
+    const html = await env.loadAsset("/report.html", "text");
 
     const template = "[[[DATA]]]";
     const dataTemplateLoc = html.indexOf(template);

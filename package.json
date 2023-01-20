@@ -16,6 +16,7 @@
     "@amcharts/amcharts5": "^5.2.47",
     "@tippyjs/react": "^4.2.6",
     "@types/jest": "^29.2.5",
+    "@types/node": "^18.11.18",
     "@types/react": "^18.0.26",
     "@types/react-dom": "^18.0.10",
     "@types/react-window": "^1.8.5",
@@ -53,13 +54,22 @@
       "<rootDir>/tests"
     ],
     "moduleNameMapper": {
+      "^@lib/(.*)$": "<rootDir>/lib/$1",
       "^@app/(.*)$": "<rootDir>/app/$1",
       "^@assets/(.*)$": "<rootDir>/assets/$1",
       "^@pipeline/(.*)$": "<rootDir>/pipeline/$1",
       "^@report/(.*)$": "<rootDir>/report/$1"
     },
     "transform": {
-      "^.+\\.ts$": "ts-jest"
-    }
+      "^.+\\.[tj]s$": [
+        "ts-jest",
+        {
+          "tsconfig": "tsconfig.node.json"
+        }
+      ]
+    },
+    "transformIgnorePatterns": [
+      "/node_modules/(?!pretty-bytes)"
+    ]
   }
 }
