@@ -44,7 +44,7 @@ export const Blocks = {
 } as const;
 
 export type BlockKey = keyof typeof Blocks;
-export type BlockDataType<K extends BlockKey> = ReturnType<typeof Blocks[K]["fn"]>;
+export type BlockDataType<K extends BlockKey> = ReturnType<(typeof Blocks)[K]["fn"]>;
 export type BlockInfo<K extends BlockKey> = {
     state: BlockState;
     data: BlockDataType<K> | null;
