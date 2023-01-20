@@ -29,7 +29,7 @@ module.exports = (env) => {
         },
         mode: isProd ? "production" : "development",
         output: {
-            path: resolve("dist"),
+            path: resolve("dist_web"),
             publicPath: "/",
             clean: true,
             filename: "assets/[name].[contenthash:8].js",
@@ -37,7 +37,14 @@ module.exports = (env) => {
         },
         module: {
             rules: [
-                { test: /\.tsx?$/, loader: "ts-loader", exclude: [/node_modules/] },
+                {
+                    test: /\.tsx?$/,
+                    loader: "ts-loader",
+                    exclude: [/node_modules/],
+                    options: {
+                        configFile: "tsconfig.web.json",
+                    },
+                },
                 {
                     test: /\.less$/,
                     use: [
@@ -124,8 +131,8 @@ module.exports = (env) => {
                     { from: resolve("assets/demo/demo_html"), to: "demo.html" }, // this is to avoid skewing the language count in GitHub
                     { from: resolve("assets/fasttext"), to: "fasttext" },
                     { from: resolve("assets/data/models"), to: "data/models" },
-                    { from: resolve("assets/data/text"), to: "data" },
-                    { from: resolve("assets/data/emojis/emoji-data.json"), to: "data" },
+                    { from: resolve("assets/data/text"), to: "data/text" },
+                    { from: resolve("assets/data/emojis/emoji-data.json"), to: "data/emojis/emoji-data.json" },
                 ],
             }),
         ].concat(

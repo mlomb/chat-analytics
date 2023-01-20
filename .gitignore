@@ -1,5 +1,6 @@
 node_modules/
-dist/
+dist_web/
+dist_node/
 coverage/
 report_sample*.data
 stats.json

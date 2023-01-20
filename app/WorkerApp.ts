@@ -1,7 +1,7 @@
-import { ReportConfig } from "@pipeline/Types";
-import { FileInput } from "@pipeline/File";
-import { progress } from "@pipeline/Progress";
 import { generateDatabase, generateReportSite } from "@pipeline/process/Generate";
+import { progress } from "@pipeline/Progress";
+import { ReportConfig } from "@pipeline/Types";
+import { wrapFile, WebEnv } from "@app/WebEnv";
 
 export interface InitMessage {
     files: File[];
@@ -22,21 +22,14 @@ export interface ResultMessage {
     };
 }
 
-const wrapFile = (file: File): FileInput => ({
-    name: file.name,
-    size: file.size,
-    lastModified: file.lastModified,
-    slice: (start, end) => (start !== undefined ? file.slice(start, end).arrayBuffer() : file.arrayBuffer()),
-});
-
 self.onmessage = async (ev: MessageEvent<InitMessage>) => {
     progress.reset();
     progress.on("update", (msg) => self.postMessage(msg));
 
     try {
-        const database = await generateDatabase(ev.data.files.map(wrapFile), ev.data.config);
+        const database = await generateDatabase(ev.data.files.map(wrapFile), ev.data.config, WebEnv);
         if (env.isDev) console.log(database);
-        const result = await generateReportSite(database);
+        const result = await generateReportSite(database, WebEnv);
         if (env.isDev) {
             // include the origin in relative URLs, so it can be opened locally
             result.html = result.html
