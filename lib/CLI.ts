@@ -42,15 +42,13 @@ const argv = yargs(hideBin(process.argv))
     )
     .parseSync();
 
-console.log(argv.inputs);
+console.log("inputs", argv.inputs);
 
 let files = argv.inputs.map((i) => glob.sync(`${i}`, { nodir: true })).flat();
-
-console.log(files);
-
+console.log("interm", files);
 files = [...new Set(files)];
 
-console.log(files);
+console.log("files", files);
 
 console.log("Target platform:", argv.platform);
 console.log("Demo: " + argv.demo);
