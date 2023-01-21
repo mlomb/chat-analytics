@@ -1,5 +1,5 @@
+const PLAUSIBLE_URL = env.isProd ? "https://p.chatanalytics.app" : "http://localhost:8000";
 export const plausible = (name: string, props?: { [key: string]: string }) => {
-    const plausibleURL = env.isProd ? "https://p.chatanalytics.app" : "http://localhost:8000";
     let url = window.location.href;
     if (!url.startsWith("https://chatanalytics.app")) {
         url = "https://chatanalytics.app/report";
@@ -15,7 +15,7 @@ export const plausible = (name: string, props?: { [key: string]: string }) => {
     };
 
     const xhr = new XMLHttpRequest();
-    xhr.open("POST", `${plausibleURL}/api/event`, true);
+    xhr.open("POST", PLAUSIBLE_URL+'/api/event', true);
     xhr.setRequestHeader("Content-Type", "application/json");
     xhr.send(JSON.stringify(data));
 };
