@@ -8,7 +8,7 @@
 
 [Open App](https://chatanalytics.app) • [View Demo](https://chatanalytics.app/demo) • [Use CLI](#cli)
 
-![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/mlomb/chat-analytics/ci.yml)
+![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/mlomb/chat-analytics/cicd.yml)
 [![codecov](https://codecov.io/gh/mlomb/chat-analytics/branch/main/graph/badge.svg)](https://codecov.io/gh/mlomb/chat-analytics)
 [![npm](https://img.shields.io/npm/v/chat-analytics)](https://www.npmjs.com/package/chat-analytics)
 
