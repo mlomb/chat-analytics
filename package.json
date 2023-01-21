@@ -1,6 +1,6 @@
 {
   "name": "chat-analytics",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "author": "Martin Emiliano Lombardo <to@mlomb.me>",
   "license": "MIT",
   "description": "Generate insightful chat analysis reports in the browser",
