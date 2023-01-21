@@ -1,9 +1,10 @@
-import "@assets/styles/DottedTable.less";
+import { ReactElement } from "react";
 import CountUp from "react-countup";
+
 import { Tooltip } from "@report/components/core/Tooltip";
 
 import InfoIcon from "@assets/images/icons/info.svg";
-import { ReactElement } from "react";
+import "@assets/styles/DottedTable.less";
 
 interface SeparatorLine {
     type: "separator";

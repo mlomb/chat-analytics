@@ -1,7 +1,7 @@
-import { AttachmentType, Index, RawID } from "@pipeline/Types";
-import { Parser } from "@pipeline/parse/Parser";
-import { JSONStream } from "@pipeline/parse/JSONStream";
 import { FileInput, getAttachmentTypeFromMimeType, streamJSONFromFile } from "@pipeline/File";
+import { AttachmentType, Index, RawID } from "@pipeline/Types";
+import { JSONStream } from "@pipeline/parse/JSONStream";
+import { Parser } from "@pipeline/parse/Parser";
 
 export class TelegramParser extends Parser {
     private lastChannelName?: string;

@@ -1,9 +1,8 @@
 import EventEmitter from "events";
 
-import { Database, FormatCache, Index } from "@pipeline/Types";
 import { Day } from "@pipeline/Time";
+import { Database, FormatCache, Index } from "@pipeline/Types";
 import { BlockDescriptions, BlockInfo, BlockKey, BlockTrigger } from "@pipeline/aggregate/Blocks";
-
 import { BlockRequestMessage, BlockResultMessage, InitMessage, ReadyMessage } from "@report/WorkerReport";
 
 export declare interface DataProvider {
@@ -65,7 +64,7 @@ export class DataProvider extends EventEmitter {
         }
         this.worker.onerror = this.onError.bind(this);
         this.worker.onmessage = this.onMessage.bind(this);
-        this.worker.postMessage(<InitMessage>{ type: "init", dataStr });
+        this.worker.postMessage({ type: "init", dataStr } as InitMessage);
     }
 
     private onError(e: ErrorEvent) {

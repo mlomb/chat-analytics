@@ -42,15 +42,16 @@
     "dist_web/report.html"
   ],
   "dependencies": {
-    "pretty-bytes": "<6.0.0",
-    "fflate": "^0.7.4",
     "fast-glob": "^3.2.12",
-    "yargs": "^17.6.2",
-    "whatsapp-chat-parser": "^3.2.2"
+    "fflate": "^0.7.4",
+    "pretty-bytes": "<6.0.0",
+    "whatsapp-chat-parser": "^3.2.2",
+    "yargs": "^17.6.2"
   },
   "devDependencies": {
     "@amcharts/amcharts5": "^5.2.48",
     "@tippyjs/react": "^4.2.6",
+    "@trivago/prettier-plugin-sort-imports": "^4.0.0",
     "@types/glob": "^8.0.0",
     "@types/jest": "^28.1.8",
     "@types/node": "^18.11.18",

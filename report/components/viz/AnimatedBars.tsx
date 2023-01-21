@@ -1,6 +1,6 @@
-import "@assets/styles/AnimatedBars.less";
-
 import CountUp from "react-countup";
+
+import "@assets/styles/AnimatedBars.less";
 
 const ITEM_STRIDE = 40;
 const HEADER_HEIGHT = 27; // hmmm

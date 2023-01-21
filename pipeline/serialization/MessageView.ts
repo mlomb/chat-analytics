@@ -1,7 +1,7 @@
 import { BitAddress, FullMessage, Index } from "@pipeline/Types";
 import { BitStream } from "@pipeline/serialization/BitStream";
-import { MessageBitConfig, MessageFlags } from "@pipeline/serialization/MessageSerialization";
 import { readIndexArray, skipIndexArray } from "@pipeline/serialization/IndexSerialization";
+import { MessageBitConfig, MessageFlags } from "@pipeline/serialization/MessageSerialization";
 
 export class MessageView {
     readonly channelIndex: Index;

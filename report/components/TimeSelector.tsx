@@ -1,20 +1,20 @@
 import { useEffect, useLayoutEffect, useRef } from "react";
 
-import { Themes } from "./viz/AmCharts5";
-import { Root, Color } from "@amcharts/amcharts5";
+import { Color, Root } from "@amcharts/amcharts5";
 import {
-    XYChart,
-    XYChartScrollbar,
-    DateAxis,
-    ValueAxis,
     AxisRendererX,
     AxisRendererY,
+    DateAxis,
     StepLineSeries,
+    ValueAxis,
+    XYChart,
+    XYChartScrollbar,
 } from "@amcharts/amcharts5/xy";
-
-import { useDataProvider } from "@report/DataProvider";
 import { BlockInfo } from "@pipeline/aggregate/Blocks";
+import { useDataProvider } from "@report/DataProvider";
 import Block from "@report/components/Block";
+
+import { Themes } from "./viz/AmCharts5";
 
 const SB_HEIGHT = 50;
 const RESETS = {

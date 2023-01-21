@@ -1,10 +1,11 @@
 import { unzipSync } from "fflate";
-import { Index } from "@pipeline/Types";
-import { Token, tokenize } from "@pipeline/process/Tokenizer";
-import { progress } from "@pipeline/Progress";
+
 import { LanguageCodes } from "@pipeline/Languages";
+import { progress } from "@pipeline/Progress";
 import { normalizeText } from "@pipeline/Text";
+import { Index } from "@pipeline/Types";
 import { Emojis } from "@pipeline/process/Emojis";
+import { Token, tokenize } from "@pipeline/process/Tokenizer";
 
 export class Sentiment {
     private readonly langs: {

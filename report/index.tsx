@@ -1,10 +1,10 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import { plausible } from "@assets/Plausible";
-
-import ReportPage from "@report/ReportPage";
 
 import { initDataProvider } from "@report/DataProvider";
+import ReportPage from "@report/ReportPage";
+
+import { plausible } from "@assets/Plausible";
 
 document.addEventListener("DOMContentLoaded", async () => {
     try {

@@ -1,8 +1,8 @@
 import { memo } from "react";
 
-import { BaseLabel, LabelProps } from "@report/components/core/labels/BaseLabel";
-import { LazyImage } from "@report/components/core/LazyImage";
 import { useDataProvider } from "@report/DataProvider";
+import { LazyImage } from "@report/components/core/LazyImage";
+import { BaseLabel, LabelProps } from "@report/components/core/labels/BaseLabel";
 
 import DefaultFaviconIcon from "@assets/images/icons/default-favicon.png";
 

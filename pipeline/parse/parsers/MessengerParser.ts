@@ -1,6 +1,6 @@
-import { Parser } from "@pipeline/parse/Parser";
 import { FileInput } from "@pipeline/File";
 import { AttachmentType } from "@pipeline/Types";
+import { Parser } from "@pipeline/parse/Parser";
 
 export class MessengerParser extends Parser {
     private messageIndex = 0;

@@ -1,7 +1,7 @@
+import { useDataProvider } from "@report/DataProvider";
+import { LazyImage } from "@report/components/core/LazyImage";
 import { PlatformAvatar } from "@report/components/core/avatars/PlatformAvatar";
 import { TextAvatar } from "@report/components/core/avatars/TextAvatar";
-import { LazyImage } from "@report/components/core/LazyImage";
-import { useDataProvider } from "@report/DataProvider";
 
 export const GuildAvatar = ({ index }: { index: number }) => {
     const dp = useDataProvider();

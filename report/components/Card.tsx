@@ -1,11 +1,12 @@
-import "@assets/styles/Card.less";
+import { ReactElement, useState } from "react";
 
-import { useState, ReactElement } from "react";
 import { BlockDataType, BlockInfo, BlockKey } from "@pipeline/aggregate/Blocks";
 import Block from "@report/components/Block";
 import ErrorBoundary from "@report/components/ErrorBoundary";
 import { Tooltip } from "@report/components/core/Tooltip";
+
 import InfoIcon from "@assets/images/icons/info.svg";
+import "@assets/styles/Card.less";
 
 type Title = string | (string | string[])[];
 

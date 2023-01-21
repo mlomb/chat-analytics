@@ -1,5 +1,5 @@
-import { Index } from "@pipeline/Types";
 import { Day } from "@pipeline/Time";
+import { Index } from "@pipeline/Types";
 import { BlockDescription, BlockFn } from "@pipeline/aggregate/Blocks";
 import { parseAndFilterMessages } from "@pipeline/aggregate/Helpers";
 import { MessageView } from "@pipeline/serialization/MessageView";

@@ -1,7 +1,7 @@
-import "@assets/styles/TopMessages.less";
-
 import { FullMessage } from "@pipeline/Types";
 import { MessageLabel } from "@report/components/core/MessageLabel";
+
+import "@assets/styles/TopMessages.less";
 
 export type TitleFn = (msg: FullMessage) => string;
 

@@ -1,7 +1,6 @@
-import { Platform } from "@pipeline/Types";
 import { Platforms } from "@app/Platforms";
-
 import Button from "@app/components/Button";
+import { Platform } from "@pipeline/Types";
 
 interface Props {
     pickPlatform: (platform: Platform) => void;

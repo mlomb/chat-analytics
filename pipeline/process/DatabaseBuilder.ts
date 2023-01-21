@@ -1,15 +1,6 @@
-import prettyBytes from "pretty-bytes";
-
 import { Env } from "@pipeline/Env";
 import { LanguageCodes } from "@pipeline/Languages";
-import { Emojis, EmojisData } from "@pipeline/process/Emojis";
-import { FastTextModel, loadFastTextModel } from "@pipeline/process/FastTextModel";
-import { IndexedData } from "@pipeline/process/IndexedData";
-import { Sentiment } from "@pipeline/process/Sentiment";
-import { Token, tokenize } from "@pipeline/process/Tokenizer";
 import { progress } from "@pipeline/Progress";
-import { BitStream } from "@pipeline/serialization/BitStream";
-import { MessageBitConfig, readMessage, writeMessage } from "@pipeline/serialization/MessageSerialization";
 import { matchFormat, normalizeText } from "@pipeline/Text";
 import { Day, genTimeKeys } from "@pipeline/Time";
 import {
@@ -21,10 +12,16 @@ import {
     Guild,
     IMessage,
     Index,
-    Message,
     RawID,
     ReportConfig,
 } from "@pipeline/Types";
+import { Emojis, EmojisData } from "@pipeline/process/Emojis";
+import { FastTextModel, loadFastTextModel } from "@pipeline/process/FastTextModel";
+import { IndexedData } from "@pipeline/process/IndexedData";
+import { Sentiment } from "@pipeline/process/Sentiment";
+import { Token, tokenize } from "@pipeline/process/Tokenizer";
+import { BitStream } from "@pipeline/serialization/BitStream";
+import { MessageBitConfig, readMessage, writeMessage } from "@pipeline/serialization/MessageSerialization";
 
 // section in the bitstream
 type ChannelSection = {
@@ -362,7 +359,7 @@ export class DatabaseBuilder {
 
             // store message
             writeMessage(
-                <Message>{
+                {
                     day: day.toBinary(),
                     // TODO: timezones
                     secondOfDay: date.getSeconds() + 60 * (date.getMinutes() + 60 * date.getHours()),

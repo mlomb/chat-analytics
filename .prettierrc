@@ -2,5 +2,8 @@
     "printWidth": 120,
     "tabWidth": 4,
     "useTabs": false,
-    "endOfLine": "auto"
+    "endOfLine": "auto",
+    "importOrder": ["<THIRD_PARTY_MODULES>", "^@(?!assets)(.*)$", "^@assets/(.*)$", "^[./]"],
+    "importOrderSeparation": true,
+    "importOrderSortSpecifiers": true
 }

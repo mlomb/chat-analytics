@@ -1,20 +1,20 @@
 import { useLayoutEffect, useRef } from "react";
 
-import { Root, Color, Label, p50 } from "@amcharts/amcharts5";
+import { Color, Label, Root, p50 } from "@amcharts/amcharts5";
+import { TimeUnit } from "@amcharts/amcharts5/.internal/core/util/Time";
 import {
-    XYChart,
-    DateAxis,
-    ValueAxis,
     AxisRendererX,
     AxisRendererY,
+    DateAxis,
     StepLineSeries,
+    ValueAxis,
+    XYChart,
     XYSeries,
 } from "@amcharts/amcharts5/xy";
-
-import { useDataProvider } from "@report/DataProvider";
 import { TimelineStats } from "@pipeline/aggregate/blocks/Growth";
+import { useDataProvider } from "@report/DataProvider";
+
 import { Themes } from "./AmCharts5";
-import { TimeUnit } from "@amcharts/amcharts5/.internal/core/util/Time";
 
 const GrowthOverTime = ({ data, options }: { data?: TimelineStats; options: number[] }) => {
     const dataProvider = useDataProvider();
