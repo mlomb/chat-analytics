@@ -39,6 +39,4 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 console.log(env);
 
-plausible("pageview", {
-    url: document.location.pathname === "/demo" ? undefined : "https://chatanalytics.app/report",
-});
+plausible("pageview");
