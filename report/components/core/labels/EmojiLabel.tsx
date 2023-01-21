@@ -1,7 +1,7 @@
-import { memo, ReactElement } from "react";
+import { ReactElement, memo } from "react";
 
-import { BaseLabel, LabelProps } from "@report/components/core/labels/BaseLabel";
 import { useDataProvider } from "@report/DataProvider";
+import { BaseLabel, LabelProps } from "@report/components/core/labels/BaseLabel";
 
 interface EmojiLabelProps extends LabelProps {
     hideNameIfPossible?: boolean;

@@ -1,5 +1,5 @@
-import { FileInput } from "@pipeline/File";
 import { Env, LoadAssetFn } from "@pipeline/Env";
+import { FileInput } from "@pipeline/File";
 import { progress } from "@pipeline/Progress";
 
 // Wraps a Web API File object to our file abstraction

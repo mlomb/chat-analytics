@@ -1,18 +1,18 @@
 import { useEffect, useRef } from "react";
 
-import { Themes } from "./AmCharts5";
-import { Root, Color, HeatLegend, Percent, Container, p100, p50, percent, Label, Tooltip } from "@amcharts/amcharts5";
+import { Color, Container, HeatLegend, Label, Percent, Root, Tooltip, p50, p100, percent } from "@amcharts/amcharts5";
 import {
-    XYChart,
     AxisRendererX,
     AxisRendererY,
     CategoryAxis,
     ColumnSeries,
     ValueAxis,
+    XYChart,
     XYCursor,
 } from "@amcharts/amcharts5/xy";
-
 import { MessagesStats } from "@pipeline/aggregate/blocks/MessagesStats";
+
+import { Themes } from "./AmCharts5";
 
 const MIN_COLOR = Color.fromHex(0xfefa76);
 const MAX_COLOR = Color.fromHex(0xfe3527);

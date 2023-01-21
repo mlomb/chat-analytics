@@ -1,5 +1,5 @@
-import { Platform } from "@pipeline/Types";
 import { Platforms } from "@app/Platforms";
+import { Platform } from "@pipeline/Types";
 
 interface Props {
     platform: Platform | null;

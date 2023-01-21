@@ -1,6 +1,7 @@
 import { useLayoutEffect, useRef } from "react";
 
-import { Color, Label, p50, Root, Tooltip } from "@amcharts/amcharts5";
+import { Color, Label, Root, Tooltip, p50 } from "@amcharts/amcharts5";
+import { TimeUnit } from "@amcharts/amcharts5/.internal/core/util/Time";
 import {
     AxisRendererX,
     AxisRendererY,
@@ -12,11 +13,10 @@ import {
     XYCursor,
     XYSeries,
 } from "@amcharts/amcharts5/xy";
-
-import { useDataProvider } from "@report/DataProvider";
 import { MessagesPerCycle } from "@pipeline/aggregate/blocks/MessagesPerCycle";
+import { useDataProvider } from "@report/DataProvider";
+
 import { Themes } from "./AmCharts5";
-import { TimeUnit } from "@amcharts/amcharts5/.internal/core/util/Time";
 
 const MessagesGraph = ({ data, options }: { data?: MessagesPerCycle; options: number[] }) => {
     const dataProvider = useDataProvider();

@@ -1,10 +1,9 @@
-import "@assets/styles/Labels.less";
-
 import { ReactNode } from "react";
 
 import { Index } from "@pipeline/Types";
 
 import LinkOutIcon from "@assets/images/icons/link-out-blue.svg";
+import "@assets/styles/Labels.less";
 
 // common props for all labels
 export interface LabelProps {

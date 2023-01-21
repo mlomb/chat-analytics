@@ -1,18 +1,18 @@
 import { useLayoutEffect, useRef } from "react";
 
-import { Root, Color, Label, p50, Tooltip, Bullet, Circle } from "@amcharts/amcharts5";
+import { Bullet, Circle, Color, Label, Root, Tooltip, p50 } from "@amcharts/amcharts5";
 import {
-    XYChart,
-    DateAxis,
-    ValueAxis,
     AxisRendererX,
     AxisRendererY,
-    XYSeries,
+    DateAxis,
     SmoothedXLineSeries,
+    ValueAxis,
+    XYChart,
+    XYSeries,
 } from "@amcharts/amcharts5/xy";
-
-import { useDataProvider } from "@report/DataProvider";
 import { ActiveAuthors } from "@pipeline/aggregate/blocks/ActiveAuthors";
+import { useDataProvider } from "@report/DataProvider";
+
 import { Themes } from "./AmCharts5";
 
 const ActiveAuthorsOverTime = ({ data, options }: { data?: ActiveAuthors; options: number[] }) => {

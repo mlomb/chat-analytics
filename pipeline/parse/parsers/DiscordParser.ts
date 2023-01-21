@@ -1,7 +1,7 @@
-import { AttachmentType, Author, ChannelType, Index } from "@pipeline/Types";
-import { Parser } from "@pipeline/parse/Parser";
-import { JSONStream } from "@pipeline/parse/JSONStream";
 import { FileInput, getAttachmentTypeFromFileName, streamJSONFromFile } from "@pipeline/File";
+import { AttachmentType, Author, ChannelType, Index } from "@pipeline/Types";
+import { JSONStream } from "@pipeline/parse/JSONStream";
+import { Parser } from "@pipeline/parse/Parser";
 
 export class DiscordParser extends Parser {
     private lastGuildIndex?: Index;

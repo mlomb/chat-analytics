@@ -1,8 +1,8 @@
 import { memo } from "react";
 
+import { useDataProvider } from "@report/DataProvider";
 import { GuildAvatar } from "@report/components/core/avatars/GuildAvatar";
 import { BaseLabel, LabelProps } from "@report/components/core/labels/BaseLabel";
-import { useDataProvider } from "@report/DataProvider";
 
 const _GuildLabel = ({ index }: LabelProps) => {
     const dp = useDataProvider();

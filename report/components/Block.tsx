@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { InView } from "react-intersection-observer";
 
-import { useDataProvider } from "@report/DataProvider";
 import { BlockInfo, BlockKey } from "@pipeline/aggregate/Blocks";
+import { useDataProvider } from "@report/DataProvider";
 
 interface Props<K extends BlockKey> {
     blockKey: K;

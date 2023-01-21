@@ -1,7 +1,7 @@
-import { generateDatabase, generateReportSite } from "@pipeline/process/Generate";
+import { WebEnv, wrapFile } from "@app/WebEnv";
 import { progress } from "@pipeline/Progress";
 import { ReportConfig } from "@pipeline/Types";
-import { wrapFile, WebEnv } from "@app/WebEnv";
+import { generateDatabase, generateReportSite } from "@pipeline/process/Generate";
 
 export interface InitMessage {
     files: File[];
@@ -36,7 +36,8 @@ self.onmessage = async (ev: MessageEvent<InitMessage>) => {
                 .replace('<script defer src="', '<script defer src="' + ev.data.origin)
                 .replace('<link href="', '<link href="' + ev.data.origin);
         }
-        self.postMessage(<ResultMessage>{
+
+        const message: ResultMessage = {
             type: "result",
             data: env.isDev ? result.data : "",
             html: result.html,
@@ -47,7 +48,9 @@ self.onmessage = async (ev: MessageEvent<InitMessage>) => {
                 guilds: database.guilds.length,
                 messages: Object.values(database.channels).reduce((acc, ch) => acc + (ch.msgCount ?? 0), 0),
             },
-        });
+        };
+
+        self.postMessage(message);
     } catch (ex) {
         // handle exceptions
         if (ex instanceof Error) {

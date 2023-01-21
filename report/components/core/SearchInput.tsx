@@ -1,8 +1,8 @@
-import "@assets/styles/SearchInput.less";
-
 import { useRef, useState } from "react";
 
 import { Tooltip } from "@report/components/core/Tooltip";
+
+import "@assets/styles/SearchInput.less";
 
 interface Props {
     placeholder?: string;

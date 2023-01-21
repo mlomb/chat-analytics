@@ -1,11 +1,11 @@
 import { unzipSync } from "fflate";
-import { AttachmentType } from "@pipeline/Types";
-import { FileInput } from "@pipeline/File";
-import { Parser } from "@pipeline/parse/Parser";
-import { extractChatName, isGroupWelcome, matchAttachmentType, removeBadChars } from "@pipeline/parse/parsers/WhatsApp";
-
 // There is a convenient parser already out there
 import { parseStringSync } from "whatsapp-chat-parser";
+
+import { FileInput } from "@pipeline/File";
+import { AttachmentType } from "@pipeline/Types";
+import { Parser } from "@pipeline/parse/Parser";
+import { extractChatName, isGroupWelcome, matchAttachmentType, removeBadChars } from "@pipeline/parse/parsers/WhatsApp";
 
 export class WhatsAppParser extends Parser {
     private channelIndex = 0;

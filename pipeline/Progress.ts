@@ -144,11 +144,11 @@ class Progress extends EventEmitter {
         }
 
         if (emit) {
-            this.emit("update", <ProgressMessage>{
+            this.emit("update", {
                 type: "progress",
                 tasks: this.tasks,
                 keys: this.keys,
-            });
+            } as ProgressMessage);
             this.lastCount = this.active?.progress?.actual || 0;
             this.lastTs = ts || Date.now();
         }

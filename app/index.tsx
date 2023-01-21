@@ -1,8 +1,9 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import { plausible } from "@assets/Plausible";
 
 import HomePage from "@app/HomePage";
+
+import { plausible } from "@assets/Plausible";
 
 createRoot(document.getElementById("app") as HTMLElement).render(
     <StrictMode>

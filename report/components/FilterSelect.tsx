@@ -11,11 +11,10 @@
 
     react-select: https://github.com/JedWatson/react-select
 */
-
-import "@assets/styles/FilterSelect.less";
-
 import React, { PureComponent, ReactNode } from "react";
 import { FixedSizeList, ListChildComponentProps } from "react-window";
+
+import "@assets/styles/FilterSelect.less";
 
 const OPTION_HEIGHT = 35;
 const CHIPS_LIMIT = 3;

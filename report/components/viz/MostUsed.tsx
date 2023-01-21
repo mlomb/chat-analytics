@@ -1,9 +1,9 @@
 import { memo, useMemo, useState } from "react";
 
-import { Index } from "@pipeline/Types";
 import { matchFormat } from "@pipeline/Text";
-import AnimatedBars, { AnimatedBarEntry } from "@report/components/viz/AnimatedBars";
+import { Index } from "@pipeline/Types";
 import SearchInput from "@report/components/core/SearchInput";
+import AnimatedBars, { AnimatedBarEntry } from "@report/components/viz/AnimatedBars";
 
 interface BaseProps {
     what: string;

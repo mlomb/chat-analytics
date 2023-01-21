@@ -1,7 +1,7 @@
+import { Day, formatTime } from "@pipeline/Time";
 import { BlockDescription, BlockFn } from "@pipeline/aggregate/Blocks";
 import { parseAndFilterMessages } from "@pipeline/aggregate/Helpers";
 import { MessageView } from "@pipeline/serialization/MessageView";
-import { Day, formatTime } from "@pipeline/Time";
 
 interface PeriodStat {
     minutes: number;
@@ -133,10 +133,10 @@ const fn: BlockFn<MessagesStats> = (database, filters, common) => {
     const activity: ActivityEntry[] = activityCounts.map((count, i) => {
         const weekday = Math.floor(i / 24);
         const hour = i % 24;
-        return <ActivityEntry>{
+        return {
             value: count,
             hour: `${hour}hs`,
-            weekday: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][weekday],
+            weekday: (["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"] as const)[weekday],
         };
     });
 
