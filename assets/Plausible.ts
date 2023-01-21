@@ -16,7 +16,7 @@ export const plausible = (name: string, props?: { [key: string]: string }) => {
 
     const xhr = new XMLHttpRequest();
     xhr.open("POST", `${plausibleURL}/api/event`, true);
-    xhr.setRequestHeader("Content-Type", "text/plain");
+    xhr.setRequestHeader("Content-Type", "application/json");
     xhr.send(JSON.stringify(data));
 };
 
