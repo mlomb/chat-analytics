@@ -55,11 +55,9 @@ const Steps = () => {
 
     const startGeneration = () => {
         plausible("Start generation", {
-            props: {
-                platform: state.platform as Platform,
-                files: state.files.length + "",
-                size: sizeCategory(state.files.reduce((acc, file) => acc + file.size, 0)),
-            },
+            platform: state.platform as Platform,
+            files: state.files.length + "",
+            size: sizeCategory(state.files.reduce((acc, file) => acc + file.size, 0)),
         });
         const startTime = performance.now();
         // @ts-ignore
@@ -110,14 +108,12 @@ const Steps = () => {
 
                 const endTime = performance.now();
                 plausible("Finish generation", {
-                    props: {
-                        platform: state.platform as Platform,
-                        outputSize: sizeCategory(data.html.length),
-                        channels: numberCategory(data.counts.channels),
-                        authors: numberCategory(data.counts.authors),
-                        messages: numberCategory(data.counts.messages),
-                        time: timeCategory((endTime - startTime) / 1000),
-                    },
+                    platform: state.platform as Platform,
+                    outputSize: sizeCategory(data.html.length),
+                    channels: numberCategory(data.counts.channels),
+                    authors: numberCategory(data.counts.authors),
+                    messages: numberCategory(data.counts.messages),
+                    time: timeCategory((endTime - startTime) / 1000),
                 });
             }
         };
@@ -146,7 +142,7 @@ const Steps = () => {
     };
 
     const pickPlatform = (platform: Platform) => {
-        plausible("Pick platform", { props: { platform } });
+        plausible("Pick platform", { platform });
         setState({ ...state, currentStep: 1, platform });
     };
 

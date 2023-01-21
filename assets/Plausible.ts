@@ -1,25 +1,18 @@
-export const plausible = (name: string, options: { url?: string; props?: { [key: string]: string } } = {}) => {
+export const plausible = (name: string, props?: { [key: string]: string }) => {
     const plausibleURL = env.isProd ? "https://p.chatanalytics.app" : "http://localhost:8000";
-
-    // Avoid leaking personal information
-    // it happened in the past, we don't know why
-    // so we'll try to a void it replace any URL
-    // we don't recognize
-    let url = options.url || window.location.href;
+    let url = window.location.href;
     if (!url.startsWith("https://chatanalytics.app")) {
         url = "https://chatanalytics.app/report";
     }
 
-    const data: any = {
+    const data = {
         domain: "chatanalytics.app",
         name,
         url,
         referrer: document.referrer || null,
         screen_width: window.innerWidth,
+        props: props,
     };
-    if (options.props) {
-        data.props = JSON.stringify(options.props);
-    }
 
     const xhr = new XMLHttpRequest();
     xhr.open("POST", `${plausibleURL}/api/event`, true);
