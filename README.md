@@ -4,12 +4,12 @@
 ![Logo-Dark](assets/images/logos/app_dark.svg#gh-dark-mode-only)
 ![Logo-Light](assets/images/logos/app_light.svg#gh-light-mode-only)
 
-<h3 align="center">Generate insightful chat analysis reports</h3>
+<h3>Generate insightful chat analysis reports</h3>
 
 [Open App](https://chatanalytics.app) • [View Demo](https://chatanalytics.app/demo) • [Use CLI](#cli)
 
 ![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/mlomb/chat-analytics/ci.yml)
-[![codecov](https://codecov.io/gh/mlomb/chat-analytics/branch/main/graph/badge.svg)](https://github.com/mlomb/chat-analytics)
+[![codecov](https://codecov.io/gh/mlomb/chat-analytics/branch/main/graph/badge.svg)](https://codecov.io/gh/mlomb/chat-analytics)
 [![npm](https://img.shields.io/npm/v/chat-analytics)](https://www.npmjs.com/package/chat-analytics)
 
 [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/donate/?hosted_button_id=NKHZJPKFJ34WJ)
