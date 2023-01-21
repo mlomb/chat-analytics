@@ -26,7 +26,7 @@ The [demo](https://chatanalytics.app/demo) is an export from the [DefleMask](htt
 docker run --rm -it -v $PWD/out:/out tyrrrz/discordchatexporter:stable exportguild -f json -g 253601524398293010 -t <token>
 ```
 
-Zipping and then replacing the file in Google Drive.
+Zipping and then replacing the file in Google Drive (~280MB uncompressed, 23MB compressed).
 
 ---
 

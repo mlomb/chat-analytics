@@ -4,9 +4,13 @@
 ![Logo-Dark](assets/images/logos/app_dark.svg#gh-dark-mode-only)
 ![Logo-Light](assets/images/logos/app_light.svg#gh-light-mode-only)
 
-<h4>Generate insightful chat analysis reports</h4>
+<h3 align="center">Generate insightful chat analysis reports</h3>
 
-[Open App](https://chatanalytics.app) • [View Demo](https://chatanalytics.app/demo)
+[Open App](https://chatanalytics.app) • [View Demo](https://chatanalytics.app/demo) • [Use CLI](#cli)
+
+![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/mlomb/chat-analytics/ci.yml)
+[![codecov](https://codecov.io/gh/mlomb/chat-analytics/branch/main/graph/badge.svg)](https://github.com/mlomb/chat-analytics)
+[![npm](https://img.shields.io/npm/v/chat-analytics)](https://www.npmjs.com/package/chat-analytics)
 
 [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/donate/?hosted_button_id=NKHZJPKFJ34WJ)
 
@@ -39,6 +43,29 @@ The contribution of [new platform parsers](DOCS.md#writing-a-new-parser) is alwa
 Since all chat data always stays in the browser, there is zero risk of someone reading your chats. Note that **the report HTML file contains sensitive information** (one may reconstruct message contents for every message), so share your reports with people you trust.
 
 The site does not use cookies either and uses a self-hosted version of [Plausible](https://plausible.io). All events do not contain PII and information is segmented (i.e 1MB-10MB, etc). Since I want full transparency, you can check the [site analytics here](https://p.chatanalytics.app/chatanalytics.app).
+
+## CLI
+
+You can generate reports from the command line using `npx chat-analytics`:
+
+```
+Usage: chat-analytics -p <platform> -i <input files>
+
+Options:
+      --help      Show help                                            [boolean]
+      --version   Show version number                                  [boolean]
+  -p, --platform  The platform to generate for
+   [string] [required] [choices: "discord", "messenger", "telegram", "whatsapp"]
+  -i, --inputs    The input file(s) to use (glob)             [array] [required]
+  -o, --output    The output HTML filename     [string] [default: "report.html"]
+      --demo      Mark the report as a demo           [boolean] [default: false]
+```
+
+For example:
+
+```sh
+npx chat-analytics -p discord -i "exported/*.json" -o report.html
+```
 
 ## Docs & Development
 
