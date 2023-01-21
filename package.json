@@ -3,6 +3,21 @@
   "version": "0.0.1",
   "author": "Martin Emiliano Lombardo <to@mlomb.me>",
   "license": "MIT",
+  "description": "Generate insightful chat analysis reports in the browser",
+  "keywords": [
+    "chat",
+    "analytics",
+    "analysis",
+    "tracking",
+    "stats",
+    "statistics",
+    "discord",
+    "telegram",
+    "whatsapp"
+  ],
+  "homepage": "https://chatanalytics.app",
+  "repository": "https://github.com/mlomb/chat-analytics",
+  "bugs": "https://github.com/mlomb/chat-analytics/issues",
   "scripts": {
     "build:node": "tsc -p tsconfig.node.json && tsc-alias -p tsconfig.node.json",
     "build:web": "webpack build --env production --progress",
