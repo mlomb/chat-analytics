@@ -26,6 +26,13 @@
     "dist",
     "dist_web/report.html"
   ],
+  "dependencies": {
+    "pretty-bytes": "<6.0.0",
+    "fflate": "^0.7.4",
+    "fast-glob": "^3.2.12",
+    "yargs": "^17.6.2",
+    "whatsapp-chat-parser": "^3.2.2"
+  },
   "devDependencies": {
     "@amcharts/amcharts5": "^5.2.48",
     "@tippyjs/react": "^4.2.6",
@@ -41,7 +48,6 @@
     "css-loader": "^6.7.3",
     "cssnano": "^5.1.14",
     "emoji-regex": "^10.2.1",
-    "fflate": "^0.7.4",
     "html-inline-css-webpack-plugin": "^1.11.1",
     "html-webpack-plugin": "^5.5.0",
     "jest": "^28.1.3",
@@ -50,7 +56,6 @@
     "mini-css-extract-plugin": "~2.7.2",
     "postcss-loader": "^7.0.2",
     "prettier": "^2.8.3",
-    "pretty-bytes": "<6.0.0",
     "react": "^18.2.0",
     "react-countup": "^6.4.0",
     "react-dom": "^18.2.0",
@@ -62,9 +67,7 @@
     "typescript": "^4.9.4",
     "webpack": "^5.75.0",
     "webpack-cli": "^5.0.1",
-    "webpack-dev-server": "^4.11.1",
-    "whatsapp-chat-parser": "^3.2.2",
-    "yargs": "^17.6.2"
+    "webpack-dev-server": "^4.11.1"
   },
   "jest": {
     "collectCoverageFrom": [
@@ -89,8 +92,5 @@
         }
       ]
     }
-  },
-  "dependencies": {
-    "fast-glob": "^3.2.12"
   }
 }
