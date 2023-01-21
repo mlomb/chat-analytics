@@ -2,10 +2,6 @@
 
 Things pending or ideas. Don't expect them soon.
 
-### Misc
-
-* If someone is interested, maybe make a NodeJS package to be used as a library
-
 ### Report generation
 
 * Handle english contractions (i.e combine "dont" and "don't")
