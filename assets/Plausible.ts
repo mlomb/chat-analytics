@@ -10,13 +10,16 @@ export const plausible = (name: "pageview" | string, props?: { [key: string]: st
     // - keeps any ?search=params
 
     let pathname: string;
-
-    if (window.location.hostname !== "chatanalytics.app") {
-        pathname = "/report";
-    } else {
+    if (window.location.hostname === "chatanalytics.app") {
         pathname = window.location.pathname;
-        pathname = pathname.endsWith("/") ? pathname.slice(0, -1) : pathname; // make sure the path doesn't end with a slash
-        pathname = ALLOWED_PATHS.includes(pathname) ? pathname : "/report";
+        if (pathname.endsWith("/")) {
+            pathname = pathname.slice(0, -1); // make sure the path doesn't end with a slash
+        }
+        if (!ALLOWED_PATHS.includes(pathname)) {
+            pathname = "/report";
+        }
+    } else {
+        pathname = "/report";
     }
 
     const data = {
