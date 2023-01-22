@@ -1,7 +1,6 @@
 /**
  * @jest-environment jsdom
  */
-
 import { plausible } from "@assets/Plausible";
 
 const testPageview = ({ location, expectedPath }: { location: string; expectedPath: string }) => {
