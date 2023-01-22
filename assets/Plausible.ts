@@ -1,27 +1,43 @@
-const PLAUSIBLE_URL = env.isProd ? "https://p.chatanalytics.app" : "http://localhost:8000";
-export const plausible = (name: string, props?: {[key: string]: string }) => {
-    let url = window.location.href;
-    if (!url.startsWith("https://chatanalytics.app")) {
-        url = "https://chatanalytics.app/report";
+const PLAUSIBLE_URL = "env" in window && env.isProd ? "https://p.chatanalytics.app" : "http://localhost:8000";
+const ALLOWED_PATHS = ["", "/demo", "/report"];
+
+export const plausible = (name: "pageview" | string, props?: { [key: string]: string }) => {
+    // We want the url where:
+    // - the hostname is always "chatanalytics.app"
+    // - the path is either "", "/", "/demo" or "/report"
+    //   - if the hostname is not "chatanalytics.app" => then we are sure we are in a report => fallback to "/report"
+    //   - if the path is neither => fallback to "/report"
+    // - keeps any ?search=params
+
+    let pathname: string;
+
+    if (window.location.hostname !== "chatanalytics.app") {
+        pathname = "/report";
+    } else {
+        pathname = window.location.pathname;
+        pathname = pathname.endsWith("/") ? pathname.slice(0, -1) : pathname; // make sure the path doesn't end with a slash
+        pathname = ALLOWED_PATHS.includes(pathname) ? pathname : "/report";
     }
 
     const data = {
         domain: "chatanalytics.app",
         name,
-        url,
-        referrer: document.referrer || null,
+        url: `https://chatanalytics.app${pathname}${window.location.search}`,
+        referrer: document.referrer,
         screen_width: window.innerWidth,
-        props: props,
+        props,
     };
 
-    const xhr = new XMLHttpRequest();
-    xhr.open("POST", PLAUSIBLE_URL+'/api/event', true);
-    xhr.setRequestHeader("Content-Type", "application/json");
-    xhr.send(JSON.stringify(data));
+    fetch(PLAUSIBLE_URL + "/api/event", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+    });
 };
 
 // These functions are used to round the input and avoid fingerprinting
 
+// istanbul ignore next
 export const sizeCategory = (size: number): string => {
     size /= 1024;
     if (size < 100) return "0-100KB";
@@ -36,6 +52,7 @@ export const sizeCategory = (size: number): string => {
     if (size < 5000000) return "1GB-5GB";
     return "5GB+";
 };
+// istanbul ignore next
 export const numberCategory = (num: number): string => {
     num = Math.round(num);
     if (num <= 10) return num + "";
@@ -55,6 +72,7 @@ export const numberCategory = (num: number): string => {
     if (num <= 100000000) return "50M-100M";
     return "100M+";
 };
+// istanbul ignore next
 export const timeCategory = (seconds: number): string => {
     seconds = Math.round(seconds);
     if (seconds <= 10) return seconds + "s";

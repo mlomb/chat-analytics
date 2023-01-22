@@ -42,11 +42,11 @@
     "dist_web/report.html"
   ],
   "dependencies": {
-    "pretty-bytes": "<6.0.0",
-    "fflate": "^0.7.4",
     "fast-glob": "^3.2.12",
-    "yargs": "^17.6.2",
-    "whatsapp-chat-parser": "^3.2.2"
+    "fflate": "^0.7.4",
+    "pretty-bytes": "<6.0.0",
+    "whatsapp-chat-parser": "^3.2.2",
+    "yargs": "^17.6.2"
   },
   "devDependencies": {
     "@amcharts/amcharts5": "^5.2.48",
@@ -66,6 +66,7 @@
     "html-inline-css-webpack-plugin": "^1.11.1",
     "html-webpack-plugin": "^5.5.0",
     "jest": "^28.1.3",
+    "jest-environment-jsdom": "^29.3.1",
     "less": "^4.1.3",
     "less-loader": "^11.1.0",
     "mini-css-extract-plugin": "~2.7.2",
@@ -86,6 +87,7 @@
   },
   "jest": {
     "collectCoverageFrom": [
+      "assets/Plausible.ts",
       "lib/**",
       "!lib/CLI.ts",
       "pipeline/**",
