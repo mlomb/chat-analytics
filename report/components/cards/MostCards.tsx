@@ -1,21 +1,19 @@
 import { Index } from "@pipeline/Types";
-import MostUsed from "@report/components/viz/MostUsed";
-import { useDataProvider } from "@report/DataProvider";
-
-import { AuthorLabel } from "@report/components/core/labels/AuthorLabel";
-import { ChannelLabel } from "@report/components/core/labels/ChannelLabel";
-import { DomainLabel } from "@report/components/core/labels/DomainLabel";
-import { MentionLabel } from "@report/components/core/labels/MentionLabel";
-import { EmojiLabel } from "@report/components/core/labels/EmojiLabel";
-import { WordLabel } from "@report/components/core/labels/WordLabel";
-import WordCloud from "@report/components/viz/WordCloud";
-
 import { ConversationStats } from "@pipeline/aggregate/blocks/ConversationStats";
 import { EmojiStats } from "@pipeline/aggregate/blocks/EmojiStats";
 import { ExternalStats } from "@pipeline/aggregate/blocks/ExternalStats";
 import { InteractionStats } from "@pipeline/aggregate/blocks/InteractionStats";
 import { LanguageStats } from "@pipeline/aggregate/blocks/LanguageStats";
 import { MessagesStats } from "@pipeline/aggregate/blocks/MessagesStats";
+import { useDataProvider } from "@report/DataProvider";
+import { AuthorLabel } from "@report/components/core/labels/AuthorLabel";
+import { ChannelLabel } from "@report/components/core/labels/ChannelLabel";
+import { DomainLabel } from "@report/components/core/labels/DomainLabel";
+import { EmojiLabel } from "@report/components/core/labels/EmojiLabel";
+import { MentionLabel } from "@report/components/core/labels/MentionLabel";
+import { WordLabel } from "@report/components/core/labels/WordLabel";
+import MostUsed from "@report/components/viz/MostUsed";
+import WordCloud from "@report/components/viz/WordCloud";
 
 const EmptyArray: any[] = [];
 

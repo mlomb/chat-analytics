@@ -1,8 +1,8 @@
-import "@assets/styles/Avatars.less";
-
 import { ReactNode } from "react";
 
 import { TextAvatar } from "@report/components/core/avatars/TextAvatar";
+
+import "@assets/styles/Avatars.less";
 
 interface Props {
     avatars: ReactNode[];

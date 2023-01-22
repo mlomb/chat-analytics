@@ -1,10 +1,10 @@
 import prettyBytes from "pretty-bytes";
 import { useEffect, useState } from "react";
 
-import Button from "@app/components/Button";
 import { ResultMessage } from "@app/WorkerApp";
-import { plausible } from "@assets/Plausible";
+import Button from "@app/components/Button";
 
+import { plausible } from "@assets/Plausible";
 import Download from "@assets/images/icons/download.svg";
 import LinkOut from "@assets/images/icons/link-out.svg";
 import Refresh from "@assets/images/icons/refresh.svg";

@@ -1,25 +1,15 @@
-import "@assets/styles/ReportPage.less";
+import { Fragment, ReactNode, useEffect, useMemo, useState } from "react";
 
-import { Fragment, useEffect, useMemo, useState, ReactNode } from "react";
-
-import { useDataProvider } from "@report/DataProvider";
 import { PlatformsInfo } from "@pipeline/Platforms";
-
-import Header from "@report/components/Header";
-import Footer from "@report/components/Footer";
-import LoadingOverlay from "@report/components/LoadingOverlay";
+import { useDataProvider } from "@report/DataProvider";
 import Card from "@report/components/Card";
+import Footer from "@report/components/Footer";
+import Header from "@report/components/Header";
+import LoadingOverlay from "@report/components/LoadingOverlay";
 import { TabContainer } from "@report/components/Tabs";
-
-import MessagesOverTime from "@report/components/viz/MessagesOverTime";
-import SentimentOverTime from "@report/components/viz/SentimentOverTime";
-import ActiveAuthorsOverTime from "@report/components/viz/ActiveAuthorsOverTime";
-import MessagesStatsTable from "@report/components/cards/MessagesStatsTable";
-import LanguageStatsTable from "@report/components/cards/LanguageStatsTable";
 import EmojiStatsTable from "@report/components/cards/EmojiStatsTable";
-import SentimentStatsTable from "@report/components/cards/SentimentStatsTable";
-import ConversationParticipation from "@report/components/viz/ConversationParticipation";
-import GrowthOverTime from "@report/components/viz/GrowthOverTime";
+import LanguageStatsTable from "@report/components/cards/LanguageStatsTable";
+import MessagesStatsTable from "@report/components/cards/MessagesStatsTable";
 import {
     MostConversations,
     MostGetterEmojis,
@@ -32,8 +22,16 @@ import {
     MostUsedEmojis,
     MostUsedWords,
 } from "@report/components/cards/MostCards";
+import SentimentStatsTable from "@report/components/cards/SentimentStatsTable";
 import { TopReacted } from "@report/components/cards/TopCards";
+import ActiveAuthorsOverTime from "@report/components/viz/ActiveAuthorsOverTime";
+import ConversationParticipation from "@report/components/viz/ConversationParticipation";
+import GrowthOverTime from "@report/components/viz/GrowthOverTime";
 import MessagesActivity from "@report/components/viz/MessagesActivity";
+import MessagesOverTime from "@report/components/viz/MessagesOverTime";
+import SentimentOverTime from "@report/components/viz/SentimentOverTime";
+
+import "@assets/styles/ReportPage.less";
 
 const CardContainer = (props: { children: ReactNode }) => <div className="CardContainer">{props.children}</div>;
 

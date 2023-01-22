@@ -1,7 +1,9 @@
 // NOTE: we can't use CSS-based tooltips because they break with overflow: hidden containers
-import Tippy from "@tippyjs/react";
-import "@assets/styles/Tooltip.less";
 import { ReactElement, ReactNode } from "react";
+
+import Tippy from "@tippyjs/react";
+
+import "@assets/styles/Tooltip.less";
 
 interface Props {
     content: ReactNode;

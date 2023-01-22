@@ -1,11 +1,11 @@
 import { useLayoutEffect, useRef } from "react";
 
-import { Themes } from "./AmCharts5";
 import { Root } from "@amcharts/amcharts5";
 import { ChordDirected } from "@amcharts/amcharts5/flow";
-
-import { useDataProvider } from "@report/DataProvider";
 import { ConversationStats } from "@pipeline/aggregate/blocks/ConversationStats";
+import { useDataProvider } from "@report/DataProvider";
+
+import { Themes } from "./AmCharts5";
 
 const ConversationParticipation = ({ data, options }: { data?: ConversationStats; options: number[] }) => {
     const dataProvider = useDataProvider();

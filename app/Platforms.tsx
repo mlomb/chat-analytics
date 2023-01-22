@@ -6,26 +6,26 @@ import DiscordLogo from "@assets/images/logos/discord.svg";
 import MessengerLogo from "@assets/images/logos/messenger.svg";
 import TelegramLogo from "@assets/images/logos/telegram.svg";
 import WhatsAppLogo from "@assets/images/logos/whatsapp.svg";
-
-import DiscordFormat from "@assets/images/platforms/discord/instructions/discord_format.png";
-import DiscordExport from "@assets/images/platforms/discord/instructions/discord_export.gif";
+// Discord
 import DiscordChannels from "@assets/images/platforms/discord/instructions/discord_channels.png";
-
-import FacebookTab from "@assets/images/platforms/messenger/instructions/tab.png";
-import FacebookFormat from "@assets/images/platforms/messenger/instructions/format.png";
+import DiscordExport from "@assets/images/platforms/discord/instructions/discord_export.gif";
+import DiscordFormat from "@assets/images/platforms/discord/instructions/discord_format.png";
+// Facebook
 import FacebookDeselect from "@assets/images/platforms/messenger/instructions/deselect.png";
+import FacebookFormat from "@assets/images/platforms/messenger/instructions/format.png";
 import FacebookMessages from "@assets/images/platforms/messenger/instructions/messages.png";
 import FacebookRequest from "@assets/images/platforms/messenger/instructions/request.png";
-
+import FacebookTab from "@assets/images/platforms/messenger/instructions/tab.png";
+// Telegram
 import TelegramTreeDots from "@assets/images/platforms/telegram/instructions/telegram_dots.png";
-import TelegramNoMedia from "@assets/images/platforms/telegram/instructions/telegram_no_media.png";
-import TelegramFormat from "@assets/images/platforms/telegram/instructions/telegram_format.png";
 import TelegramExport from "@assets/images/platforms/telegram/instructions/telegram_export.gif";
-
-import WhatsAppThreeDots from "@assets/images/platforms/whatsapp/instructions/whatsapp_dots.png";
-import WhatsAppIOSNoMedia from "@assets/images/platforms/whatsapp/instructions/whatsapp_ios_no_media.png";
+import TelegramFormat from "@assets/images/platforms/telegram/instructions/telegram_format.png";
+import TelegramNoMedia from "@assets/images/platforms/telegram/instructions/telegram_no_media.png";
+// WhatsApp
 import WhatsAppAndroidNoMedia from "@assets/images/platforms/whatsapp/instructions/whatsapp_android_no_media.png";
+import WhatsAppThreeDots from "@assets/images/platforms/whatsapp/instructions/whatsapp_dots.png";
 import WhatsAppIOSExport from "@assets/images/platforms/whatsapp/instructions/whatsapp_ios_export.png";
+import WhatsAppIOSNoMedia from "@assets/images/platforms/whatsapp/instructions/whatsapp_ios_no_media.png";
 
 const DiscordInstructions = () => {
     return (

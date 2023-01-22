@@ -1,9 +1,9 @@
+import { matchFormat } from "@pipeline/Text";
+import { DateKey, Day, genTimeKeys } from "@pipeline/Time";
 import { Database, FormatCache, Index } from "@pipeline/Types";
-import { Blocks, BlockDescriptions, BlockKey, BlockInfo, CommonBlockData } from "@pipeline/aggregate/Blocks";
+import { BlockDescriptions, BlockInfo, BlockKey, Blocks, CommonBlockData } from "@pipeline/aggregate/Blocks";
 import { Filters } from "@pipeline/aggregate/Filters";
 import { decompress } from "@pipeline/compression/Compression";
-import { DateKey, Day, genTimeKeys } from "@pipeline/Time";
-import { matchFormat } from "@pipeline/Text";
 
 export interface InitMessage {
     type: "init";
@@ -57,7 +57,7 @@ const init = (msg: InitMessage) => {
     };
     console.timeEnd("Build format cache");
 
-    self.postMessage(<ReadyMessage>{
+    const message: ReadyMessage = {
         type: "ready",
         database: {
             ...database,
@@ -67,7 +67,9 @@ const init = (msg: InitMessage) => {
         formatCache,
         // remove functions
         blocksDescs: JSON.parse(JSON.stringify(Blocks)) as BlockDescriptions,
-    });
+    };
+
+    self.postMessage(message);
 
     if (env.isDev) console.log(database);
 };

@@ -1,5 +1,5 @@
-import { Database, Index } from "@pipeline/Types";
 import { DateKey, Day, genTimeKeys } from "@pipeline/Time";
+import { Database, Index } from "@pipeline/Types";
 
 export class Filters {
     channels: Index[];

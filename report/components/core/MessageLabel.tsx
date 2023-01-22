@@ -1,15 +1,15 @@
-import "@assets/styles/Labels.less";
-
 import { Day, formatTime } from "@pipeline/Time";
 import { AttachmentType, FullMessage } from "@pipeline/Types";
+import { useDataProvider } from "@report/DataProvider";
+import { Tooltip } from "@report/components/core/Tooltip";
 import { AuthorLabel } from "@report/components/core/labels/AuthorLabel";
 import { ChannelLabel } from "@report/components/core/labels/ChannelLabel";
 import { DomainLabel } from "@report/components/core/labels/DomainLabel";
 import { EmojiLabel } from "@report/components/core/labels/EmojiLabel";
 import { MentionLabel } from "@report/components/core/labels/MentionLabel";
 import { WordLabel } from "@report/components/core/labels/WordLabel";
-import { Tooltip } from "@report/components/core/Tooltip";
-import { useDataProvider } from "@report/DataProvider";
+
+import "@assets/styles/Labels.less";
 
 interface ChipProps {
     type: "attachment" | "link" | "mention" | "word" | "emoji";

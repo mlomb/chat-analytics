@@ -1,6 +1,6 @@
 import { useLayoutEffect, useRef } from "react";
 
-import { Root, Color, Percent, Tooltip } from "@amcharts/amcharts5";
+import { Color, Percent, Root, Tooltip } from "@amcharts/amcharts5";
 import { PieChart, PieSeries } from "@amcharts/amcharts5/percent";
 
 import { Themes } from "./AmCharts5";

@@ -1,8 +1,8 @@
 import { memo } from "react";
 
+import { useDataProvider } from "@report/DataProvider";
 import { AuthorAvatar } from "@report/components/core/avatars/AuthorAvatar";
 import { BaseLabel, LabelProps } from "@report/components/core/labels/BaseLabel";
-import { useDataProvider } from "@report/DataProvider";
 
 const _AuthorLabel = ({ index }: LabelProps) => {
     const dp = useDataProvider();

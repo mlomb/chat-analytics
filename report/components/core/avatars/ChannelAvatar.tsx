@@ -1,9 +1,9 @@
+import { useDataProvider } from "@report/DataProvider";
 import { AuthorAvatar } from "@report/components/core/avatars/AuthorAvatar";
 import { AvatarStack } from "@report/components/core/avatars/AvatarStack";
 import { GuildAvatar } from "@report/components/core/avatars/GuildAvatar";
 import { BackgroundForTelegramAvatar } from "@report/components/core/avatars/Telegram";
 import { TextAvatar } from "@report/components/core/avatars/TextAvatar";
-import { useDataProvider } from "@report/DataProvider";
 
 import discord_group_avatar_0 from "@assets/images/platforms/discord/avatars/group_avatar_0.png";
 import discord_group_avatar_1 from "@assets/images/platforms/discord/avatars/group_avatar_1.png";

@@ -1,10 +1,10 @@
-import "@assets/styles/HomePage.less";
 import { useState } from "react";
 
 import Landing from "@app/components/Landing";
 import Steps from "@app/components/Steps";
 
 import Logo from "@assets/images/logos/app_dark.svg";
+import "@assets/styles/HomePage.less";
 
 const HomePage = () => {
     const [index, setIndex] = useState(0);

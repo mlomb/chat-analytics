@@ -1,17 +1,17 @@
-import { useEffect, useRef } from "react";
 import prettyBytes from "pretty-bytes";
+import { useEffect, useRef } from "react";
 
 import { ProgressKeys, TaskInfo } from "@pipeline/Progress";
 
-import Tick from "@assets/images/icons/tick.svg";
-import Spinner from "@assets/images/icons/spinner.svg";
-import Times from "@assets/images/icons/times.svg";
-import Refresh from "@assets/images/icons/refresh.svg";
-import Hashtag from "@assets/images/icons/hashtag.svg";
-import User from "@assets/images/icons/user.svg";
 import Bubble from "@assets/images/icons/bubble.svg";
 import Clock from "@assets/images/icons/clock.svg";
+import Hashtag from "@assets/images/icons/hashtag.svg";
 import Pause from "@assets/images/icons/pause.svg";
+import Refresh from "@assets/images/icons/refresh.svg";
+import Spinner from "@assets/images/icons/spinner.svg";
+import Tick from "@assets/images/icons/tick.svg";
+import Times from "@assets/images/icons/times.svg";
+import User from "@assets/images/icons/user.svg";
 
 interface Props {
     active: boolean;

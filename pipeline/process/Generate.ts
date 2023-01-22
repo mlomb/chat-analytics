@@ -1,14 +1,14 @@
-import { Database, ReportConfig } from "@pipeline/Types";
+import { Env } from "@pipeline/Env";
 import { FileInput } from "@pipeline/File";
 import { progress } from "@pipeline/Progress";
+import { Database, ReportConfig } from "@pipeline/Types";
+import { compress } from "@pipeline/compression/Compression";
 import { Parser } from "@pipeline/parse/Parser";
 import { DiscordParser } from "@pipeline/parse/parsers/DiscordParser";
 import { MessengerParser } from "@pipeline/parse/parsers/MessengerParser";
 import { TelegramParser } from "@pipeline/parse/parsers/TelegramParser";
 import { WhatsAppParser } from "@pipeline/parse/parsers/WhatsAppParser";
 import { DatabaseBuilder } from "@pipeline/process/DatabaseBuilder";
-import { compress } from "@pipeline/compression/Compression";
-import { Env } from "@pipeline/Env";
 
 export const generateDatabase = async (files: FileInput[], config: ReportConfig, env: Env): Promise<Database> => {
     const builder: DatabaseBuilder = new DatabaseBuilder(config, env);

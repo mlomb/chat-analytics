@@ -1,8 +1,8 @@
-import { memo, ReactNode } from "react";
+import { ReactNode, memo } from "react";
 
+import { useDataProvider } from "@report/DataProvider";
 import { ChannelAvatar } from "@report/components/core/avatars/ChannelAvatar";
 import { BaseLabel, LabelProps } from "@report/components/core/labels/BaseLabel";
-import { useDataProvider } from "@report/DataProvider";
 
 import Hashtag from "@assets/images/icons/hashtag.svg";
 

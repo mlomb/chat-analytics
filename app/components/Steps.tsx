@@ -1,19 +1,18 @@
-import "@assets/styles/Steps.less";
-
 import { useState } from "react";
 
-import { Platform } from "@pipeline/Types";
-import { ProgressKeys, ProgressMessage, TaskInfo } from "@pipeline/Progress";
 import { InitMessage, ResultMessage } from "@app/WorkerApp";
-import { numberCategory, plausible, sizeCategory, timeCategory } from "@assets/Plausible";
-
-import Stepper from "@app/components/Stepper";
 import Button from "@app/components/Button";
+import Stepper from "@app/components/Stepper";
+import { ProgressKeys, ProgressMessage, TaskInfo } from "@pipeline/Progress";
+import { Platform } from "@pipeline/Types";
 
-import PlatformSelect from "./steps/PlatformSelect";
+import { numberCategory, plausible, sizeCategory, timeCategory } from "@assets/Plausible";
+import "@assets/styles/Steps.less";
+
 import ExportInstructions from "./steps/ExportInstructions";
 import FilesSelect from "./steps/FilesSelect";
 import GenerationProgress from "./steps/GenerationProgress";
+import PlatformSelect from "./steps/PlatformSelect";
 import ViewDownloadReport from "./steps/ViewDownloadReport";
 
 // prettier-ignore

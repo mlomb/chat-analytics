@@ -1,9 +1,9 @@
 import { ReactNode } from "react";
 
+import { useDataProvider } from "@report/DataProvider";
+import { LazyImage } from "@report/components/core/LazyImage";
 import { BackgroundForTelegramAvatar } from "@report/components/core/avatars/Telegram";
 import { TextAvatar } from "@report/components/core/avatars/TextAvatar";
-import { LazyImage } from "@report/components/core/LazyImage";
-import { useDataProvider } from "@report/DataProvider";
 
 import discord_author_avatar_0 from "@assets/images/platforms/discord/avatars/author_avatar_0.png";
 import discord_author_avatar_1 from "@assets/images/platforms/discord/avatars/author_avatar_1.png";

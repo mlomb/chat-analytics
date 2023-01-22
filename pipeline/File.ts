@@ -1,6 +1,6 @@
-import { JSONStream } from "@pipeline/parse/JSONStream";
 import { progress } from "@pipeline/Progress";
 import { AttachmentType } from "@pipeline/Types";
+import { JSONStream } from "@pipeline/parse/JSONStream";
 
 // interface for file to be parsed
 export interface FileInput {

@@ -1,6 +1,18 @@
-import { Database, Index } from "@pipeline/Types";
 import { TimeKeysResult } from "@pipeline/Time";
+import { Database, Index } from "@pipeline/Types";
 import { Filters } from "@pipeline/aggregate/Filters";
+// register blocks
+import ActiveAuthors from "@pipeline/aggregate/blocks/ActiveAuthors";
+import ConversationStats from "@pipeline/aggregate/blocks/ConversationStats";
+import EmojiStats from "@pipeline/aggregate/blocks/EmojiStats";
+import ExternalStats from "@pipeline/aggregate/blocks/ExternalStats";
+import Growth from "@pipeline/aggregate/blocks/Growth";
+import InteractionStats from "@pipeline/aggregate/blocks/InteractionStats";
+import LanguageStats from "@pipeline/aggregate/blocks/LanguageStats";
+import MessagesPerCycle from "@pipeline/aggregate/blocks/MessagesPerCycle";
+import MessagesStats from "@pipeline/aggregate/blocks/MessagesStats";
+import SentimentPerCycle from "@pipeline/aggregate/blocks/SentimentPerCycle";
+import SentimentStats from "@pipeline/aggregate/blocks/SentimentStats";
 
 // this is data used by multiple blocks and can be computed only once
 export interface CommonBlockData {
@@ -15,19 +27,6 @@ export type BlockDescription<K, T> = {
     triggers: BlockTrigger[];
     fn: BlockFn<T>;
 };
-
-// register blocks
-import MessagesPerCycle from "@pipeline/aggregate/blocks/MessagesPerCycle";
-import MessagesStats from "@pipeline/aggregate/blocks/MessagesStats";
-import LanguageStats from "@pipeline/aggregate/blocks/LanguageStats";
-import EmojiStats from "@pipeline/aggregate/blocks/EmojiStats";
-import InteractionStats from "@pipeline/aggregate/blocks/InteractionStats";
-import SentimentStats from "@pipeline/aggregate/blocks/SentimentStats";
-import ExternalStats from "@pipeline/aggregate/blocks/ExternalStats";
-import SentimentPerCycle from "@pipeline/aggregate/blocks/SentimentPerCycle";
-import ConversationStats from "@pipeline/aggregate/blocks/ConversationStats";
-import Growth from "@pipeline/aggregate/blocks/Growth";
-import ActiveAuthors from "@pipeline/aggregate/blocks/ActiveAuthors";
 
 export const Blocks = {
     [MessagesPerCycle.key]: MessagesPerCycle,

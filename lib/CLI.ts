@@ -1,13 +1,12 @@
 #!/usr/bin/env node
-
-import fs from "fs";
 import glob from "fast-glob";
+import fs from "fs";
 import prettyBytes from "pretty-bytes";
 import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
 
-import { generateDatabase, generateReportSite } from "@lib/index";
 import { loadFile } from "@lib/NodeEnv";
+import { generateDatabase, generateReportSite } from "@lib/index";
 import { ReportConfig } from "@pipeline/Types";
 
 const argv = yargs(hideBin(process.argv))

@@ -1,11 +1,9 @@
-import "@assets/styles/Landing.less";
-
 import { Platforms } from "@app/Platforms";
-
 import Button from "@app/components/Button";
 
 import Lock from "@assets/images/icons/lock.svg";
 import GitHub from "@assets/images/logos/github.svg";
+import "@assets/styles/Landing.less";
 
 interface Props {
     onStart: () => void;

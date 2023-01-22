@@ -1,7 +1,7 @@
-import { BitStream } from "@pipeline/serialization/BitStream";
-import { MessageBitConfig, readMessage, writeMessage } from "@pipeline/serialization/MessageSerialization";
 import { Index, Message } from "@pipeline/Types";
+import { BitStream } from "@pipeline/serialization/BitStream";
 import { readIndexArray, writeIndexArray } from "@pipeline/serialization/IndexSerialization";
+import { MessageBitConfig, readMessage, writeMessage } from "@pipeline/serialization/MessageSerialization";
 
 describe("index serialization", () => {
     // prettier-ignore
