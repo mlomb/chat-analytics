@@ -1,5 +1,5 @@
 const PLAUSIBLE_URL = "env" in window && env.isProd ? "https://p.chatanalytics.app" : "http://localhost:8000";
-const ALLOWED_PATHS = ["", "/demo", "/report"];
+const ALLOWED_PATHS = ["", "/demo"];
 
 export const plausible = (name: "pageview" | string, props?: { [key: string]: string }) => {
     // We want the url where:
