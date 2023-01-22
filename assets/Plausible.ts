@@ -4,10 +4,10 @@ const ALLOWED_PATHS = ["", "/demo"];
 export const plausible = (name: "pageview" | string, props?: { [key: string]: string }) => {
     // We want the url where:
     // - the hostname is always "chatanalytics.app"
+    //   - otherwise fallback to "/report"
     // - the path is either "", "/", "/demo" or "/report"
-    //   - if the hostname is not "chatanalytics.app" => then we are sure we are in a report => fallback to "/report"
-    //   - if the path is neither => fallback to "/report"
-    // - keeps any ?search=params
+    //   - otherwise fallback to "/report"
+    // - all search params are kept
 
     let pathname: string;
     if (window.location.hostname === "chatanalytics.app") {
