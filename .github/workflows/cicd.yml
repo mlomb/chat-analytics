@@ -49,6 +49,12 @@ jobs:
       - name: Generate demo report
         run: |
           chat-analytics -p discord -i export/*.json -o dist_web/demo.html --demo
+      - name: Upload demo report as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: Demo
+          path: dist_web/demo.html
+          if-no-files-found: error
       - name: Publish
         uses: cloudflare/pages-action@1
         if: ${{ env.HAVE_CLOUDFLARE_TOKEN == 'true' }}
