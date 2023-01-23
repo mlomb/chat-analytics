@@ -1,4 +1,4 @@
-const PLAUSIBLE_URL = "env" in window && env.isProd ? "https://p.chatanalytics.app" : "http://localhost:8000";
+const PLAUSIBLE_URL = typeof env !== "undefined" && env.isProd ? "https://p.chatanalytics.app" : "";
 const ALLOWED_PATHS = ["", "/demo"];
 
 const isOfficialHostname = (hostname: string): boolean =>
