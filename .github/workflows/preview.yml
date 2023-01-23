@@ -17,7 +17,7 @@ jobs:
         with:
           run_id: ${{ github.event.workflow_run.id }}
           name: pr
-      - run: export PR=$(cat pr.txt)
+      - run: echo "PR_NUM=$(cat pr.txt)" >> $GITHUB_ENV
       - uses: dawidd6/action-download-artifact@v2
         with:
           run_id: ${{ github.event.workflow_run.id }}
@@ -35,4 +35,4 @@ jobs:
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           projectName: chat-analytics
           directory: dist_web
-          branch: pr-${{ env.PR }}
+          branch: pr-${{ env.PR_NUM }}
