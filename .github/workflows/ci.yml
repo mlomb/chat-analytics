@@ -1,0 +1,86 @@
+name: CI 🧪
+
+on: [push, pull_request]
+
+jobs:
+  format-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
+      - run: npm ci
+      - run: npm run format-check
+
+  build-web:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
+      - run: npm ci
+      - run: npm run build:web
+      - uses: actions/upload-artifact@v3
+        with:
+          name: build-web
+          path: dist_web
+          if-no-files-found: error
+
+  build-node:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
+      - run: npm ci
+      - run: npm run build:node
+      - uses: actions/upload-artifact@v3
+        with:
+          name: build-node
+          path: dist
+          if-no-files-found: error
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
+      - run: npm ci
+      - run: npm run test
+      - uses: codecov/codecov-action@v3
+
+  gen-demo:
+    runs-on: ubuntu-latest
+    needs: [build-web, build-node]
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
+      - run: npm ci
+      - uses: actions/download-artifact@v3
+        with:
+          name: build-web
+          path: dist_web
+      - uses: actions/download-artifact@v3
+        with:
+          name: build-node
+          path: dist
+      - run: npm link
+      - name: Download demo input files
+        run: |
+          curl -s -L "https://drive.google.com/uc?export=download&confirm=yes&id=1SqHZqKstFem9qf1kgusuhiGUcE3xY8KQ" -o export.zip
+          unzip -qq -O utf8 export.zip -d export
+      - name: Generate demo report
+        run: |
+          chat-analytics -p discord -i export/*.json -o demo.html --demo
+      - uses: actions/upload-artifact@v3
+        with:
+          name: demo
+          path: demo.html
+          if-no-files-found: error
