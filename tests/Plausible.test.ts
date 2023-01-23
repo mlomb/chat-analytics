@@ -30,21 +30,22 @@ it.each([
     { expectedPath: "/report", location: "http://someuser.github.io/somereport" },
     { expectedPath: "/report", location: "http://someuser.github.io/somereport/Report - Chat Analytics.html" },
     { expectedPath: "/report", location: "file:///C:/Users/user/Downloads/Report - Chat Analytics.html" },
+    { expectedPath: "/report", location: "http://123.123.123.123/index.html" },
     { expectedPath: "/report", location: "http://127.0.0.1:8080" },
     { expectedPath: "/report", location: "http://127.0.0.1:8080/Report - Chat Analytics.html" },
 ])("should resolve in path '$expectedPath': $location", testPageview);
 
 it.each([
     {
-        location: "https://chatanalytics.app/?utm_source=report",
         expectedPath: "?utm_source=report",
+        location: "https://chatanalytics.app/?utm_source=report",
     },
     {
-        location: "https://chatanalytics.app/demo/?utm_source=facebook",
         expectedPath: "/demo?utm_source=facebook",
+        location: "https://chatanalytics.app/demo/?utm_source=facebook",
     },
     {
-        location: "http://someuser.github.io/somereport/?utm_source=twitter",
         expectedPath: "/report?utm_source=twitter",
+        location: "http://someuser.github.io/somereport/?utm_source=twitter",
     },
 ])("should preserve search params: $location", testPageview);

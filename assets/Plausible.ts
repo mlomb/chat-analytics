@@ -1,6 +1,9 @@
 const PLAUSIBLE_URL = "env" in window && env.isProd ? "https://p.chatanalytics.app" : "http://localhost:8000";
 const ALLOWED_PATHS = ["", "/demo"];
 
+const isOfficialHostname = (hostname: string): boolean =>
+    hostname === "chatanalytics.app" || hostname.endsWith(".chat-analytics.pages.dev");
+
 export const plausible = (name: "pageview" | string, props?: { [key: string]: string }) => {
     // We want the url where:
     // - the hostname is always "chatanalytics.app"
@@ -9,16 +12,10 @@ export const plausible = (name: "pageview" | string, props?: { [key: string]: st
     //   - otherwise fallback to "/report"
     // - all search params are kept
 
-    let pathname: string;
-    if (window.location.hostname === "chatanalytics.app") {
-        pathname = window.location.pathname;
-        if (pathname.endsWith("/")) {
-            pathname = pathname.slice(0, -1); // make sure the path doesn't end with a slash
-        }
-        if (!ALLOWED_PATHS.includes(pathname)) {
-            pathname = "/report";
-        }
-    } else {
+    let pathname = window.location.pathname.replace(/\/$/, ""); // trim trailing slash
+
+    if (!isOfficialHostname(window.location.hostname) || !ALLOWED_PATHS.includes(pathname)) {
+        // fallback to report
         pathname = "/report";
     }
 
@@ -35,10 +32,10 @@ export const plausible = (name: "pageview" | string, props?: { [key: string]: st
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
-    });
+    }).catch(() => {});
 };
 
-// These functions are used to round the input and avoid fingerprinting
+// These functions are used to round the information and avoid fingerprinting
 
 // istanbul ignore next
 export const sizeCategory = (size: number): string => {
