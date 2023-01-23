@@ -1,4 +1,4 @@
-name: CI 🧪
+name: CICD 🚀
 
 on: [push, pull_request]
 
@@ -84,3 +84,34 @@ jobs:
           name: demo
           path: demo.html
           if-no-files-found: error
+
+  # store PR number for previews, see preview.yml
+  pr:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo ${{ github.event.number }} > pr.txt
+      - uses: actions/upload-artifact@v3
+        with:
+          name: pr
+          path: pr.txt
+
+  deploy:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: [build-web, gen-demo]
+    runs-on: ubuntu-latest
+      - uses: actions/download-artifact@v3
+        with:
+          name: build-web
+          path: dist_web
+      - uses: actions/download-artifact@v3
+        with:
+          name: demo
+          path: dist_web
+      - uses: cloudflare/pages-action@1
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          projectName: chat-analytics
+          directory: dist_web
+          branch: main
