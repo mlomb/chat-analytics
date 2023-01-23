@@ -1,16 +1,23 @@
-name: Deploy 🚀
+name: Preview PR ⚡
 
 on:
   workflow_run:
-    workflows: ["CI 🧪"]
+    workflows: ["CICD 🚀"]
     types:
       - completed
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    if: github.event.workflow_run.conclusion == 'success'
+    if: >
+      github.event.workflow_run.event == 'pull_request' &&
+      github.event.workflow_run.conclusion == 'success'
     steps:
+      - uses: dawidd6/action-download-artifact@v2
+        with:
+          run_id: ${{ github.event.workflow_run.id }}
+          name: pr
+      - run: export PR=$(cat pr.txt)
       - uses: dawidd6/action-download-artifact@v2
         with:
           run_id: ${{ github.event.workflow_run.id }}
@@ -28,5 +35,4 @@ jobs:
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           projectName: chat-analytics
           directory: dist_web
-
-
+          branch: pr-${{ env.PR }}
