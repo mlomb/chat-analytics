@@ -17,7 +17,7 @@ jobs:
         with:
           run_id: ${{ github.event.workflow_run.id }}
           name: pr
-      - run: echo "PR=$(cat pr.txt | awk '{print 0 + $1}')" >> $GITHUB_ENV
+      - run: echo "PR_NUM=$(cat pr.txt | awk '{print 0 + $1}')" >> $GITHUB_ENV
       - uses: dawidd6/action-download-artifact@v2
         with:
           run_id: ${{ github.event.workflow_run.id }}
@@ -39,8 +39,8 @@ jobs:
 
       # add comment status in PR
       - name: Find Comment
-        uses: peter-evans/find-comment@v2
         id: fc
+        uses: peter-evans/find-comment@v2
         with:
           issue-number: ${{ env.PR_NUM }}
           comment-author: 'github-actions[bot]'
