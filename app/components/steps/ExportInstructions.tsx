@@ -8,7 +8,7 @@ interface Props {
 }
 
 export const ExportInstructions = ({ platform }: Props) => {
-    const p = platform ? Platforms[platform] : undefined;
+    const info = platform ? Platforms[platform] : undefined;
 
     return (
         <div className="ExportInstructions">
@@ -18,10 +18,10 @@ export const ExportInstructions = ({ platform }: Props) => {
             Follow these steps to export chats in{" "}
             <span
                 style={{
-                    color: `hsl(${p?.color[0]}, ${p?.color[1]}%, ${p?.color[2]}%)`,
+                    color: `hsl(${info?.color[0]}, ${info?.color[1]}%, ${info?.color[2]}%)`,
                 }}
             >
-                {p?.title}
+                {info?.title}
             </span>
             :
             <br />

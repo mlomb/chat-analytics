@@ -29,34 +29,37 @@ const StepMaxHeights = [360, 1300, 400, 420, 420];
 const BackColor: [number, number, number] = [216, 10, 10];
 const NextColor: [number, number, number] = [258, 90, 61];
 
+// we hardcode this task first since the worker doesn't emit it
+const StartWorkerTask: ProgressTask = {
+    status: "success",
+    title: "Start WebWorker",
+};
+
+// This component is a bit messy since it has all the logic to talk with the Worker
+// It's not that bad
 export const Steps = () => {
     const [state, setState] = useState<{
         currentStep: number;
         platform: Platform | undefined;
         files: File[];
         worker: Worker | null;
-        result: ResultMessage | null;
         progressTasks: ProgressTask[];
         progressStats: ProgressStats;
+        result: ResultMessage | null;
     }>({
         currentStep: 0,
         platform: undefined,
         files: [],
         worker: null,
         result: null,
-        progressTasks: [
-            {
-                status: "processing",
-                title: "Start WebWorker",
-            },
-        ],
+        progressTasks: [StartWorkerTask],
         progressStats: {},
     });
 
     const startGeneration = () => {
         plausible("Start generation", {
             platform: state.platform as Platform,
-            files: state.files.length + "",
+            files: numberCategory(state.files.length),
             size: sizeCategory(state.files.reduce((acc, file) => acc + file.size, 0)),
         });
         const startTime = performance.now();
@@ -79,30 +82,36 @@ export const Steps = () => {
         };
         worker.onmessage = (e: MessageEvent<ProgressMessage | ResultMessage>) => {
             const data = e.data;
+            const endTime = performance.now();
+            let terminate = false;
+
             if (data.type === "progress") {
                 if (data.tasks.some((task) => task.status === "error")) {
                     plausible("Generation errored", {
                         platform: state.platform as Platform,
-                        files: state.files.length + "",
+                        files: numberCategory(state.files.length),
+                        time: timeCategory((endTime - startTime) / 1000),
                     });
+
+                    terminate = true;
                 }
 
                 setState((state) => ({
                     ...state,
-                    progressTasks: [
-                        {
-                            status: "success",
-                            title: "Start WebWorker",
-                        },
-                        ...data.tasks,
-                    ],
+                    progressTasks: [StartWorkerTask, ...data.tasks],
                     progressStats: data.stats,
                 }));
             } else if (data.type === "result") {
-                if (env.isProd) {
-                    // terminate worker since we don't need it anymore
-                    worker.terminate();
-                }
+                plausible("Finish generation", {
+                    platform: state.platform as Platform,
+                    outputSize: sizeCategory(data.html.length),
+                    messages: numberCategory(data.counts.messages),
+                    authors: numberCategory(data.counts.authors),
+                    channels: numberCategory(data.counts.channels),
+                    guilds: numberCategory(data.counts.guilds),
+                    time: timeCategory((endTime - startTime) / 1000),
+                });
+
                 // give a small delay
                 setTimeout(() => {
                     setState((prevState) => ({
@@ -113,19 +122,16 @@ export const Steps = () => {
                     }));
                 }, 1000);
 
-                const endTime = performance.now();
-                plausible("Finish generation", {
-                    platform: state.platform as Platform,
-                    outputSize: sizeCategory(data.html.length),
-                    messages: numberCategory(data.counts.messages),
-                    authors: numberCategory(data.counts.authors),
-                    channels: numberCategory(data.counts.channels),
-                    guilds: numberCategory(data.counts.guilds),
-                    time: timeCategory((endTime - startTime) / 1000),
-                });
+                // terminate worker since we don't need it anymore
+                terminate = true;
+            }
+
+            if (terminate && env.isProd) {
+                worker.terminate();
             }
         };
-        // <InitMessage>
+
+        // send message to start generation
         const init: InitMessage = {
             files: state.files,
             config: {
@@ -134,16 +140,17 @@ export const Steps = () => {
             origin: window.location.origin,
         };
         worker.postMessage(init);
+
         setState((prevState) => ({
             ...prevState,
             currentStep: 3,
             worker,
         }));
 
-        // show usaved progress before leaving
+        // show usaved progress alert before leaving
         if (env.isProd) {
             window.addEventListener("beforeunload", (event) => {
-                // This message is never shown really.
+                // this message is never shown really.
                 event.returnValue = `Are you sure you want to leave?`;
             });
         }
@@ -154,7 +161,7 @@ export const Steps = () => {
         setState({ ...state, currentStep: 1, platform });
     };
 
-    const p = state.platform ? Platforms[state.platform] : undefined;
+    const info = state.platform ? Platforms[state.platform] : undefined;
 
     return (
         <div className="Steps">
@@ -173,7 +180,7 @@ export const Steps = () => {
                 </div>
                 <div>
                     <FilesSelection
-                        defaultFilename={p?.defaultFilename}
+                        defaultFilename={info?.defaultFilename}
                         files={state.files}
                         onFilesUpdate={(files) => setState({ ...state, files })}
                     />
