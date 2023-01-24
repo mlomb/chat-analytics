@@ -37,6 +37,15 @@ jobs:
           directory: dist_web
           branch: pr-${{ env.PR_NUM }}
 
+  post-comment:
+    runs-on: ubuntu-latest
+    if: >
+      github.event.workflow_run.event == 'pull_request' &&
+      github.event.workflow_run.conclusion == 'success'
+    needs: deploy
+    permissions:
+      pull-requests: write
+    steps:
       # add comment status in PR
       - name: Find Comment
         id: fc
@@ -51,5 +60,5 @@ jobs:
           comment-id: ${{ steps.fc.outputs.comment-id }}
           issue-number: ${{ env.PR_NUM }}
           body: |
-            ⚡ Preview for this PR can be found in: https://pr-${{ env.PR_NUM }}.chat-analytics.pages.dev. [Demo here](https://pr-${{ env.PR_NUM }}.chat-analytics.pages.dev/demo).
+            ⚡ Preview for this PR can be found in: https://pr-${{ env.PR_NUM }}.chat-analytics.pages.dev [Demo here](https://pr-${{ env.PR_NUM }}.chat-analytics.pages.dev/demo).
           edit-mode: replace
