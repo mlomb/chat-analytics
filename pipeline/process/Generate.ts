@@ -74,8 +74,13 @@ export const generateReportSite = async (
     const encodedData = compress(database);
     env.progress?.done();
 
-    const html = await env.loadAsset("/report.html", "text");
+    // build title to avoid HTML injections (just so it doesn't break)
+    const title = database.title.replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
+    let html = await env.loadAsset("/report.html", "text");
+    html = html.replace("[[TITLE]]", `${title} - Chat Analytics`);
+
+    // we can't use replace for the data, if the data is too large it will cause a crash
     const template = "[[[DATA]]]";
     const dataTemplateLoc = html.indexOf(template);
     const finalHtml = html.slice(0, dataTemplateLoc) + encodedData + html.slice(dataTemplateLoc + template.length);
