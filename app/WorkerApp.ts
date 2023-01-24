@@ -1,5 +1,5 @@
 import { WebEnv, wrapFile } from "@app/WebEnv";
-import { ProgressStats, ProgressTask as ProgressTask } from "@pipeline/Progress";
+import { ProgressStats, ProgressTask } from "@pipeline/Progress";
 import { ReportConfig } from "@pipeline/Types";
 import { generateDatabase, generateReportSite } from "@pipeline/process/Generate";
 
@@ -35,12 +35,12 @@ self.onmessage = async (ev: MessageEvent<InitMessage>) => {
     const { progress } = WebEnv;
 
     progress.reset();
-    progress.on("update", (tasks, stats) => 
+    progress.on("update", (tasks, stats) =>
         self.postMessage({
             type: "progress",
             tasks,
             stats,
-        } satisfies ProgressMessage)
+        })
     );
 
     try {
