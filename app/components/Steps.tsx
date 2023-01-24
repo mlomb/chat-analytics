@@ -80,6 +80,13 @@ export const Steps = () => {
         worker.onmessage = (e: MessageEvent<ProgressMessage | ResultMessage>) => {
             const data = e.data;
             if (data.type === "progress") {
+                if (data.tasks.some((task) => task.status === "error")) {
+                    plausible("Generation errored", {
+                        platform: state.platform as Platform,
+                        files: state.files.length + "",
+                    });
+                }
+
                 setState((state) => ({
                     ...state,
                     progressTasks: [
