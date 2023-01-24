@@ -1,18 +1,15 @@
 import prettyBytes from "pretty-bytes";
 import { DragEvent, useRef, useState } from "react";
 
-import Button from "@app/components/Button";
-import { Platform } from "@pipeline/Types";
-
-import { Platforms } from "@assets/Platforms";
+import { Button } from "@app/components/Button";
 
 interface Props {
-    platform: Platform | null;
+    defaultFilename?: string;
     files: File[];
     onFilesUpdate: (files: File[]) => void;
 }
 
-const FilesSelect = ({ platform, files, onFilesUpdate }: Props) => {
+export const FilesSelection = ({ defaultFilename, files, onFilesUpdate }: Props) => {
     const fileRef = useRef<HTMLInputElement>(null);
     const [dragover, setDragover] = useState(false);
 
@@ -67,8 +64,6 @@ const FilesSelect = ({ platform, files, onFilesUpdate }: Props) => {
         fileRef.current!.value = "";
     };
 
-    const platformInfo = platform ? Platforms[platform] : undefined;
-
     return (
         <div className="FilesSelect">
             Select the files from the previous step:
@@ -82,7 +77,7 @@ const FilesSelect = ({ platform, files, onFilesUpdate }: Props) => {
                     onDragEnter={onDrag}
                     onDragLeave={onDrag}
                 >
-                    Drop <span>{platformInfo?.defaultFilename}</span> files here
+                    Drop <span>{defaultFilename}</span> files here
                     <br />
                     or click to browse
                 </button>
@@ -109,5 +104,3 @@ const FilesSelect = ({ platform, files, onFilesUpdate }: Props) => {
         </div>
     );
 };
-
-export default FilesSelect;

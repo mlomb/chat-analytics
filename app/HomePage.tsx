@@ -1,12 +1,12 @@
 import { useState } from "react";
 
-import Landing from "@app/components/Landing";
-import Steps from "@app/components/Steps";
+import { Landing } from "@app/components/Landing";
+import { Steps } from "@app/components/Steps";
 
 import Logo from "@assets/images/logos/app_dark.svg";
 import "@assets/styles/HomePage.less";
 
-const HomePage = () => {
+export const HomePage = () => {
     const [index, setIndex] = useState(0);
 
     // ain't pretty but it works
@@ -39,5 +39,3 @@ const HomePage = () => {
         </div>
     );
 };
-
-export default HomePage;

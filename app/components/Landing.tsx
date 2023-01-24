@@ -1,4 +1,4 @@
-import Button from "@app/components/Button";
+import { Button } from "@app/components/Button";
 
 import { Platforms } from "@assets/Platforms";
 import Lock from "@assets/images/icons/lock.svg";
@@ -9,7 +9,7 @@ interface Props {
     onStart: () => void;
 }
 
-const Landing = ({ onStart }: Props) => {
+export const Landing = ({ onStart }: Props) => {
     return (
         <div className="Landing">
             <h1 className="Landing__title">Generate insightful chat analysis reports</h1>
@@ -26,10 +26,10 @@ const Landing = ({ onStart }: Props) => {
                 <br />
                 <div className="Landing__platforms-line">
                     <span>Supports</span>
-                    {Object.values(Platforms).map((p) => (
+                    {Object.entries(Platforms).map(([key, p]) => (
                         <div
                             className="Landing__platform"
-                            key={p.platform}
+                            key={key}
                             style={{
                                 backgroundColor: `hsl(${p.color[0]}, ${p.color[1]}%, ${p.color[2]}%)`,
                             }}
@@ -54,5 +54,3 @@ const Landing = ({ onStart }: Props) => {
         </div>
     );
 };
-
-export default Landing;

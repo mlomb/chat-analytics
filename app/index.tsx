@@ -1,7 +1,7 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 
-import HomePage from "@app/HomePage";
+import { HomePage } from "@app/HomePage";
 
 import { plausible } from "@assets/Plausible";
 

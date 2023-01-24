@@ -1,19 +1,20 @@
 import { useState } from "react";
 
 import { InitMessage, ResultMessage } from "@app/WorkerApp";
-import Button from "@app/components/Button";
-import Stepper from "@app/components/Stepper";
+import { Button } from "@app/components/Button";
+import { Stepper } from "@app/components/Stepper";
 import { ProgressKeys, ProgressMessage, TaskInfo } from "@pipeline/Progress";
 import { Platform } from "@pipeline/Types";
 
+import { Platforms } from "@assets/Platforms";
 import { numberCategory, plausible, sizeCategory, timeCategory } from "@assets/Plausible";
 import "@assets/styles/Steps.less";
 
-import ExportInstructions from "./steps/ExportInstructions";
-import FilesSelect from "./steps/FilesSelect";
-import GenerationProgress from "./steps/GenerationProgress";
-import PlatformSelect from "./steps/PlatformSelect";
-import ViewDownloadReport from "./steps/ViewDownloadReport";
+import { ExportInstructions } from "./steps/ExportInstructions";
+import { FilesSelection } from "./steps/FilesSelection";
+import { GenerationProgress } from "./steps/GenerationProgress";
+import { PlatformSelection } from "./steps/PlatformSelection";
+import { ViewDownloadReport } from "./steps/ViewDownloadReport";
 
 // prettier-ignore
 const StepTitles = [
@@ -28,10 +29,10 @@ const StepMaxHeights = [360, 1300, 400, 420, 420];
 const BackColor: [number, number, number] = [216, 10, 10];
 const NextColor: [number, number, number] = [258, 90, 61];
 
-const Steps = () => {
+export const Steps = () => {
     const [state, setState] = useState<{
         currentStep: number;
-        platform: Platform | null;
+        platform: Platform | undefined;
         files: File[];
         worker: Worker | null;
         result: ResultMessage | null;
@@ -39,7 +40,7 @@ const Steps = () => {
         progressKeys: ProgressKeys;
     }>({
         currentStep: 0,
-        platform: null,
+        platform: undefined,
         files: [],
         worker: null,
         result: null,
@@ -109,9 +110,10 @@ const Steps = () => {
                 plausible("Finish generation", {
                     platform: state.platform as Platform,
                     outputSize: sizeCategory(data.html.length),
-                    channels: numberCategory(data.counts.channels),
-                    authors: numberCategory(data.counts.authors),
                     messages: numberCategory(data.counts.messages),
+                    authors: numberCategory(data.counts.authors),
+                    channels: numberCategory(data.counts.channels),
+                    guilds: numberCategory(data.counts.guilds),
                     time: timeCategory((endTime - startTime) / 1000),
                 });
             }
@@ -145,10 +147,12 @@ const Steps = () => {
         setState({ ...state, currentStep: 1, platform });
     };
 
+    const p = state.platform ? Platforms[state.platform] : undefined;
+
     return (
         <div className="Steps">
             <Stepper step={state.currentStep} stepTitles={StepTitles} stepMaxHeights={StepMaxHeights}>
-                <PlatformSelect pickPlatform={pickPlatform} />
+                <PlatformSelection pickPlatform={pickPlatform} />
                 <div>
                     <ExportInstructions platform={state.platform} />
                     <div className="Steps__nav">
@@ -164,8 +168,8 @@ const Steps = () => {
                     </div>
                 </div>
                 <div>
-                    <FilesSelect
-                        platform={state.platform}
+                    <FilesSelection
+                        defaultFilename={p?.defaultFilename}
                         files={state.files}
                         onFilesUpdate={(files) => setState({ ...state, files })}
                     />
@@ -184,5 +188,3 @@ const Steps = () => {
         </div>
     );
 };
-
-export default Steps;
