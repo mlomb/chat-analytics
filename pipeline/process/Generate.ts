@@ -62,7 +62,7 @@ export const generateDatabase = async (files: FileInput[], config: ReportConfig,
 };
 
 // Returns the final data and HTML code
-export const generateReportSite = async (
+export const generateReport = async (
     database: Database,
     env: Env
 ): Promise<{

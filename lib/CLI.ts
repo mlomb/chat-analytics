@@ -5,8 +5,9 @@ import prettyBytes from "pretty-bytes";
 import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
 
-import { loadFile } from "@lib/NodeEnv";
-import { generateDatabase, generateReportSite } from "@lib/index";
+import { loadFile, loadNodeAsset } from "@lib/NodeEnv";
+import { generateDatabase, generateReport } from "@lib/index";
+import { Progress } from "@pipeline/Progress";
 import { ReportConfig } from "@pipeline/Types";
 
 const argv = yargs(hideBin(process.argv))
@@ -59,13 +60,50 @@ const config: ReportConfig = {
     platform: argv.platform,
     demo: argv.demo,
 };
+const NodeEnv = {
+    loadAsset: loadNodeAsset,
+    progress: new Progress(),
+};
+// } satisfies Env;
+
+let lastTaskDisplayed = 0;
+
+NodeEnv.progress.on("progress", (tasks, stats) => {
+    const idx = tasks.length - 1;
+    const { title, subject, progress } = tasks[idx];
+
+    let line = title + (subject ? `: ${subject}` : "");
+    if (progress) {
+        const format = progress.format === "bytes" ? prettyBytes : (n: number) => n.toLocaleString();
+        line += " ";
+        line += format(progress.actual);
+        if (progress.total) line += `/${format(progress.total)}`;
+    }
+
+    if (process.stdout.isTTY) {
+        if (lastTaskDisplayed < idx) {
+            lastTaskDisplayed = idx;
+            process.stdout.write("\n");
+        }
+
+        process.stdout.clearLine(0);
+        process.stdout.cursorTo(0);
+        process.stdout.write(line);
+    } else {
+        if (lastTaskDisplayed < idx) {
+            lastTaskDisplayed = idx;
+            console.log(line);
+        }
+    }
+});
 
 (async () => {
     console.log("Generating report...");
 
     console.time("Done");
-    const db = await generateDatabase(files.map(loadFile), config);
-    const result = await generateReportSite(db);
+    const db = await generateDatabase(files.map(loadFile), config, NodeEnv);
+    const result = await generateReport(db, NodeEnv);
+    if (process.stdout.isTTY) process.stdout.write("\n");
     console.timeEnd("Done");
 
     fs.writeFileSync(argv.output, result.html, "utf8");
