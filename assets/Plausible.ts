@@ -38,21 +38,6 @@ export const plausible = (name: "pageview" | string, props?: { [key: string]: st
 // These functions are used to round the information and avoid fingerprinting
 
 // istanbul ignore next
-export const sizeCategory = (size: number): string => {
-    size /= 1024;
-    if (size < 100) return "0-100KB";
-    if (size < 500) return "100KB-500KB";
-    if (size < 1000) return "500KB-1MB";
-    if (size < 5000) return "1MB-5MB";
-    if (size < 10000) return "5MB-10MB";
-    if (size < 50000) return "10MB-50MB";
-    if (size < 100000) return "50MB-100MB";
-    if (size < 500000) return "100MB-500MB";
-    if (size < 1000000) return "500MB-1GB";
-    if (size < 5000000) return "1GB-5GB";
-    return "5GB+";
-};
-// istanbul ignore next
 export const numberCategory = (num: number): string => {
     num = Math.round(num);
     if (num <= 10) return num + "";
@@ -71,6 +56,21 @@ export const numberCategory = (num: number): string => {
     if (num <= 50000000) return "10M-50M";
     if (num <= 100000000) return "50M-100M";
     return "100M+";
+};
+// istanbul ignore next
+export const sizeCategory = (size: number): string => {
+    size /= 1024;
+    if (size < 100) return "0-100KB";
+    if (size < 500) return "100KB-500KB";
+    if (size < 1000) return "500KB-1MB";
+    if (size < 5000) return "1MB-5MB";
+    if (size < 10000) return "5MB-10MB";
+    if (size < 50000) return "10MB-50MB";
+    if (size < 100000) return "50MB-100MB";
+    if (size < 500000) return "100MB-500MB";
+    if (size < 1000000) return "500MB-1GB";
+    if (size < 5000000) return "1GB-5GB";
+    return "5GB+";
 };
 // istanbul ignore next
 export const timeCategory = (seconds: number): string => {

@@ -1,5 +1,5 @@
 import prettyBytes from "pretty-bytes";
-import { useEffect, useLayoutEffect, useRef } from "react";
+import { useLayoutEffect, useRef } from "react";
 
 import { RestartLink } from "@app/components/RestartLink";
 import { ProgressStats, ProgressTask } from "@pipeline/Progress";
@@ -30,44 +30,40 @@ const TaskProgress = ({
     actual: number;
     total?: number;
     format: (value: number) => string;
-}) => {
-    return (
-        <span className="TaskItem__progress">
-            {format(actual)}
-            {total !== undefined && actual < total ? "/" + format(total) : ""}
-        </span>
-    );
-};
+}) => (
+    <span className="TaskItem__progress">
+        {format(actual)}
+        {total !== undefined && actual < total ? "/" + format(total) : ""}
+    </span>
+);
 
-const TaskItem = ({ task: { title, subject, status, progress } }: { task: ProgressTask }) => {
-    return (
-        <div className={`TaskItem TaskItem--status-${status}`}>
-            <div className="TaskItem__icon">
-                <img
-                    src={
-                        status === "processing"
-                            ? Spinner
-                            : status === "success"
-                            ? Tick
-                            : status === "waiting"
-                            ? Pause
-                            : Times
-                    }
-                />
-            </div>
-            <span className="TaskItem__title">{title}</span>
-            <span className="TaskItem__subject" title={subject}>
-                {subject}
-            </span>
-            {progress &&
-                (progress.format === "number" ? (
-                    <TaskProgress {...progress} format={(value) => value.toLocaleString()} />
-                ) : (
-                    <TaskProgress {...progress} format={prettyBytes} />
-                ))}
+const TaskItem = ({ task: { title, subject, status, progress } }: { task: ProgressTask }) => (
+    <div className={`TaskItem TaskItem--status-${status}`}>
+        <div className="TaskItem__icon">
+            <img
+                src={
+                    status === "processing"
+                        ? Spinner
+                        : status === "success"
+                        ? Tick
+                        : status === "waiting"
+                        ? Pause
+                        : Times
+                }
+            />
         </div>
-    );
-};
+        <span className="TaskItem__title">{title}</span>
+        <span className="TaskItem__subject" title={subject}>
+            {subject}
+        </span>
+        {progress &&
+            (progress.format === "number" ? (
+                <TaskProgress {...progress} format={(value) => value.toLocaleString()} />
+            ) : (
+                <TaskProgress {...progress} format={prettyBytes} />
+            ))}
+    </div>
+);
 
 const Timer = ({ ticking }: { ticking: boolean }) => {
     const ref = useRef<HTMLSpanElement>(null);
@@ -93,14 +89,12 @@ const Timer = ({ ticking }: { ticking: boolean }) => {
     return <span ref={ref}>00:00</span>;
 };
 
-const ErrorBox = ({ error }: { error: string }) => {
-    return (
-        <>
-            <div className="ErrorBox">{error}</div>
-            <RestartLink text="Start again" />
-        </>
-    );
-};
+const ErrorBox = ({ error }: { error: string }) => (
+    <>
+        <div className="ErrorBox">{error}</div>
+        <RestartLink text="Start again" />
+    </>
+);
 
 export const GenerationProgress = (props: Props) => {
     const error = props.tasks[props.tasks.length - 1].error;
@@ -120,7 +114,7 @@ export const GenerationProgress = (props: Props) => {
                     <img src={Bubble} />
                     {stat("messages")}
                 </div>
-                <div className="GenerationProgress__stat" title="input files processed">
+                <div className="GenerationProgress__stat" title="# of input files processed">
                     <img src={Files} />
                     {stat("processed_files")}/{stat("total_files")}
                 </div>

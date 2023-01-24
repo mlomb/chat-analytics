@@ -123,7 +123,7 @@ export const ViewDownloadReport = ({ result }: Props) => {
             </div>
             <div className="ViewDownloadReport__notice">
                 Remember that we don't store your reports, so you can't share the "View Locally" link. To share the
-                report, download it and share the file.
+                report, <b>download it and share the file</b>.
             </div>
             <RestartLink text="Generate a new report" />
         </div>
