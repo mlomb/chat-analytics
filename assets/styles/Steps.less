@@ -180,14 +180,14 @@
     white-space: pre-wrap;
 }
 
-.StatusItem {
+.TaskItem {
     display: flex;
     margin-bottom: 5px;
     font-size: 14px;
     white-space: nowrap;
 }
 
-.StatusItem__subject {
+.TaskItem__subject {
     min-width: 0;
     color: #b495ff;
     overflow: hidden;
@@ -195,7 +195,7 @@
     padding-left: 5px;
 }
 
-.StatusItem__progress {
+.TaskItem__progress {
     color: #8d8a8a;
     margin-left: auto;
     padding-left: 10px;
@@ -203,7 +203,7 @@
     font-size: 13px;
 }
 
-.StatusItem__icon {
+.TaskItem__icon {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -220,29 +220,29 @@
     }
 }
 
-.StatusItem {
-    &.StatusItem--status-processing {
-        .StatusItem__progress {
+.TaskItem {
+    &.TaskItem--status-processing {
+        .TaskItem__progress {
             color: #d8d8d8;
         }
-        .StatusItem__icon {
+        .TaskItem__icon {
             background: #3560c8;
         }
     }
-    &.StatusItem--status-waiting {
-        .StatusItem__title,
-        .StatusItem__subject,
-        .StatusItem__progress {
+    &.TaskItem--status-waiting {
+        .TaskItem__title,
+        .TaskItem__subject,
+        .TaskItem__progress {
             opacity: 0.5;
         }
-        .StatusItem__icon {
+        .TaskItem__icon {
             background: #c97d00;
         }
     }
-    &.StatusItem--status-success .StatusItem__icon {
+    &.TaskItem--status-success .TaskItem__icon {
         background: #28c900;
     }
-    &.StatusItem--status-error .StatusItem__icon {
+    &.TaskItem--status-error .TaskItem__icon {
         background: #c83535;
     }
 }
@@ -265,16 +265,4 @@
 
 .ViewDownloadReport__notice {
     color: gray;
-}
-
-.ViewDownloadReport__restart {
-    display: inline-flex;
-    align-items: center;
-    margin-top: 10px;
-
-    img {
-        width: 1rem;
-        height: 1rem;
-        margin-right: 8px;
-    }
 }

@@ -1,9 +1,9 @@
 import { useState } from "react";
 
-import { InitMessage, ResultMessage } from "@app/WorkerApp";
+import { InitMessage, ProgressMessage, ResultMessage } from "@app/WorkerApp";
 import { Button } from "@app/components/Button";
 import { Stepper } from "@app/components/Stepper";
-import { ProgressKeys, ProgressMessage, TaskInfo } from "@pipeline/Progress";
+import { ProgressStats, ProgressTask } from "@pipeline/Progress";
 import { Platform } from "@pipeline/Types";
 
 import { Platforms } from "@assets/Platforms";
@@ -36,21 +36,21 @@ export const Steps = () => {
         files: File[];
         worker: Worker | null;
         result: ResultMessage | null;
-        tasks: TaskInfo[];
-        progressKeys: ProgressKeys;
+        progressTasks: ProgressTask[];
+        progressStats: ProgressStats;
     }>({
         currentStep: 0,
         platform: undefined,
         files: [],
         worker: null,
         result: null,
-        tasks: [
+        progressTasks: [
             {
                 status: "processing",
                 title: "Start WebWorker",
             },
         ],
-        progressKeys: {},
+        progressStats: {},
     });
 
     const startGeneration = () => {
@@ -66,13 +66,13 @@ export const Steps = () => {
             console.log(e);
             worker.terminate();
             setState((prevState) => {
-                const tasks = prevState.tasks;
+                const tasks = prevState.progressTasks;
                 const last = tasks[tasks.length - 1];
                 last.status = "error";
                 last.error = e.message;
                 return {
                     ...prevState,
-                    tasks,
+                    progressTasks: tasks,
                 };
             });
             if (env.isDev) throw e;
@@ -82,14 +82,14 @@ export const Steps = () => {
             if (data.type === "progress") {
                 setState((state) => ({
                     ...state,
-                    tasks: [
+                    progressTasks: [
                         {
                             status: "success",
                             title: "Start WebWorker",
                         },
                         ...data.tasks,
                     ],
-                    progressKeys: data.keys,
+                    progressStats: data.stats,
                 }));
             } else if (data.type === "result") {
                 if (env.isProd) {
@@ -156,10 +156,7 @@ export const Steps = () => {
                 <div>
                     <ExportInstructions platform={state.platform} />
                     <div className="Steps__nav">
-                        <Button
-                            hueColor={BackColor}
-                            onClick={() => setState({ ...state, currentStep: 0 /*, platform: null*/ })}
-                        >
+                        <Button hueColor={BackColor} onClick={() => setState({ ...state, currentStep: 0 })}>
                             Back
                         </Button>
                         <Button hueColor={NextColor} onClick={() => setState({ ...state, currentStep: 2 })}>
@@ -182,7 +179,11 @@ export const Steps = () => {
                         </Button>
                     </div>
                 </div>
-                <GenerationProgress tasks={state.tasks} keys={state.progressKeys} active={state.worker !== null} />
+                <GenerationProgress
+                    working={state.worker !== null}
+                    tasks={state.progressTasks}
+                    stats={state.progressStats}
+                />
                 <ViewDownloadReport result={state.result} />
             </Stepper>
         </div>
