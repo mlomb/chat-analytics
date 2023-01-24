@@ -1,4 +1,4 @@
-import { progress } from "@pipeline/Progress";
+import { Progress } from "@pipeline/Progress";
 import { AttachmentType } from "@pipeline/Types";
 import { JSONStream } from "@pipeline/parse/JSONStream";
 
@@ -24,7 +24,11 @@ export const wrapStringAsFile = (content: string): FileInput => {
 };
 
 const JSON_CHUNK_SIZE = 1024 * 1024 * 2; // 2MB
-export const streamJSONFromFile = async function* (stream: JSONStream, file: FileInput): AsyncGenerator<void> {
+export const streamJSONFromFile = async function* (
+    stream: JSONStream,
+    file: FileInput,
+    progress?: Progress
+): AsyncGenerator<void> {
     const fileSize = file.size;
     const textDecoder = new TextDecoder("utf-8");
 
@@ -34,7 +38,7 @@ export const streamJSONFromFile = async function* (stream: JSONStream, file: Fil
         const str = textDecoder.decode(buffer, { stream: true });
         receivedLength += buffer.byteLength;
         stream.push(str);
-        progress.progress("bytes", receivedLength, fileSize);
+        progress?.progress("bytes", receivedLength, fileSize);
         yield;
     }
 };

@@ -25,11 +25,11 @@ export interface ProgressMessage {
     keys: ProgressKeys;
 }
 
-declare interface Progress {
+export declare interface Progress {
     on(event: "update", listener: (msg: ProgressMessage) => void): this;
 }
 
-class Progress extends EventEmitter {
+export class Progress extends EventEmitter {
     // all tasks
     private tasks: TaskInfo[] = [];
     // active task
@@ -154,7 +154,3 @@ class Progress extends EventEmitter {
         }
     }
 }
-
-// global progress object
-// can be used anywhere but be careful
-export const progress = new Progress();

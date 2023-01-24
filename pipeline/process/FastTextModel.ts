@@ -1,5 +1,4 @@
 import { Env } from "@pipeline/Env";
-import { progress } from "@pipeline/Progress";
 
 interface FastTextModelClass {
     loadModel: (path: string) => void;

@@ -1,12 +1,15 @@
-import { Platforms } from "@app/Platforms";
+import { PlatformInstructions } from "@app/components/PlatformInstructions";
 import { Platform } from "@pipeline/Types";
+
+import { Platforms } from "@assets/Platforms";
 
 interface Props {
     platform: Platform | null;
 }
 
 const ExportInstructions = ({ platform }: Props) => {
-    const platformInfo = Platforms.find((p) => p.platform === platform);
+    const platformInfo = platform ? Platforms[platform] : undefined;
+    const instructions = platform ? PlatformInstructions[platform] : undefined;
 
     return (
         <div className="ExportInstructions">
@@ -23,7 +26,7 @@ const ExportInstructions = ({ platform }: Props) => {
             </span>
             :
             <br />
-            {platformInfo?.instructions}
+            {instructions}
         </div>
     );
 };

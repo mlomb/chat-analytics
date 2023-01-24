@@ -1,6 +1,5 @@
 import { Env } from "@pipeline/Env";
 import { LanguageCodes } from "@pipeline/Languages";
-import { progress } from "@pipeline/Progress";
 import { matchFormat, normalizeText } from "@pipeline/Text";
 import { Day, genTimeKeys } from "@pipeline/Time";
 import {
@@ -138,7 +137,7 @@ export class DatabaseBuilder {
                 msgAddr: 0,
                 msgCount: 0,
             });
-            progress.stat("channels", this.numChannels);
+            this.env.progress?.stat("channels", this.numChannels);
         }
         return index;
     }
@@ -147,7 +146,7 @@ export class DatabaseBuilder {
         let index = this.authors.getIndex(rawId);
         if (index === undefined) {
             index = this.authors.set(rawId, author);
-            progress.stat("authors", this.numAuthors);
+            this.env.progress?.stat("authors", this.numAuthors);
         }
         return index;
     }
@@ -381,7 +380,7 @@ export class DatabaseBuilder {
             // extend section
             channelSection.end = this.stream.offset;
             this.authorMessagesCount[msg.authorIndex] = (this.authorMessagesCount[msg.authorIndex] || 0) + 1;
-            progress.stat("messages", this.totalMessages++);
+            this.env.progress?.stat("messages", this.totalMessages++);
         }
     }
 
@@ -406,7 +405,7 @@ export class DatabaseBuilder {
         const { newWords, newWordsMapping } = this.filterWords();
         const { authorsOrder, authorsBotCutoff } = this.sortAuthors();
 
-        progress.new("Compacting messages data");
+        this.env.progress?.new("Compacting messages data");
         // how many bits are needed to store n (n > 0)
         const numBitsFor = (n: number) => (n === 0 ? 1 : 32 - Math.clz32(n));
         const finalStream = new BitStream();
@@ -445,12 +444,12 @@ export class DatabaseBuilder {
 
                     // write final message
                     writeMessage(msg, finalStream, finalBitConfig);
-                    progress.progress("number", messagesWritten++, this.totalMessages);
+                    this.env.progress?.progress("number", messagesWritten++, this.totalMessages);
                     this.channels.data[channelIndex].msgCount!++;
                 }
             }
         }
-        progress.done();
+        this.env.progress?.done();
 
         // console.log("size", finalStream.offset / 8, "bytes", prettyBytes(finalStream.offset / 8));
 
@@ -494,7 +493,7 @@ export class DatabaseBuilder {
         authorsOrder: Index[];
         authorsBotCutoff: number;
     } {
-        progress.new("Sorting authors");
+        this.env.progress?.new("Sorting authors");
         const authorsOrder: Index[] = Array.from({ length: this.authors.size }, (_, i) => i);
         authorsOrder.sort((a, b) =>
             // first non-bots, then by messages count
@@ -510,7 +509,7 @@ export class DatabaseBuilder {
             this.authors.data[authorsOrder[i]].da = undefined;
         }
 
-        progress.done();
+        this.env.progress?.done();
         return { authorsOrder, authorsBotCutoff };
     }
 
@@ -525,16 +524,16 @@ export class DatabaseBuilder {
             const newWords: string[] = [];
             const newWordsMapping: number[] = new Array(len).fill(-1);
 
-            progress.new("Filtering words");
+            this.env.progress?.new("Filtering words");
             for (let i = 0; i < len; i++) {
                 // we will keep the word if it has been said at least twice
                 if (this.wordsCount[i] >= 2) {
                     newWordsMapping[i] = newWords.length;
                     newWords.push(this.words.data[i]);
                 }
-                progress.progress("number", i, len);
+                this.env.progress?.progress("number", i, len);
             }
-            progress.done();
+            this.env.progress?.done();
 
             // NOTE: I tried sorting alphabetically to improve compression, but it was worse
 

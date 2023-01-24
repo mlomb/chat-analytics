@@ -1,8 +1,8 @@
 import { Env, LoadAssetFn } from "@pipeline/Env";
 import { FileInput } from "@pipeline/File";
-import { progress } from "@pipeline/Progress";
+import { Progress } from "@pipeline/Progress";
 
-// Wraps a Web API File object to our file abstraction
+/** Wraps a Web API File object to our file abstraction */
 export const wrapFile = (file: File): FileInput => ({
     name: file.name,
     size: file.size,
@@ -10,7 +10,13 @@ export const wrapFile = (file: File): FileInput => ({
     slice: (start, end) => (start !== undefined ? file.slice(start, end).arrayBuffer() : file.arrayBuffer()),
 });
 
-const loadAsset: LoadAssetFn = async (filepath: string, responseType: "json" | "text" | "arraybuffer") => {
+/** Global progress object for the WebEnv, since we only need one */
+const progress = new Progress();
+
+/** Loads assets when running in the web environment using XHR */
+const loadWebAsset: LoadAssetFn = async (filepath: string, responseType: "json" | "text" | "arraybuffer") => {
+    // We use XHR and not fetch because fetch doesn't support "onprogress"
+
     progress.new("Downloading file", filepath.split("/").pop());
     return new Promise<any>((resolve, reject) => {
         const xhr = new XMLHttpRequest();
@@ -27,6 +33,7 @@ const loadAsset: LoadAssetFn = async (filepath: string, responseType: "json" | "
     });
 };
 
-export const WebEnv: Env = {
-    loadAsset,
-};
+export const WebEnv = {
+    loadAsset: loadWebAsset,
+    progress,
+} satisfies Env;

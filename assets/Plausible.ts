@@ -32,7 +32,7 @@ export const plausible = (name: "pageview" | string, props?: { [key: string]: st
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
-    }).catch(() => {});
+    });
 };
 
 // These functions are used to round the information and avoid fingerprinting

@@ -1,9 +1,10 @@
 import prettyBytes from "pretty-bytes";
 import { DragEvent, useRef, useState } from "react";
 
-import { Platforms } from "@app/Platforms";
 import Button from "@app/components/Button";
 import { Platform } from "@pipeline/Types";
+
+import { Platforms } from "@assets/Platforms";
 
 interface Props {
     platform: Platform | null;
@@ -66,7 +67,7 @@ const FilesSelect = ({ platform, files, onFilesUpdate }: Props) => {
         fileRef.current!.value = "";
     };
 
-    const platformInfo = Platforms.find((p) => p.platform === platform);
+    const platformInfo = platform ? Platforms[platform] : undefined;
 
     return (
         <div className="FilesSelect">

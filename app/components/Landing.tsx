@@ -1,6 +1,6 @@
-import { Platforms } from "@app/Platforms";
 import Button from "@app/components/Button";
 
+import { Platforms } from "@assets/Platforms";
 import Lock from "@assets/images/icons/lock.svg";
 import GitHub from "@assets/images/logos/github.svg";
 import "@assets/styles/Landing.less";
@@ -26,7 +26,7 @@ const Landing = ({ onStart }: Props) => {
                 <br />
                 <div className="Landing__platforms-line">
                     <span>Supports</span>
-                    {Platforms.map((p) => (
+                    {Object.values(Platforms).map((p) => (
                         <div
                             className="Landing__platform"
                             key={p.platform}

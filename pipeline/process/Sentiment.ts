@@ -1,7 +1,7 @@
 import { unzipSync } from "fflate";
 
 import { LanguageCodes } from "@pipeline/Languages";
-import { progress } from "@pipeline/Progress";
+import { Progress } from "@pipeline/Progress";
 import { normalizeText } from "@pipeline/Text";
 import { Index } from "@pipeline/Types";
 import { Emojis } from "@pipeline/process/Emojis";
@@ -15,7 +15,7 @@ export class Sentiment {
         };
     } = {};
 
-    constructor(afinnZipBuffer: ArrayBuffer, private emojiData: Emojis) {
+    constructor(afinnZipBuffer: ArrayBuffer, private emojiData: Emojis, progress?: Progress) {
         const filesAsBuffers = unzipSync(new Uint8Array(afinnZipBuffer));
         const filesAsStrings: { [key: string]: string } = {};
 
@@ -27,7 +27,7 @@ export class Sentiment {
         // read all-negators.json
         const negators = JSON.parse(filesAsStrings["all-negators.json"]) as { [lang: string]: string[] };
 
-        progress.new("Preparing sentiment database");
+        progress?.new("Preparing sentiment database");
         const total = Object.keys(filesAsStrings).length;
         let processed = 0;
         for (const filename in filesAsStrings) {
@@ -48,9 +48,9 @@ export class Sentiment {
                     afinn: new PatternMatcher(Object.keys(langAfinn), Object.values(langAfinn)),
                 };
             }
-            progress.progress("number", processed++, total);
+            progress?.progress("number", processed++, total);
         }
-        progress.done();
+        progress?.done();
     }
 
     // NOTE: based on marcellobarile/multilang-sentiment

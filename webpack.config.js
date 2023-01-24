@@ -7,7 +7,9 @@ const HTMLInlineCSSWebpackPlugin = require("html-inline-css-webpack-plugin").def
 
 const resolve = (file) => path.resolve(__dirname, file);
 
-const notInline = [/Platforms.tsx$/];
+// By default we inline ALL images
+// But since instructions are a bit larger, better to exclude those
+const notInline = [/PlatformInstructions.tsx$/];
 
 let commitHash = "unknown";
 try {

@@ -1,28 +1,31 @@
 import { WebEnv, wrapFile } from "@app/WebEnv";
-import { progress } from "@pipeline/Progress";
 import { ReportConfig } from "@pipeline/Types";
 import { generateDatabase, generateReportSite } from "@pipeline/process/Generate";
 
+/** Message sent by the UI to start the generation process */
 export interface InitMessage {
     files: File[];
     config: ReportConfig;
     origin: string;
 }
 
+/** Message sent by the worker with the report ready and stats */
 export interface ResultMessage {
     type: "result";
     data?: string;
     html: string;
     title: string;
     counts: {
+        messages: number;
         authors: number;
         channels: number;
         guilds: number;
-        messages: number;
     };
 }
 
 self.onmessage = async (ev: MessageEvent<InitMessage>) => {
+    const { progress } = WebEnv;
+
     progress.reset();
     progress.on("update", (msg) => self.postMessage(msg));
 
@@ -32,6 +35,7 @@ self.onmessage = async (ev: MessageEvent<InitMessage>) => {
         const result = await generateReportSite(database, WebEnv);
         if (env.isDev) {
             // include the origin in relative URLs, so it can be opened locally
+            // e.g. http://localhost:8080
             result.html = result.html
                 .replace('<script defer src="', '<script defer src="' + ev.data.origin)
                 .replace('<link href="', '<link href="' + ev.data.origin);
@@ -43,10 +47,10 @@ self.onmessage = async (ev: MessageEvent<InitMessage>) => {
             html: result.html,
             title: database.title,
             counts: {
+                messages: Object.values(database.channels).reduce((acc, ch) => acc + (ch.msgCount ?? 0), 0),
                 authors: database.authors.length,
                 channels: database.channels.length,
                 guilds: database.guilds.length,
-                messages: Object.values(database.channels).reduce((acc, ch) => acc + (ch.msgCount ?? 0), 0),
             },
         };
 
