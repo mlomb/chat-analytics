@@ -1,4 +1,4 @@
-import { Env, LoadAssetFn } from "@pipeline/Env";
+import { LoadAssetFn } from "@pipeline/Env";
 import { FileInput } from "@pipeline/File";
 import { Progress } from "@pipeline/Progress";
 
