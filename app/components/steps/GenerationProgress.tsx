@@ -6,6 +6,7 @@ import { ProgressStats, ProgressTask } from "@pipeline/Progress";
 
 import Bubble from "@assets/images/icons/bubble.svg";
 import Clock from "@assets/images/icons/clock.svg";
+import Files from "@assets/images/icons/files.svg";
 import Hashtag from "@assets/images/icons/hashtag.svg";
 import Pause from "@assets/images/icons/pause.svg";
 import Spinner from "@assets/images/icons/spinner.svg";
@@ -103,22 +104,27 @@ const ErrorBox = ({ error }: { error: string }) => {
 
 export const GenerationProgress = (props: Props) => {
     const error = props.tasks[props.tasks.length - 1].error;
+    const stat = (name: string) => (props.stats[name] || 0).toLocaleString();
     return (
         <>
             <div className="GenerationProgress__stats">
                 <div className="GenerationProgress__stat" title="# of channels">
                     <img src={Hashtag} />
-                    {(props.stats["channels"] || 0).toLocaleString()}
+                    {stat("channels")}
                 </div>
                 <div className="GenerationProgress__stat" title="# of authors">
                     <img src={User} />
-                    {(props.stats["authors"] || 0).toLocaleString()}
+                    {stat("authors")}
                 </div>
                 <div className="GenerationProgress__stat" title="# of messages">
                     <img src={Bubble} />
-                    {(props.stats["messages"] || 0).toLocaleString()}
+                    {stat("messages")}
                 </div>
-                <div className="GenerationProgress__stat" title="time">
+                <div className="GenerationProgress__stat" title="input files processed">
+                    <img src={Files} />
+                    {stat("processed_files")}/{stat("total_files")}
+                </div>
+                <div className="GenerationProgress__stat" title="time elapsed">
                     <img src={Clock} />
                     <Timer ticking={props.working && error === undefined} />
                 </div>

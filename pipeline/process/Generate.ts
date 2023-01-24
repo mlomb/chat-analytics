@@ -10,6 +10,8 @@ import { WhatsAppParser } from "@pipeline/parse/parsers/WhatsAppParser";
 import { DatabaseBuilder } from "@pipeline/process/DatabaseBuilder";
 
 export const generateDatabase = async (files: FileInput[], config: ReportConfig, env: Env): Promise<Database> => {
+    env.progress?.stat("total_files", files.length);
+
     const builder: DatabaseBuilder = new DatabaseBuilder(config, env);
     // load data needed for processing
     await builder.init();
@@ -34,6 +36,7 @@ export const generateDatabase = async (files: FileInput[], config: ReportConfig,
     }
 
     // parse and process all files
+    let processed = 0;
     for (const file of parser.sortFiles(files)) {
         env.progress?.new("Processing", file.name);
         try {
@@ -49,6 +52,7 @@ export const generateDatabase = async (files: FileInput[], config: ReportConfig,
             throw err;
         }
         env.progress?.done();
+        env.progress?.stat("processed_files", ++processed);
     }
 
     // no longer needed
