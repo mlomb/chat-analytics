@@ -10,7 +10,7 @@ interface Props {
     children: ReactNode[];
 }
 
-const Stepper = ({ step, stepTitles, stepMaxHeights, children }: Props) => (
+export const Stepper = ({ step, stepTitles, stepMaxHeights, children }: Props) => (
     <>
         {children.map((child, index) => {
             const active = step === index;
@@ -46,5 +46,3 @@ const Stepper = ({ step, stepTitles, stepMaxHeights, children }: Props) => (
         })}
     </>
 );
-
-export default Stepper;

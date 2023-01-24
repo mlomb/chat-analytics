@@ -4,12 +4,11 @@ import { Platform } from "@pipeline/Types";
 import { Platforms } from "@assets/Platforms";
 
 interface Props {
-    platform: Platform | null;
+    platform?: Platform;
 }
 
-const ExportInstructions = ({ platform }: Props) => {
-    const platformInfo = platform ? Platforms[platform] : undefined;
-    const instructions = platform ? PlatformInstructions[platform] : undefined;
+export const ExportInstructions = ({ platform }: Props) => {
+    const p = platform ? Platforms[platform] : undefined;
 
     return (
         <div className="ExportInstructions">
@@ -19,15 +18,14 @@ const ExportInstructions = ({ platform }: Props) => {
             Follow these steps to export chats in{" "}
             <span
                 style={{
-                    color: `hsl(${platformInfo?.color[0]}, ${platformInfo?.color[1]}%, ${platformInfo?.color[2]}%)`,
+                    color: `hsl(${p?.color[0]}, ${p?.color[1]}%, ${p?.color[2]}%)`,
                 }}
             >
-                {platformInfo?.title}
+                {p?.title}
             </span>
             :
             <br />
-            {instructions}
+            {PlatformInstructions[platform!]}
         </div>
     );
 };
-export default ExportInstructions;

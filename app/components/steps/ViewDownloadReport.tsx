@@ -2,7 +2,7 @@ import prettyBytes from "pretty-bytes";
 import { useEffect, useState } from "react";
 
 import { ResultMessage } from "@app/WorkerApp";
-import Button from "@app/components/Button";
+import { Button } from "@app/components/Button";
 
 import { plausible } from "@assets/Plausible";
 import Download from "@assets/images/icons/download.svg";
@@ -13,7 +13,7 @@ interface Props {
     result: ResultMessage | null;
 }
 
-const ViewDownloadReport = ({ result }: Props) => {
+export const ViewDownloadReport = ({ result }: Props) => {
     const [files, setFiles] = useState<{
         dataBlob: Blob | null;
         dataURL: string;
@@ -132,5 +132,3 @@ const ViewDownloadReport = ({ result }: Props) => {
         </div>
     );
 };
-
-export default ViewDownloadReport;

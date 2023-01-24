@@ -4,7 +4,7 @@ type Props = {
     hueColor: [number, number, number];
 } & (React.AnchorHTMLAttributes<HTMLAnchorElement> | React.ButtonHTMLAttributes<HTMLButtonElement>);
 
-const Button = ({ hueColor, className, style, ...rest }: Props) => {
+export const Button = ({ hueColor, className, style, ...rest }: Props) => {
     const [h, s, l] = hueColor;
 
     const cssStyles = {
@@ -23,5 +23,3 @@ const Button = ({ hueColor, className, style, ...rest }: Props) => {
         <button className={classes} style={cssStyles} {...rest} />
     );
 };
-
-export default Button;

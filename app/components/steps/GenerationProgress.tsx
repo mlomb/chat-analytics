@@ -89,7 +89,7 @@ const Timer = (props: { active: boolean }) => {
     return <span ref={ref}>00:00</span>;
 };
 
-const GenerationProgress = (props: Props) => {
+export const GenerationProgress = (props: Props) => {
     const error = props.tasks[props.tasks.length - 1].error;
     return (
         <>
@@ -121,5 +121,3 @@ const GenerationProgress = (props: Props) => {
         </>
     );
 };
-
-export default GenerationProgress;
