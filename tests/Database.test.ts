@@ -1,3 +1,4 @@
+import { loadNodeAsset } from "@lib/NodeEnv";
 import { generateDatabase } from "@lib/index";
 import { wrapStringAsFile } from "@pipeline/File";
 
@@ -9,7 +10,11 @@ const TEST_CHAT = [
 ].join("\n");
 
 test("simple example", async () => {
-    const db = await generateDatabase([wrapStringAsFile(TEST_CHAT)], { platform: "whatsapp" });
+    const db = await generateDatabase(
+        [wrapStringAsFile(TEST_CHAT)],
+        { platform: "whatsapp" },
+        { loadAsset: loadNodeAsset }
+    );
     expect(db.authors.length).toBe(2);
     expect(db.channels[0].name).toBe("A & B");
 });
