@@ -40,14 +40,21 @@ export const MostRepliesAuthors = ({ data }: { data?: InteractionStats }) => (
         colorHue={240}
     />
 );
-export const MostConversations = ({ data }: { data?: ConversationStats }) => (
+
+///////////////////////////
+/// CONVERSATIONS
+///////////////////////////
+export const MostConversations = ({ data, options }: { data?: ConversationStats; options: number[] }) => (
     <MostUsed
-        what="Author"
+        what={options[0] === 0 ? "Author" : "Channel"}
         unit="Number of conversations started"
-        counts={data?.conversationsStarted || EmptyArray}
-        itemComponent={AuthorLabel}
-        maxItems={Math.min(15, useDataProvider().database.authors.length)}
-        colorHue={240}
+        counts={data ? (options[0] === 0 ? data.authorConversations : data.channelConversations) : EmptyArray}
+        itemComponent={options[0] === 0 ? AuthorLabel : ChannelLabel}
+        maxItems={Math.min(
+            15,
+            Math.max(useDataProvider().database.authors.length, useDataProvider().database.channels.length)
+        )}
+        colorHue={options[0] === 0 ? 240 : 266}
     />
 );
 
@@ -136,7 +143,7 @@ export const MostProducerEmojis = ({ data, options }: { data?: EmojiStats; optio
     <MostUsed
         what={options[0] === 0 ? "Author" : "Channel"}
         unit="Number of emojis used"
-        counts={data ? (options[0] === 0 ? data?.inText.authorCount : data?.inText.channelCount) : EmptyArray}
+        counts={data ? (options[0] === 0 ? data.inText.authorCount : data.inText.channelCount) : EmptyArray}
         maxItems={Math.min(
             15,
             Math.max(useDataProvider().database.authors.length, useDataProvider().database.channels.length)
@@ -150,7 +157,7 @@ export const MostGetterEmojis = ({ data, options }: { data?: EmojiStats; options
     <MostUsed
         what={options[0] === 0 ? "Author" : "Channel"}
         unit="Number of reactions received"
-        counts={data ? (options[0] === 0 ? data?.inReactions.authorCount : data?.inReactions.channelCount) : EmptyArray}
+        counts={data ? (options[0] === 0 ? data.inReactions.authorCount : data.inReactions.channelCount) : EmptyArray}
         maxItems={Math.min(
             15,
             Math.max(useDataProvider().database.authors.length, useDataProvider().database.channels.length)

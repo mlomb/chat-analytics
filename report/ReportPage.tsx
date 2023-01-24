@@ -213,7 +213,7 @@ const ReportDashboard = () => {
                     .concat([
                         <Card
                             num={1}
-                            title="Conversations started"
+                            title={["Conversations started", ["by author", "in channel"]]}
                             blockKey="conversation-stats"
                             children={MostConversations}
                             tooltip={conversationTooltip}
