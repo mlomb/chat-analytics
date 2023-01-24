@@ -1,6 +1,5 @@
 import { Env } from "@pipeline/Env";
 import { FileInput } from "@pipeline/File";
-import { progress } from "@pipeline/Progress";
 import { Database, ReportConfig } from "@pipeline/Types";
 import { compress } from "@pipeline/compression/Compression";
 import { Parser } from "@pipeline/parse/Parser";
@@ -36,7 +35,7 @@ export const generateDatabase = async (files: FileInput[], config: ReportConfig,
 
     // parse and process all files
     for (const file of parser.sortFiles(files)) {
-        progress.new("Processing", file.name);
+        env.progress?.new("Processing", file.name);
         try {
             for await (const _ of parser.parse(file)) builder.process();
             builder.process(true);
@@ -49,7 +48,7 @@ export const generateDatabase = async (files: FileInput[], config: ReportConfig,
             // handled by WorkerApp.ts
             throw err;
         }
-        progress.done();
+        env.progress?.done();
     }
 
     // no longer needed
@@ -67,9 +66,9 @@ export const generateReportSite = async (
     html: string;
 }> => {
     // compress data
-    progress.new("Compressing");
+    env.progress?.new("Compressing");
     const encodedData = compress(database);
-    progress.done();
+    env.progress?.done();
 
     const html = await env.loadAsset("/report.html", "text");
 

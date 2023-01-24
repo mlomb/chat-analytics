@@ -2,10 +2,6 @@ import { ReactNode, useState } from "react";
 
 import { Platform } from "@pipeline/Types";
 
-import DiscordLogo from "@assets/images/logos/discord.svg";
-import MessengerLogo from "@assets/images/logos/messenger.svg";
-import TelegramLogo from "@assets/images/logos/telegram.svg";
-import WhatsAppLogo from "@assets/images/logos/whatsapp.svg";
 // Discord
 import DiscordChannels from "@assets/images/platforms/discord/instructions/discord_channels.png";
 import DiscordExport from "@assets/images/platforms/discord/instructions/discord_export.gif";
@@ -26,6 +22,8 @@ import WhatsAppAndroidNoMedia from "@assets/images/platforms/whatsapp/instructio
 import WhatsAppThreeDots from "@assets/images/platforms/whatsapp/instructions/whatsapp_dots.png";
 import WhatsAppIOSExport from "@assets/images/platforms/whatsapp/instructions/whatsapp_ios_export.png";
 import WhatsAppIOSNoMedia from "@assets/images/platforms/whatsapp/instructions/whatsapp_ios_no_media.png";
+
+// All assets included in this file are NOT inlined
 
 const DiscordInstructions = () => {
     return (
@@ -196,44 +194,11 @@ const WhatsAppInstructions = () => {
     );
 };
 
-export const Platforms: {
-    platform: Platform;
-    title: string;
-    color: [number, number, number]; // HSL
-    defaultFilename: string;
-    logo: ReactNode;
-    instructions: ReactNode;
-}[] = [
-    {
-        platform: "discord",
-        title: "Discord",
-        color: [235, 86, 65],
-        defaultFilename: "<guild> - <channel> [ID].json",
-        logo: <img src={DiscordLogo} alt="" />,
-        instructions: <DiscordInstructions />,
-    },
-    {
-        platform: "messenger",
-        title: "Messenger",
-        color: [214, 89, 52],
-        defaultFilename: "message_<number>.json",
-        logo: <img src={MessengerLogo} alt="" />,
-        instructions: <MessengerInstructions />,
-    },
-    {
-        platform: "telegram",
-        title: "Telegram",
-        color: [200, 79, 52],
-        defaultFilename: "result.json",
-        logo: <img src={TelegramLogo} alt="" />,
-        instructions: <TelegramInstructions />,
-    },
-    {
-        platform: "whatsapp",
-        title: "WhatsApp",
-        color: [142, 70, 49],
-        defaultFilename: "WhatsApp Chat with <chat name>.txt/zip",
-        logo: <img src={WhatsAppLogo} alt="" />,
-        instructions: <WhatsAppInstructions />,
-    },
-];
+export const PlatformInstructions: {
+    [key in Platform]: ReactNode;
+} = {
+    discord: <DiscordInstructions />,
+    messenger: <MessengerInstructions />,
+    telegram: <TelegramInstructions />,
+    whatsapp: <WhatsAppInstructions />,
+};

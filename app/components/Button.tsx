@@ -14,7 +14,7 @@ const Button = ({ hueColor, className, style, ...rest }: Props) => {
         ...style,
     } as React.CSSProperties;
 
-    const classes = ["Button", className || ""].join(" ");
+    const classes = `Button ${className}`;
 
     return "href" in rest ? (
         <a className={classes} style={cssStyles} {...rest} />
