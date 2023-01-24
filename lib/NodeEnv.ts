@@ -1,10 +1,10 @@
 import fs from "fs";
 import path from "path";
 
-import { Env, LoadAssetFn } from "@pipeline/Env";
+import { LoadAssetFn } from "@pipeline/Env";
 import { FileInput } from "@pipeline/File";
 
-// Loads a file from disk and wraps it into our abstraction
+/** Loads a file from disk and wraps it into our file abstraction */
 export const loadFile = (filepath: string): FileInput => {
     const content = fs.readFileSync(filepath);
     const stats = fs.statSync(filepath);
@@ -17,12 +17,13 @@ export const loadFile = (filepath: string): FileInput => {
     };
 };
 
-const loadAsset: LoadAssetFn = async (filepath: string, type: "json" | "text" | "arraybuffer") => {
+/** Loads assets when running in a NodeJS process */
+export const loadNodeAsset: LoadAssetFn = async (filepath: string, type: "json" | "text" | "arraybuffer") => {
     if (process.env.NODE_ENV === "test") {
         // during tests, the tests are run from the original .ts files
         filepath = path.join(__dirname, "..", "assets", filepath);
     } else {
-        // used when the package is deployed in dist/
+        // otherwise, the package is deployed in dist/
         filepath = path.join(__dirname, "..", "..", "assets", filepath);
     }
 
@@ -39,8 +40,4 @@ const loadAsset: LoadAssetFn = async (filepath: string, type: "json" | "text" | 
     if (type === "text") return content.toString("utf-8");
     else if (type === "json") return JSON.parse(content.toString("utf-8"));
     else return content.buffer.slice(content.byteOffset, content.byteOffset + content.byteLength);
-};
-
-export const NodeEnv: Env = {
-    loadAsset,
 };

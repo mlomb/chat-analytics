@@ -20,7 +20,7 @@ export interface ProgressStats {
 }
 
 export declare interface Progress {
-    on(event: "update", listener: (tasks: ProgressTask[], stats: ProgressStats) => void): this;
+    on(event: "progress", listener: (tasks: ProgressTask[], stats: ProgressStats) => void): this;
 }
 
 export class Progress extends EventEmitter {
@@ -138,7 +138,7 @@ export class Progress extends EventEmitter {
         }
 
         if (emit) {
-            this.emit("update", this.tasks, this.keys);
+            this.emit("progress", this.tasks, this.keys);
             this.lastCount = this.active?.progress?.actual || 0;
             this.lastTs = ts || Date.now();
         }

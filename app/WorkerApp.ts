@@ -1,7 +1,7 @@
 import { WebEnv, wrapFile } from "@app/WebEnv";
 import { ProgressStats, ProgressTask } from "@pipeline/Progress";
 import { ReportConfig } from "@pipeline/Types";
-import { generateDatabase, generateReportSite } from "@pipeline/process/Generate";
+import { generateDatabase, generateReport } from "@pipeline/process/Generate";
 
 /** Message sent by the UI to start the generation process */
 export interface InitMessage {
@@ -35,7 +35,7 @@ self.onmessage = async (ev: MessageEvent<InitMessage>) => {
     const { progress } = WebEnv;
 
     progress.reset();
-    progress.on("update", (tasks, stats) =>
+    progress.on("progress", (tasks, stats) =>
         self.postMessage({
             type: "progress",
             tasks,
@@ -46,7 +46,7 @@ self.onmessage = async (ev: MessageEvent<InitMessage>) => {
     try {
         const database = await generateDatabase(ev.data.files.map(wrapFile), ev.data.config, WebEnv);
         if (env.isDev) console.log(database);
-        const result = await generateReportSite(database, WebEnv);
+        const result = await generateReport(database, WebEnv);
         if (env.isDev) {
             // include the origin in relative URLs, so it can be opened locally
             // e.g. http://localhost:8080
