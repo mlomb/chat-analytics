@@ -3,11 +3,11 @@ import { useEffect, useState } from "react";
 
 import { ResultMessage } from "@app/WorkerApp";
 import { Button } from "@app/components/Button";
+import { RestartLink } from "@app/components/RestartLink";
 
 import { plausible } from "@assets/Plausible";
 import Download from "@assets/images/icons/download.svg";
 import LinkOut from "@assets/images/icons/link-out.svg";
-import Refresh from "@assets/images/icons/refresh.svg";
 
 interface Props {
     result: ResultMessage | null;
@@ -125,10 +125,7 @@ export const ViewDownloadReport = ({ result }: Props) => {
                 Remember that we don't store your reports, so you can't share the "View Locally" link. To share the
                 report, download it and share the file.
             </div>
-            <a href="/" className="ViewDownloadReport__restart">
-                <img src={Refresh} alt="Refresh" />
-                Generate a new report
-            </a>
+            <RestartLink text="Generate a new report" />
         </div>
     );
 };

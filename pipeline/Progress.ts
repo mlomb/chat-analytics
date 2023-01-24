@@ -3,7 +3,7 @@ import { EventEmitter } from "events";
 type Status = "processing" | "waiting" | "success" | "error";
 type FormatProgress = "number" | "bytes";
 
-export interface TaskInfo {
+export interface ProgressTask {
     status: Status;
     title: string;
     subject?: string;
@@ -15,29 +15,23 @@ export interface TaskInfo {
     error?: string;
 }
 
-export interface ProgressKeys {
+export interface ProgressStats {
     [key: string]: number;
 }
 
-export interface ProgressMessage {
-    type: "progress";
-    tasks: TaskInfo[];
-    keys: ProgressKeys;
-}
-
 export declare interface Progress {
-    on(event: "update", listener: (msg: ProgressMessage) => void): this;
+    on(event: "update", listener: (tasks: ProgressTask[], stats: ProgressStats) => void): this;
 }
 
 export class Progress extends EventEmitter {
     // all tasks
-    private tasks: TaskInfo[] = [];
+    private tasks: ProgressTask[] = [];
     // active task
-    private active?: TaskInfo;
+    private active?: ProgressTask;
     // you can't invoke progress after an error
     private errored: boolean = false;
     // keys
-    private keys: ProgressKeys = {};
+    private keys: ProgressStats = {};
 
     // removes all tasks
     reset() {
@@ -49,7 +43,7 @@ export class Progress extends EventEmitter {
     // adds a new task to the stack
     new(title: string, subject?: string) {
         console.assert(!this.errored, "Can't continue after an error");
-        const task: TaskInfo = {
+        const task: ProgressTask = {
             status: "processing",
             title,
             subject,
@@ -144,11 +138,7 @@ export class Progress extends EventEmitter {
         }
 
         if (emit) {
-            this.emit("update", {
-                type: "progress",
-                tasks: this.tasks,
-                keys: this.keys,
-            } as ProgressMessage);
+            this.emit("update", this.tasks, this.keys);
             this.lastCount = this.active?.progress?.actual || 0;
             this.lastTs = ts || Date.now();
         }

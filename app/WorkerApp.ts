@@ -1,4 +1,5 @@
 import { WebEnv, wrapFile } from "@app/WebEnv";
+import { ProgressStats, ProgressTask as ProgressTask } from "@pipeline/Progress";
 import { ReportConfig } from "@pipeline/Types";
 import { generateDatabase, generateReportSite } from "@pipeline/process/Generate";
 
@@ -7,6 +8,13 @@ export interface InitMessage {
     files: File[];
     config: ReportConfig;
     origin: string;
+}
+
+/** Message sent by the worker to the UI periodically to update progress information */
+export interface ProgressMessage {
+    type: "progress";
+    tasks: ProgressTask[];
+    stats: ProgressStats;
 }
 
 /** Message sent by the worker with the report ready and stats */
@@ -27,7 +35,13 @@ self.onmessage = async (ev: MessageEvent<InitMessage>) => {
     const { progress } = WebEnv;
 
     progress.reset();
-    progress.on("update", (msg) => self.postMessage(msg));
+    progress.on("update", (tasks, stats) => 
+        self.postMessage({
+            type: "progress",
+            tasks,
+            stats,
+        } satisfies ProgressMessage)
+    );
 
     try {
         const database = await generateDatabase(ev.data.files.map(wrapFile), ev.data.config, WebEnv);
