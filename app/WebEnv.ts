@@ -36,4 +36,6 @@ const loadWebAsset: LoadAssetFn = async (filepath: string, responseType: "json" 
 export const WebEnv = {
     loadAsset: loadWebAsset,
     progress,
-} satisfies Env;
+};
+// TODO: add the following line when https://github.com/trivago/prettier-plugin-sort-imports/issues/204 is resolved
+// } satisfies Env;
