@@ -12,12 +12,14 @@ jobs:
     if: >
       github.event.workflow_run.event == 'pull_request' &&
       github.event.workflow_run.conclusion == 'success'
+    permissions:
+      pull-requests: write
     steps:
       - uses: dawidd6/action-download-artifact@v2
         with:
           run_id: ${{ github.event.workflow_run.id }}
           name: pr
-      - run: echo "PR_NUM=$(cat pr.txt | awk '{print 0 + $1}')" >> $GITHUB_ENV
+      - run: echo "PR_NUM=$(cat pr.txt | awk '{print 0 + $1; exit;}')" >> $GITHUB_ENV
       - uses: dawidd6/action-download-artifact@v2
         with:
           run_id: ${{ github.event.workflow_run.id }}
@@ -37,15 +39,6 @@ jobs:
           directory: dist_web
           branch: pr-${{ env.PR_NUM }}
 
-  post-comment:
-    runs-on: ubuntu-latest
-    if: >
-      github.event.workflow_run.event == 'pull_request' &&
-      github.event.workflow_run.conclusion == 'success'
-    needs: deploy
-    permissions:
-      pull-requests: write
-    steps:
       # add comment status in PR
       - name: Find Comment
         id: fc
