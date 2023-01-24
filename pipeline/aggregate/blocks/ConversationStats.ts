@@ -15,17 +15,19 @@ interface Node {
 }
 
 export interface ConversationStats {
-    numConversationsStarted: number;
-    conversationsStarted: number[]; // indexed by author index
-
+    authorConversations: number[]; // indexed by author index
+    channelConversations: number[]; // indexed by channel index
     nodes: Node[];
 }
 
 const fn: BlockFn<ConversationStats> = (database, filters, common) => {
     const { dateKeys } = common.timeKeys;
 
+    const channelConversations: number[] = new Array(database.channels.length).fill(0);
+    const authorConversations: number[] = new Array(database.authors.length).fill(0);
+
     // first, find the MAX_AUTHORS authors with the most messages
-    const authorsCounts: number[] = new Array(database.authors.length).fill(0);
+    const authorsCounts: number[] = [...authorConversations];
     parseAndFilterMessages((msg) => authorsCounts[msg.authorIndex]++, database, filters);
 
     // sort authors by count
@@ -34,10 +36,6 @@ const fn: BlockFn<ConversationStats> = (database, filters, common) => {
         .filter((author) => author.count > 0)
         .sort((a, b) => b.count - a.count)
         .slice(0, MAX_AUTHORS);
-
-    // reuse array to track conversation starts
-    const conversationsStarted: number[] = authorsCounts.fill(0);
-    let numConversationsStarted = 0;
 
     // make a lookup table for author index -> sorted index or -1 if not present
     const authorsLookup: number[] = new Array(database.authors.length).fill(-1);
@@ -68,8 +66,6 @@ const fn: BlockFn<ConversationStats> = (database, filters, common) => {
 
         // start of a new conversation
         if (ctx.lastMessageTimestamp === -1 || ts - ctx.lastMessageTimestamp > NEW_CONVERSATION_THRESHOLD * 1000) {
-            numConversationsStarted++;
-
             // mark in table in M^2
             const participants = ctx.activeParticipant
                 .map((active, index) => (active ? index : -1))
@@ -99,9 +95,10 @@ const fn: BlockFn<ConversationStats> = (database, filters, common) => {
 
             // reset
             ctx.activeParticipant.fill(false);
+            channelConversations[msg.channelIndex]++;
             // we have to check since we are not filtering by author
             if (filters.hasAuthor(msg.authorIndex)) {
-                conversationsStarted[msg.authorIndex]++;
+                authorConversations[msg.authorIndex]++;
             }
         }
 
@@ -128,8 +125,8 @@ const fn: BlockFn<ConversationStats> = (database, filters, common) => {
     }
 
     return {
-        numConversationsStarted,
-        conversationsStarted,
+        authorConversations,
+        channelConversations,
         nodes,
     };
 };
