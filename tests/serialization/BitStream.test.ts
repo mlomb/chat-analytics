@@ -191,7 +191,7 @@ describe("reading", () => {
     });
 });
 
-test("read then write", () => {
+it("should get bits correctly after lots of sets", () => {
     const s = new BitStream();
     const bits = [],
         values = [];
@@ -211,13 +211,15 @@ test("read then write", () => {
     }
 });
 
-describe("varint", () => {
-    const cases: number[] = [0, 100, 200, 500, 1000, 5000, 10000, 100000, 2000000, 5000000];
-    test.each(cases)("%p", async (value) => {
+describe.each([7, 8, 9, 10, 11, 15, 16, 17, 20, 24, 31, 32])("varint %s bits", (bits) => {
+    const cases: number[] = [0, 100, 200, 500, 1000, 5000, 10000, 100000, 2000000, 5000000, 1000000000].filter(
+        (v) => v < Math.pow(2, bits)
+    );
+    it.each(cases)("should write and read correctly %p", async (value) => {
         let s = new BitStream();
         s.offset = 0;
-        s.writeVarInt(value);
+        s.writeVarInt(value, bits);
         s.offset = 0;
-        expect(s.readVarInt()).toBe(value);
+        expect(s.readVarInt(bits)).toBe(value);
     });
 });

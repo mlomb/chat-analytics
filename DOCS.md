@@ -1,6 +1,6 @@
 # Docs
 
-The app uses webpack, React and amCharts 5.
+The app uses TypeScript, webpack 5, React and amCharts 5.
 
 TO-DO: expand docs
 
