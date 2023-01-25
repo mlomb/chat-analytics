@@ -1,20 +1,10 @@
+// @ts-nocheck
 import { FileInput } from "@pipeline/File";
 import { AttachmentType } from "@pipeline/Types";
 import { Parser } from "@pipeline/parse/Parser";
 
 export class MessengerParser extends Parser {
     private messageIndex = 0;
-
-    sortFiles(files: FileInput[]): FileInput[] {
-        // we are expecting files like "message_<number>.json"
-        // where the lower the number, the newer the messages
-        // so if we have 4 files, we want to process them in this order: 4, 3, 2, 1
-        const extractNumber = (name: string) => {
-            const match = name.match(/message_(\d+)\.json/);
-            return match ? parseInt(match[1]) : 0;
-        };
-        return files.sort((a, b) => extractNumber(b.name) - extractNumber(a.name));
-    }
 
     // Note: we might want to support the ZIP files provided by Facebook
     // there are two problems with this:

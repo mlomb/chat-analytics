@@ -1,6 +1,6 @@
 import { LoadAssetFn } from "@pipeline/Env";
-import { FileInput } from "@pipeline/File";
 import { Progress } from "@pipeline/Progress";
+import { FileInput } from "@pipeline/parse/File";
 
 /** Wraps a Web API File object to our file abstraction */
 export const wrapFile = (file: File): FileInput => ({

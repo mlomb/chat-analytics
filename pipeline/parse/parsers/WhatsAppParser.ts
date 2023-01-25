@@ -2,8 +2,8 @@ import { unzipSync } from "fflate";
 // There is a convenient parser already out there
 import { parseStringSync } from "whatsapp-chat-parser";
 
-import { FileInput } from "@pipeline/File";
 import { AttachmentType } from "@pipeline/Types";
+import { FileInput } from "@pipeline/parse/File";
 import { Parser } from "@pipeline/parse/Parser";
 import { extractChatName, isGroupWelcome, matchAttachmentType, removeBadChars } from "@pipeline/parse/parsers/WhatsApp";
 
@@ -52,13 +52,11 @@ export class WhatsAppParser extends Parser {
 
         name = name || `Chat #${this.channelIndex}`;
 
-        const channelIndex = this.channelIndex++;
-        const guildIndex = this.builder.addGuild("Default", {
-            name: "WhatsApp Chats",
-        });
-        const assignedChannelIndex = this.builder.addChannel(channelIndex, {
+        this.emit("guild", { id: 0, name: "WhatsApp Chats" });
+        this.emit("channel", {
+            id: this.channelIndex++,
+            guildId: 0,
             name,
-            guildIndex: guildIndex,
             type: numAuthors > 2 ? "group" : "dm",
         });
 
@@ -76,8 +74,10 @@ export class WhatsAppParser extends Parser {
                     continue;
                 }
 
-                const authorIndex = this.builder.addAuthor(message.author, {
-                    n: message.author,
+                this.emit("author", {
+                    id: message.author,
+                    name: message.author,
+                    bot: false,
                 });
 
                 let attachment: AttachmentType | undefined = matchAttachmentType(messageContent);
@@ -92,14 +92,16 @@ export class WhatsAppParser extends Parser {
                 // TODO: handle "live location shared"
                 // TODO: handle deleted messages?
 
-                this.builder.addMessage({
+                this.emit("message", {
                     id: this.messageIndex++,
-                    authorIndex,
-                    channelIndex: assignedChannelIndex,
+                    authorId: message.author,
+                    channelId: this.channelIndex,
                     timestamp,
-                    content: attachment === undefined ? messageContent : undefined,
+                    textContent: attachment === undefined ? messageContent : undefined,
+                    /*
                     attachments: attachment === undefined ? [] : [attachment],
                     reactions: [],
+                    */
                 });
             }
         }

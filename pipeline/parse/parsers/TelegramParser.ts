@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { FileInput, getAttachmentTypeFromMimeType, streamJSONFromFile } from "@pipeline/File";
 import { AttachmentType, Index, RawID } from "@pipeline/Types";
 import { JSONStream } from "@pipeline/parse/JSONStream";
