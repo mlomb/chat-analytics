@@ -521,7 +521,7 @@ export class DatabaseBuilder {
 
         // filter words in case we have too many
         if (len > 100000) {
-            newWords= [];
+            newWords = [];
             newWordsMapping = new Array(len).fill(-1);
 
             this.env.progress?.new("Filtering words");
@@ -555,7 +555,7 @@ export class DatabaseBuilder {
         }
         if (this.guilds.size > 1) {
             if (this.guilds.data.some((g) => g.name === "Direct Messages")) {
-                return "Discord Servers and DMs"
+                return "Discord Servers and DMs";
             }
             return "Discord Servers";
         }
