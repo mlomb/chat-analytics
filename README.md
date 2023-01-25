@@ -19,7 +19,6 @@
 ---
 
 A web app that takes chat exports from supported platforms and generates a single HTML file containing information, statistics and graphs about them.  
-To generate reports you need a browser with [ES6 support](https://caniuse.com/es6).
 
 
 ## Chat platform support
@@ -33,16 +32,16 @@ You can generate reports from the following platforms:
 | Telegram  | `json` from [Telegram Desktop](https://desktop.telegram.org/)                    | ✅            | ✅                | ✅                                                                                   | ❌ (not provided) | ❌                      | ✅ (as text) |
 | WhatsApp  | `txt` or `zip` exported from a phone                                             | ✅            | ❌ (not provided) | ✅<strong>*</strong> (if exported from iOS)<br>🟦 (generic if exported from Android) | ❌ (not provided) | ❌                      | ✅ (as text) |
 
-<strong>*</strong>: not all languages are supported, check [WhatsApp.ts](pipeline/parse/parsers/WhatsApp.ts).
+<strong>*</strong>: not all languages are supported, check [WhatsApp.ts](/pipeline/parse/parsers/WhatsApp.ts).
 
 You can't combine exports from different platforms.  
-The contribution of [new platform parsers](DOCS.md#writing-a-new-parser) is always welcomed 🙂
+The contribution of [new platform parsers](/docs/PIPELINE.md#writing-a-new-parser) is always welcomed 🙂
 
 ## Privacy & Analytics
 
 Since all chat data always stays in the browser, there is zero risk of someone reading your chats. Note that **the report HTML file contains sensitive information** (one may reconstruct message contents for every message), so share your reports with people you trust.
 
-The site does not use cookies either and uses a self-hosted version of [Plausible](https://plausible.io). All events do not contain PII and information is segmented (i.e 1MB-10MB, etc). Since I want full transparency, you can check the [site analytics here](https://p.chatanalytics.app/chatanalytics.app).
+The site does not use cookies either and uses a self-hosted version of [Plausible](https://plausible.io). All events do not contain PII and the information is segmented (e.g. 1MB-10MB, etc). Since I want full transparency, you can check the [site analytics here](https://p.chatanalytics.app/chatanalytics.app).
 
 ## CLI
 
@@ -69,8 +68,8 @@ npx chat-analytics -p discord -i "exported/*.json" -o report.html
 
 ## Docs & Development
 
-You can read [DOCS.md](DOCS.md) for technical details.  
-In [TODO.md](TODO.md) you can find ideas and pending stuff to be implemented.
+You can read [docs/README.md](/docs/README.md) for technical details, and [docs/DEV.md](/docs/DEV.md) for development instructions.  
+In [docs/TODO.md](/docs/TODO.md) you can find ideas and pending stuff to be implemented.
 
 ## Acknowledgements
 
