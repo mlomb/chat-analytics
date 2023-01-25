@@ -45,9 +45,10 @@ export const Title = () => {
       - only servers: [icon of top K servers] Discord Servers
     */
     let avatars: ReactNode[];
+
     if (db.guilds.length > 1) {
         const topGuilds = db.guilds
-            .map((g, i) => ({
+            .map((_, i) => ({
                 count: db.channels.filter((c) => c.guildIndex === i).reduce((sum, c) => sum + (c.msgCount || 0), 0),
                 index: i,
             }))
@@ -72,5 +73,6 @@ export const Title = () => {
             avatars = topAuthors.map((authorIndex) => <AuthorAvatar index={authorIndex} />);
         }
     }
+
     return <BaseLabel title={db.title} name={db.title} avatar={<AvatarStack avatars={avatars} />} />;
 };
