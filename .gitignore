@@ -4,6 +4,7 @@ dist_web/
 coverage/
 report_sample*.data
 stats.json
+report.html
 
 # pack build
 chat-analytics-*.tgz
