@@ -11,7 +11,7 @@ export interface FileInput {
 }
 
 // Wraps a string into our file abstraction
-// Convinient for testing
+// Convenient for testing
 export const wrapStringAsFile = (content: string): FileInput => {
     const buffer = new TextEncoder().encode(content);
 
