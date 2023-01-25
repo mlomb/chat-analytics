@@ -391,11 +391,9 @@ export class DatabaseBuilder {
         const sections = this.channelSections[channelIndex];
         const lastSection = sections[sections.length - 1];
         if (lastSection.end === this.stream.offset) return lastSection;
-        else {
-            // create new section (non-contiguous)
-            sections.push({ start: this.stream.offset, end: this.stream.offset });
-            return sections[sections.length - 1];
-        }
+        // create new section (non-contiguous)
+        sections.push({ start: this.stream.offset, end: this.stream.offset });
+        return sections[sections.length - 1];
     }
 
     public async getDatabase(): Promise<Database> {
@@ -518,11 +516,13 @@ export class DatabaseBuilder {
         newWordsMapping: number[];
     } {
         const len = this.words.size;
+        let newWords: string[];
+        let newWordsMapping: number[];
 
         // filter words in case we have too many
         if (len > 100000) {
-            const newWords: string[] = [];
-            const newWordsMapping: number[] = new Array(len).fill(-1);
+            newWords= [];
+            newWordsMapping = new Array(len).fill(-1);
 
             this.env.progress?.new("Filtering words");
             for (let i = 0; i < len; i++) {
@@ -536,57 +536,34 @@ export class DatabaseBuilder {
             this.env.progress?.done();
 
             // NOTE: I tried sorting alphabetically to improve compression, but it was worse
-
-            return { newWords, newWordsMapping };
         } else {
-            const newWords = this.words.data;
-            const newWordsMapping = Array(len)
+            newWords = this.words.data;
+            newWordsMapping = Array(len)
                 .fill(0)
                 .map((_, i) => i);
-            return { newWords, newWordsMapping };
         }
+        return { newWords, newWordsMapping };
     }
 
     private buildTitle(): string {
         // See report/components/Title.tsx
 
-        if (this.config.platform === "discord") {
-            if (this.guilds.size === 1) {
-                const guild = this.guilds.data[0];
-
-                if (guild.name === "Direct Messages") {
-                    if (this.channels.size === 1) {
-                        return this.channels.data[0].name;
-                    } else {
-                        const allDMs = this.channels.data.every((c) => c.type === "dm");
-                        const allGroups = this.channels.data.every((c) => c.type === "group");
-
-                        if (allDMs) {
-                            return "Discord DMs";
-                        } else if (allGroups) {
-                            return "Discord Groups";
-                        } else {
-                            return "Discord Chats";
-                        }
-                    }
-                } else {
-                    return guild.name;
-                }
-            } else {
-                const hasDMs = this.guilds.data.some((g) => g.name === "Direct Messages");
-
-                return hasDMs ? "Discord Servers and DMs" : "Discord Servers";
-            }
-        } else {
+        if (this.config.platform !== "discord") {
             // We assume there is always only one guild.
-
-            if (this.channels.size === 1) {
-                return this.channels.data[0].name;
-            } else {
-                return this.guilds.data[0].name;
-            }
+            if (this.channels.size === 1) return this.channels.data[0].name;
+            return this.guilds.data[0].name;
         }
-
-        return "Chats";
+        if (this.guilds.size > 1) {
+            if (this.guilds.data.some((g) => g.name === "Direct Messages")) {
+                return "Discord Servers and DMs"
+            }
+            return "Discord Servers";
+        }
+        const guild = this.guilds.data[0];
+        if (guild.name !== "Direct Messages") return guild.name;
+        if (this.channels.size === 1) return this.channels.data[0].name;
+        if (this.channels.data.every((c) => c.type === "dm")) return "Discord DMs";
+        if (this.channels.data.every((c) => c.type === "group")) return "Discord Groups";
+        return "Discord Chats";
     }
 }
