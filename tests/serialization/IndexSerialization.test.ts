@@ -1,7 +1,6 @@
-import { Index, Message } from "@pipeline/Types";
+import { Index } from "@pipeline/Types";
 import { BitStream } from "@pipeline/serialization/BitStream";
 import { readIndexArray, writeIndexArray } from "@pipeline/serialization/IndexSerialization";
-import { MessageBitConfig, readMessage, writeMessage } from "@pipeline/serialization/MessageSerialization";
 
 describe("index serialization", () => {
     // prettier-ignore
@@ -38,83 +37,22 @@ describe("index serialization", () => {
         for (const idx in counts1) expect(counts1[idx]).toStrictEqual(counts2[idx]);
     }
 
-    test.each(cases)("should read and write correctly $case", (t) => {
+    it.each(cases)("should read and write correctly $case", (t) => {
         const got = processArr(t.case);
         equivalent(got, t.case);
     });
 
-    test("should overflow total with serial encoding", () => {
+    it("should overflow total with serial encoding", () => {
         const got = processArr(new Array(20000).fill([0, 1]));
         // some must be lost
         expect(got.length).toBeGreaterThan(0);
         expect(got.length).toBeLessThan(20000);
     });
 
-    test("should overflow length with RLE", () => {
+    it("should overflow length with RLE", () => {
         const got = processArr(new Array(500).fill([0, 65000]));
         // some must be lost
         expect(got.length).toBeGreaterThan(0);
         expect(got.length).toBeLessThan(500);
-    });
-});
-
-describe("obj -> (serialize) -> (deserialize) -> obj", () => {
-    let obj: Message;
-
-    const cases: Message[] = [
-        {
-            day: 123,
-            secondOfDay: 4,
-            authorIndex: 5,
-            langIndex: 6,
-            sentiment: 7,
-        },
-        {
-            day: 123,
-            secondOfDay: 4,
-            authorIndex: 5,
-            langIndex: 6,
-            sentiment: 7,
-            words: [
-                [8, 9],
-                [10, 11],
-            ],
-        },
-        // prettier-ignore
-        {
-            day: 123,
-            secondOfDay: 4,
-            authorIndex: 5,
-            langIndex: 6,
-            sentiment: 7,
-            words: [[8, 1], [10, 2]],
-            emojis: [[12, 3], [14, 4], [16, 5]],
-            mentions: [[30, 1], [32, 2], [34, 3]],
-            reactions: [[24, 4], [26, 5], [28, 1]],
-            domains: [[36, 2], [38, 3], [40, 4]],
-            attachments: [[0, 5], [1, 1], [2, 2]],
-        },
-    ];
-
-    test.each(cases)("%p", (_obj) => {
-        obj = _obj;
-    });
-
-    const bitConfig: MessageBitConfig = {
-        dayBits: 8,
-        authorIdxBits: 8,
-        wordIdxBits: 8,
-        emojiIdxBits: 8,
-        mentionsIdxBits: 8,
-        domainsIdxBits: 8,
-    };
-
-    afterEach(() => {
-        const stream = new BitStream();
-        stream.offset = 0;
-        writeMessage(obj, stream, bitConfig);
-        stream.offset = 0;
-        const gotObj = readMessage(stream, bitConfig);
-        expect(gotObj).toStrictEqual(obj);
     });
 });
