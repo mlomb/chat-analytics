@@ -2,7 +2,7 @@ import fs from "fs";
 import path from "path";
 
 import { LoadAssetFn } from "@pipeline/Env";
-import { FileInput } from "@pipeline/File";
+import { FileInput } from "@pipeline/parse/File";
 
 /** Loads a file from disk and wraps it into our file abstraction */
 export const loadFile = (filepath: string): FileInput => {

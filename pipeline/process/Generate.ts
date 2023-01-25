@@ -1,12 +1,8 @@
 import { Env } from "@pipeline/Env";
-import { FileInput } from "@pipeline/File";
 import { Database, ReportConfig } from "@pipeline/Types";
 import { compress } from "@pipeline/compression/Compression";
-import { Parser } from "@pipeline/parse/Parser";
-import { DiscordParser } from "@pipeline/parse/parsers/DiscordParser";
-import { MessengerParser } from "@pipeline/parse/parsers/MessengerParser";
-import { TelegramParser } from "@pipeline/parse/parsers/TelegramParser";
-import { WhatsAppParser } from "@pipeline/parse/parsers/WhatsAppParser";
+import { createParser } from "@pipeline/parse";
+import { FileInput } from "@pipeline/parse/File";
 import { DatabaseBuilder } from "@pipeline/process/DatabaseBuilder";
 
 export const generateDatabase = async (files: FileInput[], config: ReportConfig, env: Env): Promise<Database> => {
@@ -16,28 +12,16 @@ export const generateDatabase = async (files: FileInput[], config: ReportConfig,
     // load data needed for processing
     await builder.init();
 
-    // create parser
-    let parser: Parser | null = null;
-    switch (config.platform) {
-        case "discord":
-            parser = new DiscordParser(builder);
-            break;
-        case "messenger":
-            parser = new MessengerParser(builder);
-            break;
-        case "whatsapp":
-            parser = new WhatsAppParser(builder);
-            break;
-        case "telegram":
-            parser = new TelegramParser(builder);
-            break;
-        default:
-            throw new Error(`Unknown platform: ${config.platform}`);
-    }
+    const parser = createParser(config.platform);
+
+    parser.on("guild", (at, guild) => console.log("at", at, "guild", guild));
+    parser.on("channel", (at, channel) => console.log("at", at, "channel", channel));
+    parser.on("author", (at, author) => console.log("at", at, "author", author));
+    parser.on("message", (at, message) => console.log("at", at, "message", message));
 
     // parse and process all files
     let processed = 0;
-    for (const file of parser.sortFiles(files)) {
+    for (const file of files) {
         env.progress?.new("Processing", file.name);
         try {
             for await (const _ of parser.parse(file)) builder.process();
@@ -54,9 +38,6 @@ export const generateDatabase = async (files: FileInput[], config: ReportConfig,
         env.progress?.done();
         env.progress?.stat("processed_files", ++processed);
     }
-
-    // no longer needed
-    parser = null;
 
     return builder.getDatabase();
 };

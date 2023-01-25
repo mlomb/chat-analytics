@@ -1,17 +1,34 @@
-import { FileInput } from "@pipeline/File";
-import { DatabaseBuilder } from "@pipeline/process/DatabaseBuilder";
+import { EventEmitter } from "events";
 
-export abstract class Parser {
-    constructor(protected readonly builder: DatabaseBuilder) {}
+import { Timestamp } from "@pipeline/Types";
+import { FileInput } from "@pipeline/parse/File";
+import { PAuthor, PChannel, PGuild, PMessage } from "@pipeline/parse/Types";
 
-    // Since we want to read messages from past to present,
-    // we might need to sort the files in the correct order
-    sortFiles(files: FileInput[]): FileInput[] {
-        // no sorting by default
-        return files;
-    }
+// prettier-ignore
+export declare interface Parser {
+    // The `at` parameter represents how up-to-date the information is.
+    // For example, the timestamp when the export file was generated.
+    // For clarification, in messages it is NOT the timestamp of when the message was *sent*!
+    // This allows up to keep the most up to date information (last nickname, avatar, etc)
+    // If you don't have this information, just omit the parameter.
 
-    // NOTE: should yield every so often to process messages
-    // for example, every few MBs or hundreds of messages
+    emit(event: "guild",   guild: PGuild,     at?: Timestamp): boolean;
+    emit(event: "channel", channel: PChannel, at?: Timestamp): boolean;
+    emit(event: "author",  author: PAuthor,   at?: Timestamp): boolean;
+    emit(event: "message", message: PMessage, at?: Timestamp): boolean;
+
+    on(event: "guild",   listener: (guild: PGuild,     at?: Timestamp) => void): this;
+    on(event: "channel", listener: (channel: PChannel, at?: Timestamp) => void): this;
+    on(event: "author",  listener: (author: PAuthor,   at?: Timestamp) => void): this;
+    on(event: "message", listener: (message: PMessage, at?: Timestamp) => void): this;
+}
+
+export abstract class Parser extends EventEmitter {
+    /**
+     * Parses the given input file. It should emit events with the parsed data.
+     *
+     * Note that this function should yield every so often (e.g. every few MBs or hundreds of messages)
+     * to process messages and report progress back to the UI.
+     */
     abstract parse(file: FileInput): AsyncGenerator<void>;
 }

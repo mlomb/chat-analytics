@@ -1,16 +1,12 @@
-import { FileInput, getAttachmentTypeFromFileName, streamJSONFromFile } from "@pipeline/File";
-import { AttachmentType, Author, ChannelType, Index } from "@pipeline/Types";
+import { ChannelType, RawID } from "@pipeline/Types";
+import { FileInput, streamJSONFromFile } from "@pipeline/parse/File";
 import { JSONStream } from "@pipeline/parse/JSONStream";
 import { Parser } from "@pipeline/parse/Parser";
+import { PAuthor } from "@pipeline/parse/Types";
 
 export class DiscordParser extends Parser {
-    private lastGuildIndex?: Index;
-    private lastChannelIndex?: Index;
-
-    sortFiles(files: FileInput[]): FileInput[] {
-        // we always keep the most recent information last (since the export is overwriting)
-        return files.sort((a, b) => (a.lastModified || 0) - (b.lastModified || 0));
-    }
+    private lastGuildId?: RawID;
+    private lastChannelId?: RawID;
 
     async *parse(file: FileInput) {
         const stream = new JSONStream()
@@ -19,9 +15,6 @@ export class DiscordParser extends Parser {
             .onArrayItem<DiscordMessage>("messages", this.parseMessage.bind(this));
 
         yield* streamJSONFromFile(stream, file);
-
-        this.lastChannelIndex = undefined;
-        this.lastGuildIndex = undefined;
     }
 
     private parseGuild(guild: DiscordGuild) {
@@ -33,38 +26,43 @@ export class DiscordParser extends Parser {
             iconUrl = undefined;
         }
 
-        this.lastGuildIndex = this.builder.addGuild(guild.id, { name: guild.name, iconUrl });
+        this.emit("guild", { id: guild.id, name: guild.name, iconUrl });
+        this.lastGuildId = guild.id;
     }
 
     private parseChannel(channel: DiscordChannel) {
-        if (this.lastGuildIndex === undefined) throw new Error("Missing guild ID");
+        if (this.lastGuildId === undefined) throw new Error("Missing guild ID");
 
         let type: ChannelType = "text";
 
         if (channel.type == "DirectTextChat") type = "dm";
         else if (channel.type == "DirectGroupTextChat") type = "group";
 
-        this.lastChannelIndex = this.builder.addChannel(channel.id, {
+        this.emit("channel", {
+            id: channel.id,
+            guildId: this.lastGuildId,
             name: channel.name,
-            guildIndex: this.lastGuildIndex,
             type,
-            discordId: channel.id,
+            //discordId: channel.id,
         });
+        this.lastChannelId = channel.id;
     }
 
     private parseMessage(message: DiscordMessage) {
-        if (this.lastChannelIndex === undefined) throw new Error("Missing channel ID");
+        if (this.lastChannelId === undefined) throw new Error("Missing channel ID");
 
         const timestamp = Date.parse(message.timestamp);
         const timestampEdit = message.timestampEdited ? Date.parse(message.timestampEdited) : undefined;
 
         const name = message.author.nickname || message.author.name;
         const isDeletedUser = message.author.nickname == "Deleted User";
-        const author: Author = {
-            n: name + (isDeletedUser ? " #" + message.author.id : ""),
-            d: isDeletedUser ? undefined : parseInt(message.author.discriminator),
+        const author: PAuthor = {
+            id: message.author.id,
+            name: name + (isDeletedUser ? " #" + message.author.id : ""),
+            bot: false,
+            // d: isDeletedUser ? undefined : parseInt(message.author.discriminator),
         };
-        if (message.author.isBot) author.b = true;
+        if (message.author.isBot) author.bot = true;
 
         // See: https://discord.com/developers/docs/reference#image-formatting-cdn-endpoints
         // Can be:
@@ -73,12 +71,12 @@ export class DiscordParser extends Parser {
         const hasAvatar = message.author.avatarUrl && message.author.avatarUrl.length > 50;
         if (hasAvatar) {
             const avatar = message.author.avatarUrl.slice(35).split(".")[0];
-            author.da = (" " + avatar).substring(1); // avoid leak
+            //author.da = (" " + avatar).substring(1); // avoid leak
         }
 
         // :)
         if (message.type == "Default" || message.type == "Reply") {
-            const authorIndex = this.builder.addAuthor(message.author.id, author);
+            this.emit("author", author);
 
             let content = message.content;
             for (const mention of message.mentions) {
@@ -91,14 +89,14 @@ export class DiscordParser extends Parser {
             // stickers may be undefined if the export was before stickers were added to DCE
             const stickers = message.stickers || [];
 
-            this.builder.addMessage({
+            this.emit("message", {
                 id: message.id,
-                replyTo: message.reference?.messageId,
-                authorIndex,
-                channelIndex: this.lastChannelIndex,
+                //replyTo: message.reference?.messageId,
+                authorId: message.author.id,
+                channelId: this.lastChannelId,
                 timestamp,
-                timestampEdit,
-                content: content.length > 0 ? content : undefined,
+                textContent: content.length > 0 ? content : undefined,
+                /*timestampEdit,
                 attachments: message.attachments
                     .map((a) => getAttachmentTypeFromFileName(a.fileName))
                     .concat(stickers.map((_) => AttachmentType.Sticker)),
@@ -109,6 +107,7 @@ export class DiscordParser extends Parser {
                     },
                     r.count,
                 ]),
+                */
             });
         }
     }
