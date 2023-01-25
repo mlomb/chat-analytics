@@ -553,12 +553,14 @@ export class DatabaseBuilder {
             if (this.channels.size === 1) return this.channels.data[0].name;
             return this.guilds.data[0].name;
         }
+
         if (this.guilds.size > 1) {
             if (this.guilds.data.some((g) => g.name === "Direct Messages")) {
                 return "Discord Servers and DMs";
             }
             return "Discord Servers";
         }
+
         const guild = this.guilds.data[0];
         if (guild.name !== "Direct Messages") return guild.name;
         if (this.channels.size === 1) return this.channels.data[0].name;
