@@ -16,6 +16,8 @@ A small but relevant part is:
 
 ## Developing
 
+See [DEV.md](./DEV.md) for development instructions and guidelines.
+
 ## About the demo
 
 The [demo](https://chatanalytics.app/demo) is an export from the [DefleMask](https://www.deflemask.com) server which is from a friend of mine who gave me permission to use it as a demo. The input files are stored in a Google Drive zip and later downloaded [during CI](/.github/workflows/cicd.yml) to build the demo HTML automatically using the CLI (with `--demo`). It is updated manually by me using (we may want to move to a periodic workflow eventually):
