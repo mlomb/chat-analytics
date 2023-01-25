@@ -27,3 +27,8 @@ For easier development, you can run the following command to run tests after fil
 ```sh
 npm run test:watch
 ```
+
+## Where to put tests?
+
+The following is not a strict rule, but we try to keep the test files in a similar directory structure to the source files.
+Tests should exclusively be inside the `tests/` folder.

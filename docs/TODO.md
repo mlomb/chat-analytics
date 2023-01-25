@@ -1,6 +1,6 @@
 # TO-DO
 
-Things pending or ideas. Don't expect them soon.
+Things pending or ideas. Don't expect them soon. This is not a roadmap.
 
 ### Report generation
 
