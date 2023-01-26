@@ -1,7 +1,8 @@
 import { WebEnv, wrapFile } from "@app/WebEnv";
 import { ProgressStats, ProgressTask } from "@pipeline/Progress";
 import { ReportConfig } from "@pipeline/Types";
-import { generateDatabase, generateReport } from "@pipeline/process/Generate";
+import { generateDatabase } from "@pipeline/index";
+import { generateReport } from "@pipeline/process/Generate";
 
 /** Message sent by the UI to start the generation process */
 export interface InitMessage {
@@ -61,7 +62,8 @@ self.onmessage = async (ev: MessageEvent<InitMessage>) => {
             html: result.html,
             title: database.title,
             counts: {
-                messages: Object.values(database.channels).reduce((acc, ch) => acc + (ch.msgCount ?? 0), 0),
+                //messages: Object.values(database.channels).reduce((acc, ch) => acc + (ch.msgCount ?? 0), 0),
+                messages: 0,
                 authors: database.authors.length,
                 channels: database.channels.length,
                 guilds: database.guilds.length,

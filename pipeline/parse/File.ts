@@ -24,6 +24,7 @@ export const wrapStringAsFile = (content: string): FileInput => {
 // This value has been hand picked
 const JSON_CHUNK_SIZE = 1024 * 1024 * 2; // 2MB
 
+/** Streams a file into a JSONStream in 2MB chunks, optionally providing progress */
 export const streamJSONFromFile = async function* (
     stream: JSONStream,
     file: FileInput,
