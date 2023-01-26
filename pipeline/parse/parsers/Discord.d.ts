@@ -1,7 +1,5 @@
-/*
-    Types for chat dumps from https://github.com/Tyrrrz/DiscordChatExporter
-    See https://github.com/Tyrrrz/DiscordChatExporter/blob/master/DiscordChatExporter.Core/Exporting/Writers/JsonMessageWriter.cs
-*/
+// Types for chat dumps from https://github.com/Tyrrrz/DiscordChatExporter
+// See https://github.com/Tyrrrz/DiscordChatExporter/blob/master/DiscordChatExporter.Core/Exporting/Writers/JsonMessageWriter.cs
 
 type Snowflake = string;
 
