@@ -10,7 +10,9 @@ import { Database } from "./process/Types";
 export const generateDatabase = async (files: FileInput[], config: ReportConfig, env: Env): Promise<Database> => {
     const parser = createParser(config.platform);
 
-    const processor = new Processor(parser);
+    const processor = new Processor(parser, config, env);
+
+    await processor.init();
 
     for (const file of files) {
         for await (const _ of parser.parse(file)) processor.process();

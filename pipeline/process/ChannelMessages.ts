@@ -119,7 +119,7 @@ export class MessagesInterval {
      * @param isClosed if true, the interval is considered closed and it won't wait for new messages
      */
     process(fn: ProcessGroupFn, isClosed: boolean) {
-        this.messages.push(...fn(this.messageQueue));
+        this.messages.push(...this.messageQueue.map((m) => fn([m])).flat());
         this.messageQueue = [];
     }
 

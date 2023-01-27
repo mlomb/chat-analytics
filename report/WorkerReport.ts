@@ -1,10 +1,11 @@
 import { matchFormat } from "@pipeline/Text";
 import { DateKey, Day, genTimeKeys } from "@pipeline/Time";
-import { FormatCache, Index } from "@pipeline/Types";
+import { Index } from "@pipeline/Types";
 import { BlockDescriptions, BlockInfo, BlockKey, Blocks, CommonBlockData } from "@pipeline/aggregate/Blocks";
 import { Filters } from "@pipeline/aggregate/Filters";
 import { decompress } from "@pipeline/compression/Compression";
 import { Database } from "@pipeline/process/Types";
+import { FormatCache } from "@report/DataProvider";
 
 export interface InitMessage {
     type: "init";

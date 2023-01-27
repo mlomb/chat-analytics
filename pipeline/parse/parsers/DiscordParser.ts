@@ -1,3 +1,4 @@
+import { AttachmentType, getAttachmentTypeFromFileName } from "@pipeline/Attachments";
 import { ChannelType, RawID } from "@pipeline/Types";
 import { FileInput, streamJSONFromFile } from "@pipeline/parse/File";
 import { JSONStream } from "@pipeline/parse/JSONStream";
@@ -91,12 +92,13 @@ export class DiscordParser extends Parser {
 
             this.emit("message", {
                 id: message.id,
-                //replyTo: message.reference?.messageId,
                 authorId: message.author.id,
                 channelId: this.lastChannelId,
                 timestamp,
+                timestampEdit,
+                replyTo: message.reference?.messageId,
+
                 textContent: content.length > 0 ? content : undefined,
-                /*timestampEdit,
                 attachments: message.attachments
                     .map((a) => getAttachmentTypeFromFileName(a.fileName))
                     .concat(stickers.map((_) => AttachmentType.Sticker)),
@@ -107,7 +109,6 @@ export class DiscordParser extends Parser {
                     },
                     r.count,
                 ]),
-                */
             });
         }
     }

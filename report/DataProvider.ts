@@ -1,10 +1,19 @@
 import EventEmitter from "events";
 
 import { Day } from "@pipeline/Time";
-import { FormatCache, Index } from "@pipeline/Types";
+import { Index } from "@pipeline/Types";
 import { BlockDescriptions, BlockInfo, BlockKey, BlockTrigger } from "@pipeline/aggregate/Blocks";
 import { Database } from "@pipeline/process/Types";
 import { BlockRequestMessage, BlockResultMessage, InitMessage, ReadyMessage } from "@report/WorkerReport";
+
+// used in the UI to cache the format of common objects (mostly for searching)
+export interface FormatCache {
+    authors: string[];
+    channels: string[];
+    words: string[];
+    emojis: string[];
+    mentions: string[];
+}
 
 export declare interface DataProvider {
     emit<K extends BlockKey>(event: K, info: BlockInfo<K>): boolean;

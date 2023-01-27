@@ -1,4 +1,6 @@
-import { RawID } from "@pipeline/Types";
+import { Env } from "@pipeline/Env";
+import { genTimeKeys } from "@pipeline/Time";
+import { RawID, ReportConfig } from "@pipeline/Types";
 import { Parser } from "@pipeline/parse/Parser";
 import { PAuthor, PChannel, PGuild } from "@pipeline/parse/Types";
 import { ChannelMessages, ProcessGroupFn } from "@pipeline/process/ChannelMessages";
@@ -7,23 +9,27 @@ import { MessageProcessor } from "@pipeline/process/MessageProcessor";
 import { Database } from "@pipeline/process/Types";
 
 export class Processor {
-    private guilds = new IndexedData<PGuild>();
-    private channels = new IndexedData<PChannel>();
-    private authors = new IndexedData<PAuthor>();
+    private guilds = new IndexedData<RawID, PGuild>();
+    private channels = new IndexedData<RawID, PChannel>();
+    private authors = new IndexedData<RawID, PAuthor>();
 
     private messagesInChannel = new Map<RawID, ChannelMessages>();
 
     private messageProcessor = new MessageProcessor();
 
-    constructor(parser: Parser) {
-        parser.on("guild", (guild, at) => this.guilds.store(guild, at));
-        parser.on("channel", (channel, at) => this.channels.store(channel, at));
-        parser.on("author", (author, at) => this.authors.store(author, at));
+    constructor(parser: Parser, private readonly config: ReportConfig, private readonly env: Env) {
+        parser.on("guild", (guild, at) => this.guilds.store(guild.id, guild, at));
+        parser.on("channel", (channel, at) => this.channels.store(channel.id, channel, at));
+        parser.on("author", (author, at) => this.authors.store(author.id, author, at));
         parser.on("message", (message, at) => {
             if (!this.messagesInChannel.has(message.channelId))
                 this.messagesInChannel.set(message.channelId, new ChannelMessages());
             this.messagesInChannel.get(message.channelId)!.addMessage(message);
         });
+    }
+
+    async init() {
+        await this.messageProcessor.init(this.env);
     }
 
     process() {
@@ -48,6 +54,11 @@ export class Processor {
     getDatabase(): Database {
         console.log(this.messagesInChannel);
 
+        const { dateKeys, monthKeys, yearKeys } = genTimeKeys(
+            this.messageProcessor.minDate!,
+            this.messageProcessor.maxDate!
+        );
+
         for (const mc of this.messagesInChannel.values()) {
             for (const msg of mc.processedMessages()) {
                 console.log(msg);
@@ -55,17 +66,15 @@ export class Processor {
         }
 
         return {
-            config: {
-                platform: "whatsapp",
-            },
+            config: this.config,
             title: "Chats",
 
             time: {
-                minDate: "2020-01-01",
-                maxDate: "2020-01-02",
-                numDays: 1,
-                numMonths: 1,
-                numYears: 1,
+                minDate: this.messageProcessor.minDate!.dateKey,
+                maxDate: this.messageProcessor.maxDate!.dateKey,
+                numDays: dateKeys.length,
+                numMonths: monthKeys.length,
+                numYears: yearKeys.length,
             },
 
             guilds: this.guilds.data,
@@ -73,10 +82,10 @@ export class Processor {
             authors: this.authors.data.map((a) => ({ n: a.name })),
             messages: new Uint8Array(0),
 
-            words: [],
-            emojis: [],
-            mentions: [],
-            domains: [],
+            words: this.messageProcessor.words.data,
+            emojis: this.messageProcessor.emojis.data,
+            mentions: this.messageProcessor.mentions.data,
+            domains: this.messageProcessor.domains.data,
 
             serialized: new Uint8Array(0),
             authorsOrder: this.authors.data.map((a, i) => i),

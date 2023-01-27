@@ -1,9 +1,11 @@
+import { AttachmentType } from "@pipeline/Attachments";
 import { DateKey } from "@pipeline/Time";
-import { AttachmentType, BitAddress, ChannelType, Emoji, Index, RawID, ReportConfig } from "@pipeline/Types";
+import { BitAddress, ChannelType, Emoji, Index, RawID, ReportConfig } from "@pipeline/Types";
 import { PMessage } from "@pipeline/parse/Types";
 import { MessageBitConfig } from "@pipeline/serialization/MessageSerialization";
 
-export type IMessage = PMessage;
+// TODO: we want to cange all this interfaces
+// we are keeping they this way for now to avoid breaking the UI
 
 export interface Database {
     config: ReportConfig;
@@ -13,7 +15,7 @@ export interface Database {
         minDate: DateKey;
         maxDate: DateKey;
 
-        // useful to know bucket sizes
+        // useful to know bucket sizes in advance
         numDays: number;
         numMonths: number;
         numYears: number;
@@ -29,7 +31,7 @@ export interface Database {
     mentions: string[];
     domains: string[];
 
-    // we want to eventually remove the following fields
+    // eventually we want to remove the following fields
     authorsOrder: number[];
     authorsBotCutoff: number;
     bitConfig: MessageBitConfig;
@@ -84,3 +86,5 @@ export interface Message {
 export interface FullMessage extends Message {
     channelIndex: Index;
 }
+
+export type IMessage = Message;

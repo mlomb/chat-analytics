@@ -1,4 +1,5 @@
-import { ChannelType, RawID, Timestamp } from "@pipeline/Types";
+import { AttachmentType } from "@pipeline/Attachments";
+import { ChannelType, Emoji, RawID, Timestamp } from "@pipeline/Types";
 
 // The following interfaces are emitted by the parsers
 // They should be general enough to support all possible chat platforms
@@ -32,17 +33,10 @@ export interface PMessage {
     authorId: RawID;
     channelId: RawID;
     timestamp: Timestamp;
-    textContent?: string;
-
-    /*
-    id: RawID;
-    replyTo?: RawID;
-    authorIndex: Index;
-    channelIndex: Index;
-    timestamp: Timestamp;
     timestampEdit?: Timestamp;
-    content?: string;
-    attachments: AttachmentType[];
-    reactions: [Emoji, number][];
-    */
+    replyTo?: RawID;
+
+    textContent?: string;
+    attachments?: AttachmentType[];
+    reactions?: [Emoji, number][];
 }

@@ -1,4 +1,4 @@
-import { AttachmentType } from "@pipeline/Types";
+import { AttachmentType } from "@pipeline/Attachments";
 
 const FilenamePatterns = [
     "WhatsApp Chat - ",

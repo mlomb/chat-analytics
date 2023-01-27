@@ -9,17 +9,17 @@ export declare interface Parser {
     // The `at` parameter represents how up-to-date the information is.
     // For example, the timestamp when the export file was generated.
     // For clarification, in messages it is NOT the timestamp of when the message was *sent*!
-    // This allows up to keep the most up to date information (last nickname, avatar, etc)
+    // This allows us to keep the most up to date information (last nickname, avatar, etc)
     // If you don't have this information, just omit the parameter.
 
-    emit(event: "guild",   guild: PGuild,     at?: Timestamp): boolean;
+    emit(event: "guild",   guild:   PGuild,   at?: Timestamp): boolean;
     emit(event: "channel", channel: PChannel, at?: Timestamp): boolean;
-    emit(event: "author",  author: PAuthor,   at?: Timestamp): boolean;
+    emit(event: "author",  author:  PAuthor,  at?: Timestamp): boolean;
     emit(event: "message", message: PMessage, at?: Timestamp): boolean;
 
-    on(event: "guild",   listener: (guild: PGuild,     at?: Timestamp) => void): this;
+    on(event: "guild",   listener: (guild:   PGuild,   at?: Timestamp) => void): this;
     on(event: "channel", listener: (channel: PChannel, at?: Timestamp) => void): this;
-    on(event: "author",  listener: (author: PAuthor,   at?: Timestamp) => void): this;
+    on(event: "author",  listener: (author:  PAuthor,  at?: Timestamp) => void): this;
     on(event: "message", listener: (message: PMessage, at?: Timestamp) => void): this;
 }
 
