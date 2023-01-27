@@ -1,8 +1,7 @@
 import { WebEnv, wrapFile } from "@app/WebEnv";
 import { ProgressStats, ProgressTask } from "@pipeline/Progress";
 import { ReportConfig } from "@pipeline/Types";
-import { generateDatabase } from "@pipeline/index";
-import { generateReport } from "@pipeline/process/Generate";
+import { generateDatabase, generateReport } from "@pipeline/index";
 
 /** Message sent by the UI to start the generation process */
 export interface InitMessage {

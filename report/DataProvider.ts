@@ -1,8 +1,9 @@
 import EventEmitter from "events";
 
 import { Day } from "@pipeline/Time";
-import { Database, FormatCache, Index } from "@pipeline/Types";
+import { FormatCache, Index } from "@pipeline/Types";
 import { BlockDescriptions, BlockInfo, BlockKey, BlockTrigger } from "@pipeline/aggregate/Blocks";
+import { Database } from "@pipeline/process/Types";
 import { BlockRequestMessage, BlockResultMessage, InitMessage, ReadyMessage } from "@report/WorkerReport";
 
 export declare interface DataProvider {

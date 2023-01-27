@@ -1,4 +1,5 @@
-import { BitAddress, FullMessage, Index } from "@pipeline/Types";
+import { BitAddress, Index } from "@pipeline/Types";
+import { FullMessage } from "@pipeline/process/Types";
 import { BitStream } from "@pipeline/serialization/BitStream";
 import { readIndexArray, skipIndexArray } from "@pipeline/serialization/IndexSerialization";
 import { MessageBitConfig, MessageFlags } from "@pipeline/serialization/MessageSerialization";

@@ -1,5 +1,5 @@
-import { FullMessage } from "@pipeline/Types";
 import { InteractionStats } from "@pipeline/aggregate/blocks/InteractionStats";
+import { FullMessage } from "@pipeline/process/Types";
 import { TopMessages } from "@report/components/viz/TopMessages";
 
 const EmptyArray: any[] = [];

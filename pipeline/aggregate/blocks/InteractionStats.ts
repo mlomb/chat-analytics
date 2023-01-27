@@ -1,6 +1,6 @@
-import { FullMessage } from "@pipeline/Types";
 import { BlockDescription, BlockFn } from "@pipeline/aggregate/Blocks";
 import { parseAndFilterMessages } from "@pipeline/aggregate/Helpers";
+import { FullMessage } from "@pipeline/process/Types";
 import { MessageView } from "@pipeline/serialization/MessageView";
 
 export interface InteractionStats {

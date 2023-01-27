@@ -1,5 +1,5 @@
-import { Database } from "@pipeline/Types";
 import { Filters } from "@pipeline/aggregate/Filters";
+import { Database } from "@pipeline/process/Types";
 import { BitStream } from "@pipeline/serialization/BitStream";
 import { MessageView } from "@pipeline/serialization/MessageView";
 
