@@ -1,4 +1,12 @@
-import { AttachmentType } from "@pipeline/Types";
+export enum AttachmentType {
+    Image,
+    ImageAnimated, // (GIFs)
+    Video,
+    Sticker,
+    Audio,
+    Document,
+    Other,
+}
 
 const ATTACHMENT_EXTS: {
     [key in AttachmentType]?: string[];

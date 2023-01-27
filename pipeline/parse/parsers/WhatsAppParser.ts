@@ -2,7 +2,7 @@ import { unzipSync } from "fflate";
 // There is a convenient parser already out there
 import { parseStringSync } from "whatsapp-chat-parser";
 
-import { AttachmentType } from "@pipeline/Types";
+import { AttachmentType } from "@pipeline/Attachments";
 import { FileInput } from "@pipeline/parse/File";
 import { Parser } from "@pipeline/parse/Parser";
 import { extractChatName, isGroupWelcome, matchAttachmentType, removeBadChars } from "@pipeline/parse/parsers/WhatsApp";
@@ -98,10 +98,7 @@ export class WhatsAppParser extends Parser {
                     channelId: this.channelIndex,
                     timestamp,
                     textContent: attachment === undefined ? messageContent : undefined,
-                    /*
                     attachments: attachment === undefined ? [] : [attachment],
-                    reactions: [],
-                    */
                 });
             }
         }
