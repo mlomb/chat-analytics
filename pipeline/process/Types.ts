@@ -1,7 +1,6 @@
 import { AttachmentType } from "@pipeline/Attachments";
 import { DateKey } from "@pipeline/Time";
 import { BitAddress, ChannelType, Emoji, Index, RawID, ReportConfig } from "@pipeline/Types";
-import { PMessage } from "@pipeline/parse/Types";
 import { MessageBitConfig } from "@pipeline/serialization/MessageSerialization";
 
 // TODO: we want to cange all this interfaces
