@@ -1,4 +1,4 @@
-import { Message } from "@pipeline/Types";
+import { Message } from "@pipeline/process/Types";
 import { BitStream } from "@pipeline/serialization/BitStream";
 import { readIndexArray, writeIndexArray } from "@pipeline/serialization/IndexSerialization";
 

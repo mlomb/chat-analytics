@@ -1,7 +1,8 @@
 import { CSSProperties, useCallback, useLayoutEffect, useMemo, useState } from "react";
 
 import { matchFormat } from "@pipeline/Text";
-import { Database, Index } from "@pipeline/Types";
+import { Index } from "@pipeline/Types";
+import { Database } from "@pipeline/process/Types";
 import { useDataProvider } from "@report/DataProvider";
 import { Section } from "@report/ReportPage";
 import FilterSelect, { FilterOption } from "@report/components/FilterSelect";

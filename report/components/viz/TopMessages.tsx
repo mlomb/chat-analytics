@@ -1,4 +1,4 @@
-import { FullMessage } from "@pipeline/Types";
+import { FullMessage } from "@pipeline/process/Types";
 import { MessageLabel } from "@report/components/core/MessageLabel";
 
 import "@assets/styles/TopMessages.less";

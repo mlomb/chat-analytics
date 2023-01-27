@@ -33,4 +33,16 @@ export interface PMessage {
     channelId: RawID;
     timestamp: Timestamp;
     textContent?: string;
+
+    /*
+    id: RawID;
+    replyTo?: RawID;
+    authorIndex: Index;
+    channelIndex: Index;
+    timestamp: Timestamp;
+    timestampEdit?: Timestamp;
+    content?: string;
+    attachments: AttachmentType[];
+    reactions: [Emoji, number][];
+    */
 }

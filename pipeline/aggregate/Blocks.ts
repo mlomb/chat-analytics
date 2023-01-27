@@ -1,5 +1,5 @@
 import { TimeKeysResult } from "@pipeline/Time";
-import { Database, Index } from "@pipeline/Types";
+import { Index } from "@pipeline/Types";
 import { Filters } from "@pipeline/aggregate/Filters";
 // register blocks
 import ActiveAuthors from "@pipeline/aggregate/blocks/ActiveAuthors";
@@ -13,6 +13,7 @@ import MessagesPerCycle from "@pipeline/aggregate/blocks/MessagesPerCycle";
 import MessagesStats from "@pipeline/aggregate/blocks/MessagesStats";
 import SentimentPerCycle from "@pipeline/aggregate/blocks/SentimentPerCycle";
 import SentimentStats from "@pipeline/aggregate/blocks/SentimentStats";
+import { Database } from "@pipeline/process/Types";
 
 // this is data used by multiple blocks and can be computed only once
 export interface CommonBlockData {

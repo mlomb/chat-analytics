@@ -1,5 +1,6 @@
 import { Day, formatTime } from "@pipeline/Time";
-import { AttachmentType, FullMessage } from "@pipeline/Types";
+import { AttachmentType } from "@pipeline/Types";
+import { FullMessage } from "@pipeline/process/Types";
 import { useDataProvider } from "@report/DataProvider";
 import { Tooltip } from "@report/components/core/Tooltip";
 import { AuthorLabel } from "@report/components/core/labels/AuthorLabel";

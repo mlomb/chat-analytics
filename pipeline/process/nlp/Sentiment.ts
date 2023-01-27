@@ -4,8 +4,8 @@ import { LanguageCodes } from "@pipeline/Languages";
 import { Progress } from "@pipeline/Progress";
 import { normalizeText } from "@pipeline/Text";
 import { Index } from "@pipeline/Types";
-import { Emojis } from "@pipeline/process/Emojis";
-import { Token, tokenize } from "@pipeline/process/Tokenizer";
+import { Emojis } from "@pipeline/process/nlp/Emojis";
+import { Token, tokenize } from "@pipeline/process/nlp/Tokenizer";
 
 export class Sentiment {
     private readonly langs: {

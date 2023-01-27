@@ -24,6 +24,7 @@ only left boundary
 |- delta -|--- bits ---|
 */
 export class BitStream {
+    // TODO: we should rename offset to length and this.buffer.length to capacity to be consistent with the std
     public buffer: Uint32Array;
     public offset: BitAddress;
 

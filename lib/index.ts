@@ -1,1 +1,1 @@
-export * from "@pipeline/process/Generate";
+export * from "@pipeline/index";

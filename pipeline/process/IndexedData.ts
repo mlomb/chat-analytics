@@ -1,42 +1,29 @@
-import { Index } from "@pipeline/Types";
+import { Index, RawID, Timestamp } from "@pipeline/Types";
 
-export class IndexedData<K extends string | number, T> {
-    private nextIndex: Index = 0;
+/**
+ * This class is responsible to keep the most up-to-date information about a given entry.
+ */
+export class IndexedData<T extends { id: RawID }> {
     private array: T[] = [];
-    private mappings: Map<K, Index> = new Map();
+    private index = new Map<RawID, Index>();
+
+    /** Stores an entry. If an entry with the same ID already exists, it will keep the one with highest `at` value */
+    store(value: T, at?: Timestamp) {
+        // TODO: use at...
+
+        let idx = this.index.get(value.id);
+        if (idx === undefined) {
+            idx = this.array.length;
+            this.index.set(value.id, idx);
+        }
+        this.array[idx] = value;
+    }
 
     get data(): T[] {
         return this.array;
     }
 
     get size(): number {
-        return this.nextIndex;
-    }
-
-    public has(key: K): boolean {
-        return this.mappings.has(key);
-    }
-
-    public get(index: Index): T {
-        return this.array[index];
-    }
-
-    public getIndex(key: K): Index | undefined {
-        return this.mappings.get(key);
-    }
-
-    // the key must not already exist
-    public set(key: K, value: T): Index {
-        // TODO: remove this check
-        console.assert(!this.has(key));
-
-        const index = this.nextIndex++;
-        this.array[index] = value;
-        this.mappings.set(key, index);
-        return index;
-    }
-
-    public setAt(index: Index, value: T) {
-        this.array[index] = value;
+        return this.index.size;
     }
 }
