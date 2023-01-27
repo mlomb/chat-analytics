@@ -4,7 +4,7 @@ import { matchFormat, normalizeText } from "@pipeline/Text";
 import { Day } from "@pipeline/Time";
 import { Emoji, Index } from "@pipeline/Types";
 import { PMessageGroup } from "@pipeline/process/ChannelMessages";
-import { IndexedData } from "@pipeline/process/IndexedData";
+import { IndexedMap } from "@pipeline/process/IndexedMap";
 import { IMessage } from "@pipeline/process/Types";
 import { Emojis, EmojisData } from "@pipeline/process/nlp/Emojis";
 import { FastTextModel, loadFastTextModel } from "@pipeline/process/nlp/FastTextModel";
@@ -19,10 +19,10 @@ import { Token, tokenize } from "@pipeline/process/nlp/Tokenizer";
 export class MessageProcessor {
     constructor() {}
 
-    words = new IndexedData<string, string>();
-    emojis = new IndexedData<string, Emoji>();
-    mentions = new IndexedData<string, string>();
-    domains = new IndexedData<string, string>();
+    words = new IndexedMap<string, string>();
+    emojis = new IndexedMap<string, Emoji>();
+    mentions = new IndexedMap<string, string>();
+    domains = new IndexedMap<string, string>();
 
     minDate: Day | undefined;
     maxDate: Day | undefined;
@@ -138,10 +138,10 @@ export class MessageProcessor {
 
                     let emojiIdx = this.emojis.getIndex(emojiKey);
                     if (emojiIdx === undefined) {
-                        emojiIdx = this.emojis.store(emojiKey, emojiObj);
+                        emojiIdx = this.emojis.set(emojiKey, emojiObj);
                     } else if (this.emojis.getByIndex(emojiIdx)!.id === undefined && reaction[0].id) {
                         // ID is new, replace
-                        this.emojis.store(emojiKey, emojiObj, 999);
+                        this.emojis.set(emojiKey, emojiObj, 999);
                     }
                     reactionsCount[emojiIdx] = (reactionsCount[emojiIdx] || 0) + reaction[1];
                 }
@@ -159,7 +159,7 @@ export class MessageProcessor {
                         // only keep words between [2, 30] chars and no stopwords
                         if (text.length > 1 && text.length <= 30 && !this.stopwords.has(wordKey)) {
                             let wordIdx = this.words.getIndex(wordKey);
-                            if (wordIdx === undefined) wordIdx = this.words.store(wordKey, text);
+                            if (wordIdx === undefined) wordIdx = this.words.set(wordKey, text);
                             wordsCount[wordIdx] = (wordsCount[wordIdx] || 0) + 1;
                             this.wordsCount[wordIdx] = (this.wordsCount[wordIdx] || 0) + 1;
                         }
@@ -177,13 +177,13 @@ export class MessageProcessor {
                                     : {
                                           n: text,
                                       };
-                            emojiIdx = this.emojis.store(emojiKey, emojiObj);
+                            emojiIdx = this.emojis.set(emojiKey, emojiObj);
                         }
                         emojisCount[emojiIdx] = (emojisCount[emojiIdx] || 0) + 1;
                     } else if (tag === "mention") {
                         const mentionKey = matchFormat(text);
                         let mentionIdx = this.mentions.getIndex(mentionKey);
-                        if (mentionIdx === undefined) mentionIdx = this.mentions.store(mentionKey, text);
+                        if (mentionIdx === undefined) mentionIdx = this.mentions.set(mentionKey, text);
                         mentionsCount[mentionIdx] = (mentionsCount[mentionIdx] || 0) + 1;
                     } else if (tag === "url") {
                         // TODO: transform URL only messages to attachments
@@ -191,7 +191,7 @@ export class MessageProcessor {
                             const hostname = new URL(text).hostname.toLowerCase();
 
                             let domainIdx = this.domains.getIndex(hostname);
-                            if (domainIdx === undefined) domainIdx = this.domains.store(hostname, hostname);
+                            if (domainIdx === undefined) domainIdx = this.domains.set(hostname, hostname);
 
                             domainsCount[domainIdx] = (domainsCount[domainIdx] || 0) + 1;
                         } catch (ex) {}
