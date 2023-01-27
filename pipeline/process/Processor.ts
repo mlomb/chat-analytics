@@ -4,23 +4,23 @@ import { RawID, ReportConfig } from "@pipeline/Types";
 import { Parser } from "@pipeline/parse/Parser";
 import { PAuthor, PChannel, PGuild } from "@pipeline/parse/Types";
 import { ChannelMessages, ProcessGroupFn } from "@pipeline/process/ChannelMessages";
-import { IndexedData } from "@pipeline/process/IndexedData";
+import { IndexedMap } from "@pipeline/process/IndexedMap";
 import { MessageProcessor } from "@pipeline/process/MessageProcessor";
 import { Database } from "@pipeline/process/Types";
 
 export class Processor {
-    private guilds = new IndexedData<RawID, PGuild>();
-    private channels = new IndexedData<RawID, PChannel>();
-    private authors = new IndexedData<RawID, PAuthor>();
+    private guilds = new IndexedMap<RawID, PGuild>();
+    private channels = new IndexedMap<RawID, PChannel>();
+    private authors = new IndexedMap<RawID, PAuthor>();
 
     private messagesInChannel = new Map<RawID, ChannelMessages>();
 
     private messageProcessor = new MessageProcessor();
 
     constructor(parser: Parser, private readonly config: ReportConfig, private readonly env: Env) {
-        parser.on("guild", (guild, at) => this.guilds.store(guild.id, guild, at));
-        parser.on("channel", (channel, at) => this.channels.store(channel.id, channel, at));
-        parser.on("author", (author, at) => this.authors.store(author.id, author, at));
+        parser.on("guild", (guild, at) => this.guilds.set(guild.id, guild, at));
+        parser.on("channel", (channel, at) => this.channels.set(channel.id, channel, at));
+        parser.on("author", (author, at) => this.authors.set(author.id, author, at));
         parser.on("message", (message, at) => {
             if (!this.messagesInChannel.has(message.channelId))
                 this.messagesInChannel.set(message.channelId, new ChannelMessages());
