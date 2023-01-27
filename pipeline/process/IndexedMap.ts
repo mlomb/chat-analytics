@@ -10,12 +10,12 @@ export class IndexedMap<Key extends string | number, Value> {
     /** Mapping between keys and indexes */
     private index = new Map<Key, { revision: Revision; index: Index }>();
 
-    /** Linear array of values */
+    /** The linear array of values */
     private array: Value[] = [];
 
     /**
      * Stores a value. If a value with the same key already exists, it will keep the one with highest `revision` value.
-     * @returns The index of the value in the array
+     * @returns the index of the value in the array
      */
     set(key: Key, value: Value, revision: Revision = Number.MIN_SAFE_INTEGER): Index {
         let info = this.index.get(key);
@@ -45,7 +45,7 @@ export class IndexedMap<Key extends string | number, Value> {
     }
 
     /** @returns the array containing all values */
-    get data(): Value[] {
+    get values(): Value[] {
         return this.array;
     }
 

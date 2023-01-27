@@ -77,18 +77,18 @@ export class Processor {
                 numYears: yearKeys.length,
             },
 
-            guilds: this.guilds.data,
-            channels: this.channels.data.map((c) => ({ name: c.name, type: c.type, guildIndex: 0 })),
-            authors: this.authors.data.map((a) => ({ n: a.name })),
+            guilds: this.guilds.values,
+            channels: this.channels.values.map((c) => ({ name: c.name, type: c.type, guildIndex: 0 })),
+            authors: this.authors.values.map((a) => ({ n: a.name })),
             messages: new Uint8Array(0),
 
-            words: this.messageProcessor.words.data,
-            emojis: this.messageProcessor.emojis.data,
-            mentions: this.messageProcessor.mentions.data,
-            domains: this.messageProcessor.domains.data,
+            words: this.messageProcessor.words.values,
+            emojis: this.messageProcessor.emojis.values,
+            mentions: this.messageProcessor.mentions.values,
+            domains: this.messageProcessor.domains.values,
 
             serialized: new Uint8Array(0),
-            authorsOrder: this.authors.data.map((a, i) => i),
+            authorsOrder: this.authors.values.map((a, i) => i),
             authorsBotCutoff: this.authors.size - 1,
             bitConfig: {
                 dayBits: 21, // 12 + 4 + 5
