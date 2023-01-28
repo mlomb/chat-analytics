@@ -55,8 +55,7 @@ The output files will be in `dist/`.
 
 ## General things to know
 
-* The code is indented using 4 spaces.
-* JSX should only be used in `app/` and `report/`. In `pipeline/` it is not supported, since it has to be compatible with Node.
 * [Prettier](https://prettier.io) is used to format code. Don't forget to run `npm run format` before committing or enable the "Format on save" option in your editor, configured to use Prettier.
+* JSX should only be used in `app/` and `report/`. In `pipeline/` it is not supported, since it has to be compatible with Node.
 * Do not export the props interface if no one is importing it. If props are not being exported, you should call the props interface just `Props`.
 * (TODO: add more)
