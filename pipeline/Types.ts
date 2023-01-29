@@ -23,13 +23,3 @@ export interface ReportConfig {
     platform: Platform;
     demo?: boolean;
 }
-
-// TODO: refactor
-export interface Emoji {
-    // name ("fire" or "custom_emoji")
-    n: string;
-    // character (🔥)
-    c?: string;
-    // Discord emoji ID (if custom and available)
-    id?: RawID;
-}

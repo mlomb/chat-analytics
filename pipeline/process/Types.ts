@@ -1,9 +1,9 @@
 import { AttachmentType } from "@pipeline/Attachments";
 import { DateKey } from "@pipeline/Time";
-import { BitAddress, ChannelType, Emoji, Index, RawID, ReportConfig } from "@pipeline/Types";
+import { BitAddress, ChannelType, Index, RawID, ReportConfig } from "@pipeline/Types";
 import { MessageBitConfig } from "@pipeline/serialization/MessageSerialization";
 
-// TODO: we want to cange all this interfaces
+// TODO: we want to change all this interfaces
 // we are keeping they this way for now to avoid breaking the UI
 
 export interface Database {
@@ -34,7 +34,6 @@ export interface Database {
     authorsOrder: number[];
     authorsBotCutoff: number;
     bitConfig: MessageBitConfig;
-    serialized?: Uint8Array;
 }
 
 export interface Guild {
@@ -87,3 +86,13 @@ export interface FullMessage extends Message {
 }
 
 export type IMessage = Message;
+
+// change to CustomEmoji | UnicodeEmoji ?
+export interface Emoji {
+    // platform's emoji ID (if custom and available)
+    id?: RawID;
+    // name of the emoji ("fire" or "custom_emoji")
+    name: string;
+    // unicode symbol (e.g. 🔥) (not for custom emojis)
+    symbol?: string;
+}

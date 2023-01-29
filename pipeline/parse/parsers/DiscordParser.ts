@@ -104,8 +104,8 @@ export class DiscordParser extends Parser {
                     .concat(stickers.map((_) => AttachmentType.Sticker)),
                 reactions: message.reactions.map((r) => [
                     {
-                        n: r.emoji.name || r.emoji.id || "unknown",
                         id: r.emoji.id === null ? undefined : r.emoji.id,
+                        name: r.emoji.name || r.emoji.id || "unknown",
                     },
                     r.count,
                 ]),

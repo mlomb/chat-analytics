@@ -1,5 +1,5 @@
 import { AttachmentType } from "@pipeline/Attachments";
-import { ChannelType, Emoji, RawID, Timestamp } from "@pipeline/Types";
+import { ChannelType, RawID, Timestamp } from "@pipeline/Types";
 
 // The following interfaces are emitted by the parsers
 // They should be general enough to support all possible chat platforms
@@ -38,5 +38,11 @@ export interface PMessage {
 
     textContent?: string;
     attachments?: AttachmentType[];
-    reactions?: [Emoji, number][];
+    reactions?: [PEmoji, number][];
+}
+
+/** Emoji interface produced by parsers (for custom emojis) */
+export interface PEmoji {
+    id?: RawID; // if available
+    name: string; // e.g. "pepe", "pepe_sad"
 }
