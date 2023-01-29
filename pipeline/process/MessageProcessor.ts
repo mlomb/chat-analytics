@@ -1,6 +1,5 @@
 import { Env } from "@pipeline/Env";
 import { LanguageCodes } from "@pipeline/Languages";
-import { matchFormat, normalizeText } from "@pipeline/Text";
 import { Day } from "@pipeline/Time";
 import { Emoji, Index } from "@pipeline/Types";
 import { PMessageGroup } from "@pipeline/process/ChannelMessages";
@@ -9,6 +8,7 @@ import { IMessage } from "@pipeline/process/Types";
 import { Emojis, EmojisData } from "@pipeline/process/nlp/Emojis";
 import { FastTextModel, loadFastTextModel } from "@pipeline/process/nlp/FastTextModel";
 import { Sentiment } from "@pipeline/process/nlp/Sentiment";
+import { matchFormat, normalizeText } from "@pipeline/process/nlp/Text";
 import { Token, tokenize } from "@pipeline/process/nlp/Tokenizer";
 
 /**

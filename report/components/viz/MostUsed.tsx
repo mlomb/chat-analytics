@@ -1,7 +1,7 @@
 import { memo, useMemo, useState } from "react";
 
-import { matchFormat } from "@pipeline/Text";
 import { Index } from "@pipeline/Types";
+import { matchFormat } from "@pipeline/process/nlp/Text";
 import SearchInput from "@report/components/core/SearchInput";
 import AnimatedBars, { AnimatedBarEntry } from "@report/components/viz/AnimatedBars";
 

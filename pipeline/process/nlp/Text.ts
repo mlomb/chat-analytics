@@ -1,5 +1,7 @@
 const whitespaceRegex = /\s\s+/g;
+const emojiVariantFormRegex = /[\u{FE0F}\u{FE0E}]/gu;
 
+/** Normalizes the text using `NFKC` and removes other unwanted characters */
 export const normalizeText = (text: string) =>
     text
         // normalize the content using NFKC (we want the compositions)
@@ -9,10 +11,16 @@ export const normalizeText = (text: string) =>
         .replace(whitespaceRegex, " ")
         // remove variant forms from emojis
         // See: https://stackoverflow.com/questions/38100329/what-does-u-ufe0f-in-an-emoji-mean-is-it-the-same-if-i-delete-it
-        .replace(/[\u{FE0F}\u{FE0E}]/gu, "")
+        .replace(emojiVariantFormRegex, "")
         // trim
         .trim();
 
+/**
+ * Mapping between diacritics/symbols and their base characters
+ *
+ * Initial list taken from: https://github.com/JedWatson/react-select/blob/c350a124f8de853a79e0158578d438a35e67e63e/packages/react-select/src/diacritics.ts
+ * Maybe take more from: https://lunicode.com ?
+ */
 const DiacriticsAndSymbols = [
     { base: "A", letters: "AⒶＡÀÁÂẦẤẪẨÃĀĂẰẮẴẲȦǠÄǞẢÅǺǍȀȂẠẬẶḀĄȺⱯ𝐀" },
     { base: "AA", letters: "Ꜳ" },
@@ -100,18 +108,28 @@ const DiacriticsAndSymbols = [
     { base: "z", letters: "zⓩｚźẑżžẓẕƶȥɀⱬꝣ𝐳" },
 ];
 
-let diacriticsAndSymbolsRegex: RegExp;
-let diacriticsAndSymbolsReplacement: { [key: string]: string };
+const diacriticsAndSymbolsRegex = new RegExp("[" + DiacriticsAndSymbols.map((d) => d.letters).join("") + "]", "gu");
 
-diacriticsAndSymbolsRegex = new RegExp("[" + DiacriticsAndSymbols.map((d) => d.letters).join("") + "]", "gu");
-diacriticsAndSymbolsReplacement = {};
+/** Inverse mapping (e.g ⓩ → z) */
+const diacriticsAndSymbolsReplacement: { [key: string]: string } = {};
 for (const entry of DiacriticsAndSymbols) {
     for (const letter of entry.letters) {
         diacriticsAndSymbolsReplacement[letter] = entry.base;
     }
 }
 
-const reMap = (match: string) => diacriticsAndSymbolsReplacement[match];
-export const stripDiacriticsAndSymbols = (text: string) => text.replace(diacriticsAndSymbolsRegex, reMap);
+/**
+ * Replaces diacritics and symbols with their base characters.
+ * e.g. ⓩ → z
+ * e.g. á → a
+ */
+export const stripDiacriticsAndSymbols = (text: string) =>
+    text.replace(diacriticsAndSymbolsRegex, (s) => diacriticsAndSymbolsReplacement[s]);
 
-export const matchFormat = (x: string) => stripDiacriticsAndSymbols(normalizeText(x).toLocaleLowerCase());
+/**
+ * Turns a string into a format that is friendly for matching (for using `includes` or `startsWith`)
+ * Both the search string and all the strings to be matched should be passed through this function.
+ *
+ * Useful for searching in the UI.
+ */
+export const matchFormat = (text: string) => stripDiacriticsAndSymbols(normalizeText(text).toLocaleLowerCase());
