@@ -130,8 +130,8 @@ export const stripDiacriticsAndSymbols = (text: string) =>
 
 /**
  * Turns a string into a format that is friendly for matching (for using `includes` or `startsWith`)
- * Both the search string and all the strings to be matched should be passed through this function.
+ * Both the string to search and all the strings to be matched should be passed through this function.
  *
  * Useful for searching in the UI.
  */
-export const matchFormat = (text: string) => stripDiacriticsAndSymbols(normalizeText(text).toLocaleLowerCase());
+export const matchFormat = (text: string) => stripDiacriticsAndSymbols(normalizeText(text)).toLocaleLowerCase();
