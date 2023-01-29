@@ -85,12 +85,12 @@ const Matchers: Readonly<TokenMatcher[]> = [
 /**
  * Splits the input string using one TokenMatcher into a list of strings and tokens where:
  * - strings are the parts of the input that do not match the matcher (trimmed)
- * - tokens are the parts of the input that match the matcher (@see Token)
+ * - tokens are the parts of the input that do match the matcher (@see Token)
  *
  * For example, if the matcher matches emojis:
  * > "hello world" -> ["hello world"]
  * > "😃" -> [{ ..."😃" }]
- * > "text 😃 text" -> ["text", { ..."😃" }, "text"]
+ * > "notemoji 😃 notemoji" -> ["notemoji", { ..."😃" }, "notemoji"]
  */
 export const splitByToken = (input: string, matcher: TokenMatcher): (string | Token)[] => {
     const result: (string | Token)[] = [];
