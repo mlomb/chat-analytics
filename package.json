@@ -24,7 +24,7 @@
     "stats": "webpack build --env production --profile --json > stats.json",
     "dev": "webpack serve --progress",
     "test": "jest --verbose --coverage",
-    "test:watch": "jest --watchAll",
+    "test:watch": "jest --verbose --watch",
     "format": "prettier --write .",
     "format-check": "prettier --check ."
   },

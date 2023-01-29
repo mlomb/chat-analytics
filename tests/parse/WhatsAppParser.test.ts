@@ -10,8 +10,6 @@ const sample1 = `
 it("sample1 should resolve correctly", async () => {
     const parsed = await runParser(WhatsAppParser, [sample1]);
 
-    console.log(parsed);
-
     // guilds
     expect(parsed.guilds).toHaveLength(1);
     expect(parsed.guilds[0]).toHaveProperty("name", "WhatsApp Chats");

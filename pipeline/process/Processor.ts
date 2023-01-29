@@ -42,13 +42,9 @@ export class Processor {
         }
     }
 
-    /**
-     * MUST be called to indicate that the end of a file has been reached.
-     */
+    /** MUST be called to indicate that the end of an input file has been reached */
     markEOF() {
-        for (const mc of this.messagesInChannel.values()) {
-            mc.markEOF();
-        }
+        for (const channelMessages of this.messagesInChannel.values()) channelMessages.markEOF();
     }
 
     getDatabase(): Database {
@@ -59,11 +55,11 @@ export class Processor {
             this.messageProcessor.maxDate!
         );
 
-        for (const mc of this.messagesInChannel.values()) {
+        /*for (const mc of this.messagesInChannel.values()) {
             for (const msg of mc.processedMessages()) {
                 console.log(msg);
             }
-        }
+        }*/
 
         return {
             config: this.config,
@@ -87,6 +83,7 @@ export class Processor {
             mentions: this.messageProcessor.mentions.values,
             domains: this.messageProcessor.domains.values,
 
+            /////////////// ----------------------
             serialized: new Uint8Array(0),
             authorsOrder: this.authors.values.map((a, i) => i),
             authorsBotCutoff: this.authors.size - 1,
