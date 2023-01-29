@@ -1,6 +1,7 @@
 import { AttachmentType } from "@pipeline/Attachments";
 import { DateKey } from "@pipeline/Time";
 import { BitAddress, ChannelType, Index, RawID, ReportConfig } from "@pipeline/Types";
+import { IndexCounts } from "@pipeline/process/IndexCounts";
 import { MessageBitConfig } from "@pipeline/serialization/MessageSerialization";
 
 // TODO: we want to change all this interfaces
@@ -71,12 +72,12 @@ export interface Message {
     replyOffset?: number;
     langIndex?: Index;
     sentiment?: number;
-    words?: [Index, number][];
-    emojis?: [Index, number][];
-    mentions?: [Index, number][];
-    reactions?: [Index, number][];
-    domains?: [Index, number][];
-    attachments?: [AttachmentType, number][];
+    words?: IndexCounts;
+    emojis?: IndexCounts;
+    mentions?: IndexCounts;
+    reactions?: IndexCounts;
+    domains?: IndexCounts;
+    attachments?: IndexCounts<AttachmentType>;
 }
 
 // TODO: remove

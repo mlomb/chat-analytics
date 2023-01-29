@@ -4,6 +4,7 @@ import { Day } from "@pipeline/Time";
 import { Index, RawID } from "@pipeline/Types";
 import { PAuthor } from "@pipeline/parse/Types";
 import { PMessageGroup } from "@pipeline/process/ChannelMessages";
+import { IndexCounts, IndexCountsBuilder } from "@pipeline/process/IndexCounts";
 import { IndexedMap } from "@pipeline/process/IndexedMap";
 import { Emoji, IMessage } from "@pipeline/process/Types";
 import { Emojis, EmojisData } from "@pipeline/process/nlp/Emojis";
@@ -100,27 +101,16 @@ export class MessageProcessor {
             this.languagesCount[langIndex] = (this.languagesCount[langIndex] || 0) + 1;
         }
 
-        interface Counts {
-            [idx: number]: number;
-        }
-        const countsToArray = (counts: Counts): [Index, number][] => {
-            const res: [Index, number][] = [];
-            for (const [idx, count] of Object.entries(counts)) {
-                res.push([parseInt(idx), count]);
-            }
-            return res;
-        };
-
         let messages: IMessage[] = [];
 
         for (let i = 0; i < group.length; i++) {
             const msg = group[i];
 
-            const wordsCount: Counts = {};
-            const emojisCount: Counts = {};
-            const mentionsCount: Counts = {};
-            const reactionsCount: Counts = {};
-            const domainsCount: Counts = {};
+            const wordsCount = new IndexCountsBuilder();
+            const emojisCount = new IndexCountsBuilder();
+            const mentionsCount = new IndexCountsBuilder();
+            const reactionsCount = new IndexCountsBuilder();
+            const domainsCount = new IndexCountsBuilder();
 
             if (msg.reactions) {
                 for (const reaction of msg.reactions) {
@@ -139,7 +129,7 @@ export class MessageProcessor {
                         // ID is new, replace
                         this.emojis.set(emojiKey, emojiObj, 999);
                     }
-                    reactionsCount[emojiIdx] = (reactionsCount[emojiIdx] || 0) + reaction[1];
+                    reactionsCount.incr(emojiIdx, reaction[1]);
                 }
             }
 
@@ -156,7 +146,7 @@ export class MessageProcessor {
                         if (text.length > 1 && text.length <= 30 && !this.stopwords.has(wordKey)) {
                             let wordIdx = this.words.getIndex(wordKey);
                             if (wordIdx === undefined) wordIdx = this.words.set(wordKey, text);
-                            wordsCount[wordIdx] = (wordsCount[wordIdx] || 0) + 1;
+                            wordsCount.incr(wordIdx);
                             this.wordsCount[wordIdx] = (this.wordsCount[wordIdx] || 0) + 1;
                         }
                         hasText = true;
@@ -175,12 +165,12 @@ export class MessageProcessor {
                                       };
                             emojiIdx = this.emojis.set(emojiKey, emojiObj);
                         }
-                        emojisCount[emojiIdx] = (emojisCount[emojiIdx] || 0) + 1;
+                        emojisCount.incr(emojiIdx);
                     } else if (tag === "mention") {
                         const mentionKey = matchFormat(text);
                         let mentionIdx = this.mentions.getIndex(mentionKey);
                         if (mentionIdx === undefined) mentionIdx = this.mentions.set(mentionKey, text);
-                        mentionsCount[mentionIdx] = (mentionsCount[mentionIdx] || 0) + 1;
+                        mentionsCount.incr(mentionIdx);
                     } else if (tag === "url") {
                         // TODO: transform URL only messages to attachments
                         try {
@@ -189,7 +179,7 @@ export class MessageProcessor {
                             let domainIdx = this.domains.getIndex(hostname);
                             if (domainIdx === undefined) domainIdx = this.domains.set(hostname, hostname);
 
-                            domainsCount[domainIdx] = (domainsCount[domainIdx] || 0) + 1;
+                            domainsCount.incr(domainIdx);
                         } catch (ex) {}
                     }
                 }
@@ -213,11 +203,11 @@ export class MessageProcessor {
                 replyOffset: msg.replyTo ? 1 : 0, // offset is not really being used right now in the UI
                 langIndex: hasText ? langIndex : undefined,
                 sentiment: hasText ? sentiment : undefined,
-                words: countsToArray(wordsCount),
-                emojis: countsToArray(emojisCount),
-                mentions: countsToArray(mentionsCount),
-                reactions: countsToArray(reactionsCount),
-                domains: countsToArray(domainsCount),
+                words: wordsCount.toArray(),
+                emojis: emojisCount.toArray(),
+                mentions: mentionsCount.toArray(),
+                reactions: reactionsCount.toArray(),
+                domains: domainsCount.toArray(),
                 // TODO: should be combined
                 attachments: msg.attachments?.map((a) => [a, 1]),
             });
