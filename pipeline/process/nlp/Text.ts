@@ -10,6 +10,8 @@ export const normalizeText = (text: string) =>
         // change all whitespace to one space (important for the lang detector, newlines bad)
         .replace(whitespaceRegex, " ")
         // remove variant forms from emojis
+        // U+FE0E → text variant
+        // U+FE0F → graphics variant (colors)
         // See: https://stackoverflow.com/questions/38100329/what-does-u-ufe0f-in-an-emoji-mean-is-it-the-same-if-i-delete-it
         .replace(emojiVariantFormRegex, "")
         // trim
