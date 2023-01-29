@@ -1,5 +1,29 @@
 import emojiRegex from "emoji-regex";
 
+/*
+    We are currently using a simple regex-based tokenizer.
+    It is not perfect, but it works for now. Its main disadvantage is that it
+    only works for Latin-based and similar languages. We should probably use a more
+    sophisticated tokenizer in the future.
+    
+    Citing fastText tokenizer:
+    > We used the Stanford word segmenter for Chinese, Mecab for Japanese and
+    > UETsegmenter for Vietnamese. For languages using the Latin, Cyrillic, Hebrew
+    > or Greek scripts, we used the tokenizer from the Europarl preprocessing tools.
+    > For the remaining languages, we used the ICU tokenizer.
+    > (source: https://fasttext.cc/docs/en/crawl-vectors.html)
+    Migrating these is a lot of work.
+    I didn't find a good library for this, so we would have to implement it ourselves.
+    Also I only know well Spanish and English, so I need help here.
+
+    But we also have another problem, we don't know beforehand what language the
+    messages are in. Asking the user may only work sometimes since people can be
+    multilingual in the same conversation and servers may have different languages per channel.
+    We could switch tokenizers based on the language of the message detected by fastText,
+    but my tests showed that it is not very accurate. 😔
+    https://i.imgflip.com/4hkogk.jpg
+*/
+
 export type Tag = "code" | "url" | "mention" | "emoji" | "custom-emoji" | "word" | "unknown";
 
 export interface Token {
@@ -7,14 +31,17 @@ export interface Token {
     tag: Tag;
 }
 
-interface Matcher {
-    regex: RegExp;
+export interface TokenMatcher {
+    /** What kind of token is being matched */
     tag: Tag;
+    /** Regex pattern to search for this token */
+    regex: RegExp;
+    /** Optionally applies a transformation to the matched text */
     transform?: (match: string) => string;
 }
 
-// order is critical
-const Matchers: Matcher[] = [
+// the order of the matchers is critical
+const Matchers: Readonly<TokenMatcher[]> = [
     {
         // should we handle it this way?
         // source code, ascii art, some other stuff should not be included
@@ -55,44 +82,70 @@ const Matchers: Matcher[] = [
     },
 ];
 
-// match against one matcher
-// result: [ "not matched", { ...token }, "not matched", ... ]
-const matchOne = (input: string, matcher: Matcher): (string | Token)[] => {
+/**
+ * Splits the input string using one TokenMatcher into a list of strings and tokens where:
+ * - strings are the parts of the input that do not match the matcher (trimmed)
+ * - tokens are the parts of the input that match the matcher (@see Token)
+ *
+ * For example, if the matcher matches emojis:
+ * > "hello world" -> ["hello world"]
+ * > "😃" -> [{ ..."😃" }]
+ * > "text 😃 text" -> ["text", { ..."😃" }, "text"]
+ */
+export const splitByToken = (input: string, matcher: TokenMatcher): (string | Token)[] => {
+    const result: (string | Token)[] = [];
+
     const matches = input.match(matcher.regex);
-    if (matches === null || matches.length === 0) return [input];
     const remaining = input.split(matcher.regex);
 
-    const result: (string | Token)[] = [];
+    // interleave the matched and unmatched
     for (let i = 0; i < remaining.length; i++) {
-        const s = remaining[i].trim();
-        if (s.length > 0) result.push(s);
-        if (i < matches.length) {
+        // unmatched string
+        const unmatched = remaining[i].trim();
+        if (unmatched.length > 0) result.push(unmatched);
+
+        // matched token
+        if (matches && i < matches.length) {
             result.push({
                 text: matcher.transform ? matcher.transform(matches[i]) : matches[i],
                 tag: matcher.tag,
             });
         }
     }
+
     return result;
 };
 
-const tokenizeStep = (input: string, step: number): Token[] => {
-    if (step >= Matchers.length) {
-        // TODO: something else?
+/**
+ * Tokenizes a string recursively.
+ * It is assumed that all matchers with index `< matcherIndex` have already been
+ * tried and failed to match, so we are clear to test for matchers `>= matcherIndex`.
+ *
+ * @param matcherIndex the index of the matcher to use in the Matchers array
+ */
+export const tokenizeStep = (input: string, matcherIndex: number): Token[] => {
+    if (matcherIndex >= Matchers.length) {
+        // no more matchers to try, mark as unknown
         return [{ text: input, tag: "unknown" }];
     }
 
     const result: Token[] = [];
-    const list = matchOne(input, Matchers[step]);
-    for (const t of list) {
-        if (typeof t === "string") {
+
+    // split input by the matcher
+    const list = splitByToken(input, Matchers[matcherIndex]);
+    // now recursively tokenize with the remaining matchers
+    // when the element is a string (aka unmatched)
+    for (const elem of list) {
+        if (typeof elem === "string") {
             // continue tokenizing
-            result.push(...tokenizeStep(t, step + 1));
+            result.push(...tokenizeStep(elem, matcherIndex + 1));
         } else {
-            result.push(t);
+            result.push(elem);
         }
     }
+
     return result;
 };
 
+/** Tokenizes a string into a list of tokens */
 export const tokenize = (input: string): Token[] => tokenizeStep(input, 0);

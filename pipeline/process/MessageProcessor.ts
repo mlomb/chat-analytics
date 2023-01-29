@@ -12,9 +12,11 @@ import { Sentiment } from "@pipeline/process/nlp/Sentiment";
 import { Token, tokenize } from "@pipeline/process/nlp/Tokenizer";
 
 /**
- * The MessageProcessor takes PMessageGroup objects and processes them into the final Message object.
+ * The MessageProcessor takes PMessageGroup's and processes them into the IMessage's (intermediate messages)
  *
  * It does all the necessary analysis.
+ *
+ * TODO: NEEDS REFACTORING
  */
 export class MessageProcessor {
     constructor() {}
@@ -28,7 +30,6 @@ export class MessageProcessor {
     maxDate: Day | undefined;
 
     // keep track of some counts
-    private authorMessagesCount: number[] = [];
     private wordsCount: number[] = [];
     private languagesCount: { [lang: number]: number } = {};
 
@@ -209,7 +210,7 @@ export class MessageProcessor {
                 // TODO: timezones
                 secondOfDay: date.getSeconds() + 60 * (date.getMinutes() + 60 * date.getHours()),
                 authorIndex: 0, // msg.authorIndex,
-                replyOffset: 0,
+                replyOffset: msg.replyTo ? 1 : 0, // offset is not really being used right now in the UI
                 langIndex: hasText ? langIndex : undefined,
                 sentiment: hasText ? sentiment : undefined,
                 words: countsToArray(wordsCount),

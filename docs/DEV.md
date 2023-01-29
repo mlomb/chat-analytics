@@ -2,6 +2,8 @@
 
 Hi there!
 
+Don't forget to run `npm install` before starting to develop.
+
 ## Developing UI
 
 Run `npm run dev`. You can now open:
