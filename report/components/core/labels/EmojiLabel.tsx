@@ -16,11 +16,12 @@ const _EmojiLabel = ({ index, hideNameIfPossible }: EmojiLabelProps) => {
         image = <img src={`https://cdn.discordapp.com/emojis/${emoji.id}.png?size=32`} height={16} />;
     }
 
-    const showName = emoji.n !== emoji.c && (!hideNameIfPossible || (emoji.c === undefined && image === null));
+    const showName =
+        emoji.name !== emoji.symbol && (!hideNameIfPossible || (emoji.symbol === undefined && image === null));
 
-    const title = emoji.n;
-    const icon = image ? image : <span style={{ color: "#b9b9b9" }}>{emoji.c}</span>;
-    const name = showName ? (emoji.c ? emoji.n : `:${emoji.n}:`) : undefined;
+    const title = emoji.name;
+    const icon = image ? image : <span style={{ color: "#b9b9b9" }}>{emoji.symbol}</span>;
+    const name = showName ? (emoji.symbol ? emoji.name : `:${emoji.name}:`) : undefined;
 
     return <BaseLabel title={title} icon={icon} name={name} />;
 };

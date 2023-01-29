@@ -54,7 +54,7 @@ const init = (msg: InitMessage) => {
         authors: database.authors.map((author) => matchFormat(author.n)),
         channels: database.channels.map((channel) => matchFormat(channel.name)),
         words: database.words.map((word) => matchFormat(word)),
-        emojis: database.emojis.map((emoji) => matchFormat(emoji.n)),
+        emojis: database.emojis.map((emoji) => matchFormat(emoji.name)),
         mentions: database.mentions.map((mention) => matchFormat(mention)),
     };
     console.timeEnd("Build format cache");
@@ -64,7 +64,7 @@ const init = (msg: InitMessage) => {
         database: {
             ...database,
             // no needed in the UI
-            serialized: undefined,
+            messages: undefined,
         },
         formatCache,
         // remove functions

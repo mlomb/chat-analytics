@@ -17,6 +17,7 @@ Things pending or ideas. Don't expect them soon. This is not a roadmap.
 * Weeks are off, currently being calculated as `floor((dayOfMonth - 1) / 7)` which is wrong.
 * Detect if some ES6 or other API used during generation is not available and show an error early.
 * Add other platform parsers like Google Teams, MS Teams, Slack, etc.
+* Handle emoticons? (e.g. :D, :P, etc)
 
 ### Report UI
 

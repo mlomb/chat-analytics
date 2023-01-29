@@ -1,10 +1,11 @@
 import { Env } from "@pipeline/Env";
 import { LanguageCodes } from "@pipeline/Languages";
 import { Day } from "@pipeline/Time";
-import { Emoji, Index } from "@pipeline/Types";
+import { Index, RawID } from "@pipeline/Types";
+import { PAuthor } from "@pipeline/parse/Types";
 import { PMessageGroup } from "@pipeline/process/ChannelMessages";
 import { IndexedMap } from "@pipeline/process/IndexedMap";
-import { IMessage } from "@pipeline/process/Types";
+import { Emoji, IMessage } from "@pipeline/process/Types";
 import { Emojis, EmojisData } from "@pipeline/process/nlp/Emojis";
 import { FastTextModel, loadFastTextModel } from "@pipeline/process/nlp/FastTextModel";
 import { Sentiment } from "@pipeline/process/nlp/Sentiment";
@@ -19,7 +20,7 @@ import { Token, tokenize } from "@pipeline/process/nlp/Tokenizer";
  * TODO: NEEDS REFACTORING
  */
 export class MessageProcessor {
-    constructor() {}
+    constructor(private readonly authors: IndexedMap<RawID, PAuthor>) {}
 
     words = new IndexedMap<string, string>();
     emojis = new IndexedMap<string, Emoji>();
@@ -115,12 +116,6 @@ export class MessageProcessor {
         for (let i = 0; i < group.length; i++) {
             const msg = group[i];
 
-            // TODO: timezones
-            const date = new Date(msg.timestamp);
-            const day = Day.fromDate(date);
-            if (this.minDate === undefined || Day.lt(day, this.minDate)) this.minDate = day;
-            if (this.maxDate === undefined || Day.gt(day, this.maxDate)) this.maxDate = day;
-
             const wordsCount: Counts = {};
             const emojisCount: Counts = {};
             const mentionsCount: Counts = {};
@@ -129,12 +124,12 @@ export class MessageProcessor {
 
             if (msg.reactions) {
                 for (const reaction of msg.reactions) {
-                    const emojiKey = normalizeText(reaction[0].n).toLowerCase();
+                    const emojiKey = normalizeText(reaction[0].name).toLowerCase();
 
                     const emojiObj: Emoji = {
                         id: reaction[0].id,
-                        n: reaction[0].id ? reaction[0].n : this.emojisData!.getName(emojiKey),
-                        c: reaction[0].id ? undefined : emojiKey,
+                        name: reaction[0].id ? reaction[0].name : this.emojisData!.getName(emojiKey),
+                        symbol: reaction[0].id ? undefined : emojiKey,
                     };
 
                     let emojiIdx = this.emojis.getIndex(emojiKey);
@@ -172,11 +167,11 @@ export class MessageProcessor {
                             const emojiObj: Emoji =
                                 tag === "emoji"
                                     ? {
-                                          c: text,
-                                          n: this.emojisData!.getName(text),
+                                          symbol: text,
+                                          name: this.emojisData!.getName(text),
                                       }
                                     : {
-                                          n: text,
+                                          name: text,
                                       };
                             emojiIdx = this.emojis.set(emojiKey, emojiObj);
                         }
@@ -205,9 +200,14 @@ export class MessageProcessor {
                 }
             }
 
+            // TODO: timezones
+            const date = new Date(msg.timestamp);
+            const day = Day.fromDate(date);
+            if (this.minDate === undefined || Day.lt(day, this.minDate)) this.minDate = day;
+            if (this.maxDate === undefined || Day.gt(day, this.maxDate)) this.maxDate = day;
+
             messages.push({
                 day: day.toBinary(),
-                // TODO: timezones
                 secondOfDay: date.getSeconds() + 60 * (date.getMinutes() + 60 * date.getHours()),
                 authorIndex: 0, // msg.authorIndex,
                 replyOffset: msg.replyTo ? 1 : 0, // offset is not really being used right now in the UI

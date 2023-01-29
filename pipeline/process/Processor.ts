@@ -15,7 +15,7 @@ export class Processor {
 
     private messagesInChannel = new Map<RawID, ChannelMessages>();
 
-    private messageProcessor = new MessageProcessor();
+    private messageProcessor = new MessageProcessor(this.authors);
 
     constructor(parser: Parser, private readonly config: ReportConfig, private readonly env: Env) {
         parser.on("guild", (guild, at) => this.guilds.set(guild.id, guild, at));
@@ -84,7 +84,6 @@ export class Processor {
             domains: this.messageProcessor.domains.values,
 
             /////////////// ----------------------
-            serialized: new Uint8Array(0),
             authorsOrder: this.authors.values.map((a, i) => i),
             authorsBotCutoff: this.authors.size - 1,
             bitConfig: {

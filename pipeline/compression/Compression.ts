@@ -9,7 +9,7 @@ import { Database } from "@pipeline/process/Types";
 
 // ((POJO -> TextEncoder) + Binary) -> Gzip -> Base91
 function compress(database: Database): string {
-    let serializedBuffer = database.serialized;
+    let serializedBuffer = database.messages;
     if (serializedBuffer === undefined) throw new Error("Serialized data is undefined");
 
     let json = JSON.stringify({
@@ -59,7 +59,7 @@ function decompress(data: string): Database {
     const jsonString = textDecoder.decode(jsonBuffer);
     console.log("JSON string length", jsonString.length);
     const database = JSON.parse(jsonString) as Database;
-    database.serialized = serializedData;
+    database.messages = serializedData;
 
     return database;
 }
