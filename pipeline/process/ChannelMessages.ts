@@ -199,6 +199,6 @@ export class MessagesInterval {
 
     /** @returns the total number of messages in the interval */
     get numMessages() {
-        return this.messages.length + this.messageQueue.length;
+        return this.messageQueue.length + this.messages.length;
     }
 }
