@@ -1,5 +1,6 @@
 import { EventEmitter } from "events";
 
+import { Progress } from "@pipeline/Progress";
 import { Timestamp } from "@pipeline/Types";
 import { FileInput } from "@pipeline/parse/File";
 import { PAuthor, PChannel, PGuild, PMessage } from "@pipeline/parse/Types";
@@ -30,5 +31,5 @@ export abstract class Parser extends EventEmitter {
      * Note that this function should yield every so often (e.g. every few MBs or hundreds of messages)
      * to process messages and report progress back to the UI.
      */
-    abstract parse(file: FileInput): AsyncGenerator<void>;
+    abstract parse(file: FileInput, progress?: Progress): AsyncGenerator<void>;
 }

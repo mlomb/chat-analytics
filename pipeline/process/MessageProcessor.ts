@@ -1,14 +1,12 @@
 import { Env } from "@pipeline/Env";
 import { LanguageCodes } from "@pipeline/Languages";
 import { Day } from "@pipeline/Time";
-import { Index, RawID } from "@pipeline/Types";
-import { PAuthor, PMessage } from "@pipeline/parse/Types";
 import { PMessageGroup } from "@pipeline/process/ChannelMessages";
-import { IndexCounts, IndexCountsBuilder } from "@pipeline/process/IndexCounts";
-import { IndexedMap } from "@pipeline/process/IndexedMap";
+import { DatabaseBuilder } from "@pipeline/process/DatabaseBuilder";
+import { IndexCountsBuilder } from "@pipeline/process/IndexCounts";
 import { Emoji, IMessage } from "@pipeline/process/Types";
 import { Emojis, EmojisData } from "@pipeline/process/nlp/Emojis";
-import { FastTextLID176Model, FastTextModel } from "@pipeline/process/nlp/FastTextModel";
+import { FastTextLID176Model } from "@pipeline/process/nlp/FastTextModel";
 import { Sentiment } from "@pipeline/process/nlp/Sentiment";
 import { matchFormat, normalizeText } from "@pipeline/process/nlp/Text";
 import { Token, tokenize } from "@pipeline/process/nlp/Tokenizer";
@@ -21,15 +19,7 @@ import { Token, tokenize } from "@pipeline/process/nlp/Tokenizer";
  * TODO: NEEDS REFACTORING
  */
 export class MessageProcessor {
-    constructor(private readonly authors: IndexedMap<RawID, PAuthor>) {}
-
-    words = new IndexedMap<string, string>();
-    emojis = new IndexedMap<string, Emoji>();
-    mentions = new IndexedMap<string, string>();
-    domains = new IndexedMap<string, string>();
-
-    minDate: Day | undefined;
-    maxDate: Day | undefined;
+    constructor(private readonly builder: DatabaseBuilder) {}
 
     // static data
     private stopwords: Set<string> = new Set();
@@ -71,6 +61,8 @@ export class MessageProcessor {
     }
 
     processGroupToIntermediate(group: PMessageGroup): IMessage[] {
+        const { authors, words, emojis, mentions, domains } = this.builder;
+
         // normalize and tokenize messages
         const tokenizations: Token[][] = group.map((msg) =>
             msg.textContent ? tokenize(normalizeText(msg.textContent)) : []
@@ -113,12 +105,12 @@ export class MessageProcessor {
                         symbol: reaction[0].id ? undefined : emojiKey,
                     };
 
-                    let emojiIdx = this.emojis.getIndex(emojiKey);
+                    let emojiIdx = emojis.getIndex(emojiKey);
                     if (emojiIdx === undefined) {
-                        emojiIdx = this.emojis.set(emojiKey, emojiObj);
-                    } else if (this.emojis.getByIndex(emojiIdx)!.id === undefined && reaction[0].id) {
+                        emojiIdx = emojis.set(emojiKey, emojiObj);
+                    } else if (emojis.getByIndex(emojiIdx)!.id === undefined && reaction[0].id) {
                         // ID is new, replace
-                        this.emojis.set(emojiKey, emojiObj, 999);
+                        emojis.set(emojiKey, emojiObj, 999);
                     }
                     reactionsCount.incr(emojiIdx, reaction[1]);
                 }
@@ -135,14 +127,14 @@ export class MessageProcessor {
                         const wordKey = matchFormat(text);
                         // only keep words between [2, 30] chars and no stopwords
                         if (text.length > 1 && text.length <= 30 && !this.stopwords.has(wordKey)) {
-                            let wordIdx = this.words.getIndex(wordKey);
-                            if (wordIdx === undefined) wordIdx = this.words.set(wordKey, text);
+                            let wordIdx = words.getIndex(wordKey);
+                            if (wordIdx === undefined) wordIdx = words.set(wordKey, text);
                             wordsCount.incr(wordIdx);
                         }
                         hasText = true;
                     } else if (tag === "emoji" || tag === "custom-emoji") {
                         const emojiKey = text.toLowerCase();
-                        let emojiIdx = this.emojis.getIndex(emojiKey);
+                        let emojiIdx = emojis.getIndex(emojiKey);
                         if (emojiIdx === undefined) {
                             const emojiObj: Emoji =
                                 tag === "emoji"
@@ -153,21 +145,21 @@ export class MessageProcessor {
                                     : {
                                           name: text,
                                       };
-                            emojiIdx = this.emojis.set(emojiKey, emojiObj);
+                            emojiIdx = emojis.set(emojiKey, emojiObj);
                         }
                         emojisCount.incr(emojiIdx);
                     } else if (tag === "mention") {
                         const mentionKey = matchFormat(text);
-                        let mentionIdx = this.mentions.getIndex(mentionKey);
-                        if (mentionIdx === undefined) mentionIdx = this.mentions.set(mentionKey, text);
+                        let mentionIdx = mentions.getIndex(mentionKey);
+                        if (mentionIdx === undefined) mentionIdx = mentions.set(mentionKey, text);
                         mentionsCount.incr(mentionIdx);
                     } else if (tag === "url") {
                         // TODO: transform URL only messages to attachments
                         try {
                             const hostname = new URL(text).hostname.toLowerCase();
 
-                            let domainIdx = this.domains.getIndex(hostname);
-                            if (domainIdx === undefined) domainIdx = this.domains.set(hostname, hostname);
+                            let domainIdx = domains.getIndex(hostname);
+                            if (domainIdx === undefined) domainIdx = domains.set(hostname, hostname);
 
                             domainsCount.incr(domainIdx);
                         } catch (ex) {}
@@ -183,13 +175,13 @@ export class MessageProcessor {
             // TODO: timezones
             const date = new Date(msg.timestamp);
             const day = Day.fromDate(date);
-            if (this.minDate === undefined || Day.lt(day, this.minDate)) this.minDate = day;
-            if (this.maxDate === undefined || Day.gt(day, this.maxDate)) this.maxDate = day;
+            if (this.builder.minDate === undefined || Day.lt(day, this.builder.minDate)) this.builder.minDate = day;
+            if (this.builder.maxDate === undefined || Day.gt(day, this.builder.maxDate)) this.builder.maxDate = day;
 
             messages.push({
                 day: day.toBinary(),
                 secondOfDay: date.getSeconds() + 60 * (date.getMinutes() + 60 * date.getHours()),
-                authorIndex: this.authors.getIndex(msg.authorId)!,
+                authorIndex: authors.getIndex(msg.authorId)!,
                 replyOffset: msg.replyTo ? 1 : 0, // offset is not really being used right now in the UI
                 langIndex: hasText ? langIndex : undefined,
                 sentiment: hasText ? sentiment : undefined,
