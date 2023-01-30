@@ -18,6 +18,7 @@ export interface PChannel {
     guildId: RawID;
     name: string;
     type: ChannelType;
+    avatar?: string;
 }
 
 /** Author interface produced by parsers */
@@ -25,6 +26,7 @@ export interface PAuthor {
     id: RawID;
     name: string;
     bot: boolean;
+    avatar?: string;
 }
 
 /** Message interface produced by parsers */
