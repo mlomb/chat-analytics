@@ -35,7 +35,7 @@ export class Processor {
     process() {
         console.log("Processing...");
 
-        const processFn: ProcessGroupFn = this.messageProcessor.process.bind(this.messageProcessor);
+        const processFn: ProcessGroupFn = this.messageProcessor.processGroupToIntermediate.bind(this.messageProcessor);
 
         for (const mc of this.messagesInChannel.values()) {
             mc.process(processFn);

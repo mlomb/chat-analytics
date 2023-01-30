@@ -2,13 +2,13 @@ import { Env } from "@pipeline/Env";
 import { LanguageCodes } from "@pipeline/Languages";
 import { Day } from "@pipeline/Time";
 import { Index, RawID } from "@pipeline/Types";
-import { PAuthor } from "@pipeline/parse/Types";
+import { PAuthor, PMessage } from "@pipeline/parse/Types";
 import { PMessageGroup } from "@pipeline/process/ChannelMessages";
 import { IndexCounts, IndexCountsBuilder } from "@pipeline/process/IndexCounts";
 import { IndexedMap } from "@pipeline/process/IndexedMap";
 import { Emoji, IMessage } from "@pipeline/process/Types";
 import { Emojis, EmojisData } from "@pipeline/process/nlp/Emojis";
-import { FastTextModel, loadFastTextModel } from "@pipeline/process/nlp/FastTextModel";
+import { FastTextLID176Model, FastTextModel } from "@pipeline/process/nlp/FastTextModel";
 import { Sentiment } from "@pipeline/process/nlp/Sentiment";
 import { matchFormat, normalizeText } from "@pipeline/process/nlp/Text";
 import { Token, tokenize } from "@pipeline/process/nlp/Tokenizer";
@@ -37,7 +37,7 @@ export class MessageProcessor {
 
     // static data
     private stopwords: Set<string> = new Set();
-    private langPredictModel: FastTextModel | null = null;
+    private langPredictModel: FastTextLID176Model | null = null;
     private emojisData: Emojis | null = null;
     private sentiment: Sentiment | null = null;
 
@@ -59,7 +59,7 @@ export class MessageProcessor {
         }
 
         // load language detector model
-        this.langPredictModel = await loadFastTextModel("lid.176", env);
+        this.langPredictModel = await FastTextLID176Model.load(env);
 
         // load emoji data
         {
@@ -74,31 +74,25 @@ export class MessageProcessor {
         }
     }
 
-    process(group: PMessageGroup): IMessage[] {
+    processGroupToIntermediate(group: PMessageGroup): IMessage[] {
         // normalize and tokenize messages
-        const tokenizations: Token[][] = [];
-        for (const msg of group) {
-            if (msg.textContent && msg.textContent.length > 0) {
-                tokenizations.push(tokenize(normalizeText(msg.textContent)));
-            } else {
-                tokenizations.push([]);
-            }
-        }
+        const tokenizations: Token[][] = group.map((msg) =>
+            msg.textContent ? tokenize(normalizeText(msg.textContent)) : []
+        );
 
-        // detect language in the whole group
+        // combine text for all the messages in the group
+        const allText = tokenizations
+            .flat()
+            .filter((token) => token.tag === "word")
+            .join(" ")
+            .toLowerCase();
+
+        // detect language in the whole group text
+        // this yields better accuracy
         let langIndex: number = 0;
-        const combined: string[] = [];
-        for (const tokens of tokenizations) {
-            for (const token of tokens) {
-                // only keep words
-                if (token.tag === "word") combined.push(token.text.toLowerCase());
-            }
-        }
-        if (combined.length > 0) {
-            const combinedWords = combined.join(" ");
-            const prediction = this.detectLanguageLine(combinedWords);
-            langIndex = prediction.index;
-            this.languagesCount[langIndex] = (this.languagesCount[langIndex] || 0) + 1;
+        if (allText.length > 0) {
+            const lang = this.langPredictModel!.identifyLanguage(allText);
+            langIndex = LanguageCodes.indexOf(lang.iso639);
         }
 
         let messages: IMessage[] = [];
@@ -199,7 +193,7 @@ export class MessageProcessor {
             messages.push({
                 day: day.toBinary(),
                 secondOfDay: date.getSeconds() + 60 * (date.getMinutes() + 60 * date.getHours()),
-                authorIndex: 0, // msg.authorIndex,
+                authorIndex: this.authors.getIndex(msg.authorId)!,
                 replyOffset: msg.replyTo ? 1 : 0, // offset is not really being used right now in the UI
                 langIndex: hasText ? langIndex : undefined,
                 sentiment: hasText ? sentiment : undefined,
@@ -208,23 +202,10 @@ export class MessageProcessor {
                 mentions: mentionsCount.toArray(),
                 reactions: reactionsCount.toArray(),
                 domains: domainsCount.toArray(),
-                // TODO: should be combined
-                attachments: msg.attachments?.map((a) => [a, 1]),
+                attachments: IndexCountsBuilder.fromList(msg.attachments ?? []).toArray(),
             });
         }
 
         return messages;
-    }
-
-    // NOTE: assumes the word is normalized and contains no newlines
-    private detectLanguageLine(line: string) {
-        const result = this.langPredictModel!.predict(line, 1, 0.0);
-        const code = result[0][1].slice(9); // "__label__".length === 9
-        return {
-            accuracy: result[0][0],
-            // ISO 639-2/3
-            iso639: code,
-            index: LanguageCodes.indexOf(code),
-        };
     }
 }
