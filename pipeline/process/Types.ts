@@ -24,16 +24,16 @@ export interface Database {
     guilds: Guild[];
     channels: Channel[];
     authors: Author[];
-    messages?: Uint8Array;
+    messages: Uint8Array;
 
     emojis: Emoji[];
     words: string[];
     mentions: string[];
     domains: string[];
 
+    numBotAuthors: number;
+
     // eventually we want to remove the following fields
-    authorsOrder: number[];
-    authorsBotCutoff: number;
     bitConfig: MessageBitConfig;
 }
 

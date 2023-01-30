@@ -34,6 +34,14 @@ export class IndexedMap<Key extends string | number, Value> {
         return info.index;
     }
 
+    reindex(fn: (index: number) => number): number[] {
+        return new Array(this.array.length)
+            .fill(0)
+            .map((_, idx) => [idx, fn(idx)])
+            .sort((a, b) => b[1] - a[1])
+            .map((a) => a[0]);
+    }
+
     /** @returns the index of the value with the given key */
     getIndex(key: Key): Index | undefined {
         return this.index.get(key)?.index;

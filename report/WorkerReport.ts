@@ -64,6 +64,8 @@ const init = (msg: InitMessage) => {
         database: {
             ...database,
             // no needed in the UI
+            // force removal
+            // @ts-expect-error
             messages: undefined,
         },
         formatCache,

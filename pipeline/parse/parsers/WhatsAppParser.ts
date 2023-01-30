@@ -54,7 +54,7 @@ export class WhatsAppParser extends Parser {
 
         this.emit("guild", { id: 0, name: "WhatsApp Chats" });
         this.emit("channel", {
-            id: this.channelIndex++,
+            id: this.channelIndex,
             guildId: 0,
             name,
             type: numAuthors > 2 ? "group" : "dm",
@@ -102,5 +102,7 @@ export class WhatsAppParser extends Parser {
                 });
             }
         }
+
+        this.channelIndex++;
     }
 }
