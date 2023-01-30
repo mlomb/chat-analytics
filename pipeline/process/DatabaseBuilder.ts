@@ -8,7 +8,7 @@ import { IndexedMap } from "@pipeline/process/IndexedMap";
 import { MessageProcessor } from "@pipeline/process/MessageProcessor";
 import { Database } from "@pipeline/process/Types";
 
-export class Processor {
+export class DatabaseBuilder {
     private guilds = new IndexedMap<RawID, PGuild>();
     private channels = new IndexedMap<RawID, PChannel>();
     private authors = new IndexedMap<RawID, PAuthor>();
@@ -134,6 +134,7 @@ export class Processor {
             mentions: this.messageProcessor.mentions.values,
             domains: this.messageProcessor.domains.values,
 
+            numMessages: this.numMessages,
             numBotAuthors: this.numBotAuthors,
 
             /////////////// ----------------------

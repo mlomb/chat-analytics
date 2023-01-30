@@ -111,7 +111,7 @@ NodeEnv.progress.on("progress", (tasks, stats) => {
     console.log("Report data size: " + prettyBytes(result.data.length));
     console.log("Report HTML size: " + prettyBytes(result.html.length));
     console.log("The report contains:");
-    console.log(` [*] ${db.channels.reduce((c, ch) => c + (ch.msgCount || 0), 0)} messages`);
+    console.log(` [*] ${db.numMessages} messages`);
     console.log(` [*] ${db.authors.length} authors`);
     console.log(` [*] ${db.channels.length} channels`);
     console.log(` [*] ${db.guilds.length} guilds`);

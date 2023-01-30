@@ -61,8 +61,7 @@ self.onmessage = async (ev: MessageEvent<InitMessage>) => {
             html: result.html,
             title: database.title,
             counts: {
-                //messages: Object.values(database.channels).reduce((acc, ch) => acc + (ch.msgCount ?? 0), 0),
-                messages: 0,
+                messages: database.numMessages,
                 authors: database.authors.length,
                 channels: database.channels.length,
                 guilds: database.guilds.length,

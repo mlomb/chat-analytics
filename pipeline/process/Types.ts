@@ -31,6 +31,7 @@ export interface Database {
     mentions: string[];
     domains: string[];
 
+    numMessages: number;
     numBotAuthors: number;
 
     // eventually we want to remove the following fields
