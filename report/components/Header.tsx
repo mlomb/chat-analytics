@@ -26,10 +26,7 @@ const channelsFilterOptionsFn: (db: Database) => FilterOption[] = (db) => {
     const options: FilterOption[] = [
         {
             name: "Select all channels",
-            options: db.channels
-                .map((c, i) => [c.msgCount || 0, i])
-                .sort((a, b) => b[0] - a[0])
-                .map((c) => c[1]),
+            options: db.channels.map((_, i) => i),
         },
     ];
 
@@ -60,22 +57,23 @@ const channelsFilterOptionsFn: (db: Database) => FilterOption[] = (db) => {
 };
 
 const authorsFilterOptionsFn: (db: Database) => FilterOption[] = (db) => {
-    const botsPresent = db.authorsBotCutoff >= 0;
+    const botsPresent = db.numBotAuthors > 0;
     const options: FilterOption[] = [
         {
             name: "Select all authors" + (botsPresent ? "  (🧍➕🤖)" : ""),
-            options: db.authorsOrder,
+            options: db.authors.map((_, i) => i),
         },
     ];
     if (botsPresent) {
+        const allIndexes = new Array(db.authors.length).fill(0).map((_, i) => i);
         options.push(
             {
                 name: "Select only non-bot authors (🧍)",
-                options: db.authorsOrder.slice(0, db.authorsBotCutoff),
+                options: allIndexes.slice(0, -db.numBotAuthors),
             },
             {
                 name: "Select only bot authors (🤖)",
-                options: db.authorsOrder.slice(db.authorsBotCutoff),
+                options: allIndexes.slice(-db.numBotAuthors),
             }
         );
     }

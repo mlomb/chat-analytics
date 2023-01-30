@@ -47,19 +47,70 @@ export class Processor {
         for (const channelMessages of this.messagesInChannel.values()) channelMessages.markEOF();
     }
 
-    getDatabase(): Database {
-        console.log(this.messagesInChannel);
+    guildsReindex?: number[];
+    channelsReindex?: number[];
+    authorsReindex?: number[];
+    wordsReindex?: number[];
 
+    /**
+     * count things
+     * reindex things
+     */
+    private countAndReindex() {
+        this.env.progress?.new("Counting for reindex...");
+
+        const totalMessages = this.numMessages;
+        let alreadyCounted = 0;
+
+        let guildCounts = new Uint32Array(this.guilds.size);
+        let channelCounts = new Uint32Array(this.channels.size);
+        let authorCounts = new Uint32Array(this.authors.size);
+        let wordsCounts = new Uint32Array(this.messageProcessor.words.size);
+
+        for (const [id, mc] of this.messagesInChannel) {
+            const channelIndex = this.channels.getIndex(id)!;
+            const guildIndex = this.guilds.getIndex(this.channels.getByIndex(channelIndex)!.guildId)!;
+
+            for (const msg of mc.processedMessages()) {
+                guildCounts[guildIndex]++;
+                channelCounts[channelIndex]++;
+                authorCounts[msg.authorIndex]++;
+
+                if (msg.words) {
+                    for (const [idx, count] of msg.words) wordsCounts[idx] += count;
+                }
+
+                this.env.progress?.progress("number", ++alreadyCounted, totalMessages);
+            }
+        }
+
+        this.env.progress?.done();
+        this.env.progress?.new("Reindexing...");
+
+        const reindexAuthor = (idx: number) => {
+            // reindexing the author is a bit special,
+            // we want non bot authors first, and then
+            // sorted by amount of messages
+            const author = this.authors.getByIndex(idx)!;
+            return (author.bot ? 0 : 1) * 1000000000 + authorCounts[idx];
+        };
+
+        this.guildsReindex = this.guilds.reindex((idx) => guildCounts[idx]);
+        this.channelsReindex = this.channels.reindex((idx) => channelCounts[idx]);
+        this.authorsReindex = this.authors.reindex(reindexAuthor);
+        this.wordsReindex = this.messageProcessor.words.reindex((idx) => wordsCounts[idx]);
+
+        this.env.progress?.done();
+    }
+
+    getDatabase(): Database {
+        this.countAndReindex();
+
+        console.log(this);
         const { dateKeys, monthKeys, yearKeys } = genTimeKeys(
             this.messageProcessor.minDate!,
             this.messageProcessor.maxDate!
         );
-
-        /*for (const mc of this.messagesInChannel.values()) {
-            for (const msg of mc.processedMessages()) {
-                console.log(msg);
-            }
-        }*/
 
         return {
             config: this.config,
@@ -83,9 +134,9 @@ export class Processor {
             mentions: this.messageProcessor.mentions.values,
             domains: this.messageProcessor.domains.values,
 
+            numBotAuthors: this.numBotAuthors,
+
             /////////////// ----------------------
-            authorsOrder: this.authors.values.map((a, i) => i),
-            authorsBotCutoff: this.authors.size - 1,
             bitConfig: {
                 dayBits: 21, // 12 + 4 + 5
                 authorIdxBits: 21,
@@ -95,5 +146,13 @@ export class Processor {
                 domainsIdxBits: 16,
             },
         };
+    }
+
+    get numMessages() {
+        return [...this.messagesInChannel.values()].reduce((acc, mc) => acc + mc.numMessages, 0);
+    }
+
+    get numBotAuthors() {
+        return this.authors.values.reduce((acc, a) => acc + +a.bot, 0);
     }
 }

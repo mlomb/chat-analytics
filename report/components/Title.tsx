@@ -69,8 +69,7 @@ export const Title = () => {
                 .map((c) => c.index);
             avatars = topChannels.map((channelIndex) => <ChannelAvatar index={channelIndex} />);
         } else {
-            const topAuthors = db.authorsOrder.slice(0, topK);
-            avatars = topAuthors.map((authorIndex) => <AuthorAvatar index={authorIndex} />);
+            avatars = new Array(topK).fill(0).map((_, authorIndex) => <AuthorAvatar index={authorIndex} />);
         }
     }
 
