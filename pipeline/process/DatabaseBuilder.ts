@@ -195,9 +195,10 @@ export class DatabaseBuilder {
         };
     }
 
-    makeFinalMessages() {}
-
     build(): Database {
+        if (this.numMessages === 0)
+            throw new Error("No messages found. Are you sure you are using the right platform?");
+
         this.countAndReindex();
 
         const { dateKeys, monthKeys, yearKeys } = genTimeKeys(this.minDate, this.maxDate);
