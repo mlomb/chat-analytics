@@ -1,12 +1,14 @@
 import { Env } from "@pipeline/Env";
-import { genTimeKeys } from "@pipeline/Time";
+import { Day, genTimeKeys } from "@pipeline/Time";
 import { RawID, ReportConfig } from "@pipeline/Types";
 import { Parser } from "@pipeline/parse/Parser";
 import { PAuthor, PChannel, PGuild } from "@pipeline/parse/Types";
 import { ChannelMessages, ProcessGroupFn } from "@pipeline/process/ChannelMessages";
 import { IndexedMap } from "@pipeline/process/IndexedMap";
 import { MessageProcessor } from "@pipeline/process/MessageProcessor";
-import { Database } from "@pipeline/process/Types";
+import { Author, Channel, Database, Guild } from "@pipeline/process/Types";
+import { BitStream } from "@pipeline/serialization/BitStream";
+import { MessageBitConfig, writeMessage } from "@pipeline/serialization/MessageSerialization";
 
 export class DatabaseBuilder {
     private guilds = new IndexedMap<RawID, PGuild>();
@@ -47,10 +49,10 @@ export class DatabaseBuilder {
         for (const channelMessages of this.messagesInChannel.values()) channelMessages.markEOF();
     }
 
-    guildsReindex?: number[];
-    channelsReindex?: number[];
-    authorsReindex?: number[];
-    wordsReindex?: number[];
+    guildsReindex: number[] = [];
+    channelsReindex: number[] = [];
+    authorsReindex: number[] = [];
+    wordsReindex: number[] = [];
 
     /**
      * count things
@@ -112,6 +114,61 @@ export class DatabaseBuilder {
             this.messageProcessor.maxDate!
         );
 
+        const guilds = this.guilds.remap<Guild>((guild) => guild, this.guildsReindex);
+        const channels = this.channels.remap<Channel>(
+            (channel) => ({
+                name: channel.name,
+                type: channel.type,
+                guildIndex: this.guilds.getIndex(channel.guildId)!,
+            }),
+            this.channelsReindex
+        );
+        const authors = this.authors.remap<Author>(
+            (author) => ({
+                n: author.name,
+                b: author.bot ? author.bot : undefined,
+            }),
+            this.authorsReindex
+        );
+
+        this.env.progress?.new("Compacting messages data");
+        let messagesWritten = 0;
+        const numBitsFor = (n: number) => (n === 0 ? 1 : 32 - Math.clz32(n));
+        const finalStream = new BitStream();
+        const finalBitConfig: MessageBitConfig = {
+            dayBits: Math.max(1, numBitsFor(dateKeys.length)),
+            authorIdxBits: Math.max(1, numBitsFor(this.authors.size)),
+            wordIdxBits: Math.max(1, numBitsFor(this.messageProcessor.words.size)),
+            emojiIdxBits: Math.max(1, numBitsFor(this.messageProcessor.emojis.size)),
+            mentionsIdxBits: Math.max(1, numBitsFor(this.messageProcessor.mentions.size)),
+            domainsIdxBits: Math.max(1, numBitsFor(this.messageProcessor.domains.size)),
+        };
+        for (const [id, mc] of this.messagesInChannel) {
+            const channelIndex = this.channelsReindex[this.channels.getIndex(id)!];
+
+            channels[channelIndex].msgAddr = finalStream.offset;
+            channels[channelIndex].msgCount = 0;
+
+            for (const msg of mc.processedMessages()) {
+                writeMessage(
+                    {
+                        ...msg,
+                        day: dateKeys.indexOf(Day.fromBinary(msg.day).dateKey),
+                        authorIndex: this.authorsReindex[msg.authorIndex],
+                    },
+                    finalStream,
+                    finalBitConfig
+                );
+                channels[channelIndex].msgCount!++;
+            }
+            this.env.progress?.progress("number", messagesWritten++, this.numMessages);
+        }
+        this.env.progress?.done();
+
+        console.log(guilds);
+        console.log(channels);
+        console.log(authors);
+
         return {
             config: this.config,
             title: "Chats",
@@ -124,10 +181,11 @@ export class DatabaseBuilder {
                 numYears: yearKeys.length,
             },
 
-            guilds: this.guilds.values,
-            channels: this.channels.values.map((c) => ({ name: c.name, type: c.type, guildIndex: 0 })),
-            authors: this.authors.values.map((a) => ({ n: a.name })),
-            messages: new Uint8Array(0),
+            guilds,
+            channels,
+            authors,
+            // round to the nearest multiple of 4
+            messages: finalStream.buffer8.slice(0, ((Math.ceil(finalStream.offset / 8) + 3) & ~0x03) + 4),
 
             words: this.messageProcessor.words.values,
             emojis: this.messageProcessor.emojis.values,
@@ -138,14 +196,7 @@ export class DatabaseBuilder {
             numBotAuthors: this.numBotAuthors,
 
             /////////////// ----------------------
-            bitConfig: {
-                dayBits: 21, // 12 + 4 + 5
-                authorIdxBits: 21,
-                wordIdxBits: 21,
-                emojiIdxBits: 18,
-                mentionsIdxBits: 20,
-                domainsIdxBits: 16,
-            },
+            bitConfig: finalBitConfig,
         };
     }
 

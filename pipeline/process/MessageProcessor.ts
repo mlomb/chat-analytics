@@ -31,10 +31,6 @@ export class MessageProcessor {
     minDate: Day | undefined;
     maxDate: Day | undefined;
 
-    // keep track of some counts
-    private wordsCount: number[] = [];
-    private languagesCount: { [lang: number]: number } = {};
-
     // static data
     private stopwords: Set<string> = new Set();
     private langPredictModel: FastTextLID176Model | null = null;
@@ -84,6 +80,7 @@ export class MessageProcessor {
         const allText = tokenizations
             .flat()
             .filter((token) => token.tag === "word")
+            .map((token) => token.text)
             .join(" ")
             .toLowerCase();
 
@@ -141,7 +138,6 @@ export class MessageProcessor {
                             let wordIdx = this.words.getIndex(wordKey);
                             if (wordIdx === undefined) wordIdx = this.words.set(wordKey, text);
                             wordsCount.incr(wordIdx);
-                            this.wordsCount[wordIdx] = (this.wordsCount[wordIdx] || 0) + 1;
                         }
                         hasText = true;
                     } else if (tag === "emoji" || tag === "custom-emoji") {
