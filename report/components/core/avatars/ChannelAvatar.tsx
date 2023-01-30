@@ -35,7 +35,7 @@ export const ChannelAvatar = ({ index }: { index: number }) => {
         // if the channel is a DM, show the avatar of the authors
         return (
             <AvatarStack
-                avatars={channel.dmAuthorIndexes!.map((i) => (
+                avatars={channel.participants!.map((i) => (
                     <AuthorAvatar index={i} key={i} />
                 ))}
             />
@@ -58,7 +58,7 @@ export const ChannelAvatar = ({ index }: { index: number }) => {
 
         if (platform === "discord") {
             // Discord uses the timestamp part of the channel snowflake to determine which group avatar to use
-            const timestamp = parseInt((BigInt(channel.discordId!) >> BigInt(22)).toString());
+            const timestamp = parseInt(channel.avatar || "0");
             src = DiscordDefaultGroupAvatars[timestamp % DiscordDefaultGroupAvatars.length];
         } else if (platform === "whatsapp") {
             src = wpp_group_avatar;

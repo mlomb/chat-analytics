@@ -45,7 +45,7 @@ export class DiscordParser extends Parser {
             guildId: this.lastGuildId,
             name: channel.name,
             type,
-            //discordId: channel.id,
+            avatar: this.parseSnowflake(channel.id).timestamp.toString(),
         });
         this.lastChannelId = channel.id;
     }
@@ -60,9 +60,8 @@ export class DiscordParser extends Parser {
         const isDeletedUser = message.author.nickname == "Deleted User";
         const author: PAuthor = {
             id: message.author.id,
-            name: name + (isDeletedUser ? " #" + message.author.id : ""),
+            name: name + (isDeletedUser ? " #" + message.author.id : "#" + message.author.discriminator),
             bot: false,
-            // d: isDeletedUser ? undefined : parseInt(message.author.discriminator),
         };
         if (message.author.isBot) author.bot = true;
 
@@ -73,7 +72,7 @@ export class DiscordParser extends Parser {
         const hasAvatar = message.author.avatarUrl && message.author.avatarUrl.length > 50;
         if (hasAvatar) {
             const avatar = message.author.avatarUrl.slice(35).split(".")[0];
-            //author.da = (" " + avatar).substring(1); // avoid leak
+            author.avatar = (" " + avatar).substring(1); // avoid leak
         }
 
         // :)
@@ -112,5 +111,15 @@ export class DiscordParser extends Parser {
                 ]),
             });
         }
+    }
+
+    // See https://discord.com/developers/docs/reference#snowflakes
+    parseSnowflake(snowflake: string) {
+        return {
+            timestamp: BigInt(snowflake) >> BigInt(22),
+            // internalWorkerId
+            // internalProcessId
+            // increment
+        };
     }
 }

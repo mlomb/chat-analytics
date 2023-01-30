@@ -1,6 +1,6 @@
 import { Env } from "@pipeline/Env";
 import { Day, genTimeKeys } from "@pipeline/Time";
-import { RawID, ReportConfig } from "@pipeline/Types";
+import { Index, RawID, ReportConfig } from "@pipeline/Types";
 import { createParser } from "@pipeline/parse";
 import { FileInput } from "@pipeline/parse/File";
 import { Parser } from "@pipeline/parse/Parser";
@@ -69,6 +69,7 @@ export class DatabaseBuilder {
     /** Process the provided files */
     async processFiles(files: FileInput[]) {
         let filesProcessed = 0;
+        this.env.progress?.stat("total_files", files.length);
 
         for (const file of files) {
             this.env.progress?.new("Processing", file.name);
@@ -89,7 +90,6 @@ export class DatabaseBuilder {
 
             this.env.progress?.done();
             this.env.progress?.stat("processed_files", ++filesProcessed);
-            this.env.progress?.stat("total_files", files.length);
         }
     }
 
@@ -118,10 +118,13 @@ export class DatabaseBuilder {
     //                                                 //
     /////////////////////////////////////////////////////
 
-    guildsReindex: number[] = [];
-    channelsReindex: number[] = [];
-    authorsReindex: number[] = [];
-    wordsReindex: number[] = [];
+    guildsReindex: Index[] = [];
+    channelsReindex: Index[] = [];
+    authorsReindex: Index[] = [];
+    wordsReindex: Index[] = [];
+
+    /** We want to store participants for DM chats to later override the channel name with "Alice & Bob" */
+    dmParticipants = new Map<RawID, Index[]>();
 
     /**
      * [+] Why indexing?
@@ -148,6 +151,7 @@ export class DatabaseBuilder {
 
         for (const [id, mc] of this.messagesInChannel) {
             const channelIndex = this.channels.getIndex(id)!;
+            const channel = this.channels.getByIndex(channelIndex)!;
             const guildIndex = this.guilds.getIndex(this.channels.getByIndex(channelIndex)!.guildId)!;
 
             for (const msg of mc.processedMessages()) {
@@ -157,6 +161,17 @@ export class DatabaseBuilder {
 
                 if (msg.words) {
                     for (const [idx, count] of msg.words) wordsCounts[idx] += count;
+                }
+
+                // if this channel is a DM, store participants
+                if (channel.type === "dm") {
+                    if (!this.dmParticipants.has(channel.id)) {
+                        this.dmParticipants.set(channel.id, []);
+                    }
+                    const participants = this.dmParticipants.get(channel.id)!;
+                    if (!participants.includes(msg.authorIndex)) {
+                        participants.push(msg.authorIndex);
+                    }
                 }
 
                 this.env.progress?.progress("number", ++alreadyCounted, totalMessages);
@@ -176,10 +191,29 @@ export class DatabaseBuilder {
 
     /** Transforms a parser PChannel into a final Channel */
     makeFinalChannel(channel: PChannel): Channel {
+        const participants = this.dmParticipants.get(channel.id) || [];
+
+        // I really don't want to do this here, but I don't
+        // like the alternatives right now
+        const formatParticipantName = (i: Index) => {
+            const name = this.authors.getByIndex(i)!.name;
+            if (name.split("#").pop()?.length === 4)
+                // skip Discord discriminator
+                return name.slice(0, -5);
+            return name;
+        };
+
         return {
-            name: channel.name,
+            name:
+                channel.type !== "dm"
+                    ? // non DMs preserve the name
+                      channel.name
+                    : // DMs use the names of the participants "Alice & Bob"
+                      participants.map(formatParticipantName).join(" & "),
             type: channel.type,
+            avatar: channel.avatar,
             guildIndex: this.guildsReindex[this.guilds.getIndex(channel.guildId)!],
+            participants: participants.length > 0 ? participants : undefined,
 
             // the following are set making the final messages
             msgAddr: undefined,
@@ -188,10 +222,12 @@ export class DatabaseBuilder {
     }
 
     /** Transforms a parser PAuthor into a final Author */
-    makeFinalAuthor(author: PAuthor): Author {
+    makeFinalAuthor(author: PAuthor, oldIndex: number): Author {
         return {
             n: author.name,
             b: author.bot === true ? true : undefined,
+            // only keep avatars if the author is in the top 1000 authors
+            a: this.authorsReindex[oldIndex] < 1000 ? author.avatar : undefined,
         };
     }
 
@@ -228,9 +264,10 @@ export class DatabaseBuilder {
 
             for (const [id, mc] of this.messagesInChannel) {
                 const channelIndex = this.channelsReindex[this.channels.getIndex(id)!];
+                const channel = channels[channelIndex];
 
-                channels[channelIndex].msgAddr = messagesStream.offset;
-                channels[channelIndex].msgCount = mc.numMessages;
+                channel.msgAddr = messagesStream.offset;
+                channel.msgCount = mc.numMessages;
 
                 for (const msg of mc.processedMessages()) {
                     writeMessage(
@@ -250,7 +287,7 @@ export class DatabaseBuilder {
 
         return {
             config: this.config,
-            title: "Chats",
+            title: this.buildTitle(guilds, channels),
 
             time: {
                 minDate: this.minDate.dateKey,
@@ -273,5 +310,29 @@ export class DatabaseBuilder {
             numMessages: this.numMessages,
             bitConfig,
         };
+    }
+
+    private buildTitle(guilds: Guild[], channels: Channel[]): string {
+        // See report/components/Title.tsx
+
+        if (this.config.platform !== "discord") {
+            // We assume there is always only one guild.
+            if (channels.length === 1) return channels[0].name;
+            return guilds[0].name;
+        }
+
+        if (guilds.length > 1) {
+            if (guilds.some((g) => g.name === "Direct Messages")) {
+                return "Discord Servers and DMs";
+            }
+            return "Discord Servers";
+        }
+
+        const guild = guilds[0];
+        if (guild.name !== "Direct Messages") return guild.name;
+        if (channels.length === 1) return channels[0].name;
+        if (channels.every((c) => c.type === "dm")) return "Discord DMs";
+        if (channels.every((c) => c.type === "group")) return "Discord Groups";
+        return "Discord Chats";
     }
 }

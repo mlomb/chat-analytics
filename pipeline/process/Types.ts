@@ -42,9 +42,9 @@ export interface Guild {
 export interface Channel {
     name: string;
     type: ChannelType;
+    avatar?: string;
     guildIndex: Index;
-    dmAuthorIndexes?: Index[];
-    discordId?: RawID;
+    participants?: Index[]; // only included if type === "dm"
 
     // messages location
     msgAddr?: BitAddress;
@@ -52,14 +52,9 @@ export interface Channel {
 }
 
 export interface Author {
-    // name
-    n: string;
-    // bot
-    b?: undefined | true;
-    // Discord discriminant (#XXXX)
-    d?: number;
-    // Discord avatar (user_id/user_avatar)
-    da?: string;
+    n: string; // name
+    b?: undefined | true; // bot
+    a?: string; // avatar
 }
 
 export interface Message {

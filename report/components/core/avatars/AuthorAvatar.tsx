@@ -41,8 +41,12 @@ export const AuthorAvatar = ({ index }: { index: number }) => {
 
     switch (platform) {
         case "discord":
-            url = author.da ? `https://cdn.discordapp.com/avatars/${author.da}.png?size=64` : undefined;
-            placeholder = RawImg(DiscordDefaultDMAvatars[(author.d || 0) % 5]);
+            let discriminator = 0;
+            const num = author.n.split("#").pop();
+            if (num && num.length === 4) discriminator = parseInt(num);
+
+            url = author.a ? `https://cdn.discordapp.com/avatars/${author.a}.png?size=64` : undefined;
+            placeholder = RawImg(DiscordDefaultDMAvatars[discriminator % 5]);
             break;
         case "telegram":
             return (
