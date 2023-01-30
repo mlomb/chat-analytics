@@ -3,24 +3,14 @@ import { ReportConfig } from "@pipeline/Types";
 import { FileInput } from "@pipeline/parse/File";
 
 import { compress } from "./compression/Compression";
-import { createParser } from "./parse";
 import { DatabaseBuilder } from "./process/DatabaseBuilder";
 import { Database } from "./process/Types";
 
 export const generateDatabase = async (files: FileInput[], config: ReportConfig, env: Env): Promise<Database> => {
-    const parser = createParser(config.platform);
-
-    const builder = new DatabaseBuilder(parser, config, env);
-
+    const builder = new DatabaseBuilder(config, env);
     await builder.init();
-
-    for (const file of files) {
-        for await (const _ of parser.parse(file)) builder.process();
-        builder.markEOF();
-        builder.process();
-    }
-
-    return builder.getDatabase();
+    await builder.processFiles(files);
+    return builder.build();
 };
 
 // Returns the final data and HTML code

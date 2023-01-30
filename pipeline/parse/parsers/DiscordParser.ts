@@ -1,4 +1,5 @@
 import { AttachmentType, getAttachmentTypeFromFileName } from "@pipeline/Attachments";
+import { Progress } from "@pipeline/Progress";
 import { ChannelType, RawID } from "@pipeline/Types";
 import { FileInput, streamJSONFromFile } from "@pipeline/parse/File";
 import { JSONStream } from "@pipeline/parse/JSONStream";
@@ -9,13 +10,13 @@ export class DiscordParser extends Parser {
     private lastGuildId?: RawID;
     private lastChannelId?: RawID;
 
-    async *parse(file: FileInput) {
+    async *parse(file: FileInput, progress?: Progress) {
         const stream = new JSONStream()
             .onObject<DiscordGuild>("guild", this.parseGuild.bind(this))
             .onObject<DiscordChannel>("channel", this.parseChannel.bind(this))
             .onArrayItem<DiscordMessage>("messages", this.parseMessage.bind(this));
 
-        yield* streamJSONFromFile(stream, file);
+        yield* streamJSONFromFile(stream, file, progress);
     }
 
     private parseGuild(guild: DiscordGuild) {
