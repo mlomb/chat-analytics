@@ -10,6 +10,9 @@ export type WeekKey = `${MonthKey}--${number}`;
 // I prefer working with [year, month, day] instead of Date objects
 // to avoid all kind of problems
 export class Day {
+    static readonly LOWEST = new Day(0, 0, 0);
+    static readonly HIGHEST = new Day(9999, 12, 31);
+
     public readonly year: number; // YYYY
     public readonly month: number; // 1-12 !
     public readonly day: number; // 1-31

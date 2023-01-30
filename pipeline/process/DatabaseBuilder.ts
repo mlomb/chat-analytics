@@ -18,8 +18,8 @@ import { MessageBitConfig, writeMessage } from "@pipeline/serialization/MessageS
 export class DatabaseBuilder {
     parser: Parser;
 
-    minDate: Day | undefined;
-    maxDate: Day | undefined;
+    minDate = Day.HIGHEST;
+    maxDate = Day.LOWEST;
 
     guilds = new IndexedMap<RawID, PGuild>();
     channels = new IndexedMap<RawID, PChannel>();
@@ -114,7 +114,7 @@ export class DatabaseBuilder {
 
     /////////////////////////////////////////////////////
     //                                                 //
-    //                   REINDEXING                    //
+    //             REINDEX / MAKE FINAL                //
     //                                                 //
     /////////////////////////////////////////////////////
 
@@ -124,8 +124,15 @@ export class DatabaseBuilder {
     wordsReindex: number[] = [];
 
     /**
-     * count things
-     * reindex things
+     * [+] Why indexing?
+     * While we process messages it is more efficient to store an index to the actual author/word/whatever
+     * than storing a full RawID that may potentially be a large string.
+     * [+] Why the burden of reindexing?
+     * We want to sort authors, channels and such by the number of messages they have, so it doesn't need to
+     * be done in the UI (also all indexes end up being nice :) )
+     * [+] How?
+     * During processing we use the index that IndexedMap provides. After all processing is done (this function)
+     * we count the messages and then generate a mapping between the old index and the "final" ones with `reindex`.
      */
     private countAndReindex() {
         this.env.progress?.new("Counting for reindex...");
@@ -159,90 +166,94 @@ export class DatabaseBuilder {
         this.env.progress?.done();
         this.env.progress?.new("Reindexing...");
 
-        const reindexAuthor = (idx: number) => {
-            // reindexing the author is a bit special,
-            // we want non bot authors first, and then
-            // sorted by amount of messages
-            const author = this.authors.getByIndex(idx)!;
-            return (author.bot ? 0 : 1) * 1000000000 + authorCounts[idx];
-        };
-
         this.guildsReindex = this.guilds.reindex((idx) => guildCounts[idx]);
         this.channelsReindex = this.channels.reindex((idx) => channelCounts[idx]);
-        this.authorsReindex = this.authors.reindex(reindexAuthor);
+        this.authorsReindex = this.authors.reindex((idx) => authorCounts[idx]);
         this.wordsReindex = this.words.reindex((idx) => wordsCounts[idx]);
 
         this.env.progress?.done();
     }
 
+    /** Transforms a parser PChannel into a final Channel */
+    makeFinalChannel(channel: PChannel): Channel {
+        return {
+            name: channel.name,
+            type: channel.type,
+            guildIndex: this.guildsReindex[this.guilds.getIndex(channel.guildId)!],
+
+            // the following are set making the final messages
+            msgAddr: undefined,
+            msgCount: undefined,
+        };
+    }
+
+    /** Transforms a parser PAuthor into a final Author */
+    makeFinalAuthor(author: PAuthor): Author {
+        return {
+            n: author.name,
+            b: author.bot === true ? true : undefined,
+        };
+    }
+
+    makeFinalMessages() {}
+
     build(): Database {
         this.countAndReindex();
 
-        console.log(this);
-        const { dateKeys, monthKeys, yearKeys } = genTimeKeys(this.minDate!, this.maxDate!);
+        const { dateKeys, monthKeys, yearKeys } = genTimeKeys(this.minDate, this.maxDate);
 
         const guilds = this.guilds.remap<Guild>((guild) => guild, this.guildsReindex);
-        const channels = this.channels.remap<Channel>(
-            (channel) => ({
-                name: channel.name,
-                type: channel.type,
-                guildIndex: this.guilds.getIndex(channel.guildId)!,
-            }),
-            this.channelsReindex
-        );
-        const authors = this.authors.remap<Author>(
-            (author) => ({
-                n: author.name,
-                b: author.bot ? author.bot : undefined,
-            }),
-            this.authorsReindex
-        );
+        const channels = this.channels.remap<Channel>(this.makeFinalChannel.bind(this), this.channelsReindex);
+        const authors = this.authors.remap<Author>(this.makeFinalAuthor.bind(this), this.authorsReindex);
 
-        this.env.progress?.new("Compacting messages data");
-        let messagesWritten = 0;
-        const numBitsFor = (n: number) => (n === 0 ? 1 : 32 - Math.clz32(n));
-        const finalStream = new BitStream();
-        const finalBitConfig: MessageBitConfig = {
-            dayBits: Math.max(1, numBitsFor(dateKeys.length)),
-            authorIdxBits: Math.max(1, numBitsFor(this.authors.size)),
-            wordIdxBits: Math.max(1, numBitsFor(this.words.size)),
-            emojiIdxBits: Math.max(1, numBitsFor(this.emojis.size)),
-            mentionsIdxBits: Math.max(1, numBitsFor(this.mentions.size)),
-            domainsIdxBits: Math.max(1, numBitsFor(this.domains.size)),
+        /** Return the minimum amount of bits needed to store a given number */
+        const numBitsFor = (n: number) => Math.max(1, n === 0 ? 1 : 32 - Math.clz32(n));
+
+        const messagesStream = new BitStream();
+        const bitConfig: MessageBitConfig = {
+            dayBits: numBitsFor(dateKeys.length),
+            authorIdxBits: numBitsFor(this.authors.size),
+            wordIdxBits: numBitsFor(this.words.size),
+            emojiIdxBits: numBitsFor(this.emojis.size),
+            mentionsIdxBits: numBitsFor(this.mentions.size),
+            domainsIdxBits: numBitsFor(this.domains.size),
         };
-        for (const [id, mc] of this.messagesInChannel) {
-            const channelIndex = this.channelsReindex[this.channels.getIndex(id)!];
 
-            channels[channelIndex].msgAddr = finalStream.offset;
-            channels[channelIndex].msgCount = 0;
+        {
+            this.env.progress?.new("Compacting messages data");
 
-            for (const msg of mc.processedMessages()) {
-                writeMessage(
-                    {
-                        ...msg,
-                        day: dateKeys.indexOf(Day.fromBinary(msg.day).dateKey),
-                        authorIndex: this.authorsReindex[msg.authorIndex],
-                    },
-                    finalStream,
-                    finalBitConfig
-                );
-                channels[channelIndex].msgCount!++;
+            const totalMessages = this.numMessages;
+            let alreadyCounted = 0;
+
+            for (const [id, mc] of this.messagesInChannel) {
+                const channelIndex = this.channelsReindex[this.channels.getIndex(id)!];
+
+                channels[channelIndex].msgAddr = messagesStream.offset;
+                channels[channelIndex].msgCount = mc.numMessages;
+
+                for (const msg of mc.processedMessages()) {
+                    writeMessage(
+                        {
+                            ...msg,
+                            day: dateKeys.indexOf(Day.fromBinary(msg.day).dateKey),
+                            authorIndex: this.authorsReindex[msg.authorIndex],
+                        },
+                        messagesStream,
+                        bitConfig
+                    );
+                }
+                this.env.progress?.progress("number", ++alreadyCounted, totalMessages);
             }
-            this.env.progress?.progress("number", messagesWritten++, this.numMessages);
+            this.env.progress?.done();
         }
-        this.env.progress?.done();
-
-        console.log(guilds);
-        console.log(channels);
-        console.log(authors);
 
         return {
             config: this.config,
             title: "Chats",
 
             time: {
-                minDate: this.minDate!.dateKey,
-                maxDate: this.maxDate!.dateKey,
+                minDate: this.minDate.dateKey,
+                maxDate: this.maxDate.dateKey,
                 numDays: dateKeys.length,
                 numMonths: monthKeys.length,
                 numYears: yearKeys.length,
@@ -251,19 +262,15 @@ export class DatabaseBuilder {
             guilds,
             channels,
             authors,
-            // round to the nearest multiple of 4
-            messages: finalStream.buffer8.slice(0, ((Math.ceil(finalStream.offset / 8) + 3) & ~0x03) + 4),
-
             words: this.words.values,
             emojis: this.emojis.values,
             mentions: this.mentions.values,
             domains: this.domains.values,
 
+            // round to the nearest multiple of 4
+            messages: messagesStream.buffer8.slice(0, ((Math.ceil(messagesStream.offset / 8) + 3) & ~0x03) + 4),
             numMessages: this.numMessages,
-            numBotAuthors: this.numBotAuthors,
-
-            /////////////// ----------------------
-            bitConfig: finalBitConfig,
+            bitConfig,
         };
     }
 }

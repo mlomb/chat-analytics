@@ -175,8 +175,8 @@ export class MessageProcessor {
             // TODO: timezones
             const date = new Date(msg.timestamp);
             const day = Day.fromDate(date);
-            if (this.builder.minDate === undefined || Day.lt(day, this.builder.minDate)) this.builder.minDate = day;
-            if (this.builder.maxDate === undefined || Day.gt(day, this.builder.maxDate)) this.builder.maxDate = day;
+            if (Day.lt(day, this.builder.minDate)) this.builder.minDate = day;
+            if (Day.gt(day, this.builder.maxDate)) this.builder.maxDate = day;
 
             messages.push({
                 day: day.toBinary(),
