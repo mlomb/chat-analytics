@@ -42,6 +42,10 @@ export class IndexedMap<Key extends string | number, Value> {
             .map((a) => a[0]);
     }
 
+    remap<T>(fn: (value: Value, index: number) => T, indexes: number[]): T[] {
+        return indexes.map((idx) => fn(this.array[idx], idx));
+    }
+
     /** @returns the index of the value with the given key */
     getIndex(key: Key): Index | undefined {
         return this.index.get(key)?.index;
