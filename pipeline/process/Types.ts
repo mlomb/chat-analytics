@@ -36,7 +36,7 @@ export interface Database {
 
 export interface Guild {
     name: string;
-    iconUrl?: string;
+    avatar?: string;
 }
 
 export interface Channel {

@@ -9,7 +9,7 @@ import { ChannelType, RawID, Timestamp } from "@pipeline/Types";
 export interface PGuild {
     id: RawID;
     name: string;
-    iconUrl?: string;
+    avatar?: string;
 }
 
 /** Channel interface produced by parsers */
