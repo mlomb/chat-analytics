@@ -129,8 +129,8 @@ test("GC_3A_5M.json should resolve correctly", async () => {
     ]);
 });
 
-test("SV_5A_10M.json should resolve correctly", async () => {
-    const parsed = await runParserFromSamples(DiscordParser, ["discord/SV_5A_10M.json"]);
+test("SV_5A_5M.json should resolve correctly", async () => {
+    const parsed = await runParserFromSamples(DiscordParser, ["discord/SV_5A_5M.json"]);
 
     // guilds
     expect(parsed.guilds).toHaveLength(1);
