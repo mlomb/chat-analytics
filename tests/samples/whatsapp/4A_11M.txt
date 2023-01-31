@@ -1,0 +1,14 @@
+12/9/20, 23:55 - Messages and calls are end-to-end encrypted. No one outside of this chat, not even WhatsApp, can read or listen to them. Tap to learn more.
+12/9/20, 23:16 - Alice created group "Some cool group chat"
+12/9/20, 23:55 - Alice added you
+12/9/20, 23:55 - Bob: hello
+12/9/20, 23:55 - Eve: hi
+12/9/20, 23:55 - Eve: whats up
+12/9/20, 23:55 - Alice: boiii
+12/9/20, 23:55 - Alice: shooting stars
+12/9/20, 23:55 - Bob: im bob
+12/9/20, 23:55 - Alice: lets goo
+12/9/20, 23:55 - Mallory: im mallory
+12/9/20, 23:55 - Trent: 👩🏻‍⚖️
+12/9/20, 23:56 - Mallory: im still mallory
+12/9/20, 23:56 - Trent: heh

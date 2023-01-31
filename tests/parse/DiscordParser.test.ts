@@ -1,5 +1,5 @@
 import { AttachmentType } from "@pipeline/Attachments";
-import { PAuthor, PEmoji, PMessage } from "@pipeline/parse/Types";
+import { PAuthor, PMessage } from "@pipeline/parse/Types";
 import { DiscordParser } from "@pipeline/parse/parsers/DiscordParser";
 
 import { runParserFromSamples, runParserFromString } from "./Util";
