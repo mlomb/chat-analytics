@@ -34,7 +34,7 @@ export class DiscordParser extends Parser {
             iconUrl = undefined;
         }
 
-        this.emit("guild", { id: guild.id, name: guild.name, iconUrl });
+        this.emit("guild", { id: guild.id, name: guild.name, avatar: iconUrl });
         this.lastGuildId = guild.id;
     }
 

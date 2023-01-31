@@ -18,7 +18,7 @@ export const GuildAvatar = ({ index }: { index: number }) => {
 
             return (
                 <div className="Avatar">
-                    <LazyImage src={guild.iconUrl} placeholder={placeholder} />
+                    <LazyImage src={guild.avatar} placeholder={placeholder} />
                 </div>
             );
         case "telegram":
