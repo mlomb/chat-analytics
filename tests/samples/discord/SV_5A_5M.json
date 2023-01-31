@@ -1,0 +1,166 @@
+{
+    "guild": {
+        "id": "253601524398293010",
+        "name": "DefleMask",
+        "iconUrl": "https://cdn.discordapp.com/icons/253601524398293010/a_801de7dbf6c4b24d8c2c0b576c36150a.png"
+    },
+    "channel": {
+        "id": "253601524398293010",
+        "type": "GuildTextChat",
+        "categoryId": "497802346320101387",
+        "category": "Chat",
+        "name": "general-chiptune",
+        "topic": "discuss chiptune stuff here"
+    },
+    "dateRange": {
+        "after": null,
+        "before": null
+    },
+    "messages": [
+        {
+            "id": "459136077417021488",
+            "type": "Default",
+            "timestamp": "2018-05-20T16:09:44.209+00:00",
+            "timestampEdited": "2018-05-20T16:09:56.439+00:00",
+            "callEndedTimestamp": null,
+            "isPinned": false,
+            "content": "This message has been edited and written by a deleted user.",
+            "author": {
+                "id": "555555555555555555",
+                "name": "Deleted User",
+                "discriminator": "0000",
+                "nickname": "Deleted User",
+                "color": null,
+                "isBot": false,
+                "avatarUrl": "https://cdn.discordapp.com/embed/avatars/0.png"
+            },
+            "attachments": [],
+            "embeds": [],
+            "reactions": [],
+            "mentions": []
+        },
+        {
+            "id": "459136077417021488",
+            "type": "Default",
+            "timestamp": "2018-05-20T16:09:44.209+00:00",
+            "timestampEdited": "2018-05-20T16:09:56.439+00:00",
+            "callEndedTimestamp": null,
+            "isPinned": false,
+            "content": "This message has been edited and written by a deleted user.",
+            "author": {
+                "id": "555555555555555555",
+                "name": "Deleted User",
+                "discriminator": "0000",
+                "nickname": "Deleted User",
+                "color": null,
+                "isBot": false,
+                "avatarUrl": "https://cdn.discordapp.com/embed/avatars/0.png"
+            },
+            "attachments": [],
+            "embeds": [],
+            "reactions": [],
+            "mentions": []
+        },
+        {
+            "id": "447793085255123004",
+            "type": "Default",
+            "timestamp": "2018-05-20T16:09:51.118+00:00",
+            "timestampEdited": null,
+            "callEndedTimestamp": null,
+            "isPinned": false,
+            "content": "This author of this message does not have the nickname property, and should fallback to use name.",
+            "author": {
+                "id": "111111111111111111",
+                "name": "mlomb",
+                "discriminator": "5506",
+                "color": null,
+                "isBot": false,
+                "avatarUrl": "https://cdn.discordapp.com/avatars/111111111111111111/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.png?size=128"
+            },
+            "attachments": [],
+            "embeds": [],
+            "reactions": [],
+            "mentions": []
+        },
+        {
+            "id": "447793085255123005",
+            "type": "Default",
+            "timestamp": "2018-05-20T16:09:51.118+00:00",
+            "timestampEdited": null,
+            "callEndedTimestamp": null,
+            "isPinned": false,
+            "content": "This message has attachments and stickers.",
+            "author": {
+                "id": "111111111111111111",
+                "name": "mlomb",
+                "discriminator": "5506",
+                "nickname": "mlomb",
+                "color": null,
+                "isBot": false,
+                "avatarUrl": "https://cdn.discordapp.com/avatars/111111111111111111/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.png?size=128"
+            },
+            "attachments": [
+                {
+                    "id": "460937410155642891",
+                    "url": "https://cdn.discordapp.com/attachments/123/123/unknown.png",
+                    "fileName": "unknown.png",
+                    "fileSizeBytes": 165152
+                }
+            ],
+            "embeds": [],
+            "stickers": [
+                {
+                    "id": "809207919115239525",
+                    "name": "Laugh",
+                    "format": "PngAnimated",
+                    "sourceUrl": "https://discord.com/stickers/809207919115239525.png"
+                }
+            ],
+            "reactions": [],
+            "mentions": []
+        },
+        {
+            "id": "447793085255123006",
+            "type": "Default",
+            "timestamp": "2018-05-20T16:09:51.118+00:00",
+            "timestampEdited": null,
+            "callEndedTimestamp": null,
+            "isPinned": false,
+            "content": "This message has reactions.",
+            "author": {
+                "id": "111111111111111111",
+                "name": "mlomb",
+                "discriminator": "5506",
+                "nickname": "mlomb",
+                "color": null,
+                "isBot": false,
+                "avatarUrl": "https://cdn.discordapp.com/avatars/111111111111111111/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.png?size=128"
+            },
+            "attachments": [],
+            "embeds": [],
+            "stickers": [],
+            "reactions": [
+                {
+                    "emoji": {
+                        "id": "464662216386412545",
+                        "name": "paul",
+                        "isAnimated": false,
+                        "imageUrl": "https://cdn.discordapp.com/emojis/464662216386412545.png"
+                    },
+                    "count": 3
+                },
+                {
+                    "emoji": {
+                        "id": null,
+                        "name": "❤",
+                        "isAnimated": false,
+                        "imageUrl": "https://twemoji.maxcdn.com/2/svg/2764.svg"
+                    },
+                    "count": 2
+                }
+            ],
+            "mentions": []
+        }
+    ],
+    "messageCount": 5
+}

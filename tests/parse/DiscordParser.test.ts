@@ -1,4 +1,5 @@
-import { PAuthor } from "@pipeline/parse/Types";
+import { AttachmentType } from "@pipeline/Attachments";
+import { PAuthor, PEmoji, PMessage } from "@pipeline/parse/Types";
 import { DiscordParser } from "@pipeline/parse/parsers/DiscordParser";
 
 import { runParserFromSamples, runParserFromString } from "./Util";
@@ -23,6 +24,11 @@ const AUTHOR_SOMEONE: PAuthor = {
     id: "444444444444444444",
     name: "Someones nickname#1234",
     bot: true,
+};
+const AUTHOR_DELETED: PAuthor = {
+    id: "555555555555555555",
+    name: "Deleted User #555555555555555555",
+    bot: false,
 };
 
 test("DM_2A_2M.json should resolve correctly", async () => {
@@ -82,6 +88,7 @@ test("GC_3A_5M.json should resolve correctly", async () => {
                 id: "1064990764406419508",
                 type: "group",
                 name: "a group chat",
+                avatar: "253913584806",
             }),
         ])
     );
@@ -97,26 +104,99 @@ test("GC_3A_5M.json should resolve correctly", async () => {
 
     // messages
     expect(parsed.messages).toStrictEqual([
-        expect.objectContaining({
+        expect.objectContaining<PMessage>({
             id: "1064990824305274930",
-            textContent: "bla bla",
+            channelId: "1064990764406419508",
+            textContent: "Should honor nickname over name",
             authorId: AUTHOR_THEPLANT.id,
             timestamp: Date.parse("2023-01-17T19:33:19.087+00:00"),
         }),
-        expect.objectContaining({
+        expect.objectContaining<PMessage>({
             id: "1064991070322180096",
+            channelId: "1064990764406419508",
             textContent: "hey!!",
             authorId: AUTHOR_LOMBI.id,
             timestamp: Date.parse("2023-01-17T19:34:17.742+00:00"),
         }),
-        expect.objectContaining({
+        expect.objectContaining<PMessage>({
             id: "530805779645595660",
+            channelId: "1064990764406419508",
             textContent: "hey whats up",
             authorId: AUTHOR_MLOMB.id,
             timestamp: Date.parse("2023-01-18T20:12:12.123+00:00"),
             replyTo: "1064990824305274930",
         }),
     ]);
+});
+
+test("SV_5A_10M.json should resolve correctly", async () => {
+    const parsed = await runParserFromSamples(DiscordParser, ["discord/SV_5A_10M.json"]);
+
+    // guilds
+    expect(parsed.guilds).toHaveLength(1);
+    expect(parsed.guilds[0]).toStrictEqual(
+        expect.objectContaining({
+            id: "253601524398293010",
+            name: "DefleMask",
+            avatar: "https://cdn.discordapp.com/icons/253601524398293010/a_801de7dbf6c4b24d8c2c0b576c36150a.png",
+        })
+    );
+
+    // channels
+    expect(parsed.channels).toHaveLength(1);
+    expect(parsed.channels).toStrictEqual([
+        expect.objectContaining({
+            id: "253601524398293010",
+            type: "text",
+            name: "general-chiptune",
+        }),
+    ]);
+
+    // authors
+    expect(parsed.authors).toEqual(
+        expect.arrayContaining([expect.objectContaining(AUTHOR_DELETED), expect.objectContaining(AUTHOR_MLOMB)])
+    );
+
+    // messages
+    expect(parsed.messages).toEqual(
+        expect.arrayContaining([
+            expect.objectContaining<PMessage>({
+                id: "459136077417021488",
+                channelId: "253601524398293010",
+                textContent: "This message has been edited and written by a deleted user.",
+                authorId: AUTHOR_DELETED.id,
+                timestamp: Date.parse("2018-05-20T16:09:44.209+00:00"),
+                timestampEdit: Date.parse("2018-05-20T16:09:56.439+00:00"),
+            }),
+            expect.objectContaining<PMessage>({
+                id: "447793085255123004",
+                channelId: "253601524398293010",
+                textContent:
+                    "This author of this message does not have the nickname property, and should fallback to use name.",
+                authorId: AUTHOR_MLOMB.id,
+                timestamp: Date.parse("2018-05-20T16:09:51.118+00:00"),
+            }),
+            expect.objectContaining<PMessage>({
+                id: "447793085255123005",
+                channelId: "253601524398293010",
+                authorId: AUTHOR_MLOMB.id,
+                textContent: "This message has attachments and stickers.",
+                timestamp: Date.parse("2018-05-20T16:09:51.118+00:00"),
+                attachments: expect.arrayContaining([AttachmentType.Image, AttachmentType.Sticker]),
+            }),
+            expect.objectContaining<PMessage>({
+                id: "447793085255123006",
+                channelId: "253601524398293010",
+                authorId: AUTHOR_MLOMB.id,
+                textContent: "This message has reactions.",
+                timestamp: Date.parse("2018-05-20T16:09:51.118+00:00"),
+                reactions: expect.arrayContaining([
+                    [{ name: "❤" }, 2],
+                    [{ id: "464662216386412545", name: "paul" }, 3],
+                ]),
+            }),
+        ])
+    );
 });
 
 it("should crash if the guild information is not present before the channel", async () => {
