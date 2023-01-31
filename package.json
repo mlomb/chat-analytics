@@ -68,6 +68,7 @@
     "html-webpack-plugin": "^5.5.0",
     "jest": "^28.1.3",
     "jest-environment-jsdom": "^29.3.1",
+    "jest-extended": "^3.2.3",
     "less": "^4.1.3",
     "less-loader": "^11.1.0",
     "mini-css-extract-plugin": "~2.7.2",
@@ -87,6 +88,7 @@
     "webpack-dev-server": "^4.11.1"
   },
   "jest": {
+    "setupFilesAfterEnv": ["jest-extended/all"],
     "collectCoverageFrom": [
       "assets/Plausible.ts",
       "lib/**",
