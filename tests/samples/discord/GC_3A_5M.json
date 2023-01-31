@@ -47,10 +47,10 @@
             "timestampEdited": null,
             "callEndedTimestamp": null,
             "isPinned": false,
-            "content": "bla bla",
+            "content": "Should honor nickname over name",
             "author": {
                 "id": "333333333333333333",
-                "name": "theplant",
+                "name": "not a plant",
                 "discriminator": "6597",
                 "nickname": "theplant",
                 "color": null,
@@ -131,9 +131,9 @@
             "reactions": [],
             "mentions": [],
             "reference": {
-              "messageId": "1064990824305274930",
-              "channelId": "1064990764406419508",
-              "guildId": null
+                "messageId": "1064990824305274930",
+                "channelId": "1064990764406419508",
+                "guildId": null
             }
         }
     ],

@@ -55,7 +55,7 @@ export class DiscordParser extends Parser {
             //   + the default avatar is the timestamp of the Snowflake mod 8
             //   + image avatars are not available in the export, see https://github.com/Tyrrrz/DiscordChatExporter/issues/987
             // else: we other kind of channels don't have avatars
-            avatar: channel.type === "group" ? this.parseSnowflake(channel.id).timestamp.toString() : undefined,
+            avatar: type === "group" ? this.parseSnowflake(channel.id).timestamp.toString() : undefined,
         });
         this.lastChannelId = channel.id;
     }
