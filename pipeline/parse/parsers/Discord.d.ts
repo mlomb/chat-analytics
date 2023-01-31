@@ -4,29 +4,29 @@
 type Snowflake = string;
 
 type DiscordChannelType =
-    | "GuildTextChat"
-    | "DirectTextChat"
-    | "GuildVoiceChat"
     | "DirectGroupTextChat"
+    | "DirectTextChat"
     | "GuildCategory"
-    | "GuildNews"
-    | "GuildNewsThread"
-    | "GuildPublicThread"
-    | "GuildPrivateThread"
-    | "GuildStageVoice"
     | "GuildDirectory"
     | "GuildForum"
+    | "GuildNews"
+    | "GuildNewsThread"
+    | "GuildPrivateThread"
+    | "GuildPublicThread"
+    | "GuildStageVoice"
+    | "GuildTextChat"
+    | "GuildVoiceChat"
     | string;
 
 type DiscordMessageType =
+    | "Call"
+    | "ChannelIconChange"
+    | "ChannelNameChange"
+    | "ChannelPinnedMessage"
     | "Default"
+    | "GuildMemberJoin"
     | "RecipientAdd"
     | "RecipientRemove"
-    | "Call"
-    | "ChannelNameChange"
-    | "ChannelIconChange"
-    | "ChannelPinnedMessage"
-    | "GuildMemberJoin"
     | "Reply"
     | string;
 

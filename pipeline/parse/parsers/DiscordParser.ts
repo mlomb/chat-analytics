@@ -10,6 +10,13 @@ export class DiscordParser extends Parser {
     private lastGuildId?: RawID;
     private lastChannelId?: RawID;
 
+    /**
+     * Parse a Discord export file from DCE (https://github.com/Tyrrrz/DiscordChatExporter)
+     *
+     * We are assuming that in the JSON file, the "guild" key appear first and the "channel" key second in the file.
+     * This is up to DCE, hopefully they won't change it.
+     * Since we are streaming the file, we can handle big exports 😊
+     */
     async *parse(file: FileInput, progress?: Progress) {
         const stream = new JSONStream()
             .onObject<DiscordGuild>("guild", this.parseGuild.bind(this))
@@ -23,8 +30,7 @@ export class DiscordParser extends Parser {
         let iconUrl: string | undefined = guild.iconUrl;
 
         if (iconUrl === "https://cdn.discordapp.com/embed/avatars/0.png") {
-            // default icon means no icon
-            // I think this is DCE's fault but I'm not sure
+            // this is the default icon, we treat is as having no icon at all
             iconUrl = undefined;
         }
 
@@ -45,7 +51,11 @@ export class DiscordParser extends Parser {
             guildId: this.lastGuildId,
             name: channel.name,
             type,
-            avatar: this.parseSnowflake(channel.id).timestamp.toString(),
+            // If the channel is a group:
+            //   + the default avatar is the timestamp of the Snowflake mod 8
+            //   + image avatars are not available in the export, see https://github.com/Tyrrrz/DiscordChatExporter/issues/987
+            // else: we other kind of channels don't have avatars
+            avatar: channel.type === "group" ? this.parseSnowflake(channel.id).timestamp.toString() : undefined,
         });
         this.lastChannelId = channel.id;
     }
@@ -53,41 +63,42 @@ export class DiscordParser extends Parser {
     private parseMessage(message: DiscordMessage) {
         if (this.lastChannelId === undefined) throw new Error("Missing channel ID");
 
+        // Timestamps in the export are in UTC
+        // "YYYY-MM-DDTHH:MM:SS.mmm+00:00"
         const timestamp = Date.parse(message.timestamp);
         const timestampEdit = message.timestampEdited ? Date.parse(message.timestampEdited) : undefined;
 
+        // Discord allows users to have different nicknames depending the chat. We honor the nickname first
         const name = message.author.nickname || message.author.name;
-        const isDeletedUser = message.author.nickname == "Deleted User";
-        const author: PAuthor = {
-            id: message.author.id,
-            name: name + (isDeletedUser ? " #" + message.author.id : "#" + message.author.discriminator),
-            bot: false,
-        };
-        if (message.author.isBot) author.bot = true;
+        const isDeletedUser = name === "Deleted User";
 
+        // About the avatar:
         // See: https://discord.com/developers/docs/reference#image-formatting-cdn-endpoints
         // Can be:
-        // - https://cdn.discordapp.com/avatars/user_id/user_avatar.png
-        // - https://cdn.discordapp.com/embed/avatars/discriminator.png (must not set avatar, length is < 50)
-        const hasAvatar = message.author.avatarUrl && message.author.avatarUrl.length > 50;
-        if (hasAvatar) {
-            const avatar = message.author.avatarUrl.slice(35).split(".")[0];
-            author.avatar = (" " + avatar).substring(1); // avoid leak
-        }
+        // - https://cdn.discordapp.com/avatars/user_id/user_avatar.png (custom avatar, we only care about `user_id/user_avatar`)
+        // - https://cdn.discordapp.com/embed/avatars/discriminator.png (default color avatar)
+        let avatar: string | undefined;
+        if (message.author.avatarUrl && message.author.avatarUrl.includes("discordapp.com/avatars"))
+            avatar = message.author.avatarUrl.slice(35).split(".")[0];
 
-        // :)
+        this.emit("author", {
+            id: message.author.id,
+            bot: message.author.isBot,
+            name: name + (isDeletedUser ? " #" + message.author.id : "#" + message.author.discriminator),
+            avatar: avatar ? (" " + avatar).substring(1) : undefined, // avoid leak
+        });
+
         if (message.type == "Default" || message.type == "Reply") {
-            this.emit("author", author);
-
             let content = message.content;
             for (const mention of message.mentions) {
-                // replace names by nicknames in mentions
-                // and just to make sure, replace spaces by underscores in the nickname
-                // and add spaces in the sides
+                // replace names by nicknames in mentions (to honor nicknames)
+                // and just to make sure, replace spaces by underscores in the nickname and
+                // add spaces in the sides so it can be picked correctly up by the Tokenizer
                 content = content.split(`@${mention.name}`).join(` @${mention.nickname.replace(/\s/g, "_")} `);
             }
 
             // stickers may be undefined if the export was before stickers were added to DCE
+            // TODO: in the far future we may want to make stats for platforms that support stickers (in their exports)
             const stickers = message.stickers || [];
 
             this.emit("message", {
@@ -113,10 +124,15 @@ export class DiscordParser extends Parser {
         }
     }
 
-    // See https://discord.com/developers/docs/reference#snowflakes
-    parseSnowflake(snowflake: string) {
+    /**
+     * Parse a Discord Snowflake into its components
+     *
+     * See https://discord.com/developers/docs/reference#snowflakes
+     */
+    parseSnowflake(snowflake: Snowflake) {
         return {
             timestamp: BigInt(snowflake) >> BigInt(22),
+            // complete when needed:
             // internalWorkerId
             // internalProcessId
             // increment

@@ -1,0 +1,141 @@
+{
+    "guild": {
+        "id": "0",
+        "name": "Direct Messages",
+        "iconUrl": "https://cdn.discordapp.com/embed/avatars/0.png"
+    },
+    "channel": {
+        "id": "1064990764406419508",
+        "type": "DirectGroupTextChat",
+        "categoryId": "0",
+        "category": "Group",
+        "name": "a group chat",
+        "topic": null
+    },
+    "dateRange": {
+        "after": null,
+        "before": null
+    },
+    "messages": [
+        {
+            "id": "1064990775659729017",
+            "type": "ChannelNameChange",
+            "timestamp": "2023-01-17T19:33:07.489+00:00",
+            "timestampEdited": null,
+            "callEndedTimestamp": null,
+            "isPinned": false,
+            "content": "Changed the channel name.",
+            "author": {
+                "id": "222222222222222222",
+                "name": "lombi",
+                "discriminator": "8778",
+                "nickname": "lombi",
+                "color": null,
+                "isBot": false,
+                "avatarUrl": "https://cdn.discordapp.com/embed/avatars/3.png"
+            },
+            "attachments": [],
+            "embeds": [],
+            "stickers": [],
+            "reactions": [],
+            "mentions": []
+        },
+        {
+            "id": "1064990824305274930",
+            "type": "Default",
+            "timestamp": "2023-01-17T19:33:19.087+00:00",
+            "timestampEdited": null,
+            "callEndedTimestamp": null,
+            "isPinned": false,
+            "content": "bla bla",
+            "author": {
+                "id": "333333333333333333",
+                "name": "theplant",
+                "discriminator": "6597",
+                "nickname": "theplant",
+                "color": null,
+                "isBot": false,
+                "avatarUrl": "https://cdn.discordapp.com/avatars/333333333333333333/89eeaf49ac25ca932094c69e56a796e0.png?size=512"
+            },
+            "attachments": [],
+            "embeds": [],
+            "stickers": [],
+            "reactions": [],
+            "mentions": []
+        },
+        {
+            "id": "1064991038751649806",
+            "type": "ChannelIconChange",
+            "timestamp": "2023-01-17T19:34:10.215+00:00",
+            "timestampEdited": null,
+            "callEndedTimestamp": null,
+            "isPinned": false,
+            "content": "Changed the channel icon.",
+            "author": {
+                "id": "222222222222222222",
+                "name": "lombi",
+                "discriminator": "8778",
+                "nickname": "lombi",
+                "color": null,
+                "isBot": false,
+                "avatarUrl": "https://cdn.discordapp.com/embed/avatars/3.png"
+            },
+            "attachments": [],
+            "embeds": [],
+            "stickers": [],
+            "reactions": [],
+            "mentions": []
+        },
+        {
+            "id": "1064991070322180096",
+            "type": "Default",
+            "timestamp": "2023-01-17T19:34:17.742+00:00",
+            "timestampEdited": null,
+            "callEndedTimestamp": null,
+            "isPinned": false,
+            "content": "hey!!",
+            "author": {
+                "id": "222222222222222222",
+                "name": "lombi",
+                "discriminator": "8778",
+                "nickname": "lombi",
+                "color": null,
+                "isBot": false,
+                "avatarUrl": "https://cdn.discordapp.com/embed/avatars/3.png"
+            },
+            "attachments": [],
+            "embeds": [],
+            "stickers": [],
+            "reactions": [],
+            "mentions": []
+        },
+        {
+            "id": "530805779645595660",
+            "type": "Default",
+            "timestamp": "2023-01-18T20:12:12.123+00:00",
+            "timestampEdited": null,
+            "callEndedTimestamp": null,
+            "isPinned": false,
+            "content": "hey whats up",
+            "author": {
+                "id": "111111111111111111",
+                "name": "mlomb",
+                "discriminator": "5506",
+                "nickname": "mlomb",
+                "color": null,
+                "isBot": false,
+                "avatarUrl": "https://cdn.discordapp.com/avatars/111111111111111111/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.png?size=128"
+            },
+            "attachments": [],
+            "embeds": [],
+            "reactions": [],
+            "mentions": [],
+            "reference": {
+              "messageId": "1064990824305274930",
+              "channelId": "1064990764406419508",
+              "guildId": null
+            }
+        }
+    ],
+    "messageCount": 5
+}
