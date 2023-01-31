@@ -1,0 +1,66 @@
+{
+    "guild": {
+        "id": "0",
+        "name": "Direct Messages",
+        "iconUrl": "https://cdn.discordapp.com/embed/avatars/0.png"
+    },
+    "channel": {
+        "id": "530805775262679064",
+        "type": "DirectTextChat",
+        "categoryId": "0",
+        "category": "Private",
+        "name": "Someones name",
+        "topic": null
+    },
+    "dateRange": {
+        "after": null,
+        "before": null
+    },
+    "messages": [
+        {
+            "id": "530805779645595660",
+            "type": "Default",
+            "timestamp": "2019-01-04T17:52:39.762+00:00",
+            "timestampEdited": null,
+            "callEndedTimestamp": null,
+            "isPinned": false,
+            "content": "blah",
+            "author": {
+                "id": "111111111111111111",
+                "name": "mlomb",
+                "discriminator": "5506",
+                "nickname": "mlomb",
+                "color": null,
+                "isBot": false,
+                "avatarUrl": "https://cdn.discordapp.com/avatars/111111111111111111/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.png?size=128"
+            },
+            "attachments": [],
+            "embeds": [],
+            "reactions": [],
+            "mentions": []
+        },
+        {
+            "id": "538148765782114306",
+            "type": "Default",
+            "timestamp": "2019-01-25T00:11:04.083+00:00",
+            "timestampEdited": null,
+            "callEndedTimestamp": null,
+            "isPinned": false,
+            "content": "something something text",
+            "author": {
+                "id": "444444444444444444",
+                "name": "Someones name",
+                "discriminator": "1234",
+                "nickname": "Someones nickname",
+                "color": null,
+                "isBot": true,
+                "avatarUrl": "https://cdn.discordapp.com/embed/avatars/4.png"
+            },
+            "attachments": [],
+            "embeds": [],
+            "reactions": [],
+            "mentions": []
+        }
+    ],
+    "messageCount": 2
+}

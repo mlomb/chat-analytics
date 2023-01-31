@@ -1,14 +1,9 @@
 import { WhatsAppParser } from "@pipeline/parse/parsers/WhatsAppParser";
 
-import { runParser } from "./Util";
-
-const sample1 = `
-1/1/21, 12:00 - A: Hi
-1/1/21, 12:01 - B: Whats up?
-1/1/21, 12:02 - A: All good`;
+import { runParserFromSamples } from "./Util";
 
 it("sample1 should resolve correctly", async () => {
-    const parsed = await runParser(WhatsAppParser, [sample1]);
+    const parsed = await runParserFromSamples(WhatsAppParser, ["whatsapp/1A_3M.txt"]);
 
     // guilds
     expect(parsed.guilds).toHaveLength(1);

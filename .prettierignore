@@ -1,8 +1,9 @@
 .github/*
 .vscode/*
 *.html
-*.json
 *.md
+*.json
+!tests/**/*.json
 assets/data/*
 assets/fasttext/*
 dist/*
