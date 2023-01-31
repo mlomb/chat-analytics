@@ -14,7 +14,8 @@
       "@app/*": ["app/*"],
       "@assets/*": ["assets/*"],
       "@pipeline/*": ["pipeline/*"],
-      "@report/*": ["report/*"]
+      "@report/*": ["report/*"],
+      "@tests/*": ["tests/*"]
     }
   },
   "exclude": ["node_modules", "dist"]

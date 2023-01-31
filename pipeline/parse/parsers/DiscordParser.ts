@@ -4,7 +4,6 @@ import { ChannelType, RawID } from "@pipeline/Types";
 import { FileInput, streamJSONFromFile } from "@pipeline/parse/File";
 import { JSONStream } from "@pipeline/parse/JSONStream";
 import { Parser } from "@pipeline/parse/Parser";
-import { PAuthor } from "@pipeline/parse/Types";
 
 export class DiscordParser extends Parser {
     private lastGuildId?: RawID;
