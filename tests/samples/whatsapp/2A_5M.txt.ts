@@ -1,3 +1,4 @@
+import { AttachmentType } from "@pipeline/Attachments";
 import type { ExpectedPartialParseResult } from "@tests/parse/Util";
 
 import { GUILD_DEFAULT } from "./Common";
@@ -35,6 +36,16 @@ export const expectedParse: ExpectedPartialParseResult = {
             authorId: "A",
             textContent: "All good",
             timestamp: new Date(2021, 0, 1, 12, 2, 0).getTime(),
+        },
+        {
+            authorId: "A",
+            textContent: "This message should be reordered",
+            timestamp: new Date(2021, 0, 1, 12, 2, 0).getTime(),
+        },
+        {
+            authorId: "B",
+            attachments: [AttachmentType.Other],
+            timestamp: new Date(2021, 0, 1, 12, 3, 0).getTime(),
         },
     ],
 };

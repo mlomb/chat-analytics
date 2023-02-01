@@ -1,0 +1,5 @@
+1/1/21, 12:00 - A: Hi
+1/1/21, 12:01 - B: Whats up?
+1/1/21, 12:02 - A: All good
+1/1/21, 12:03 - B: <media omitted>
+1/1/21, 12:02 - A: This message should be reordered

@@ -5,7 +5,7 @@ import { checkSamplesAreParsedCorrectly, runParserFromSamples } from "./Util";
 describe("should resolve correctly", () => {
     // prettier-ignore
     const cases = [
-        [["1A_3M.txt"]],
+        [["2A_5M.txt"]],
         [["4A_11M.txt"]],
         [["4A_11M.zip"]],
     ];
