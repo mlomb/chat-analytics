@@ -32,14 +32,25 @@ export const runParser = async (klass: new () => Parser, inputs: FileInput[]): P
         authors: [],
         messages: [],
     };
+    let lastMsgTimestamp: number | undefined;
 
     const parser = new klass();
     parser.on("guild", (guild) => parsed.guilds.push(guild));
     parser.on("channel", (channel) => parsed.channels.push(channel));
     parser.on("author", (author) => parsed.authors.push(author));
-    parser.on("message", (message) => parsed.messages.push(message));
+    parser.on("message", (message) => {
+        parsed.messages.push(message);
+
+        // bonus check
+        // check that messages are emitted in chronological order, WHITHIN EACH FILE
+        if (lastMsgTimestamp === undefined) lastMsgTimestamp = message.timestamp;
+        else expect(message.timestamp).toBeGreaterThanOrEqual(lastMsgTimestamp);
+    });
 
     for (const input of inputs) {
+        // new file, reset
+        lastMsgTimestamp = undefined;
+
         for await (const _ of parser.parse(input)) continue;
     }
 

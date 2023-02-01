@@ -41,15 +41,16 @@ export class WhatsAppParser extends Parser {
         const fileContent = new TextDecoder("utf-8").decode(txtBuffer);
         const parsed = parseStringSync(fileContent);
 
+        // sometimes messages are out of order, make sure to sort them
+        // is this something that whatsapp-chat-parser should fix?
+        parsed.sort((a, b) => a.date.getTime() - b.date.getTime());
+
+        // compute the number of authors, excluding the "System" author
+        const numAuthors = new Set(parsed.filter((m) => m.author !== "System").map((m) => m.author)).size;
+
         // try to extract the chat name from the filename
         let name: string | undefined = extractChatName(file.name);
-
-        const numAuthors = new Set(parsed.filter((m) => m.author !== "System").map((m) => m.author)).size;
-        const isGroup = numAuthors > 2;
-
-        // if the chat is not a group, add "Chat with " to the name
-        if (name && !isGroup) name = `Chat with ${name}`;
-
+        // otherwise fallback
         name = name || `Chat #${this.channelIndex}`;
 
         this.emit("guild", { id: 0, name: "WhatsApp Chats" });
@@ -66,14 +67,14 @@ export class WhatsAppParser extends Parser {
             // NOTE: messages in ephemeral mode appear as empty messages
             const messageContent = removeBadChars(message.message);
 
+            if (isGroupWelcome(messageContent)) {
+                // Skip "Messages and calls are end-to-end encrypted..."
+                continue;
+            }
+
             if (message.author === "System") {
                 // parse system messages?
             } else {
-                if (isGroupWelcome(messageContent)) {
-                    // Skip "Messages and calls are end-to-end encrypted..."
-                    continue;
-                }
-
                 this.emit("author", {
                     id: message.author,
                     name: message.author,
@@ -87,6 +88,7 @@ export class WhatsAppParser extends Parser {
                 // examples:
                 // Ubicación: https://maps.google.com/?q=-XX.XXXXXX,-XX.XXXXXX
                 // location: https://maps.google.com/?q=-XX.XXXXXX,-XX.XXXXXX
+                // TODO: create attachment type for location?
                 if (messageContent.includes("https://maps.google.com/?q=")) attachment = AttachmentType.Other;
 
                 // TODO: handle "live location shared"
