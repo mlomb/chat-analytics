@@ -6,14 +6,25 @@ import { FileInput } from "@pipeline/parse/File";
 
 /** Loads a file from disk and wraps it into our file abstraction */
 export const loadFile = (filepath: string): FileInput => {
-    const content = fs.readFileSync(filepath);
     const stats = fs.statSync(filepath);
+    const fd = fs.openSync(filepath, "r");
 
     return {
         name: filepath,
         size: stats.size,
         lastModified: stats.mtimeMs,
-        slice: async (start, end) => content.subarray(start, end),
+        slice: async (start, end) => {
+            start = start ?? 0;
+            end = end ?? stats.size;
+            const buffer = Buffer.alloc(end - start);
+
+            fs.readSync(fd, buffer, {
+                length: end - start,
+                position: start,
+            });
+
+            return buffer;
+        },
     };
 };
 
