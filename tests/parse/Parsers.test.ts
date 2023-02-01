@@ -1,5 +1,6 @@
 import { Parser } from "@pipeline/parse/Parser";
 import { DiscordParser } from "@pipeline/parse/parsers/DiscordParser";
+import { MessengerParser } from "@pipeline/parse/parsers/MessengerParser";
 import { TelegramParser } from "@pipeline/parse/parsers/TelegramParser";
 import { WhatsAppParser } from "@pipeline/parse/parsers/WhatsAppParser";
 
@@ -18,6 +19,8 @@ describe("should resolve correctly", () => {
         { parser: WhatsAppParser, inputs: ["whatsapp/4A_11M.zip"] },
 
         { parser: TelegramParser, inputs: ["telegram/DM_2A_7M.json"] },
+
+        { parser: MessengerParser, inputs: ["messenger/2A_7M.json"] },
 
         // TODO: add more, cover branches
     ];

@@ -1,6 +1,5 @@
-// @ts-nocheck
-import { FileInput } from "@pipeline/File";
-import { AttachmentType } from "@pipeline/Types";
+import { AttachmentType } from "@pipeline/Attachments";
+import { FileInput } from "@pipeline/parse/File";
 import { Parser } from "@pipeline/parse/Parser";
 
 export class MessengerParser extends Parser {
@@ -20,29 +19,33 @@ export class MessengerParser extends Parser {
         // so we can just parse the whole file at once :)
         const fileContent = JSON.parse(textContent) as MessengerExportFile;
 
-        const guildIndex = this.builder.addGuild("Default", {
-            name: "Facebook Chats",
+        this.emit("guild", {
+            id: 0,
+            name: "Messenger Chats",
         });
-        const assignedChannelIndex = this.builder.addChannel(fileContent.thread_path, {
+        this.emit("channel", {
+            guildId: 0,
+            id: fileContent.thread_path,
             name: fileContent.title,
-            guildIndex: guildIndex,
             type: fileContent.participants.length > 2 ? "group" : "dm",
         });
 
         // we iterate the messages in reverse order since we want to iterate from older to newer
         for (const message of fileContent.messages.reverse()) {
-            const authorIndex = this.builder.addAuthor(message.sender_name, {
-                n: message.sender_name,
+            this.emit("author", {
+                id: message.sender_name,
+                name: message.sender_name,
+                // are there bots in Messenger?
+                bot: false,
             });
 
-            this.builder.addMessage({
+            this.emit("message", {
                 id: this.messageIndex++,
                 timestamp: message.timestamp_ms,
-                authorIndex,
-                channelIndex: assignedChannelIndex,
-                content: message.content,
+                authorId: message.sender_name,
+                channelId: fileContent.thread_path,
+                textContent: message.content,
                 attachments: this.parseAttachments(message),
-                reactions: [],
             });
 
             yield;
