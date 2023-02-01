@@ -1,13 +1,13 @@
-// @ts-nocheck
-import { FileInput, getAttachmentTypeFromMimeType, streamJSONFromFile } from "@pipeline/File";
-import { AttachmentType, Index, RawID } from "@pipeline/Types";
+import { AttachmentType, getAttachmentTypeFromMimeType } from "@pipeline/Attachments";
+import { Index, RawID } from "@pipeline/Types";
+import { FileInput, streamJSONFromFile } from "@pipeline/parse/File";
 import { JSONStream } from "@pipeline/parse/JSONStream";
 import { Parser } from "@pipeline/parse/Parser";
 
 export class TelegramParser extends Parser {
     private lastChannelName?: string;
     private lastChannelType?: TelegramChannelType;
-    private lastChannelIndex?: Index;
+    private lastChannelID?: RawID;
 
     async *parse(file: FileInput) {
         const stream = new JSONStream()
@@ -19,7 +19,7 @@ export class TelegramParser extends Parser {
         yield* streamJSONFromFile(stream, file);
 
         this.lastChannelName = undefined;
-        this.lastChannelIndex = undefined;
+        this.lastChannelID = undefined;
     }
 
     private onChannelName(channelName: string) {
@@ -31,19 +31,23 @@ export class TelegramParser extends Parser {
     }
 
     private onChannelId(rawChannelId: RawID) {
-        const guildIndex = this.builder.addGuild("Default", {
+        this.lastChannelID = rawChannelId;
+
+        this.emit("guild", {
+            id: 0,
             name: "Telegram Chats",
         });
 
-        this.lastChannelIndex = this.builder.addChannel(rawChannelId, {
+        this.emit("channel", {
+            id: rawChannelId,
+            guildId: 0,
             name: this.lastChannelName || "Telegram chat",
-            guildIndex,
             type: ["personal_chat", "bot_chat"].includes(this.lastChannelType || "") ? "dm" : "group",
         });
     }
 
     private parseMessage(message: TelegramMessage) {
-        if (this.lastChannelIndex === undefined) throw new Error("Missing channel ID");
+        if (this.lastChannelID === undefined) throw new Error("Missing channel ID");
 
         const rawId: RawID = message.id + "";
         const rawAuthorId: RawID = message.from_id + "";
@@ -54,13 +58,15 @@ export class TelegramParser extends Parser {
         const timestampEdit = message.edited ? Date.parse(message.edited) : undefined;
 
         if (message.type === "message") {
-            // NOTE: I can't find a reliable way to detect if a user is a bot :(
-            const authorIndex = this.builder.addAuthor(rawAuthorId, {
+            this.emit("author", {
+                id: rawAuthorId,
                 // use the ID as name if no nickname is available
-                n: message.from || rawId,
+                name: message.from || rawId,
+                // NOTE: I can't find a reliable way to detect if an author is a bot :(
+                bot: false,
             });
 
-            let content = this.parseTextArray(message.text);
+            let textContent = this.parseTextArray(message.text);
             let attachment: AttachmentType | undefined;
 
             // determinate attachment type
@@ -68,28 +74,28 @@ export class TelegramParser extends Parser {
             if (message.mime_type) attachment = getAttachmentTypeFromMimeType(message.mime_type);
             if (message.location_information !== undefined) attachment = AttachmentType.Other;
 
-            if (content.length === 0 && attachment === undefined) {
+            if (textContent.length === 0 && attachment === undefined) {
                 // sometimes messages do not include the "mime_type" but "photo"
                 if (message.photo) attachment = AttachmentType.Image;
                 // polls
                 if (message.poll) {
                     // put the question as the message content
-                    content = message.poll.question;
+                    textContent = message.poll.question;
                 }
                 // NOTE: also :dart: emoji appears as empty content
             }
 
-            this.builder.addMessage({
+            this.emit("message", {
                 id: rawId,
                 replyTo: rawReplyToId,
-                authorIndex,
-                channelIndex: this.lastChannelIndex,
+                authorId: rawAuthorId,
+                channelId: this.lastChannelID,
                 timestamp,
                 timestampEdit,
-                content,
+                textContent,
                 attachments: attachment === undefined ? [] : [attachment],
                 // NOTE: as of now, Telegram doesn't export reactions :(
-                reactions: [],
+                // reactions: [],
             });
         }
     }

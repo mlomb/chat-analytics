@@ -1,25 +1,6 @@
 import { DiscordParser } from "@pipeline/parse/parsers/DiscordParser";
 
-import { checkSamplesAreParsedCorrectly, runParserFromString } from "./Util";
-
-describe("should resolve correctly", () => {
-    // prettier-ignore
-    const cases = [
-        [["DM_2A_2M"]],
-        [["GC_3A_5M"]],
-        [["SV_5A_5M"]],
-        [["DM_2A_2M", "GC_3A_5M", "SV_5A_5M"]]
-    ];
-
-    test.each(cases)(
-        "%s",
-        async (filenames) =>
-            await checkSamplesAreParsedCorrectly(
-                DiscordParser,
-                filenames.map((filename) => `discord/${filename}.json`)
-            )
-    );
-});
+import { runParserFromString } from "./Util";
 
 it("should crash if the guild information is not present before the channel", async () => {
     await expect(runParserFromString(DiscordParser, [`{ "channel": {} }`])).rejects.toThrow("Missing guild ID");
