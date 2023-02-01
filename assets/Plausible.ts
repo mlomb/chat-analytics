@@ -25,7 +25,7 @@ export const plausible = (name: "pageview" | string, props?: { [key: string]: st
         url: `https://chatanalytics.app${pathname}${window.location.search}`,
         referrer: document.referrer,
         screen_width: window.innerWidth,
-        props,
+        props: JSON.stringify(props),
     };
 
     fetch(PLAUSIBLE_URL + "/api/event", {
