@@ -1,0 +1,86 @@
+﻿{
+    "participants": [
+        {
+            "name": "Alice"
+        },
+        {
+            "name": "Bob"
+        }
+    ],
+    "messages": [
+        {
+            "sender_id_INTERNAL": 0,
+            "sender_name": "Alice",
+            "timestamp_ms": 1415147732056,
+            "content": "Hello"
+        },
+        {
+            "sender_id_INTERNAL": 0,
+            "sender_name": "Bob",
+            "timestamp_ms": 1415147681489,
+            "content": "Whats up!"
+        },
+        {
+            "sender_id_INTERNAL": 0,
+            "sender_name": "Bob",
+            "timestamp_ms": 1415147325354,
+            "content": "you what"
+        },
+        {
+            "sender_id_INTERNAL": 0,
+            "sender_name": "Bob",
+            "timestamp_ms": 1415147308604,
+            "files": [
+                {
+                    "uri": "messages/inbox/alice_aaaaaaaaaa/files/blabla.docx",
+                    "media_path_INTERNAL": "",
+                    "type_INTERNAL": "",
+                    "creation_timestamp": 1429378752
+                }
+            ],
+            "ip": "1.1.1.1"
+        },
+        {
+            "sender_id_INTERNAL": 0,
+            "sender_name": "Alice",
+            "timestamp_ms": 1415147297141,
+            "audio_files": [
+                {
+                    "uri": "messages/inbox/alice_aaaaaaaaaa/audio/audioclip11111.mp4",
+                    "media_path_INTERNAL": "",
+                    "type_INTERNAL": "",
+                    "creation_timestamp": 1445813039
+                }
+            ]
+        },
+        {
+            "sender_id_INTERNAL": 0,
+            "sender_name": "Bob",
+            "timestamp_ms": 1415147254275,
+            "sticker": {
+                "uri": "messages/stickers_used/123123123123123.png",
+                "media_path_INTERNAL": "",
+                "type_INTERNAL": ""
+            }
+        },
+        {
+            "sender_id_INTERNAL": 0,
+            "sender_name": "Bob",
+            "timestamp_ms": 1415147240411,
+            "photos": [
+                {
+                    "uri": "messages/inbox/alice_aaaaaaaaaa/photos/123123123123123.jpg",
+                    "media_path_INTERNAL": "",
+                    "type_INTERNAL": "",
+                    "creation_timestamp": 1447284598
+                }
+            ],
+            "ip": "1.1.1.1"
+        }
+    ],
+    "title": "Alice",
+    "is_still_participant": true,
+    "thread_type": "Regular",
+    "thread_path": "inbox/alice_aaaaaaaaaa",
+    "magic_words": []
+}
