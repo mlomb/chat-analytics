@@ -1,3 +1,5 @@
+import { Platform } from "@pipeline/Types";
+import { createParser } from "@pipeline/parse";
 import { Parser } from "@pipeline/parse/Parser";
 import { DiscordParser } from "@pipeline/parse/parsers/DiscordParser";
 import { MessengerParser } from "@pipeline/parse/parsers/MessengerParser";
@@ -23,7 +25,19 @@ describe("should resolve correctly", () => {
         { parser: MessengerParser, inputs: ["messenger/2A_7M.json"] },
 
         // TODO: add more, cover branches
+        // Telegram and Messenger need more samples
     ];
 
     test.each(cases)("$inputs", async ({ parser, inputs }) => await checkSamplesAreParsedCorrectly(parser, inputs));
+});
+
+describe("createParser should return the correct parser", () => {
+    test.each<[Platform, new () => Parser]>([
+        ["discord", DiscordParser],
+        ["whatsapp", WhatsAppParser],
+        ["telegram", TelegramParser],
+        ["messenger", MessengerParser],
+    ])("%s", async (platform, expectedClass) => {
+        expect(createParser(platform)).toBeInstanceOf(expectedClass);
+    });
 });
