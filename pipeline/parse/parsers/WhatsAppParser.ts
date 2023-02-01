@@ -11,34 +11,15 @@ export class WhatsAppParser extends Parser {
     private channelIndex = 0;
     private messageIndex = 0;
 
+    /** Parse a WhatsApp export in txt or zip format */
     async *parse(file: FileInput) {
         const fileBuffer = await file.slice();
-        let txtBuffer: ArrayBuffer | undefined = undefined;
-        if (file.name.toLowerCase().endsWith(".zip")) {
-            if (fileBuffer.byteLength > 300 * 1024 * 1024)
-                throw new Error("Do not attach media files while exporting (file too big)");
 
-            const unzippedFiles = unzipSync(new Uint8Array(fileBuffer));
-            const files = Object.keys(unzippedFiles);
-
-            // by default is included as "_chat.txt" inside the ZIP
-            if (files.includes("_chat.txt")) {
-                txtBuffer = unzippedFiles["_chat.txt"];
-            } else {
-                // otherwise we try to find a file that matches the pattern
-                const chatTxtFiles = files
-                    .filter((f) => f.match(/.*(?:chat|whatsapp).*\.txt$/i))
-                    .sort((a, b) => a.length - b.length);
-                if (chatTxtFiles.length > 0) txtBuffer = unzippedFiles[chatTxtFiles[0]];
-            }
-
-            if (txtBuffer === undefined) throw new Error("Could not find txt file in zip");
-        } else {
-            // regular .txt
-            txtBuffer = fileBuffer;
-        }
-
+        // regular .txt or .zip file
+        const txtBuffer = file.name.toLowerCase().endsWith(".zip") ? this.extractTxtFromZip(fileBuffer) : fileBuffer;
         const fileContent = new TextDecoder("utf-8").decode(txtBuffer);
+
+        // use whatsapp-chat-parser
         const parsed = parseStringSync(fileContent);
 
         // sometimes messages are out of order, make sure to sort them
@@ -50,7 +31,7 @@ export class WhatsAppParser extends Parser {
 
         // try to extract the chat name from the filename
         let name: string | undefined = extractChatName(file.name);
-        // otherwise fallback
+        // otherwise fallback to a generic name
         name = name || `Chat #${this.channelIndex}`;
 
         this.emit("guild", { id: 0, name: "WhatsApp Chats" });
@@ -61,10 +42,11 @@ export class WhatsAppParser extends Parser {
             type: numAuthors > 2 ? "group" : "dm",
         });
 
+        // NOTE: messages in ephemeral mode appear as empty messages
         for (const message of parsed) {
             const timestamp = message.date.getTime();
 
-            // NOTE: messages in ephemeral mode appear as empty messages
+            // sometimes messages have these chars in them, I have no clue why
             const messageContent = removeBadChars(message.message);
 
             if (isGroupWelcome(messageContent)) {
@@ -106,5 +88,34 @@ export class WhatsAppParser extends Parser {
         }
 
         this.channelIndex++;
+    }
+
+    /**
+     * Tries to extract a .txt file from a .zip file buffer.
+     * It searches the default "_chat.txt" file. Otherwise tries to match some text files with a pattern.
+     *
+     * @throws if it can't find a .txt file
+     * @returns the .txt file buffer
+     */
+    extractTxtFromZip(fileBuffer: ArrayBuffer): ArrayBuffer {
+        if (fileBuffer.byteLength > 300 * 1024 * 1024)
+            throw new Error("Do not attach media files while exporting (file too big)");
+
+        const unzippedFiles = unzipSync(new Uint8Array(fileBuffer));
+        const files = Object.keys(unzippedFiles);
+
+        // by default is included as "_chat.txt" inside the ZIP
+        if (files.includes("_chat.txt")) {
+            return unzippedFiles["_chat.txt"];
+        } else {
+            // otherwise we try to find a file that matches the pattern
+            // (defensive, just in case)
+            const chatTxtFiles = files
+                .filter((f) => f.match(/.*(?:chat|whatsapp).*\.txt$/i))
+                .sort((a, b) => a.length - b.length);
+            if (chatTxtFiles.length > 0) return unzippedFiles[chatTxtFiles[0]];
+        }
+
+        throw new Error("Could not find txt file in zip");
     }
 }
