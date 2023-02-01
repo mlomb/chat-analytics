@@ -1,0 +1,114 @@
+{
+    "name": "Bob",
+    "type": "personal_chat",
+    "id": 700000000,
+    "messages": [
+        {
+            "id": 2675,
+            "type": "service",
+            "date": "2019-07-12T16:55:32",
+            "date_unixtime": "1562961332",
+            "actor": "Bob",
+            "actor_id": "user700000000",
+            "action": "joined_telegram",
+            "text": "",
+            "text_entities": []
+        },
+        {
+            "id": 3644,
+            "type": "message",
+            "date": "2022-03-09T13:07:32",
+            "date_unixtime": "1646842052",
+            "from": "Bob",
+            "from_id": "user700000000",
+            "text": [
+                {
+                    "type": "link",
+                    "text": "https://google.com"
+                },
+                " 👀"
+            ],
+            "text_entities": [
+                {
+                    "type": "link",
+                    "text": "https://google.com"
+                },
+                {
+                    "type": "plain",
+                    "text": " 👀"
+                }
+            ]
+        },
+        {
+            "id": 3645,
+            "type": "message",
+            "date": "2022-03-09T13:07:42",
+            "date_unixtime": "1646842062",
+            "from": "Alice",
+            "from_id": "user300000000",
+            "text": "hello world",
+            "text_entities": [
+                {
+                    "type": "plain",
+                    "text": "hello world"
+                }
+            ]
+        },
+        {
+            "id": 3662,
+            "type": "message",
+            "date": "2022-05-09T19:23:53",
+            "date_unixtime": "1652135033",
+            "from": "Bob",
+            "from_id": "user700000000",
+            "text": "world?",
+            "text_entities": [
+                {
+                    "type": "plain",
+                    "text": "world?"
+                }
+            ]
+        },
+        {
+            "id": 3663,
+            "type": "message",
+            "date": "2022-05-09T20:26:09",
+            "date_unixtime": "1652138769",
+            "from": "Alice",
+            "from_id": "user300000000",
+            "text": "blah blah",
+            "text_entities": [
+                {
+                    "type": "plain",
+                    "text": "blah blah"
+                }
+            ]
+        },
+        {
+            "id": 3672,
+            "type": "message",
+            "date": "2022-06-10T19:06:38",
+            "date_unixtime": "1654898798",
+            "from": "Alice",
+            "from_id": "user300000000",
+            "photo": "(File not included. Change data exporting settings to download.)",
+            "width": 960,
+            "height": 1280,
+            "text": "",
+            "text_entities": []
+        },
+        {
+            "id": 3673,
+            "type": "message",
+            "date": "2022-06-10T19:06:39",
+            "date_unixtime": "1654898799",
+            "from": "Alice",
+            "from_id": "user300000000",
+            "photo": "(File not included. Change data exporting settings to download.)",
+            "width": 960,
+            "height": 1280,
+            "text": "",
+            "text_entities": []
+        }
+    ]
+}
