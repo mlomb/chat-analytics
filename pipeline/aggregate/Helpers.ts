@@ -10,10 +10,10 @@ export const parseAndFilterMessages = (
     activeFilters = { channels: true, authors: true, time: true }
 ) => {
     const stream = new BitStream(database.messages?.buffer);
-    for (let i = 0; i < database.channels.length; i++) {
+    for (let ch = 0; ch < database.channels.length; ch++) {
         // filter channel
-        if (activeFilters.channels && !filters.hasChannel(i)) continue;
-        const channel = database.channels[i];
+        if (activeFilters.channels && !filters.hasChannel(ch)) continue;
+        const channel = database.channels[ch];
 
         if (channel.msgAddr === undefined) continue;
         if (channel.msgCount === undefined) continue;
@@ -23,7 +23,8 @@ export const parseAndFilterMessages = (
 
         // read messages
         for (let read = 0; read < channel.msgCount; read++) {
-            const message = new MessageView(stream, database.bitConfig, i);
+            const message = new MessageView(stream, database.bitConfig);
+            message.channelIndex = ch;
             // filter author
             if (!activeFilters.authors || filters.hasAuthor(message.authorIndex)) {
                 // filter time
