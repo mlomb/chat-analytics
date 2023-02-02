@@ -1,6 +1,6 @@
 import { Message } from "@pipeline/process/Types";
 import { BitStream } from "@pipeline/serialization/BitStream";
-import { readIndexArray, writeIndexArray } from "@pipeline/serialization/IndexSerialization";
+import { readIndexCounts, writeIndexCounts } from "@pipeline/serialization/IndexCountsSerialization";
 
 /** These flags are used to encode the presence of optional fields in a Message */
 // prettier-ignore
@@ -65,12 +65,12 @@ export const writeMessage = (message: Message, stream: BitStream, bitConfig: Mes
         stream.setBits(8, message.langIndex!); // 0-255
         stream.setBits(8, message.sentiment! + 128); // 0-255
     }
-    if (flags & MessageFlags.Words) writeIndexArray(message.words!, stream, bitConfig.wordIdxBits);
-    if (flags & MessageFlags.Emojis) writeIndexArray(message.emojis!, stream, bitConfig.emojiIdxBits);
-    if (flags & MessageFlags.Attachments) writeIndexArray(message.attachments!, stream, 3);
-    if (flags & MessageFlags.Reactions) writeIndexArray(message.reactions!, stream, bitConfig.emojiIdxBits);
-    if (flags & MessageFlags.Mentions) writeIndexArray(message.mentions!, stream, bitConfig.mentionsIdxBits);
-    if (flags & MessageFlags.Domains) writeIndexArray(message.domains!, stream, bitConfig.domainsIdxBits);
+    if (flags & MessageFlags.Words) writeIndexCounts(message.words!, stream, bitConfig.wordIdxBits);
+    if (flags & MessageFlags.Emojis) writeIndexCounts(message.emojis!, stream, bitConfig.emojiIdxBits);
+    if (flags & MessageFlags.Attachments) writeIndexCounts(message.attachments!, stream, 3);
+    if (flags & MessageFlags.Reactions) writeIndexCounts(message.reactions!, stream, bitConfig.emojiIdxBits);
+    if (flags & MessageFlags.Mentions) writeIndexCounts(message.mentions!, stream, bitConfig.mentionsIdxBits);
+    if (flags & MessageFlags.Domains) writeIndexCounts(message.domains!, stream, bitConfig.domainsIdxBits);
 };
 
 /**
@@ -94,12 +94,12 @@ export const readMessage = (stream: BitStream, bitConfig: MessageBitConfig): Mes
         message.langIndex = stream.getBits(8);
         message.sentiment = stream.getBits(8) - 128;
     }
-    if (flags & MessageFlags.Words) message.words = readIndexArray(stream, bitConfig.wordIdxBits);
-    if (flags & MessageFlags.Emojis) message.emojis = readIndexArray(stream, bitConfig.emojiIdxBits);
-    if (flags & MessageFlags.Attachments) message.attachments = readIndexArray(stream, 3);
-    if (flags & MessageFlags.Reactions) message.reactions = readIndexArray(stream, bitConfig.emojiIdxBits);
-    if (flags & MessageFlags.Mentions) message.mentions = readIndexArray(stream, bitConfig.mentionsIdxBits);
-    if (flags & MessageFlags.Domains) message.domains = readIndexArray(stream, bitConfig.domainsIdxBits);
+    if (flags & MessageFlags.Words) message.words = readIndexCounts(stream, bitConfig.wordIdxBits);
+    if (flags & MessageFlags.Emojis) message.emojis = readIndexCounts(stream, bitConfig.emojiIdxBits);
+    if (flags & MessageFlags.Attachments) message.attachments = readIndexCounts(stream, 3);
+    if (flags & MessageFlags.Reactions) message.reactions = readIndexCounts(stream, bitConfig.emojiIdxBits);
+    if (flags & MessageFlags.Mentions) message.mentions = readIndexCounts(stream, bitConfig.mentionsIdxBits);
+    if (flags & MessageFlags.Domains) message.domains = readIndexCounts(stream, bitConfig.domainsIdxBits);
 
     return message;
 };
