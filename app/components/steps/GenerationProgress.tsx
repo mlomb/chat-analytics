@@ -14,6 +14,8 @@ import Tick from "@assets/images/icons/tick.svg";
 import Times from "@assets/images/icons/times.svg";
 import User from "@assets/images/icons/user.svg";
 
+const prettyBytesAligned = (n: number) => prettyBytes(n, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
 interface Props {
     /** Wether the generation is currently running (still processing) */
     working: boolean;
@@ -60,7 +62,7 @@ const TaskItem = ({ task: { title, subject, status, progress } }: { task: Progre
             (progress.format === "number" ? (
                 <TaskProgress {...progress} format={(value) => value.toLocaleString()} />
             ) : (
-                <TaskProgress {...progress} format={prettyBytes} />
+                <TaskProgress {...progress} format={prettyBytesAligned} />
             ))}
     </div>
 );
