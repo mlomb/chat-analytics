@@ -1,50 +1,74 @@
-import { BitAddress } from "@pipeline/Types";
+/** Offset in bits in a BitStream */
+export type BitAddress = number;
 
-/*
-Support:
-    - Signed integers
-    - Reads and writes up to 32bits
-    - Works in multiples of 32bits
-
-cross boundary
-|--------------------------------| |---------------------------------|
-|           value1               | |            value2               |
-↓ aligned32                      | ↓ aligned32 + 1                   |
-[00000000000000000000000000000000] [00000000000000000000000000000000]
-            ↑ offset                         ↑ offset + bits
-            |            VALUE               |
-            |--------------------------------|
-|- delta -|------------- bits -------------|
-
-only left boundary
-[00000000000000000000000000000000] [00000000000000000000000000000000]
-            ↑ offset     ↑ offset + bits
-            |   VALUE    |
-            |------------|
-|- delta -|--- bits ---|
-*/
+/**
+ * A stream where you can read and write arbitrary amounts of bits.
+ * One can change the offset to seek specific locations.
+ * Only supports  signed integers up to 32 bits. Supports variable length integers.
+ * It DOES NOT check for out of bounds reads or writes.
+ *
+ * It works using a 32bits buffer and when reading or writing two situations can happen:
+ *
+ * [+] ONLY LEFT BOUNDARY: the value being read is contained in the exact 32bits word
+ * ```
+ * [00000000000000000000000000000000] [00000000000000000000000000000000]
+ *             ↑ offset     ↑ offset + bits
+ *             |    VALUE   |
+ *             |------------|
+ * |-- delta --|--- bits ---|
+ * ```
+ *
+ * [+] CROSS BOUNDARY: the value being read is split between two 32bits words
+ * ```
+ *  |--------------------------------| |---------------------------------|
+ *  |           value1               | |            value2               |
+ *  ↓ aligned32                      | ↓ aligned32 + 1                   |
+ *  [00000000000000000000000000000000] [00000000000000000000000000000000]
+ *              ↑ offset                         ↑ offset + bits
+ *              |             VALUE              |
+ *              |--------------------------------|
+ *  |-- delta --|------------- bits -------------|
+ * ```
+ *
+ * `delta`, `bits`, `aligned32` and `offset` represent the variables in the code.
+ */
 export class BitStream {
-    // TODO: we should rename offset to length and this.buffer.length to capacity to be consistent with the std
     public buffer: Uint32Array;
+
+    /** Reading and writing "head", bytes will be read or written starting from this offset */
     public offset: BitAddress;
 
     constructor(buffer?: ArrayBuffer) {
-        if (buffer) console.assert(buffer instanceof ArrayBuffer);
-        this.buffer = buffer ? new Uint32Array(buffer) : new Uint32Array(1024); // 1024 bytes by default
+        if (buffer) {
+            console.assert(buffer instanceof ArrayBuffer);
+            console.assert(buffer.byteLength % 4 === 0, "Buffer must be aligned to 32bits");
+        }
+
+        this.buffer = buffer ? new Uint32Array(buffer) : new Uint32Array(1024); // 1024 u32 by default, 4KB
         this.offset = 0;
     }
 
-    get buffer8(): Uint8Array {
-        return new Uint8Array(this.buffer.buffer);
+    /**
+     * Returns the data buffer up to the current offset as an Uint8Array.
+     * The buffer returned is aligned to 32bits, so it can be used to create another BitStream instance.
+     */
+    get buffer8(): Readonly<Uint8Array> {
+        // we are reusing the same buffer (to a void a copy) and wrapping it in a new Uint8Array with the offsets we need
+        return new Uint8Array(this.buffer.buffer, 0, Math.ceil(this.offset / 32) * 4);
     }
 
+    /**
+     * Grows the data buffer to allow new bits to be written.
+     * Note that the buffer instance will change.
+     */
     private grow(): void {
-        // TODO: maybe double is too much
-        const newBuffer = new Uint32Array(this.buffer.length * 2);
+        const growthFactor = 1.5;
+        const newBuffer = new Uint32Array(this.buffer.length * growthFactor);
         newBuffer.set(this.buffer);
         this.buffer = newBuffer;
     }
 
+    /** Sets the value at the current offset using the specified number of bits */
     setBits(bits: number, value: number): void {
         const offset = this.offset;
         this.offset += bits;
@@ -72,6 +96,7 @@ export class BitStream {
         }
     }
 
+    /** Reads the value at the current offset using the specified number of bits */
     getBits(bits: number): number {
         const buffer = this.buffer;
         const offset = this.offset;
@@ -93,7 +118,10 @@ export class BitStream {
         return value >>> 0;
     }
 
-    // variable byte encode
+    /**
+     * Writes a variable length integer, up to the specified number of bits.
+     * Knowing the maximum number of bits lets us decide if we need to use a variable length encoding or if its worse.
+     */
     writeVarInt(value: number, maxBits: number = 32): void {
         if (maxBits < 10) {
             this.setBits(maxBits, value);
@@ -107,7 +135,7 @@ export class BitStream {
         this.setBits(8, value);
     }
 
-    // variable byte decode
+    /** Reads a variable length integer, up to the specified number of bits */
     readVarInt(maxBits: number = 32): number {
         if (maxBits < 10) return this.getBits(maxBits);
 

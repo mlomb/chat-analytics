@@ -2,7 +2,7 @@ import { Message } from "@pipeline/process/Types";
 import { BitStream } from "@pipeline/serialization/BitStream";
 import { readIndexArray, writeIndexArray } from "@pipeline/serialization/IndexSerialization";
 
-// available message information
+/** These flags are used to encode the presence of optional fields in a Message */
 // prettier-ignore
 export enum MessageFlags {
     None,
@@ -17,6 +17,7 @@ export enum MessageFlags {
     Domains     = 1 << 8,
 }
 
+/** Defines how many bits are used for various fields in a Message */
 export interface MessageBitConfig {
     dayBits: number;
     authorIdxBits: number;
@@ -26,7 +27,13 @@ export interface MessageBitConfig {
     domainsIdxBits: number;
 }
 
-// hand-picked values, hoping they work well
+/**
+ * Default bit configuration for messages.
+ * At the start we don't know how many authors, words, emojis, etc. we have, so we have to use a conservative
+ * configuration that works for all possible values.
+ *
+ * These values are hand-picked.
+ */
 export const DefaultMessageBitConfig: MessageBitConfig = {
     dayBits: 21, // 12 + 4 + 5
     authorIdxBits: 21,
@@ -36,10 +43,11 @@ export const DefaultMessageBitConfig: MessageBitConfig = {
     domainsIdxBits: 16,
 };
 
-export const writeMessage = (message: Message, stream: BitStream, config: MessageBitConfig) => {
-    stream.setBits(config.dayBits, message.day);
+/** Writes the message into the stream using the provided bit configuration */
+export const writeMessage = (message: Message, stream: BitStream, bitConfig: MessageBitConfig) => {
+    stream.setBits(bitConfig.dayBits, message.day);
     stream.setBits(17, message.secondOfDay); // 0-2^17 (needed 86400)
-    stream.setBits(config.authorIdxBits, message.authorIndex);
+    stream.setBits(bitConfig.authorIdxBits, message.authorIndex);
 
     let flags = MessageFlags.None;
     if (message.replyOffset) flags |= MessageFlags.Reply;
@@ -57,18 +65,22 @@ export const writeMessage = (message: Message, stream: BitStream, config: Messag
         stream.setBits(8, message.langIndex!); // 0-255
         stream.setBits(8, message.sentiment! + 128); // 0-255
     }
-    if (flags & MessageFlags.Words) writeIndexArray(message.words!, stream, config.wordIdxBits);
-    if (flags & MessageFlags.Emojis) writeIndexArray(message.emojis!, stream, config.emojiIdxBits);
+    if (flags & MessageFlags.Words) writeIndexArray(message.words!, stream, bitConfig.wordIdxBits);
+    if (flags & MessageFlags.Emojis) writeIndexArray(message.emojis!, stream, bitConfig.emojiIdxBits);
     if (flags & MessageFlags.Attachments) writeIndexArray(message.attachments!, stream, 3);
-    if (flags & MessageFlags.Reactions) writeIndexArray(message.reactions!, stream, config.emojiIdxBits);
-    if (flags & MessageFlags.Mentions) writeIndexArray(message.mentions!, stream, config.mentionsIdxBits);
-    if (flags & MessageFlags.Domains) writeIndexArray(message.domains!, stream, config.domainsIdxBits);
+    if (flags & MessageFlags.Reactions) writeIndexArray(message.reactions!, stream, bitConfig.emojiIdxBits);
+    if (flags & MessageFlags.Mentions) writeIndexArray(message.mentions!, stream, bitConfig.mentionsIdxBits);
+    if (flags & MessageFlags.Domains) writeIndexArray(message.domains!, stream, bitConfig.domainsIdxBits);
 };
 
-export const readMessage = (stream: BitStream, config: MessageBitConfig): Message => {
-    const day = stream.getBits(config.dayBits);
+/**
+ * Reads a whole message from the stream using the provided bit configuration.
+ * If you don't need all the fields, you may want to use the `MessageView` class instead.
+ */
+export const readMessage = (stream: BitStream, bitConfig: MessageBitConfig): Message => {
+    const day = stream.getBits(bitConfig.dayBits);
     const secondOfDay = stream.getBits(17);
-    const authorIndex = stream.getBits(config.authorIdxBits);
+    const authorIndex = stream.getBits(bitConfig.authorIdxBits);
     const flags = stream.getBits(9);
 
     const message: Message = {
@@ -82,12 +94,12 @@ export const readMessage = (stream: BitStream, config: MessageBitConfig): Messag
         message.langIndex = stream.getBits(8);
         message.sentiment = stream.getBits(8) - 128;
     }
-    if (flags & MessageFlags.Words) message.words = readIndexArray(stream, config.wordIdxBits);
-    if (flags & MessageFlags.Emojis) message.emojis = readIndexArray(stream, config.emojiIdxBits);
+    if (flags & MessageFlags.Words) message.words = readIndexArray(stream, bitConfig.wordIdxBits);
+    if (flags & MessageFlags.Emojis) message.emojis = readIndexArray(stream, bitConfig.emojiIdxBits);
     if (flags & MessageFlags.Attachments) message.attachments = readIndexArray(stream, 3);
-    if (flags & MessageFlags.Reactions) message.reactions = readIndexArray(stream, config.emojiIdxBits);
-    if (flags & MessageFlags.Mentions) message.mentions = readIndexArray(stream, config.mentionsIdxBits);
-    if (flags & MessageFlags.Domains) message.domains = readIndexArray(stream, config.domainsIdxBits);
+    if (flags & MessageFlags.Reactions) message.reactions = readIndexArray(stream, bitConfig.emojiIdxBits);
+    if (flags & MessageFlags.Mentions) message.mentions = readIndexArray(stream, bitConfig.mentionsIdxBits);
+    if (flags & MessageFlags.Domains) message.domains = readIndexArray(stream, bitConfig.domainsIdxBits);
 
     return message;
 };

@@ -1,9 +1,14 @@
-import { BitAddress, Index } from "@pipeline/Types";
+import { Index } from "@pipeline/Types";
 import { FullMessage } from "@pipeline/process/Types";
-import { BitStream } from "@pipeline/serialization/BitStream";
+import { BitAddress, BitStream } from "@pipeline/serialization/BitStream";
 import { readIndexArray, skipIndexArray } from "@pipeline/serialization/IndexSerialization";
 import { MessageBitConfig, MessageFlags } from "@pipeline/serialization/MessageSerialization";
 
+/**
+ * This is an alternative to the `readMessage` function. It deserializes parts of a Message on demand,
+ * being faster when only a few fields are needed. Perfect for computing aggregate blocks, where
+ * each block may need only a few and different fields.
+ */
 export class MessageView {
     readonly channelIndex: Index;
     readonly dayIndex: Index;

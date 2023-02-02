@@ -4,9 +4,6 @@ export type RawID = string | number;
 // a zero-based index
 export type Index = number;
 
-// offset in BITS in a BitStream
-export type BitAddress = number;
-
 // UTC timestamp
 export type Timestamp = number;
 
