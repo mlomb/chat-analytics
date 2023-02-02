@@ -19,13 +19,13 @@ const fn: BlockFn<InteractionStats> = (database, filters, common) => {
     let topSingleReactions: [MessageView, number][] = [];
 
     const processMessage = (msg: MessageView) => {
-        const mentions = msg.getMentions();
+        const mentions = msg.mentions;
         if (mentions) {
             for (const mention of mentions) {
                 mentionsCount[mention[0]] += mention[1];
             }
         }
-        const reactions = msg.getReactions();
+        const reactions = msg.reactions;
         if (reactions) {
             let reactionCount = 0,
                 maxReactionCount = 0;

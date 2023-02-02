@@ -39,7 +39,7 @@ export const MessageLabel = (props: { message?: FullMessage }) => {
         return <div className="MessageLabel"></div>;
     }
 
-    const day = Day.fromKey(dp.database.time.minDate).nextDays(msg.day);
+    const day = Day.fromKey(dp.database.time.minDate).nextDays(msg.dayIndex);
     const date = formatTime("symd", day);
     const fullDateTime = formatTime("ymdhms", day, msg.secondOfDay);
 
