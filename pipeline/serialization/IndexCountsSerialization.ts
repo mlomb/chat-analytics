@@ -1,6 +1,10 @@
-import { Index } from "@pipeline/Types";
+import { IndexCounts } from "@pipeline/process/IndexCounts";
 import { BitStream } from "@pipeline/serialization/BitStream";
 
+// In this file we serialize IndexCounts, which is an array of [index, count] pairs.
+// We require `bitsPerIndex` to know how many bits to use for each index.
+// Now for counts, what do we do? ↓
+//
 // Some stats from a big chat sample (3.4M messages)
 // 4,062,249 samples
 //
@@ -39,10 +43,8 @@ import { BitStream } from "@pipeline/serialization/BitStream";
 // We can use two bits to decide the strategy per array basis, using the one which uses the less amount of bits.
 // :)
 
-export const writeIndexArray = (counts: [Index, number][], stream: BitStream, bitsPerIndex: number) => {
-    // sort in ascending order for delta encoding
-    counts.sort((a, b) => a[0] - b[0]);
-
+/** Writes the IndexCounts to the stream using `bitsPerIndex` bits to encode indexes */
+export const writeIndexCounts = (counts: IndexCounts, stream: BitStream, bitsPerIndex: number) => {
     const len = counts.length;
     let total = 0;
     let maxCount = 0;
@@ -60,11 +62,11 @@ export const writeIndexArray = (counts: [Index, number][], stream: BitStream, bi
     } else if (total === 2) {
         stream.setBits(2, 0b01); // 0b01=double index
         if (counts.length === 1) {
-            // [A, 2]
+            // [A, 2] (double combined)
             stream.setBits(bitsPerIndex, counts[0][0]);
             stream.setBits(bitsPerIndex, counts[0][0]);
         } else {
-            // [A, 1] [B, 1]
+            // [A, 1] [B, 1] (double)
             stream.setBits(bitsPerIndex, counts[0][0]);
             stream.setBits(bitsPerIndex, counts[1][0]);
         }
@@ -102,6 +104,7 @@ export const writeIndexArray = (counts: [Index, number][], stream: BitStream, bi
         for (let i = 0; i < len; i++) {
             for (let j = 0; j < counts[i][1] && written < realTotal; j++) {
                 const diff = counts[i][0] - lastIndex;
+                console.assert(diff >= 0, "delta encoding failed, index counts are not sorted");
                 // delta encoding
                 stream.setBits(bitsPerIndex, diff);
                 lastIndex += diff;
@@ -121,8 +124,9 @@ export const writeIndexArray = (counts: [Index, number][], stream: BitStream, bi
     }
 };
 
-export const readIndexArray = (stream: BitStream, bitsPerIndex: number): [Index, number][] => {
-    const counts: [Index, number][] = [];
+/** Reads IndexCounts from the stream using `bitsPerIndex` bits per index */
+export const readIndexCounts = (stream: BitStream, bitsPerIndex: number): IndexCounts => {
+    const counts: IndexCounts = [];
     const strategy = stream.getBits(2);
 
     if (strategy === 0b00) {
@@ -162,7 +166,8 @@ export const readIndexArray = (stream: BitStream, bitsPerIndex: number): [Index,
     return counts;
 };
 
-export const skipIndexArray = (stream: BitStream, bitsPerIndex: number) => {
+/** Advances the offset of the stream by one IndexCount without decoding it, thus faster if not needed */
+export const skipIndexCounts = (stream: BitStream, bitsPerIndex: number) => {
     const strategy = stream.getBits(2);
 
     if (strategy === 0b00) {

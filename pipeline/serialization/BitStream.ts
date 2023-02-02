@@ -18,7 +18,7 @@ export type BitAddress = number;
  * |-- delta --|--- bits ---|
  * ```
  *
- * [+] CROSS BOUNDARY: the value being read is split between two 32bits words
+ * [+] CROSS BOUNDARY: the value being read is divided between two 32bits words
  * ```
  *  |--------------------------------| |---------------------------------|
  *  |           value1               | |            value2               |

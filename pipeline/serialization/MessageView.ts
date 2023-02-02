@@ -1,7 +1,8 @@
 import { Index } from "@pipeline/Types";
+import { IndexCounts } from "@pipeline/process/IndexCounts";
 import { FullMessage } from "@pipeline/process/Types";
 import { BitAddress, BitStream } from "@pipeline/serialization/BitStream";
-import { readIndexArray, skipIndexArray } from "@pipeline/serialization/IndexSerialization";
+import { readIndexCounts, skipIndexCounts } from "@pipeline/serialization/IndexCountsSerialization";
 import { MessageBitConfig, MessageFlags } from "@pipeline/serialization/MessageSerialization";
 
 /**
@@ -49,64 +50,64 @@ export class MessageView {
         }
         if (flags & MessageFlags.Words) {
             this.wordsOffset = stream.offset;
-            skipIndexArray(stream, config.wordIdxBits);
+            skipIndexCounts(stream, config.wordIdxBits);
         }
         if (flags & MessageFlags.Emojis) {
             this.emojisOffset = stream.offset;
-            skipIndexArray(stream, config.emojiIdxBits);
+            skipIndexCounts(stream, config.emojiIdxBits);
         }
         if (flags & MessageFlags.Attachments) {
             this.attachmentsOffset = stream.offset;
-            skipIndexArray(stream, 3);
+            skipIndexCounts(stream, 3);
         }
         if (flags & MessageFlags.Reactions) {
             this.reactionsOffset = stream.offset;
-            skipIndexArray(stream, config.emojiIdxBits);
+            skipIndexCounts(stream, config.emojiIdxBits);
         }
         if (flags & MessageFlags.Mentions) {
             this.mentionsOffset = stream.offset;
-            skipIndexArray(stream, config.mentionsIdxBits);
+            skipIndexCounts(stream, config.mentionsIdxBits);
         }
         if (flags & MessageFlags.Domains) {
             this.domainsOffset = stream.offset;
-            skipIndexArray(stream, config.domainsIdxBits);
+            skipIndexCounts(stream, config.domainsIdxBits);
         }
     }
 
-    getWords(): [Index, number][] | undefined {
+    getWords(): IndexCounts | undefined {
         if (this.wordsOffset === 0) return undefined;
         this.stream.offset = this.wordsOffset;
-        return readIndexArray(this.stream, this.config.wordIdxBits);
+        return readIndexCounts(this.stream, this.config.wordIdxBits);
     }
 
-    getEmojis(): [Index, number][] | undefined {
+    getEmojis(): IndexCounts | undefined {
         if (this.emojisOffset === 0) return undefined;
         this.stream.offset = this.emojisOffset;
-        return readIndexArray(this.stream, this.config.emojiIdxBits);
+        return readIndexCounts(this.stream, this.config.emojiIdxBits);
     }
 
-    getAttachments(): [Index, number][] | undefined {
+    getAttachments(): IndexCounts | undefined {
         if (this.attachmentsOffset === 0) return undefined;
         this.stream.offset = this.attachmentsOffset;
-        return readIndexArray(this.stream, 3);
+        return readIndexCounts(this.stream, 3);
     }
 
-    getReactions(): [Index, number][] | undefined {
+    getReactions(): IndexCounts | undefined {
         if (this.reactionsOffset === 0) return undefined;
         this.stream.offset = this.reactionsOffset;
-        return readIndexArray(this.stream, this.config.emojiIdxBits);
+        return readIndexCounts(this.stream, this.config.emojiIdxBits);
     }
 
-    getMentions(): [Index, number][] | undefined {
+    getMentions(): IndexCounts | undefined {
         if (this.mentionsOffset === 0) return undefined;
         this.stream.offset = this.mentionsOffset;
-        return readIndexArray(this.stream, this.config.mentionsIdxBits);
+        return readIndexCounts(this.stream, this.config.mentionsIdxBits);
     }
 
-    getDomains(): [Index, number][] | undefined {
+    getDomains(): IndexCounts | undefined {
         if (this.domainsOffset === 0) return undefined;
         this.stream.offset = this.domainsOffset;
-        return readIndexArray(this.stream, this.config.domainsIdxBits);
+        return readIndexCounts(this.stream, this.config.domainsIdxBits);
     }
 
     getFullMessage(): FullMessage {
