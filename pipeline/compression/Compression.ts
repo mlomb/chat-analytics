@@ -14,7 +14,7 @@ function compress(database: Database): string {
 
     let json = JSON.stringify({
         ...database,
-        serialized: undefined,
+        messages: undefined,
     });
 
     let jsonBuffer = new TextEncoder().encode(json);

@@ -78,8 +78,6 @@ export interface FullMessage extends Message {
     channelIndex: Index;
 }
 
-export type IMessage = Message;
-
 // change to CustomEmoji | UnicodeEmoji ?
 export interface Emoji {
     // platform's emoji ID (if custom and available)

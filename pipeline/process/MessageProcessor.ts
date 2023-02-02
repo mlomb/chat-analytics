@@ -4,7 +4,7 @@ import { Day } from "@pipeline/Time";
 import { PMessageGroup } from "@pipeline/process/ChannelMessages";
 import { DatabaseBuilder } from "@pipeline/process/DatabaseBuilder";
 import { IndexCountsBuilder } from "@pipeline/process/IndexCounts";
-import { Emoji, IMessage } from "@pipeline/process/Types";
+import { Emoji, Message } from "@pipeline/process/Types";
 import { Emojis, EmojisData } from "@pipeline/process/nlp/Emojis";
 import { FastTextLID176Model } from "@pipeline/process/nlp/FastTextModel";
 import { Sentiment } from "@pipeline/process/nlp/Sentiment";
@@ -12,7 +12,7 @@ import { matchFormat, normalizeText } from "@pipeline/process/nlp/Text";
 import { Token, tokenize } from "@pipeline/process/nlp/Tokenizer";
 
 /**
- * The MessageProcessor takes PMessageGroup's and processes them into the IMessage's (intermediate messages)
+ * The MessageProcessor takes PMessageGroup's and processes them into the Message's
  *
  * It does all the necessary analysis.
  *
@@ -60,7 +60,7 @@ export class MessageProcessor {
         }
     }
 
-    processGroupToIntermediate(group: PMessageGroup): IMessage[] {
+    processGroupToIntermediate(group: PMessageGroup): Message[] {
         const { authors, words, emojis, mentions, domains } = this.builder;
 
         // normalize and tokenize messages
@@ -84,7 +84,7 @@ export class MessageProcessor {
             langIndex = LanguageCodes.indexOf(lang.iso639);
         }
 
-        let messages: IMessage[] = [];
+        let messages: Message[] = [];
 
         for (let i = 0; i < group.length; i++) {
             const msg = group[i];
