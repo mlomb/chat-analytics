@@ -9,8 +9,8 @@ import { ChannelMessages, ProcessGroupFn } from "@pipeline/process/ChannelMessag
 import { IndexedMap } from "@pipeline/process/IndexedMap";
 import { MessageProcessor } from "@pipeline/process/MessageProcessor";
 import { Author, Channel, Database, Emoji, Guild } from "@pipeline/process/Types";
-import { BitStream } from "@pipeline/serialization/BitStream";
-import { MessageBitConfig, writeMessage } from "@pipeline/serialization/MessageSerialization";
+import { MessageBitConfig } from "@pipeline/serialization/MessageSerialization";
+import { MessagesArray } from "@pipeline/serialization/MessagesArray";
 
 /**
  *
@@ -246,7 +246,6 @@ export class DatabaseBuilder {
         /** Return the minimum amount of bits needed to store a given number */
         const numBitsFor = (n: number) => Math.max(1, n === 0 ? 1 : 32 - Math.clz32(n));
 
-        const messagesStream = new BitStream();
         const bitConfig: MessageBitConfig = {
             dayBits: numBitsFor(dateKeys.length),
             authorIdxBits: numBitsFor(this.authors.size),
@@ -255,6 +254,7 @@ export class DatabaseBuilder {
             mentionsIdxBits: numBitsFor(this.mentions.size),
             domainsIdxBits: numBitsFor(this.domains.size),
         };
+        const finalMessages = new MessagesArray(bitConfig);
 
         {
             this.env.progress?.new("Compacting messages data");
@@ -266,21 +266,17 @@ export class DatabaseBuilder {
                 const channelIndex = this.channelsReindex[this.channels.getIndex(id)!];
                 const channel = channels[channelIndex];
 
-                channel.msgAddr = messagesStream.offset;
+                channel.msgAddr = finalMessages.stream.offset;
                 channel.msgCount = mc.numMessages;
 
                 for (const msg of mc.processedMessages()) {
-                    writeMessage(
-                        {
-                            ...msg,
-                            day: dateKeys.indexOf(Day.fromBinary(msg.day).dateKey),
-                            authorIndex: this.authorsReindex[msg.authorIndex],
-                        },
-                        messagesStream,
-                        bitConfig
-                    );
+                    finalMessages.push({
+                        ...msg,
+                        day: dateKeys.indexOf(Day.fromBinary(msg.day).dateKey),
+                        authorIndex: this.authorsReindex[msg.authorIndex],
+                    });
+                    this.env.progress?.progress("number", ++alreadyCounted, totalMessages);
                 }
-                this.env.progress?.progress("number", ++alreadyCounted, totalMessages);
             }
             this.env.progress?.done();
         }
@@ -305,9 +301,8 @@ export class DatabaseBuilder {
             mentions: this.mentions.values,
             domains: this.domains.values,
 
-            // round to the nearest multiple of 4
-            messages: messagesStream.buffer8.slice(0, ((Math.ceil(messagesStream.offset / 8) + 3) & ~0x03) + 4),
-            numMessages: this.numMessages,
+            messages: finalMessages.stream.buffer8,
+            numMessages: finalMessages.length,
             bitConfig,
         };
     }

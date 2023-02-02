@@ -26,6 +26,16 @@ export interface MessageBitConfig {
     domainsIdxBits: number;
 }
 
+// hand-picked values, hoping they work well
+export const DefaultMessageBitConfig: MessageBitConfig = {
+    dayBits: 21, // 12 + 4 + 5
+    authorIdxBits: 21,
+    wordIdxBits: 21,
+    emojiIdxBits: 18,
+    mentionsIdxBits: 20,
+    domainsIdxBits: 16,
+};
+
 export const writeMessage = (message: Message, stream: BitStream, config: MessageBitConfig) => {
     stream.setBits(config.dayBits, message.day);
     stream.setBits(17, message.secondOfDay); // 0-2^17 (needed 86400)
