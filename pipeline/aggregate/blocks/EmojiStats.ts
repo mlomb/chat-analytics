@@ -62,14 +62,14 @@ const fn: BlockFn<EmojiStats> = (database, filters, common) => {
     };
 
     const processMessage = (msg: MessageView) => {
-        const emojis = msg.getEmojis();
+        const emojis = msg.emojis;
         if (emojis) {
             for (const emoji of emojis) {
                 processEmojiInGroup(inText, emoji[0], emoji[1], msg.authorIndex, msg.channelIndex);
                 inText.oncePerMessage++;
             }
         }
-        const reactions = msg.getReactions();
+        const reactions = msg.reactions;
         if (reactions) {
             for (const reaction of reactions) {
                 processEmojiInGroup(inReactions, reaction[0], reaction[1], msg.authorIndex, msg.channelIndex);

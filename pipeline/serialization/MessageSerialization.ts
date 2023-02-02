@@ -45,7 +45,7 @@ export const DefaultMessageBitConfig: MessageBitConfig = {
 
 /** Writes the message into the stream using the provided bit configuration */
 export const writeMessage = (message: Message, stream: BitStream, bitConfig: MessageBitConfig) => {
-    stream.setBits(bitConfig.dayBits, message.day);
+    stream.setBits(bitConfig.dayBits, message.dayIndex);
     stream.setBits(17, message.secondOfDay); // 0-2^17 (needed 86400)
     stream.setBits(bitConfig.authorIdxBits, message.authorIndex);
 
@@ -84,7 +84,7 @@ export const readMessage = (stream: BitStream, bitConfig: MessageBitConfig): Mes
     const flags = stream.getBits(9);
 
     const message: Message = {
-        day,
+        dayIndex: day,
         secondOfDay,
         authorIndex,
     };

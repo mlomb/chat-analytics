@@ -17,11 +17,8 @@ export class MessagesArray implements Iterable<Message> {
      */
     public length: number;
 
-    /** Creates an empty array, ready for writing */
-    constructor(bitConfig: MessageBitConfig);
-
     /**
-     * Creates an array from an existing stream.
+     * Creates an array. You can provide an existing stream.
      *
      * @param count the number of messages in the stream
      */

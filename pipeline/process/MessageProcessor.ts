@@ -179,7 +179,7 @@ export class MessageProcessor {
             if (Day.gt(day, this.builder.maxDate)) this.builder.maxDate = day;
 
             messages.push({
-                day: day.toBinary(),
+                dayIndex: day.toBinary(),
                 secondOfDay: date.getSeconds() + 60 * (date.getMinutes() + 60 * date.getHours()),
                 authorIndex: authors.getIndex(msg.authorId)!,
                 replyOffset: msg.replyTo ? 1 : 0, // offset is not really being used right now in the UI

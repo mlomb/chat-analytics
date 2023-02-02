@@ -23,7 +23,7 @@ const fn: BlockFn<LanguageStats> = (database, filters, common) => {
             totalWithLang++;
             languagesCount[msg.langIndex]++;
         }
-        const words = msg.getWords();
+        const words = msg.words;
         if (words) {
             for (const word of words) {
                 wordsCount[word[0]] += word[1];

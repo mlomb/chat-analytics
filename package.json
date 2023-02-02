@@ -92,6 +92,7 @@
     "collectCoverageFrom": [
       "assets/Plausible.ts",
       "lib/**",
+      "!lib/index.ts",
       "!lib/CLI.ts",
       "pipeline/**",
       "!**/node_modules/**",

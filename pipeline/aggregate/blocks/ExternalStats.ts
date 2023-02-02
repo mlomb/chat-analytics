@@ -10,7 +10,7 @@ const fn: BlockFn<ExternalStats> = (database, filters, common) => {
     const domainsCount = new Array(database.domains.length).fill(0);
 
     const processMessage = (msg: MessageView) => {
-        const domains = msg.getDomains();
+        const domains = msg.domains;
         if (domains) {
             for (const domain of domains) {
                 domainsCount[domain[0]] += domain[1];

@@ -81,7 +81,7 @@ const fn: BlockFn<MessagesStats> = (database, filters, common) => {
         const dayOfWeek = Day.fromKey(dateKeys[msg.dayIndex]).toDate().getDay();
         activityCounts[dayOfWeek * 24 + Math.floor(msg.secondOfDay / 3600)]++;
 
-        const attachments = msg.getAttachments();
+        const attachments = msg.attachments;
         if (attachments) {
             for (const attachment of attachments) {
                 attachmentsCount[attachment[0]] += attachment[1];

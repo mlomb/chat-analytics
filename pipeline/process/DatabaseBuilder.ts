@@ -272,7 +272,7 @@ export class DatabaseBuilder {
                 for (const msg of mc.processedMessages()) {
                     finalMessages.push({
                         ...msg,
-                        day: dateKeys.indexOf(Day.fromBinary(msg.day).dateKey),
+                        dayIndex: dateKeys.indexOf(Day.fromBinary(msg.dayIndex).dateKey),
                         authorIndex: this.authorsReindex[msg.authorIndex],
                     });
                     this.env.progress?.progress("number", ++alreadyCounted, totalMessages);

@@ -1,6 +1,6 @@
 import { Index } from "@pipeline/Types";
 import { IndexCounts } from "@pipeline/process/IndexCounts";
-import { FullMessage } from "@pipeline/process/Types";
+import { FullMessage, Message } from "@pipeline/process/Types";
 import { BitAddress, BitStream } from "@pipeline/serialization/BitStream";
 import { readIndexCounts, skipIndexCounts } from "@pipeline/serialization/IndexCountsSerialization";
 import { MessageBitConfig, MessageFlags } from "@pipeline/serialization/MessageSerialization";
@@ -10,8 +10,10 @@ import { MessageBitConfig, MessageFlags } from "@pipeline/serialization/MessageS
  * being faster when only a few fields are needed. Perfect for computing aggregate blocks, where
  * each block may need only a few and different fields.
  */
-export class MessageView {
-    readonly channelIndex: Index;
+export class MessageView implements Message {
+    // provided for convenience
+    channelIndex: Index = -1;
+
     readonly dayIndex: Index;
     readonly secondOfDay: number;
     readonly authorIndex: Index;
@@ -19,92 +21,91 @@ export class MessageView {
     readonly langIndex?: Index;
     readonly sentiment?: number;
 
-    private wordsOffset: BitAddress = 0;
-    private emojisOffset: BitAddress = 0;
-    private attachmentsOffset: BitAddress = 0;
-    private reactionsOffset: BitAddress = 0;
-    private mentionsOffset: BitAddress = 0;
-    private domainsOffset: BitAddress = 0;
+    private readonly flags: MessageFlags;
+    private readonly wordsOffset: BitAddress = 0;
+    private readonly emojisOffset: BitAddress = 0;
+    private readonly attachmentsOffset: BitAddress = 0;
+    private readonly reactionsOffset: BitAddress = 0;
+    private readonly mentionsOffset: BitAddress = 0;
+    private readonly domainsOffset: BitAddress = 0;
 
-    get hasText(): boolean { return this.langIndex !== undefined; } // prettier-ignore
-    get hasWords(): boolean { return this.wordsOffset > 0; } // prettier-ignore
-    get hasEmojis(): boolean { return this.emojisOffset > 0; } // prettier-ignore
-    get hasAttachments(): boolean { return this.attachmentsOffset > 0; } // prettier-ignore
-    get hasReactions(): boolean { return this.reactionsOffset > 0; } // prettier-ignore
-    get hasMentions(): boolean { return this.mentionsOffset > 0; } // prettier-ignore
-    get hasDomains(): boolean { return this.domainsOffset > 0; } // prettier-ignore
+    get hasText(): boolean { return (this.flags & MessageFlags.Text) > 0; } // prettier-ignore
+    get hasReply(): boolean { return (this.flags & MessageFlags.Reply) > 0; } // prettier-ignore
+    get hasWords(): boolean { return (this.flags & MessageFlags.Words) > 0; } // prettier-ignore
+    get hasEmojis(): boolean { return (this.flags & MessageFlags.Emojis) > 0; } // prettier-ignore
+    get hasAttachments(): boolean { return (this.flags & MessageFlags.Attachments) > 0; } // prettier-ignore
+    get hasReactions(): boolean { return (this.flags & MessageFlags.Reactions) > 0; } // prettier-ignore
+    get hasMentions(): boolean { return (this.flags & MessageFlags.Mentions) > 0; } // prettier-ignore
+    get hasDomains(): boolean { return (this.flags & MessageFlags.Domains) > 0; } // prettier-ignore
 
-    constructor(private readonly stream: BitStream, private readonly config: MessageBitConfig, channelIndex: Index) {
-        this.channelIndex = channelIndex;
+    constructor(private readonly stream: BitStream, private readonly config: MessageBitConfig) {
         this.dayIndex = stream.getBits(config.dayBits);
         this.secondOfDay = stream.getBits(17);
         this.authorIndex = stream.getBits(config.authorIdxBits);
+        this.flags = stream.getBits(9);
 
-        const flags = stream.getBits(9);
-        if (flags & MessageFlags.Reply) {
-            this.replyOffset = stream.getBits(10);
-        }
-        if (flags & MessageFlags.Text) {
+        if (this.hasReply) this.replyOffset = stream.getBits(10);
+        if (this.hasText) {
             this.langIndex = stream.getBits(8);
             this.sentiment = stream.getBits(8) - 128;
         }
-        if (flags & MessageFlags.Words) {
+        if (this.hasWords) {
             this.wordsOffset = stream.offset;
             skipIndexCounts(stream, config.wordIdxBits);
         }
-        if (flags & MessageFlags.Emojis) {
+        if (this.hasEmojis) {
             this.emojisOffset = stream.offset;
             skipIndexCounts(stream, config.emojiIdxBits);
         }
-        if (flags & MessageFlags.Attachments) {
+        if (this.hasAttachments) {
             this.attachmentsOffset = stream.offset;
             skipIndexCounts(stream, 3);
         }
-        if (flags & MessageFlags.Reactions) {
+        if (this.hasReactions) {
             this.reactionsOffset = stream.offset;
             skipIndexCounts(stream, config.emojiIdxBits);
         }
-        if (flags & MessageFlags.Mentions) {
+        if (this.hasMentions) {
             this.mentionsOffset = stream.offset;
             skipIndexCounts(stream, config.mentionsIdxBits);
         }
-        if (flags & MessageFlags.Domains) {
+        if (this.hasDomains) {
             this.domainsOffset = stream.offset;
             skipIndexCounts(stream, config.domainsIdxBits);
         }
     }
 
-    getWords(): IndexCounts | undefined {
+    get words(): IndexCounts | undefined {
         if (this.wordsOffset === 0) return undefined;
         this.stream.offset = this.wordsOffset;
         return readIndexCounts(this.stream, this.config.wordIdxBits);
     }
 
-    getEmojis(): IndexCounts | undefined {
+    get emojis(): IndexCounts | undefined {
         if (this.emojisOffset === 0) return undefined;
         this.stream.offset = this.emojisOffset;
         return readIndexCounts(this.stream, this.config.emojiIdxBits);
     }
 
-    getAttachments(): IndexCounts | undefined {
+    get attachments(): IndexCounts | undefined {
         if (this.attachmentsOffset === 0) return undefined;
         this.stream.offset = this.attachmentsOffset;
         return readIndexCounts(this.stream, 3);
     }
 
-    getReactions(): IndexCounts | undefined {
+    get reactions(): IndexCounts | undefined {
         if (this.reactionsOffset === 0) return undefined;
         this.stream.offset = this.reactionsOffset;
         return readIndexCounts(this.stream, this.config.emojiIdxBits);
     }
 
-    getMentions(): IndexCounts | undefined {
+    get mentions(): IndexCounts | undefined {
         if (this.mentionsOffset === 0) return undefined;
         this.stream.offset = this.mentionsOffset;
         return readIndexCounts(this.stream, this.config.mentionsIdxBits);
     }
 
-    getDomains(): IndexCounts | undefined {
+    get domains(): IndexCounts | undefined {
         if (this.domainsOffset === 0) return undefined;
         this.stream.offset = this.domainsOffset;
         return readIndexCounts(this.stream, this.config.domainsIdxBits);
@@ -112,18 +113,18 @@ export class MessageView {
 
     getFullMessage(): FullMessage {
         return {
-            day: this.dayIndex,
+            dayIndex: this.dayIndex,
             secondOfDay: this.secondOfDay,
             authorIndex: this.authorIndex,
             replyOffset: this.replyOffset,
             langIndex: this.langIndex,
             sentiment: this.sentiment,
-            words: this.getWords(),
-            emojis: this.getEmojis(),
-            attachments: this.getAttachments(),
-            reactions: this.getReactions(),
-            mentions: this.getMentions(),
-            domains: this.getDomains(),
+            words: this.words,
+            emojis: this.emojis,
+            attachments: this.attachments,
+            reactions: this.reactions,
+            mentions: this.mentions,
+            domains: this.domains,
             channelIndex: this.channelIndex,
         };
     }

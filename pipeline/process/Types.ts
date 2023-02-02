@@ -59,7 +59,7 @@ export interface Author {
 }
 
 export interface Message {
-    day: number;
+    dayIndex: number;
     secondOfDay: number;
     authorIndex: Index;
     replyOffset?: number;
