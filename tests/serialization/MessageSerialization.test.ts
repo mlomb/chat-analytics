@@ -1,24 +1,23 @@
 import { Message } from "@pipeline/process/Types";
 import { BitStream } from "@pipeline/serialization/BitStream";
-import { MessageBitConfig, readMessage, writeMessage } from "@pipeline/serialization/MessageSerialization";
+import { DefaultMessageBitConfig, readMessage, writeMessage } from "@pipeline/serialization/MessageSerialization";
 
 describe("obj -> (serialize) -> (deserialize) -> obj", () => {
-    let obj: Message;
-
     const cases: Message[] = [
         {
             day: 123,
             secondOfDay: 4,
-            authorIndex: 5,
-            langIndex: 6,
-            sentiment: 7,
+            authorIndex: 8,
+            langIndex: 11,
+            sentiment: 14,
+            replyOffset: 17,
         },
         {
-            day: 123,
-            secondOfDay: 4,
-            authorIndex: 5,
-            langIndex: 6,
-            sentiment: 7,
+            day: 456,
+            secondOfDay: 6,
+            authorIndex: 9,
+            langIndex: 12,
+            sentiment: 15,
             words: [
                 [8, 9],
                 [10, 11],
@@ -26,11 +25,11 @@ describe("obj -> (serialize) -> (deserialize) -> obj", () => {
         },
         // prettier-ignore
         {
-            day: 123,
-            secondOfDay: 4,
-            authorIndex: 5,
-            langIndex: 6,
-            sentiment: 7,
+            day: 789,
+            secondOfDay: 7,
+            authorIndex: 10,
+            langIndex: 13,
+            sentiment: 16,
             words: [[8, 1], [10, 2]],
             emojis: [[12, 3], [14, 4], [16, 5]],
             mentions: [[30, 1], [32, 2], [34, 3]],
@@ -40,25 +39,11 @@ describe("obj -> (serialize) -> (deserialize) -> obj", () => {
         },
     ];
 
-    test.each(cases)("%p", (_obj) => {
-        obj = _obj;
-    });
-
-    const bitConfig: MessageBitConfig = {
-        dayBits: 8,
-        authorIdxBits: 8,
-        wordIdxBits: 8,
-        emojiIdxBits: 8,
-        mentionsIdxBits: 8,
-        domainsIdxBits: 8,
-    };
-
-    afterEach(() => {
+    test.each(cases)("%p", (message) => {
         const stream = new BitStream();
+        writeMessage(message, stream, DefaultMessageBitConfig);
         stream.offset = 0;
-        writeMessage(obj, stream, bitConfig);
-        stream.offset = 0;
-        const gotObj = readMessage(stream, bitConfig);
-        expect(gotObj).toStrictEqual(obj);
+        const gotObj = readMessage(stream, DefaultMessageBitConfig);
+        expect(gotObj).toStrictEqual(message);
     });
 });
