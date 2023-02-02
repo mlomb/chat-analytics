@@ -23,8 +23,8 @@
     "build:web": "webpack build --env production --progress",
     "stats": "webpack build --env production --profile --json > stats.json",
     "dev": "webpack serve --progress",
-    "test": "jest --verbose --coverage",
-    "test:watch": "jest --verbose --watch",
+    "test": "jest --runInBand --verbose --coverage",
+    "test:watch": "jest --runInBand --verbose --watch",
     "format": "prettier --write .",
     "format-check": "prettier --check ."
   },
