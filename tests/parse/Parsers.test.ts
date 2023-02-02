@@ -8,7 +8,7 @@ import { WhatsAppParser } from "@pipeline/parse/parsers/WhatsAppParser";
 
 import { checkSamplesAreParsedCorrectly } from "./Util";
 
-describe("should resolve correctly", () => {
+describe("should parse correctly", () => {
     // prettier-ignore
     const cases: { parser: new () => Parser; inputs: string[] }[] = [
         { parser: DiscordParser, inputs: ["discord/DM_2A_2M.json"] },
