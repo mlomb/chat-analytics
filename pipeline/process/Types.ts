@@ -1,7 +1,8 @@
 import { AttachmentType } from "@pipeline/Attachments";
 import { DateKey } from "@pipeline/Time";
-import { BitAddress, ChannelType, Index, RawID, ReportConfig } from "@pipeline/Types";
+import { ChannelType, Index, RawID, ReportConfig } from "@pipeline/Types";
 import { IndexCounts } from "@pipeline/process/IndexCounts";
+import { BitAddress } from "@pipeline/serialization/BitStream";
 import { MessageBitConfig } from "@pipeline/serialization/MessageSerialization";
 
 // TODO: we want to change all this interfaces

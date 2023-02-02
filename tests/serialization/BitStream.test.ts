@@ -1,99 +1,76 @@
 import { BitStream } from "@pipeline/serialization/BitStream";
 
 describe("writing", () => {
-    const cases: [string, number, number, number, [number, number], [number, number]][] = [
-        [
-            "only left boundary",
-            // offset
-            5,
-            // bits
-            5,
-            // input
-            0b10011,
-            // initial
-            [0b00000000000000000000000000000000, 0b00000000000000000000000000000000],
-            // expected
-            //      ↓ offset
-            [0b00000100110000000000000000000000, 0b00000000000000000000000000000000],
-            //          ↑ offset + bits
-        ],
-        [
-            "only left boundary with noise",
-            // offset
-            5,
-            // bits
-            5,
-            // input
-            0b10011,
-            // initial
-            [0b01010101011010101011101010101101, 0b01110100101010101101000101000101],
-            // expected
-            //      ↓ offset
-            [0b01010100111010101011101010101101, 0b01110100101010101101000101000101],
-            //          ↑ offset + bits
-        ],
-        [
-            "only left boundary (full 32 bits)",
-            // offset
-            0,
-            // bits
-            32,
-            // input
-            0b01110100101010101101000101000101,
-            // initial
-            [0b10001000001000001001000100001000, 0b10001000001000001001000100001000],
-            // expected
-            [0b01110100101010101101000101000101, 0b10001000001000001001000100001000],
-        ],
-        [
-            "one bit",
-            // offset
-            15,
-            // bits
-            1,
-            // input
-            0b1,
-            // initial
-            [0b00000000000000000000000000000000, 0b00000000000000000000000000000000],
-            // expected
-            [0b00000000000000010000000000000000, 0b00000000000000000000000000000000],
-        ],
-        [
-            "cross boundary",
-            // offset
-            25,
-            // bits
-            10,
-            // input
-            0b1110001110,
-            // initial
-            [0b00000000000000000000000000000000, 0b00000000000000000000000000000000],
-            // expected
-            //                          ↓ offset
-            [0b00000000000000000000000001110001, 0b11000000000000000000000000000000],
-            //                                       ↑ offset + bits
-        ],
-        [
-            "cross boundary with noise",
-            // offset
-            25,
-            // bits
-            10,
-            // input
-            0b1110001110,
-            // initial
-            [0b01010101011010101011101010101101, 0b01110100101010101101000101000101],
-            // expected
-            //                          ↓ offset
-            [0b01010101011010101011101011110001, 0b11010100101010101101000101000101],
-            //                                       ↑ offset + bits
-        ],
+    const cases: {
+        name: string;
+        offset: number;
+        bits: number;
+        input: number;
+        previous: [number, number]; // current stream data
+        expected: [number, number]; // expected stream data after write
+    }[] = [
+        {
+            name: "only left boundary",
+            offset: 5,
+            bits: 5,
+            input: 0b10011,
+            previous: [0b00000000000000000000000000000000, 0b00000000000000000000000000000000],
+            //                ↓ offset
+            expected: [0b00000100110000000000000000000000, 0b00000000000000000000000000000000],
+            //                    ↑ offset + bits
+        },
+        {
+            name: "only left boundary with noise",
+            offset: 5,
+            bits: 5,
+            input: 0b10011,
+            previous: [0b01010101011010101011101010101101, 0b01110100101010101101000101000101],
+            //                ↓ offset
+            expected: [0b01010100111010101011101010101101, 0b01110100101010101101000101000101],
+            //                    ↑ offset + bits
+        },
+        {
+            name: "only left boundary (full 32 bits)",
+            offset: 0,
+            bits: 32,
+            input: 0b01110100101010101101000101000101,
+            previous: [0b10001000001000001001000100001000, 0b10001000001000001001000100001000],
+            expected: [0b01110100101010101101000101000101, 0b10001000001000001001000100001000],
+        },
+        {
+            name: "one bit",
+            offset: 15,
+            bits: 1,
+            input: 0b1,
+            previous: [0b00000000000000000000000000000000, 0b00000000000000000000000000000000],
+            expected: [0b00000000000000010000000000000000, 0b00000000000000000000000000000000],
+        },
+        {
+            name: "cross boundary",
+            offset: 25,
+            bits: 10,
+            input: 0b1110001110,
+            previous: [0b00000000000000000000000000000000, 0b00000000000000000000000000000000],
+            //                                    ↓ offset
+            expected: [0b00000000000000000000000001110001, 0b11000000000000000000000000000000],
+            //                                                 ↑ offset + bits
+        },
+        {
+            name: "cross boundary with noise",
+            offset: 25,
+            bits: 10,
+            input: 0b1110001110,
+            previous: [0b01010101011010101011101010101101, 0b01110100101010101101000101000101],
+            //                                    ↓ offset
+            expected: [0b01010101011010101011101011110001, 0b11010100101010101101000101000101],
+            //                                                 ↑ offset + bits
+        },
     ];
 
-    test.each(cases)("%p offset=%p bits=%p", async (_, offset, bits, input, initial, expected) => {
+    test.each(cases)("$name: offset=$offset bits=$bits", ({ offset, bits, input, previous, expected }) => {
         const s = new BitStream(new ArrayBuffer(1024));
-        s.buffer[0] = initial[0];
-        s.buffer[1] = initial[1];
+        s.buffer[0] = previous[0];
+        s.buffer[1] = previous[1];
         s.offset = offset;
         s.setBits(bits, input);
         expect(s.buffer[0]).toBe(expected[0]);
@@ -102,88 +79,74 @@ describe("writing", () => {
 });
 
 describe("reading", () => {
-    const cases: [string, number, number, number, number, number][] = [
-        [
-            "only left boundary",
-            // offset
-            5,
-            // bits
-            5,
-            // expected
-            0b11111,
-            //     ↓ offset
-            0b00000111110000000000000000000000,
-            //         ↑ offset + bits
-            0b00000000000000000000000000000000,
-        ],
-        [
-            "only left boundary with noise",
-            // offset
-            5,
-            // bits
-            5,
-            // expected
-            0b10101,
-            //     ↓ offset
-            0b01010101010110101011101010101101,
-            //         ↑ offset + bits
-            0b01110100101010101101000101000101,
-        ],
-        [
-            "only left boundary (full 32 bits)",
-            // offset
-            0,
-            // bits
-            32,
-            // expected
-            0b11111111111111111111111111111111,
-            //↓ offset
-            0b11111111111111111111111111111111,
-            //                               ↑ offset + bits
-            0b00000000000000000000000000000000,
-        ],
-        [
-            "cross boundary",
-            // offset
-            5,
-            // bits
-            32,
-            // expected
-            0b11111111111111111111111111111111,
-            //     ↓ offset
-            0b00000111111111111111111111111111,
-            //    ↓ offset + bits
-            0b11111000000000000000000000000000,
-        ],
-        [
-            "cross boundary with noise",
-            // offset
-            5,
-            // bits
-            32,
-            // expected
-            0b10101011010101110101010110101110,
-            //     ↓ offset
-            0b01010101010110101011101010101101,
-            //    ↓ offset + bits
-            0b01110100101010101101000101000101,
-        ],
+    const casesNew: {
+        name: string;
+        offset: number;
+        bits: number;
+        previous: [number, number]; // current stream data
+        expected: number; // expected read
+    }[] = [
+        {
+            name: "only left boundary",
+            offset: 5,
+            bits: 5,
+            //             ↓ offset
+            previous: [0b00000111110000000000000000000000, 0b00000000000000000000000000000000],
+            //                 ↑ offset + bits
+            expected: 0b11111,
+        },
+        {
+            name: "only left boundary with noise",
+            offset: 5,
+            bits: 5,
+            //                ↓ offset
+            previous: [0b01010101010110101011101010101101, 0b01110100101010101101000101000101],
+            //                    ↑ offset + bits
+            expected: 0b10101,
+        },
+        {
+            name: "only left boundary (full 32 bits)",
+            offset: 0,
+            bits: 32,
+            //           ↓ offset
+            previous: [0b11111111111111111111111111111111, 0b00000000000000000000000000000000],
+            //                                          ↑ offset + bits
+            expected: 0b11111111111111111111111111111111,
+        },
+        {
+            name: "cross boundary",
+            offset: 5,
+            bits: 32,
+            //                ↓ offset
+            previous: [0b00000111111111111111111111111111, 0b11111000000000000000000000000000],
+            //                                                   ↑ offset + bits
+            expected: 0b11111111111111111111111111111111,
+        },
+        {
+            name: "cross boundary with noise",
+            offset: 5,
+            bits: 32,
+            //                ↓ offset
+            previous: [0b01010101010110101011101010101101, 0b01110100101010101101000101000101],
+            //                                                   ↑ offset + bits
+            expected: 0b10101011010101110101010110101110,
+        },
     ];
 
-    test.each(cases)("%p offset=%p bits=%p", async (_, offset, bits, expected, a, b) => {
+    test.each(casesNew)("$name: offset=$offset bits=$bits", async ({ offset, bits, previous, expected }) => {
         const s = new BitStream(new ArrayBuffer(4 * 2));
         s.offset = offset;
-        s.buffer[0] = a;
-        s.buffer[1] = b;
+        s.buffer[0] = previous[0];
+        s.buffer[1] = previous[1];
         const val = s.getBits(bits);
         expect(val).toBe(expected);
     });
 
-    test.each(cases)("%p (negated) offset=%p bits=%p", async (_, offset, bits, expected, a, b) => {
+    test.each(casesNew)("$name (negated): offset=$offset bits=$bits", async ({ offset, bits, previous, expected }) => {
         const s = new BitStream(new ArrayBuffer(4 * 2));
         s.offset = offset;
-        s.buffer[0] = ~a;
-        s.buffer[1] = ~b;
+        s.buffer[0] = ~previous[0];
+        s.buffer[1] = ~previous[1];
         const val = s.getBits(bits);
         if (bits === 32) expected = ~expected;
         else expected = ~expected & ((1 << bits) - 1);
@@ -211,15 +174,28 @@ it("should get bits correctly after lots of sets", () => {
     }
 });
 
-describe.each([7, 8, 9, 10, 11, 15, 16, 17, 20, 24, 31, 32])("varint %s bits", (bits) => {
+test.each([7, 8, 9, 10, 11, 15, 16, 17, 20, 24, 31, 32])("varint %s bits should write and read correctly", (bits) => {
     const cases: number[] = [0, 100, 200, 500, 1000, 5000, 10000, 100000, 2000000, 5000000, 1000000000].filter(
         (v) => v < Math.pow(2, bits)
     );
-    it.each(cases)("should write and read correctly %p", async (value) => {
+    for (const value of cases) {
         let s = new BitStream();
         s.offset = 0;
         s.writeVarInt(value, bits);
         s.offset = 0;
         expect(s.readVarInt(bits)).toBe(value);
-    });
+    }
+});
+
+test("buffer8 returns a buffer aligned to 32bits", () => {
+    const s = new BitStream();
+    s.setBits(32, 42);
+    s.setBits(32, 42);
+    s.setBits(7, 42);
+    s.setBits(7, 42);
+    expect(s.offset).toBe(32 + 32 + 7 + 7);
+    const buffer = s.buffer8;
+    expect(buffer.length).toBe(12);
+    expect(buffer.byteLength % 4).toBe(0);
+    expect(s.buffer.buffer).toBe(buffer.buffer); // test no copy
 });
