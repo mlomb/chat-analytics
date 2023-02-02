@@ -1,10 +1,9 @@
 import { Env } from "@pipeline/Env";
 import { ReportConfig } from "@pipeline/Types";
+import { compress } from "@pipeline/compression/Compression";
 import { FileInput } from "@pipeline/parse/File";
-
-import { compress } from "./compression/Compression";
-import { DatabaseBuilder } from "./process/DatabaseBuilder";
-import { Database } from "./process/Types";
+import { DatabaseBuilder } from "@pipeline/process/DatabaseBuilder";
+import { Database } from "@pipeline/process/Types";
 
 export const generateDatabase = async (files: FileInput[], config: ReportConfig, env: Env): Promise<Database> => {
     const builder = new DatabaseBuilder(config, env);
