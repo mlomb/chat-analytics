@@ -7,7 +7,7 @@ import { PMessageGroup } from "@pipeline/process/ChannelMessages";
 import { DatabaseBuilder } from "@pipeline/process/DatabaseBuilder";
 import { IndexCountsBuilder } from "@pipeline/process/IndexCounts";
 import { Emoji, Message } from "@pipeline/process/Types";
-import { Emojis, EmojisData } from "@pipeline/process/nlp/Emojis";
+import { Emojis } from "@pipeline/process/nlp/Emojis";
 import { FastTextLID176Model } from "@pipeline/process/nlp/FastTextModel";
 import { Sentiment } from "@pipeline/process/nlp/Sentiment";
 import { Stopwords } from "@pipeline/process/nlp/Stopwords";
@@ -25,25 +25,20 @@ export class MessageProcessor {
 
     // static data
     private stopwords?: Stopwords;
+    private emojis?: Emojis;
     private langPredictModel?: FastTextLID176Model;
-    private emojisData?: Emojis;
     private sentiment?: Sentiment;
 
     // download static data
     async init(env: Env) {
         this.stopwords = await Stopwords.load(env);
+        this.emojis = await Emojis.load(env);
         this.langPredictModel = await FastTextLID176Model.load(env);
-
-        // load emoji data
-        {
-            const data = await env.loadAsset<EmojisData>("/data/emojis/emoji-data.json", "json");
-            this.emojisData = new Emojis(data);
-        }
 
         // load sentiment data
         {
             const afinnZipBuffer = await env.loadAsset("/data/text/AFINN.zip", "arraybuffer");
-            this.sentiment = new Sentiment(afinnZipBuffer, this.emojisData);
+            this.sentiment = new Sentiment(afinnZipBuffer, this.emojis);
         }
     }
 
@@ -155,7 +150,7 @@ export class MessageProcessor {
 
         const emojiObj: Emoji = {
             id: emoji.id,
-            name: emoji.id ? emoji.name : this.emojisData!.getName(emojiKey),
+            name: emoji.id ? emoji.name : this.emojis!.getName(emojiKey),
             symbol: emoji.id ? undefined : emojiKey,
         };
 
