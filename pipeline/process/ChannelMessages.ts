@@ -91,9 +91,16 @@ export class ChannelMessages {
         for (const interval of this.intervals) yield* interval.processedMessages();
     }
 
-    /** @returns the index of the message in the correct cronological order. Returns one past the last valid index if not found */
-    getIndexOf(id: RawID): Index | undefined {
-        return this.intervals.reduce((acc, i) => acc + i.getIndexOf(id), 0);
+    /** @returns the index of the message in the correct cronological order. Returns undefined if not found */
+    indexOf(id: RawID): Index | undefined {
+        let offset = 0;
+
+        for (const interval of this.intervals) {
+            const idx = interval.indexOf(id);
+            if (idx !== undefined) return offset + idx;
+            offset += interval.numMessages;
+        }
+        return undefined;
     }
 
     /** @returns the number of messages in this channel */
@@ -190,9 +197,9 @@ export class MessagesInterval {
         yield* this.messages;
     }
 
-    /** @returns the index of the message relative to this interval. Returns one past the last valid index if not found */
-    getIndexOf(id: RawID): Index {
-        return this.idToIndex.get(id) ?? this.numMessages;
+    /** @returns the index of the message relative to this interval. Returns undefined if not found */
+    indexOf(id: RawID): Index | undefined {
+        return this.idToIndex.get(id);
     }
 
     isContained(ts: Timestamp): boolean {
