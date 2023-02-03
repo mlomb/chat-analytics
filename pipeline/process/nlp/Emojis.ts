@@ -5,7 +5,7 @@ interface EmojisData {
         // name
         n: string;
         // sentiment
-        s: number;
+        s?: number;
     };
 }
 
@@ -20,7 +20,7 @@ export class Emojis {
 
     /** Returns the sentiment of an emoji. e.g. 😡 → negative, ❤ → positive, 🟪 → 0. Always [-1, 1] */
     public getSentiment(emoji: string): number {
-        return this.data[emoji] ? this.data[emoji].s : 0;
+        return this.data[emoji]?.s || 0;
     }
 
     static async load(env: Env) {
