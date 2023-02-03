@@ -1,4 +1,4 @@
-import { IndexCounts, IndexCountsBuilder } from "@pipeline/process/IndexCounts";
+import { IndexCountsBuilder } from "@pipeline/process/IndexCounts";
 
 it("should count and sort correctly", () => {
     const counts = new IndexCountsBuilder();
