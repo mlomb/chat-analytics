@@ -9,6 +9,7 @@ import { ChannelMessages, ProcessGroupFn } from "@pipeline/process/ChannelMessag
 import { IndexedMap } from "@pipeline/process/IndexedMap";
 import { MessageProcessor } from "@pipeline/process/MessageProcessor";
 import { Author, Channel, Database, Emoji, Guild } from "@pipeline/process/Types";
+import { rank, remap } from "@pipeline/process/Util";
 import { MessageBitConfig } from "@pipeline/serialization/MessageSerialization";
 import { MessagesArray } from "@pipeline/serialization/MessagesArray";
 
@@ -18,9 +19,7 @@ import { MessagesArray } from "@pipeline/serialization/MessagesArray";
 export class DatabaseBuilder {
     parser: Parser;
 
-    minDate = Day.HIGHEST;
-    maxDate = Day.LOWEST;
-
+    // data stores
     guilds = new IndexedMap<RawID, PGuild>();
     channels = new IndexedMap<RawID, PChannel>();
     authors = new IndexedMap<RawID, PAuthor>();
@@ -39,10 +38,6 @@ export class DatabaseBuilder {
 
     get numChannels() { return this.channels.size; } // prettier-ignore
     get numAuthors() { return this.authors.size; } // prettier-ignore
-    get numBotAuthors() { return this.authors.values.reduce((acc, a) => acc + +a.bot, 0); } // prettier-ignore
-    get numWords() { return this.words.size; } // prettier-ignore
-    get numEmojis() { return this.emojis.size; } // prettier-ignore
-    get numMentions() { return this.mentions.size; } // prettier-ignore
     get numMessages() { return [...this.messagesInChannel.values()].reduce((acc, mc) => acc + mc.numMessages, 0); } // prettier-ignore
 
     constructor(private readonly config: ReportConfig, private readonly env: Env) {
@@ -74,23 +69,28 @@ export class DatabaseBuilder {
         for (const file of files) {
             this.env.progress?.new("Processing", file.name);
 
-            try {
-                for await (const _ of this.parser.parse(file, this.env.progress)) this.processPendingMessages();
-            } catch (err) {
-                if (err instanceof Error) {
-                    const newErr = new Error(`Error parsing file "${file.name}":\n\n${err.message}`);
-                    newErr.stack = err.stack;
-                    throw newErr;
-                }
-                // handled by WorkerApp.ts
-                throw err;
-            }
-            this.markEOF();
-            this.processPendingMessages();
+            await this.processFile(file);
 
             this.env.progress?.done();
             this.env.progress?.stat("processed_files", ++filesProcessed);
         }
+    }
+
+    /** Process the provided file. Throws in case of error. */
+    private async processFile(file: FileInput) {
+        try {
+            for await (const _ of this.parser.parse(file, this.env.progress)) this.processPendingMessages();
+        } catch (err) {
+            if (err instanceof Error) {
+                const newErr = new Error(`Error parsing file "${file.name}":\n\n${err.message}`);
+                newErr.stack = err.stack;
+                throw newErr;
+            }
+            // hopefully handled by WorkerApp.ts
+            throw err;
+        }
+        this.markEOF();
+        this.processPendingMessages();
     }
 
     /** Goes through all ChannelMessage and process all the messages that remain pending */
@@ -114,14 +114,17 @@ export class DatabaseBuilder {
 
     /////////////////////////////////////////////////////
     //                                                 //
-    //             REINDEX / MAKE FINAL                //
+    //    Counting, reindexing, making final objects   //
     //                                                 //
     /////////////////////////////////////////////////////
 
-    guildsReindex: Index[] = [];
-    channelsReindex: Index[] = [];
-    authorsReindex: Index[] = [];
-    wordsReindex: Index[] = [];
+    minDate = Day.HIGHEST;
+    maxDate = Day.LOWEST;
+
+    guildsRank: Index[] = [];
+    channelsRank: Index[] = [];
+    authorsRank: Index[] = [];
+    wordsRank: Index[] = [];
 
     /** We want to store participants for DM chats to later override the channel name with "Alice & Bob" */
     dmParticipants = new Map<RawID, Index[]>();
@@ -134,8 +137,8 @@ export class DatabaseBuilder {
      * We want to sort authors, channels and such by the number of messages they have, so it doesn't need to
      * be done in the UI (also all indexes end up being nice :) )
      * [+] How?
-     * During processing we use the index that IndexedMap provides. After all processing is done (this function)
-     * we count the messages and then generate a mapping between the old index and the "final" ones with `reindex`.
+     * During processing we use the index that IndexedMap provides. After all processing is done (in this function)
+     * we count the messages and then generate a mapping between the old index and the "final" ones with `rank`.
      */
     private countAndReindex() {
         this.env.progress?.new("Counting for reindex...");
@@ -155,10 +158,10 @@ export class DatabaseBuilder {
             const guildIndex = this.guilds.getIndex(this.channels.getByIndex(channelIndex)!.guildId)!;
 
             for (const msg of mc.processedMessages()) {
+                // count stuff
                 guildCounts[guildIndex]++;
                 channelCounts[channelIndex]++;
                 authorCounts[msg.authorIndex]++;
-
                 if (msg.words) {
                     for (const [idx, count] of msg.words) wordsCounts[idx] += count;
                 }
@@ -174,23 +177,56 @@ export class DatabaseBuilder {
                     }
                 }
 
+                // update min/max date
+                const day = Day.fromBinary(msg.dayIndex);
+                if (Day.lt(day, this.minDate)) this.minDate = day;
+                if (Day.gt(day, this.maxDate)) this.maxDate = day;
+
                 this.env.progress?.progress("number", ++alreadyCounted, totalMessages);
             }
         }
 
         this.env.progress?.done();
-        this.env.progress?.new("Reindexing...");
+        this.env.progress?.new("Computing new indexes...");
 
-        this.guildsReindex = this.guilds.reindex((idx) => guildCounts[idx]);
-        this.channelsReindex = this.channels.reindex((idx) => channelCounts[idx]);
-        this.authorsReindex = this.authors.reindex((idx) => authorCounts[idx]);
-        this.wordsReindex = this.words.reindex((idx) => wordsCounts[idx]);
+        this.guildsRank = rank(guildCounts);
+        this.channelsRank = rank(channelCounts);
+        this.authorsRank = rank(authorCounts);
+        this.wordsRank = rank(wordsCounts);
 
         this.env.progress?.done();
     }
 
+    /** Makes final objects for Guilds, Channels and Authors */
+    private makeFinalObjects() {
+        this.env.progress?.new("Building final objects...");
+
+        // prettier-ignore
+        const guilds = remap<PGuild, Guild>(
+            (guild) => guild,
+            this.guilds.values,
+            this.guildsRank
+        );
+        // prettier-ignore
+        const channels = remap<PChannel, Channel>(
+            this.makeFinalChannel.bind(this),
+            this.channels.values,
+            this.channelsRank
+        );
+        // prettier-ignore
+        const authors = remap<PAuthor, Author>(
+            this.makeFinalAuthor.bind(this),
+            this.authors.values,
+            this.authorsRank
+        );
+
+        this.env.progress?.done();
+
+        return { guilds, channels, authors };
+    }
+
     /** Transforms a parser PChannel into a final Channel */
-    makeFinalChannel(channel: PChannel): Channel {
+    private makeFinalChannel(channel: PChannel): Channel {
         const participants = this.dmParticipants.get(channel.id) || [];
 
         // I really don't want to do this here, but I don't
@@ -212,7 +248,7 @@ export class DatabaseBuilder {
                       participants.map(formatParticipantName).join(" & "),
             type: channel.type,
             avatar: channel.avatar,
-            guildIndex: this.guildsReindex[this.guilds.getIndex(channel.guildId)!],
+            guildIndex: this.guildsRank[this.guilds.getIndex(channel.guildId)!],
             participants: participants.length > 0 ? participants : undefined,
 
             // the following are set making the final messages
@@ -222,26 +258,17 @@ export class DatabaseBuilder {
     }
 
     /** Transforms a parser PAuthor into a final Author */
-    makeFinalAuthor(author: PAuthor, oldIndex: number): Author {
+    private makeFinalAuthor(author: PAuthor, oldIndex: number): Author {
         return {
             n: author.name,
             b: author.bot === true ? true : undefined,
             // only keep avatars if the author is in the top 1000 authors
-            a: this.authorsReindex[oldIndex] < 1000 ? author.avatar : undefined,
+            a: this.authorsRank[oldIndex] < 1000 ? author.avatar : undefined,
         };
     }
 
-    build(): Database {
-        if (this.numMessages === 0)
-            throw new Error("No messages found. Are you sure you are using the right platform?");
-
-        this.countAndReindex();
-
-        const { dateKeys, monthKeys, yearKeys } = genTimeKeys(this.minDate, this.maxDate);
-
-        const guilds = this.guilds.remap<Guild>((guild) => guild, this.guildsReindex);
-        const channels = this.channels.remap<Channel>(this.makeFinalChannel.bind(this), this.channelsReindex);
-        const authors = this.authors.remap<Author>(this.makeFinalAuthor.bind(this), this.authorsReindex);
+    private compactMessagesData(channels: Channel[], dateKeys: string[]) {
+        this.env.progress?.new("Compacting messages data");
 
         /** Return the minimum amount of bits needed to store a given number */
         const numBitsFor = (n: number) => Math.max(1, n === 0 ? 1 : 32 - Math.clz32(n));
@@ -256,30 +283,39 @@ export class DatabaseBuilder {
         };
         const finalMessages = new MessagesArray(bitConfig);
 
-        {
-            this.env.progress?.new("Compacting messages data");
+        const totalMessages = this.numMessages;
+        let alreadyCounted = 0;
 
-            const totalMessages = this.numMessages;
-            let alreadyCounted = 0;
+        for (const [id, mc] of this.messagesInChannel) {
+            const channelIndex = this.channelsRank[this.channels.getIndex(id)!];
+            const channel = channels[channelIndex];
 
-            for (const [id, mc] of this.messagesInChannel) {
-                const channelIndex = this.channelsReindex[this.channels.getIndex(id)!];
-                const channel = channels[channelIndex];
+            channel.msgAddr = finalMessages.stream.offset;
+            channel.msgCount = mc.numMessages;
 
-                channel.msgAddr = finalMessages.stream.offset;
-                channel.msgCount = mc.numMessages;
-
-                for (const msg of mc.processedMessages()) {
-                    finalMessages.push({
-                        ...msg,
-                        dayIndex: dateKeys.indexOf(Day.fromBinary(msg.dayIndex).dateKey),
-                        authorIndex: this.authorsReindex[msg.authorIndex],
-                    });
-                    this.env.progress?.progress("number", ++alreadyCounted, totalMessages);
-                }
+            for (const msg of mc.processedMessages()) {
+                finalMessages.push({
+                    ...msg,
+                    dayIndex: dateKeys.indexOf(Day.fromBinary(msg.dayIndex).dateKey),
+                    authorIndex: this.authorsRank[msg.authorIndex],
+                });
+                this.env.progress?.progress("number", ++alreadyCounted, totalMessages);
             }
-            this.env.progress?.done();
         }
+
+        this.env.progress?.done();
+
+        return { finalMessages };
+    }
+
+    build(): Database {
+        if (this.numMessages === 0)
+            throw new Error("No messages found. Are you sure you are using the right platform?");
+
+        this.countAndReindex();
+        const { guilds, channels, authors } = this.makeFinalObjects();
+        const { dateKeys, monthKeys, yearKeys } = genTimeKeys(this.minDate, this.maxDate);
+        const { finalMessages } = this.compactMessagesData(channels, dateKeys);
 
         return {
             config: this.config,
@@ -303,7 +339,7 @@ export class DatabaseBuilder {
 
             messages: finalMessages.stream.buffer8,
             numMessages: finalMessages.length,
-            bitConfig,
+            bitConfig: finalMessages.bitConfig,
         };
     }
 

@@ -12,11 +12,10 @@ import { matchFormat, normalizeText } from "@pipeline/process/nlp/Text";
 import { Token, tokenize } from "@pipeline/process/nlp/Tokenizer";
 
 /**
- * The MessageProcessor takes PMessageGroup's and processes them into the Message's
+ * The MessageProcessor takes PMessageGroup's and processes them into the Message's.
+ * This class is extremely coupled with the DatabaseBuilder.
  *
  * It does all the necessary analysis.
- *
- * TODO: NEEDS REFACTORING
  */
 export class MessageProcessor {
     constructor(private readonly builder: DatabaseBuilder) {}
@@ -175,8 +174,6 @@ export class MessageProcessor {
             // TODO: timezones
             const date = new Date(msg.timestamp);
             const day = Day.fromDate(date);
-            if (Day.lt(day, this.builder.minDate)) this.builder.minDate = day;
-            if (Day.gt(day, this.builder.maxDate)) this.builder.maxDate = day;
 
             messages.push({
                 dayIndex: day.toBinary(),
