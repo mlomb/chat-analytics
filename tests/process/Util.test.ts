@@ -30,3 +30,9 @@ test.each([
     // using rank it ends up being the same as a sort
     expect(remap((v) => v * 10, input, rank(input))).toEqual(expected);
 });
+
+test("`remap` filters out undefined", () => {
+    const input = [1, 2, 3];
+    const expected = [30, 10];
+    expect(remap((v) => (v === 2 ? undefined : v * 10), input, rank(input))).toEqual(expected);
+});
