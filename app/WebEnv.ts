@@ -23,7 +23,7 @@ const loadWebAsset: LoadAssetFn = async (filepath: string, responseType: "json" 
         xhr.responseType = responseType;
         xhr.open("GET", filepath);
         xhr.onload = () => {
-            progress.done();
+            progress.success();
             if (xhr.status === 200) resolve(xhr.response);
             else reject(xhr.statusText);
         };

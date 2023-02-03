@@ -23,7 +23,7 @@ export const generateReport = async (
     // compress data
     env.progress?.new("Compressing");
     const encodedData = compress(database);
-    env.progress?.done();
+    env.progress?.success();
 
     // build title to avoid HTML injections (just so it doesn't break)
     const title = database.title.replace(/</g, "&lt;").replace(/>/g, "&gt;");

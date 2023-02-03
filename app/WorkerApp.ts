@@ -34,7 +34,6 @@ export interface ResultMessage {
 self.onmessage = async (ev: MessageEvent<InitMessage>) => {
     const { progress } = WebEnv;
 
-    progress.reset();
     progress.on("progress", (tasks, stats) =>
         self.postMessage({
             type: "progress",
