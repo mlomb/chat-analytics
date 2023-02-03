@@ -50,7 +50,7 @@ export class Sentiment {
             }
             progress?.progress("number", processed++, total);
         }
-        progress?.done();
+        progress?.success();
     }
 
     // NOTE: based on marcellobarile/multilang-sentiment

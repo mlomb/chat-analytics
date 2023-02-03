@@ -71,7 +71,7 @@ export class DatabaseBuilder {
 
             await this.processFile(file);
 
-            this.env.progress?.done();
+            this.env.progress?.success();
             this.env.progress?.stat("processed_files", ++filesProcessed);
         }
     }
@@ -186,7 +186,7 @@ export class DatabaseBuilder {
             }
         }
 
-        this.env.progress?.done();
+        this.env.progress?.success();
         this.env.progress?.new("Computing new indexes...");
 
         this.guildsRank = rank(guildCounts);
@@ -194,7 +194,7 @@ export class DatabaseBuilder {
         this.authorsRank = rank(authorCounts);
         this.wordsRank = rank(wordsCounts);
 
-        this.env.progress?.done();
+        this.env.progress?.success();
     }
 
     /** Makes final objects for Guilds, Channels and Authors */
@@ -220,7 +220,7 @@ export class DatabaseBuilder {
             this.authorsRank
         );
 
-        this.env.progress?.done();
+        this.env.progress?.success();
 
         return { guilds, channels, authors };
     }
@@ -303,7 +303,7 @@ export class DatabaseBuilder {
             }
         }
 
-        this.env.progress?.done();
+        this.env.progress?.success();
 
         return { finalMessages };
     }
