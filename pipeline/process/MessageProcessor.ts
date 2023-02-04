@@ -178,6 +178,7 @@ export class MessageProcessor {
 
             let domainIdx = domains.getIndex(hostname);
             if (domainIdx === undefined) domainIdx = domains.set(hostname, hostname);
+            return domainIdx;
         } catch (ex) {
             return undefined;
         }
