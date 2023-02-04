@@ -95,6 +95,9 @@ export const writeIndexCounts = (counts: IndexCounts, stream: BitStream, bitsPer
         (bitsPerIndex + bitsPerCount) * realLen;
 
     if (serialBits < rleBits) {
+        // sort in ascending order BY INDEX for delta encoding
+        counts.sort((a, b) => a[0] - b[0]);
+
         // use serial encoding
         stream.setBits(2, 0b10); // 0b10=serial
         stream.setBits(10, realTotal);
@@ -104,7 +107,6 @@ export const writeIndexCounts = (counts: IndexCounts, stream: BitStream, bitsPer
         for (let i = 0; i < len; i++) {
             for (let j = 0; j < counts[i][1] && written < realTotal; j++) {
                 const diff = counts[i][0] - lastIndex;
-                console.assert(diff >= 0, "delta encoding failed, index counts are not sorted");
                 // delta encoding
                 stream.setBits(bitsPerIndex, diff);
                 lastIndex += diff;
