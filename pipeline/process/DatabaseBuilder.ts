@@ -32,6 +32,7 @@ export class DatabaseBuilder {
     emojis = new IndexedMap<string, Emoji>();
     mentions = new IndexedMap<string, string>();
     domains = new IndexedMap<string, string>();
+    replyIds: RawID[] = [];
 
     /** Each channel has its own ChannelMessages instance */
     messagesInChannel = new Map<RawID, ChannelMessages>();
@@ -352,7 +353,7 @@ export class DatabaseBuilder {
             channel.msgAddr = finalMessages.stream.offset;
             channel.msgCount = mc.numMessages;
 
-            for (const msg of mc.processedMessages()) {
+            for (const { id, msg } of mc.processedMessages()) {
                 const newWords = new IndexCountsBuilder();
 
                 // reindex and skip words
@@ -367,6 +368,7 @@ export class DatabaseBuilder {
                 finalMessages.push({
                     ...msg,
                     dayIndex: dateKeys.indexOf(Day.fromBinary(msg.dayIndex).dateKey),
+                    replyOffset: 0,
                     authorIndex: this.authorsRank[msg.authorIndex],
                     words: newWords.toArray(),
                 });

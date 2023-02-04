@@ -91,18 +91,6 @@ export class ChannelMessages {
         for (const interval of this.intervals) yield* interval.processedMessages();
     }
 
-    /** @returns the index of the message in the correct cronological order. Returns undefined if not found */
-    indexOf(id: RawID): Index | undefined {
-        let offset = 0;
-
-        for (const interval of this.intervals) {
-            const idx = interval.indexOf(id);
-            if (idx !== undefined) return offset + idx;
-            offset += interval.numMessages;
-        }
-        return undefined;
-    }
-
     /** @returns the number of messages in this channel */
     get numMessages() {
         return this.intervals.reduce((acc, i) => acc + i.numMessages, 0);
@@ -133,8 +121,8 @@ export class MessagesInterval {
     /** Messages already processed. */
     private messages = new MessagesArray(DefaultMessageBitConfig);
 
-    /** Mapping between original IDs and its index */
-    private idToIndex = new Map<RawID, Index>();
+    /** Original platform IDs */
+    private ids: RawID[] = [];
 
     constructor(initialMessage: PMessage) {
         this.start = initialMessage.timestamp;
@@ -146,8 +134,8 @@ export class MessagesInterval {
     addMessageAndExtend(message: PMessage) {
         if (message.timestamp < this.end) throw new Error("MessagesInterval can only be extended to the future");
 
-        this.idToIndex.set(message.id, this.numMessages);
         this.messageQueue.push(message);
+        this.ids.push(message.id);
         this.end = message.timestamp;
     }
 
@@ -194,12 +182,10 @@ export class MessagesInterval {
 
     /** @returns an iterator over the processed messages */
     *processedMessages() {
-        yield* this.messages;
-    }
-
-    /** @returns the index of the message relative to this interval. Returns undefined if not found */
-    indexOf(id: RawID): Index | undefined {
-        return this.idToIndex.get(id);
+        let i = 0;
+        for (const msg of this.messages) {
+            yield { id: this.ids[i++], msg };
+        }
     }
 
     isContained(ts: Timestamp): boolean {
