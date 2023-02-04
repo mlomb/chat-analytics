@@ -5,9 +5,6 @@ import { FileInput } from "@pipeline/parse/File";
 import { DatabaseBuilder } from "@pipeline/process/DatabaseBuilder";
 import { Database } from "@pipeline/process/Types";
 
-// convenience
-export { Config, Database, Env, FileInput };
-
 /**
  * Generates a Database object from the given files and configuration.
  *
