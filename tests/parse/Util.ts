@@ -6,7 +6,7 @@ import { FileInput, wrapStringAsFile } from "@pipeline/parse/File";
 import { Parser } from "@pipeline/parse/Parser";
 import { PAuthor, PChannel, PGuild, PMessage } from "@pipeline/parse/Types";
 
-const SAMPLE_PATH = (sample: string) => path.join(__dirname, `../samples/${sample}`);
+export const SAMPLE_PATH = (sample: string) => path.join(__dirname, `../samples/${sample}`);
 
 /** True output from the Parser after running the inputs */
 export interface ParseResult {

@@ -1,12 +1,15 @@
+import { loadFile } from "@lib/NodeEnv";
 import { Platform } from "@pipeline/Platforms";
+import { Timestamp } from "@pipeline/Types";
 import { createParser } from "@pipeline/parse";
+import { tryToFindTimestampAtEnd, wrapStringAsFile } from "@pipeline/parse/File";
 import { Parser } from "@pipeline/parse/Parser";
 import { DiscordParser } from "@pipeline/parse/parsers/DiscordParser";
 import { MessengerParser } from "@pipeline/parse/parsers/MessengerParser";
 import { TelegramParser } from "@pipeline/parse/parsers/TelegramParser";
 import { WhatsAppParser } from "@pipeline/parse/parsers/WhatsAppParser";
 
-import { checkSamplesAreParsedCorrectly } from "./Util";
+import { SAMPLE_PATH, checkSamplesAreParsedCorrectly } from "./Util";
 
 describe("should parse correctly", () => {
     // prettier-ignore
@@ -39,5 +42,26 @@ describe("createParser should return the correct parser", () => {
         ["messenger", MessengerParser],
     ])("%s", async (platform, expectedClass) => {
         expect(createParser(platform)).toBeInstanceOf(expectedClass);
+    });
+});
+
+describe("timestamp of the last message at the end of the file", () => {
+    // prettier-ignore
+    const cases: { file: string; regex: RegExp; lastMessageTimestamp: Timestamp }[] = [
+        { file: "discord/DM_2A_2M.json", regex: DiscordParser.TS_MSG_REGEX, lastMessageTimestamp: new Date("2019-01-25T00:11:04.083+00:00").getTime() },
+        { file: "discord/GC_3A_5M.json", regex: DiscordParser.TS_MSG_REGEX, lastMessageTimestamp: new Date("2023-01-18T20:12:12.123+00:00").getTime() },
+        { file: "discord/SV_5A_5M.json", regex: DiscordParser.TS_MSG_REGEX, lastMessageTimestamp: new Date("2018-05-20T16:09:51.118+00:00").getTime() },
+
+        { file: "telegram/DM_2A_7M.json", regex: TelegramParser.TS_MSG_REGEX, lastMessageTimestamp: 1654898799 },
+    ];
+
+    test.each(cases)("$file", async ({ file, regex, lastMessageTimestamp }) => {
+        const ts = await tryToFindTimestampAtEnd(regex, loadFile(SAMPLE_PATH(file)));
+        expect(ts).toBe(lastMessageTimestamp);
+    });
+
+    test("should return undefined if no timestamp is found", async () => {
+        const ts = await tryToFindTimestampAtEnd(DiscordParser.TS_MSG_REGEX, wrapStringAsFile("hello world"));
+        expect(ts).toBeUndefined();
     });
 });
