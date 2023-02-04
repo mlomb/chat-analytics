@@ -1,10 +1,11 @@
+import { PlatformsInfo } from "@pipeline/Platforms";
 import { useDataProvider } from "@report/DataProvider";
 
-import { Platforms } from "@assets/Platforms";
+import { PlatformLogos } from "@assets/PlatformLogos";
 
 export const PlatformAvatar = () => {
     const dp = useDataProvider();
-    const p = Platforms[dp.database.config.platform];
+    const p = PlatformsInfo[dp.database.config.platform];
 
     return (
         <div className="Avatar">
@@ -12,7 +13,7 @@ export const PlatformAvatar = () => {
                 className="PlatformAvatar"
                 style={{ backgroundColor: `hsl(${p.color[0]}, ${p.color[1]}%, ${p.color[2]}%)` }}
             >
-                {p.logo}
+                {PlatformLogos[dp.database.config.platform]}
             </div>
         </div>
     );

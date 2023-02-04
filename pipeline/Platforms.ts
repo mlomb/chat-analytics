@@ -1,7 +1,10 @@
-import { Platform } from "@pipeline/Types";
+/** Available platforms */
+export type Platform = "discord" | "messenger" | "telegram" | "whatsapp";
 
 interface PlatformInformation {
     name: string;
+    color: [number, number, number]; // HSL
+    defaultFilename: string;
     support: {
         stickers: boolean;
         reactions: boolean;
@@ -14,6 +17,8 @@ export const PlatformsInfo: {
 } = {
     discord: {
         name: "Discord",
+        color: [235, 86, 65],
+        defaultFilename: "<guild> - <channel> [ID].json",
         support: {
             stickers: true,
             reactions: true,
@@ -22,6 +27,8 @@ export const PlatformsInfo: {
     },
     messenger: {
         name: "Messenger",
+        color: [214, 89, 52],
+        defaultFilename: "message_<number>.json",
         support: {
             stickers: true,
             reactions: false,
@@ -30,6 +37,8 @@ export const PlatformsInfo: {
     },
     telegram: {
         name: "Telegram",
+        color: [200, 79, 52],
+        defaultFilename: "result.json",
         support: {
             stickers: false,
             reactions: false,
@@ -38,6 +47,8 @@ export const PlatformsInfo: {
     },
     whatsapp: {
         name: "WhatsApp",
+        color: [142, 70, 49],
+        defaultFilename: "WhatsApp Chat with <chat name>.txt/zip",
         support: {
             stickers: true,
             reactions: false,

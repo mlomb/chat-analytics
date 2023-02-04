@@ -1,4 +1,4 @@
-import { Platform } from "@pipeline/Types";
+import { Platform } from "@pipeline/Platforms";
 import { Parser } from "@pipeline/parse/Parser";
 import { DiscordParser } from "@pipeline/parse/parsers/DiscordParser";
 import { MessengerParser } from "@pipeline/parse/parsers/MessengerParser";

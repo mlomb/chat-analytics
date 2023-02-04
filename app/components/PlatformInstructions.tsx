@@ -1,6 +1,6 @@
 import { ReactNode, useState } from "react";
 
-import { Platform } from "@pipeline/Types";
+import { Platform } from "@pipeline/Platforms";
 
 // Discord
 import DiscordChannels from "@assets/images/platforms/discord/instructions/discord_channels.png";
