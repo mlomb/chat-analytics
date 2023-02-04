@@ -1,6 +1,7 @@
 import { Button } from "@app/components/Button";
+import { Platform, PlatformsInfo } from "@pipeline/Platforms";
 
-import { Platforms } from "@assets/Platforms";
+import { PlatformLogos } from "@assets/PlatformLogos";
 import Lock from "@assets/images/icons/lock.svg";
 import GitHub from "@assets/images/logos/github.svg";
 import "@assets/styles/Landing.less";
@@ -26,7 +27,7 @@ export const Landing = ({ onStart }: Props) => {
                 <br />
                 <div className="Landing__platforms-line">
                     <span>Supports</span>
-                    {Object.entries(Platforms).map(([key, p]) => (
+                    {Object.entries(PlatformsInfo).map(([key, p]) => (
                         <div
                             className="Landing__platform"
                             key={key}
@@ -34,7 +35,7 @@ export const Landing = ({ onStart }: Props) => {
                                 backgroundColor: `hsl(${p.color[0]}, ${p.color[1]}%, ${p.color[2]}%)`,
                             }}
                         >
-                            {p.logo}
+                            {PlatformLogos[key as Platform]}
                         </div>
                     ))}
                 </div>

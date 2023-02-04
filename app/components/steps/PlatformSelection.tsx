@@ -1,7 +1,7 @@
 import { Button } from "@app/components/Button";
-import { Platform } from "@pipeline/Types";
+import { Platform, PlatformsInfo } from "@pipeline/Platforms";
 
-import { Platforms } from "@assets/Platforms";
+import { PlatformLogos } from "@assets/PlatformLogos";
 
 interface Props {
     pickPlatform: (platform: Platform) => void;
@@ -9,10 +9,10 @@ interface Props {
 
 export const PlatformSelection = ({ pickPlatform }: Props) => (
     <div className="PlatformSelect__buttons">
-        {Object.entries(Platforms).map(([key, p]) => (
+        {Object.entries(PlatformsInfo).map(([key, p]) => (
             <Button key={key} hueColor={p.color} onClick={() => pickPlatform(key as Platform)}>
-                {p.logo}
-                {p.title}
+                {PlatformLogos[key as Platform]}
+                {p.name}
             </Button>
         ))}
     </div>

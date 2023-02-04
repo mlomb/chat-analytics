@@ -1,3 +1,5 @@
+import { Platform } from "@pipeline/Platforms";
+
 /** A zero based index */
 export type Index = number;
 
@@ -12,9 +14,6 @@ export type Timestamp = number;
  * - text: generic text channel
  */
 export type ChannelType = "dm" | "group" | "text";
-
-/** Available platforms */
-export type Platform = "discord" | "messenger" | "telegram" | "whatsapp";
 
 /** Configuration for database and report generation */
 export interface Config {

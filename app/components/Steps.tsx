@@ -3,10 +3,9 @@ import { useState } from "react";
 import { InitMessage, ProgressMessage, ResultMessage } from "@app/WorkerApp";
 import { Button } from "@app/components/Button";
 import { Stepper } from "@app/components/Stepper";
+import { Platform, PlatformsInfo } from "@pipeline/Platforms";
 import { ProgressStats, ProgressTask } from "@pipeline/Progress";
-import { Platform } from "@pipeline/Types";
 
-import { Platforms } from "@assets/Platforms";
 import { numberCategory, plausible, sizeCategory, timeCategory } from "@assets/Plausible";
 import "@assets/styles/Steps.less";
 
@@ -161,7 +160,7 @@ export const Steps = () => {
         setState({ ...state, currentStep: 1, platform });
     };
 
-    const info = state.platform ? Platforms[state.platform] : undefined;
+    const info = state.platform ? PlatformsInfo[state.platform] : undefined;
 
     return (
         <div className="Steps">
