@@ -1,5 +1,6 @@
 import { unzipSync } from "fflate";
 
+import { Env } from "@pipeline/Env";
 import { LanguageCodes } from "@pipeline/Languages";
 import { Progress } from "@pipeline/Progress";
 import { Index } from "@pipeline/Types";
@@ -7,6 +8,8 @@ import { Emojis } from "@pipeline/process/nlp/Emojis";
 import { normalizeText } from "@pipeline/process/nlp/Text";
 import { Token, tokenize } from "@pipeline/process/nlp/Tokenizer";
 
+// TODO: This class has to be refactored and tested, but since we probably will change a bit
+// the way we handle sentiment, I will leave it as it is for now.
 export class Sentiment {
     private readonly langs: {
         [lang: Index]: {
@@ -15,7 +18,7 @@ export class Sentiment {
         };
     } = {};
 
-    constructor(afinnZipBuffer: ArrayBuffer, private emojiData: Emojis, progress?: Progress) {
+    private constructor(afinnZipBuffer: ArrayBuffer, private emojiData: Emojis, progress?: Progress) {
         const filesAsBuffers = unzipSync(new Uint8Array(afinnZipBuffer));
         const filesAsStrings: { [key: string]: string } = {};
 
@@ -54,7 +57,7 @@ export class Sentiment {
     }
 
     // NOTE: based on marcellobarile/multilang-sentiment
-    get(tokens: Token[], lang: Index): number | undefined {
+    calculate(tokens: Token[], lang: Index): number | undefined {
         const langDb = this.langs[lang];
         if (langDb === undefined) return undefined;
 
@@ -96,6 +99,11 @@ export class Sentiment {
         }
 
         return score;
+    }
+
+    static async load(env: Env, emojis: Emojis) {
+        const afinnZipBuffer = await env.loadAsset("/data/text/AFINN.zip", "arraybuffer");
+        return new Sentiment(afinnZipBuffer, emojis, env.progress);
     }
 }
 
