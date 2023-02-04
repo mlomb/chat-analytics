@@ -153,7 +153,7 @@ export interface TimeKeysResult {
  */
 export const genTimeKeys = (start: Day, end: Day): TimeKeysResult => {
     // check start <= end
-    console.assert(Day.lt(start, end) || Day.eq(start, end));
+    if (Day.lt(end, start)) throw new Error("genTimeKeys: start must be before end");
 
     const onePastEnd = end.nextDay();
 

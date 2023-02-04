@@ -1,5 +1,5 @@
 import { PMessage } from "@pipeline/parse/Types";
-import { ChannelMessages } from "@pipeline/process/ChannelMessages";
+import { ChannelMessages, MessagesInterval } from "@pipeline/process/ChannelMessages";
 import { Message } from "@pipeline/process/Types";
 
 const makePMessage = (i: number, authorId: number = 0) => ({ id: i, authorId, channelId: 1, timestamp: i });
@@ -131,4 +131,11 @@ describe("complex sample", () => {
     it("iteration should return all elements", () => {
         expect(Array.from(cm.processedMessages())).toStrictEqual(expected.map((i) => processFn(makePMessage(i))));
     });
+});
+
+it("should crash if interval is extended into the past", () => {
+    const interval = new MessagesInterval(makePMessage(69));
+    expect(() => interval.addMessageAndExtend(makePMessage(68))).toThrow(
+        "MessagesInterval can only be extended to the future"
+    );
 });

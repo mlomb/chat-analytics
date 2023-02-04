@@ -144,7 +144,7 @@ export class MessagesInterval {
 
     /** Adds the PMessage to the queue and extends the end of the interval to contain it */
     addMessageAndExtend(message: PMessage) {
-        console.assert(message.timestamp >= this.end, "Intervals can only be extended to the future");
+        if (message.timestamp < this.end) throw new Error("MessagesInterval can only be extended to the future");
 
         this.idToIndex.set(message.id, this.numMessages);
         this.messageQueue.push(message);
