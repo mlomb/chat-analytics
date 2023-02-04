@@ -1,4 +1,5 @@
 import { Progress } from "@pipeline/Progress";
+import { Timestamp } from "@pipeline/Types";
 import { JSONStream } from "@pipeline/parse/JSONStream";
 
 /** Our interface for input files. Environment agnostic */
@@ -42,4 +43,37 @@ export const streamJSONFromFile = async function* (
         progress?.progress("bytes", receivedLength, fileSize);
         yield;
     }
+};
+
+/**
+ * Tries to find a timestamp at the end of a file, using the provided regex. The regex must have a capture group.
+ * It can detect ISO 8601 dates and unix timestamps.
+ *
+ * This is useful to compute how up-to-date a file is before parsing it, so we can always keep the latest information (e.g. nicknames)
+ */
+export const tryToFindTimestampAtEnd = async (regex: RegExp, file: FileInput): Promise<Timestamp | undefined> => {
+    // read last 4KB of file
+    const buffer = await file.slice(Math.max(0, file.size - 4096), file.size);
+    const text = new TextDecoder().decode(buffer);
+
+    // try to match
+    const match = Array.from(text.matchAll(regex));
+    const lastMatch = match.pop();
+
+    if (lastMatch && lastMatch.length >= 2) {
+        const found = lastMatch[1];
+        let ts: Timestamp;
+
+        if (found.includes("T")) {
+            // try to parse as ISO 8601 date
+            ts = new Date(found).getTime();
+        } else {
+            // try to parse as unix timestamp
+            ts = parseInt(found, 10);
+        }
+
+        if (!isNaN(ts)) return ts;
+    }
+
+    return undefined;
 };

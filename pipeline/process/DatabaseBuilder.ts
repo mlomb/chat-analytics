@@ -48,6 +48,7 @@ export class DatabaseBuilder {
         this.parser.on("channel", (channel, at) => this.channels.set(channel.id, channel, at));
         this.parser.on("author", (author, at) => this.authors.set(author.id, author, at));
         this.parser.on("message", (message, at) => {
+            // NOTE: `at` is not supported for messages
             let channelMessages = this.messagesInChannel.get(message.channelId);
             if (channelMessages === undefined) {
                 // new channel found

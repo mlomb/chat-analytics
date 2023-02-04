@@ -1,15 +1,25 @@
 import { AttachmentType, getAttachmentTypeFromMimeType } from "@pipeline/Attachments";
-import { FileInput, streamJSONFromFile } from "@pipeline/parse/File";
+import { Timestamp } from "@pipeline/Types";
+import { FileInput, streamJSONFromFile, tryToFindTimestampAtEnd } from "@pipeline/parse/File";
 import { JSONStream } from "@pipeline/parse/JSONStream";
 import { Parser } from "@pipeline/parse/Parser";
-import { RawID } from "@pipeline/parse/Types";
+import { PAuthor, PChannel, PGuild, PMessage, RawID } from "@pipeline/parse/Types";
 
 export class TelegramParser extends Parser {
     private lastChannelName?: string;
     private lastChannelType?: TelegramChannelType;
     private lastChannelID?: RawID;
+    private lastMessageTimestampInFile?: Timestamp;
+
+    /**
+     * Regex to find the timestamp of the last message in a Telegram export file.
+     * We use the timestamp of the last message as the `at` value (see @Parser)
+     */
+    static readonly TS_MSG_REGEX = /"date_unixtime": ?"([0-9]+)"/gi;
 
     async *parse(file: FileInput) {
+        this.lastMessageTimestampInFile = await tryToFindTimestampAtEnd(TelegramParser.TS_MSG_REGEX, file);
+
         const stream = new JSONStream()
             .onObject<string>("name", this.onChannelName.bind(this))
             .onObject<TelegramChannelType>("type", this.onChannelType.bind(this))
@@ -33,17 +43,19 @@ export class TelegramParser extends Parser {
     private onChannelId(rawChannelId: RawID) {
         this.lastChannelID = rawChannelId;
 
-        this.emit("guild", {
+        const pguild: PGuild = {
             id: 0,
             name: "Telegram Chats",
-        });
-
-        this.emit("channel", {
+        };
+        const pchannel: PChannel = {
             id: rawChannelId,
             guildId: 0,
             name: this.lastChannelName || "Telegram chat",
             type: ["personal_chat", "bot_chat"].includes(this.lastChannelType || "") ? "dm" : "group",
-        });
+        };
+
+        this.emit("guild", pguild, this.lastMessageTimestampInFile);
+        this.emit("channel", pchannel, this.lastMessageTimestampInFile);
     }
 
     private parseMessage(message: TelegramMessage) {
@@ -58,13 +70,14 @@ export class TelegramParser extends Parser {
         const timestampEdit = message.edited ? Date.parse(message.edited) : undefined;
 
         if (message.type === "message") {
-            this.emit("author", {
+            const pauthor: PAuthor = {
                 id: rawAuthorId,
                 // use the ID as name if no nickname is available
                 name: message.from || rawId,
                 // NOTE: I can't find a reliable way to detect if an author is a bot :(
                 bot: false,
-            });
+            };
+            this.emit("author", pauthor, this.lastMessageTimestampInFile);
 
             let textContent = this.parseTextArray(message.text);
             let attachment: AttachmentType | undefined;
@@ -85,7 +98,7 @@ export class TelegramParser extends Parser {
                 // NOTE: also :dart: emoji appears as empty content
             }
 
-            this.emit("message", {
+            const pmessage: PMessage = {
                 id: rawId,
                 replyTo: rawReplyToId,
                 authorId: rawAuthorId,
@@ -96,7 +109,8 @@ export class TelegramParser extends Parser {
                 attachments: attachment === undefined ? [] : [attachment],
                 // NOTE: as of now, Telegram doesn't export reactions :(
                 // reactions: [],
-            });
+            };
+            this.emit("message", pmessage, this.lastMessageTimestampInFile);
         }
     }
 

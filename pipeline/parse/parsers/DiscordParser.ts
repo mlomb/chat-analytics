@@ -1,14 +1,21 @@
 import { AttachmentType, getAttachmentTypeFromFileName } from "@pipeline/Attachments";
 import { Progress } from "@pipeline/Progress";
 import { ChannelType } from "@pipeline/Types";
-import { FileInput, streamJSONFromFile } from "@pipeline/parse/File";
+import { FileInput, streamJSONFromFile, tryToFindTimestampAtEnd } from "@pipeline/parse/File";
 import { JSONStream } from "@pipeline/parse/JSONStream";
 import { Parser } from "@pipeline/parse/Parser";
-import { RawID } from "@pipeline/parse/Types";
+import { PAuthor, PChannel, PMessage, RawID } from "@pipeline/parse/Types";
 
 export class DiscordParser extends Parser {
     private lastGuildId?: RawID;
     private lastChannelId?: RawID;
+    private lastMessageTimestampInFile?: number;
+
+    /**
+     * Regex to find the timestamp of the last message in a Discord export file.
+     * We use the timestamp of the last message as the `at` value (see @Parser)
+     */
+    static readonly TS_MSG_REGEX = /"timestamp": ?"([0-9-:.+T]+)"/gi;
 
     /**
      * Parse a Discord export file from DCE (https://github.com/Tyrrrz/DiscordChatExporter)
@@ -18,6 +25,8 @@ export class DiscordParser extends Parser {
      * Since we are streaming the file, we can handle big exports 😊
      */
     async *parse(file: FileInput, progress?: Progress) {
+        this.lastMessageTimestampInFile = await tryToFindTimestampAtEnd(DiscordParser.TS_MSG_REGEX, file);
+
         const stream = new JSONStream()
             .onObject<DiscordGuild>("guild", this.parseGuild.bind(this))
             .onObject<DiscordChannel>("channel", this.parseChannel.bind(this))
@@ -34,7 +43,7 @@ export class DiscordParser extends Parser {
             iconUrl = undefined;
         }
 
-        this.emit("guild", { id: guild.id, name: guild.name, avatar: iconUrl });
+        this.emit("guild", { id: guild.id, name: guild.name, avatar: iconUrl }, this.lastMessageTimestampInFile);
         this.lastGuildId = guild.id;
     }
 
@@ -46,7 +55,7 @@ export class DiscordParser extends Parser {
         if (channel.type == "DirectTextChat") type = "dm";
         else if (channel.type == "DirectGroupTextChat") type = "group";
 
-        this.emit("channel", {
+        const pchannel: PChannel = {
             id: channel.id,
             guildId: this.lastGuildId,
             name: channel.name,
@@ -56,7 +65,9 @@ export class DiscordParser extends Parser {
             //   + image avatars are not available in the export, see https://github.com/Tyrrrz/DiscordChatExporter/issues/987
             // else: we other kind of channels don't have avatars
             avatar: type === "group" ? this.parseSnowflake(channel.id).timestamp.toString() : undefined,
-        });
+        };
+
+        this.emit("channel", pchannel, this.lastMessageTimestampInFile);
         this.lastChannelId = channel.id;
     }
 
@@ -81,12 +92,13 @@ export class DiscordParser extends Parser {
         if (message.author.avatarUrl && message.author.avatarUrl.includes("discordapp.com/avatars"))
             avatar = message.author.avatarUrl.slice(35).split(".")[0];
 
-        this.emit("author", {
+        const pauthor: PAuthor = {
             id: message.author.id,
             bot: message.author.isBot,
             name: name + (isDeletedUser ? " #" + message.author.id : "#" + message.author.discriminator),
             avatar: avatar ? (" " + avatar).substring(1) : undefined, // avoid leak
-        });
+        };
+        this.emit("author", pauthor, this.lastMessageTimestampInFile);
 
         if (message.type == "Default" || message.type == "Reply") {
             let content = message.content;
@@ -101,7 +113,7 @@ export class DiscordParser extends Parser {
             // TODO: in the far future we may want to make stats for platforms that support stickers (in their exports)
             const stickers = message.stickers || [];
 
-            this.emit("message", {
+            const pmessage: PMessage = {
                 id: message.id,
                 authorId: message.author.id,
                 channelId: this.lastChannelId,
@@ -120,7 +132,8 @@ export class DiscordParser extends Parser {
                     },
                     r.count,
                 ]),
-            });
+            };
+            this.emit("message", pmessage, this.lastMessageTimestampInFile);
         }
     }
 
