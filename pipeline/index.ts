@@ -1,18 +1,26 @@
 import { Env } from "@pipeline/Env";
-import { ReportConfig } from "@pipeline/Types";
+import { Config } from "@pipeline/Types";
 import { compress } from "@pipeline/compression/Compression";
 import { FileInput } from "@pipeline/parse/File";
 import { DatabaseBuilder } from "@pipeline/process/DatabaseBuilder";
 import { Database } from "@pipeline/process/Types";
 
-export const generateDatabase = async (files: FileInput[], config: ReportConfig, env: Env): Promise<Database> => {
+// convenience
+export { Config, Database, Env, FileInput };
+
+/**
+ * Generates a Database object from the given files and configuration.
+ *
+ * The entry point for chat-analytics if you want to use it as a library.
+ */
+export const generateDatabase = async (files: FileInput[], config: Config, env: Env): Promise<Database> => {
     const builder = new DatabaseBuilder(config, env);
     await builder.init();
     await builder.processFiles(files);
     return builder.build();
 };
 
-// Returns the final data and HTML code
+/** Takes a Database object and generates the report HTML code. It also returns the compressed data */
 export const generateReport = async (
     database: Database,
     env: Env

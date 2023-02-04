@@ -1,12 +1,12 @@
-import { FullMessage } from "@pipeline/process/Types";
+import { MessageComplete } from "@pipeline/process/Types";
 import { MessageLabel } from "@report/components/core/MessageLabel";
 
 import "@assets/styles/TopMessages.less";
 
-export type TitleFn = (msg: FullMessage) => string;
+export type TitleFn = (msg: MessageComplete) => string;
 
 interface TopMessagesProps {
-    messages: FullMessage[];
+    messages: MessageComplete[];
     title: TitleFn;
 }
 
@@ -21,7 +21,7 @@ export const TopMessages = (props: TopMessagesProps) => {
     );
 };
 
-const TopMessage = ({ msg, i, title }: { msg: FullMessage; i: number; title: TitleFn }) => (
+const TopMessage = ({ msg, i, title }: { msg: MessageComplete; i: number; title: TitleFn }) => (
     <div className="TopMessage">
         <div>
             <span className="TopMessage__pos">#{i + 1}</span>

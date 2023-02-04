@@ -1,6 +1,6 @@
 import { Env } from "@pipeline/Env";
 import { Day, genTimeKeys } from "@pipeline/Time";
-import { Index, ReportConfig } from "@pipeline/Types";
+import { Config, Index } from "@pipeline/Types";
 import { createParser } from "@pipeline/parse";
 import { FileInput } from "@pipeline/parse/File";
 import { Parser } from "@pipeline/parse/Parser";
@@ -14,7 +14,9 @@ import { MessageBitConfig } from "@pipeline/serialization/MessageSerialization";
 import { MessagesArray } from "@pipeline/serialization/MessagesArray";
 
 /**
+ * Builds the Database object from input files.
  *
+ * ⚠️ You probably want to use `generateDatabase` instead of manually creating a DatabaseBuilder.
  */
 export class DatabaseBuilder {
     parser: Parser;
@@ -40,7 +42,7 @@ export class DatabaseBuilder {
     get numAuthors() { return this.authors.size; } // prettier-ignore
     get numMessages() { return [...this.messagesInChannel.values()].reduce((acc, mc) => acc + mc.numMessages, 0); } // prettier-ignore
 
-    constructor(private readonly config: ReportConfig, private readonly env: Env) {
+    constructor(private readonly config: Config, private readonly env: Env) {
         this.parser = createParser(config.platform);
         this.parser.on("guild", (guild, at) => this.guilds.set(guild.id, guild, at));
         this.parser.on("channel", (channel, at) => this.channels.set(channel.id, channel, at));
@@ -343,6 +345,7 @@ export class DatabaseBuilder {
         };
     }
 
+    /** Builds the final report title. Do we want to have this here? */
     private buildTitle(guilds: Guild[], channels: Channel[]): string {
         // See report/components/Title.tsx
 

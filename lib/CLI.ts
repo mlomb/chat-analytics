@@ -8,7 +8,7 @@ import { hideBin } from "yargs/helpers";
 import { loadFile, loadNodeAsset } from "@lib/NodeEnv";
 import { generateDatabase, generateReport } from "@lib/index";
 import { Progress } from "@pipeline/Progress";
-import { ReportConfig } from "@pipeline/Types";
+import { Config } from "@pipeline/Types";
 
 const argv = yargs(hideBin(process.argv))
     .scriptName("chat-analytics")
@@ -56,7 +56,7 @@ for (const file of files) {
 }
 
 // run
-const config: ReportConfig = {
+const config: Config = {
     platform: argv.platform,
     demo: argv.demo,
 };

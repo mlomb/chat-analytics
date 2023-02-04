@@ -45,7 +45,7 @@ export declare interface Progress {
  * - `progress()` (optional)
  * - ...
  * - `progress()` (optional)
- * - `done()` or `error()`
+ * - `success()` or `error()`
  *
  * Note: there is a undocumented and untested `waiting` state, which allows multiple `new` calls (unused)
  */
