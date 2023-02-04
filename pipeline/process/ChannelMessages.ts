@@ -1,5 +1,5 @@
-import { Index, RawID, Timestamp } from "@pipeline/Types";
-import { PMessage } from "@pipeline/parse/Types";
+import { Index, Timestamp } from "@pipeline/Types";
+import { PMessage, RawID } from "@pipeline/parse/Types";
 import { Message } from "@pipeline/process/Types";
 import { DefaultMessageBitConfig } from "@pipeline/serialization/MessageSerialization";
 import { MessagesArray } from "@pipeline/serialization/MessagesArray";

@@ -1,6 +1,3 @@
-// raw ID that comes from the platform (e.g: 9876554321)
-export type RawID = string | number;
-
 // a zero-based index
 export type Index = number;
 
