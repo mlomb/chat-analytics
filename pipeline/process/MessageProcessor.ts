@@ -1,5 +1,5 @@
 import { Env } from "@pipeline/Env";
-import { LanguageCodes } from "@pipeline/Languages";
+import { LanguageCodes, getLanguageIndexByCode } from "@pipeline/Languages";
 import { Day } from "@pipeline/Time";
 import { Index } from "@pipeline/Types";
 import { PEmoji, PMessage } from "@pipeline/parse/Types";
@@ -10,7 +10,6 @@ import { Emoji, Message } from "@pipeline/process/Types";
 import { Emojis } from "@pipeline/process/nlp/Emojis";
 import { FastTextLID176Model } from "@pipeline/process/nlp/FastTextModel";
 import { Sentiment } from "@pipeline/process/nlp/Sentiment";
-import { Stopwords } from "@pipeline/process/nlp/Stopwords";
 import { matchFormat, normalizeText } from "@pipeline/process/nlp/Text";
 import { Token, tokenize } from "@pipeline/process/nlp/Tokenizer";
 
@@ -24,14 +23,12 @@ export class MessageProcessor {
     constructor(private readonly builder: DatabaseBuilder) {}
 
     // static data
-    private stopwords?: Stopwords;
     private emojis?: Emojis;
     private langPredictModel?: FastTextLID176Model;
     private sentiment?: Sentiment;
 
     // download static data
     async init(env: Env) {
-        this.stopwords = await Stopwords.load(env);
         this.emojis = await Emojis.load(env);
         this.langPredictModel = await FastTextLID176Model.load(env);
         this.sentiment = await Sentiment.load(env, this.emojis);
@@ -55,8 +52,7 @@ export class MessageProcessor {
         // this yields better accuracy
         let langIndex: number | undefined;
         if (allText.length > 0) {
-            const lang = this.langPredictModel!.identifyLanguage(allText);
-            langIndex = LanguageCodes.indexOf(lang.iso639);
+            langIndex = this.langPredictModel!.identifyLanguage(allText).iso639index;
         }
 
         return group.map((message, index) => this.processMessage(message, tokenizations[index], langIndex));

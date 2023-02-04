@@ -1,4 +1,5 @@
 import { Env } from "@pipeline/Env";
+import { Language, getLanguageIndexByCode } from "@pipeline/Languages";
 
 interface FastTextModelClass {
     loadModel: (path: string) => void;
@@ -79,7 +80,8 @@ export class FastTextLID176Model {
         const result = this.model.predict(line, 1, 0.0);
         const code = result[0][1].slice(9); // "__label__".length === 9
         return {
-            iso639: code,
+            iso639: code as Language,
+            iso639index: getLanguageIndexByCode(code as Language),
             accuracy: result[0][0],
         };
     }
