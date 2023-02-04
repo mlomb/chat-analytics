@@ -99,6 +99,13 @@ export class MessageProcessor {
             sentiment = this.sentiment?.calculate(tokens, langIndex) || 0;
         }
 
+        let replyOffset = undefined;
+        if (msg.replyTo) {
+            // store replyTo index
+            replyOffset = this.builder.replyIds.length;
+            this.builder.replyIds.push(msg.replyTo);
+        }
+
         // TODO: timezones
         const date = new Date(msg.timestamp);
         const day = Day.fromDate(date);
@@ -107,7 +114,7 @@ export class MessageProcessor {
             dayIndex: day.toBinary(),
             secondOfDay: date.getSeconds() + 60 * (date.getMinutes() + 60 * date.getHours()),
             authorIndex: this.builder.authors.getIndex(msg.authorId)!,
-            replyOffset: msg.replyTo ? 1 : 0, // offset is not really being used right now in the UI
+            replyOffset,
             langIndex,
             sentiment: langIndex !== undefined ? sentiment : undefined,
             words: wordsCount.toArray(),

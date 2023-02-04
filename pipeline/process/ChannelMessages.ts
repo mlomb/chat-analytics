@@ -95,6 +95,11 @@ export class ChannelMessages {
     get numMessages() {
         return this.intervals.reduce((acc, i) => acc + i.numMessages, 0);
     }
+
+    /** @returns the number of bytes occupied by serialized messages */
+    get numBytes() {
+        return this.intervals.reduce((acc, i) => acc + i.numBytes, 0);
+    }
 }
 
 /**
@@ -199,5 +204,10 @@ export class MessagesInterval {
     /** @returns the total number of messages in the interval */
     get numMessages() {
         return this.messageQueue.length + this.messages.length;
+    }
+
+    /** @returns the number of bytes occupied by serialized messages */
+    get numBytes() {
+        return this.messages.stream.offset;
     }
 }

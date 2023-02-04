@@ -19,3 +19,36 @@ describe("should deserialize correctly", () => {
         expect(view.getFullMessage()).toMatchObject(message);
     });
 });
+
+it("should link replies correctly", () => {
+    const stream = new BitStream();
+
+    let offsetOfSecondMessage = 0;
+    for (let i = 0; i < SAMPLE_MESSAGES.length; i++) {
+        if (i === 1) offsetOfSecondMessage = stream.offset;
+        writeMessage(SAMPLE_MESSAGES[i], stream, DefaultMessageBitConfig);
+    }
+
+    let offsetOfTestMessage = stream.offset;
+    writeMessage(
+        {
+            dayIndex: 1,
+            secondOfDay: 2,
+            authorIndex: 3,
+            langIndex: 4,
+            sentiment: 5,
+            replyOffset: offsetOfSecondMessage,
+        },
+        stream,
+        DefaultMessageBitConfig
+    );
+
+    stream.offset = offsetOfTestMessage;
+    const view = new MessageView(stream, DefaultMessageBitConfig);
+
+    expect(view.hasReply).toBeTruthy();
+    expect(view.replyOffset).toBe(offsetOfSecondMessage);
+    expect(view.reply).toBeDefined();
+    expect(view.reply!.getFullMessage()).toMatchObject(SAMPLE_MESSAGES[1]);
+    expect(view.reply!.reply).toBeUndefined();
+});
