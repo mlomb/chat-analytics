@@ -1,6 +1,6 @@
 import { Index } from "@pipeline/Types";
 import { IndexCounts } from "@pipeline/process/IndexCounts";
-import { FullMessage, Message } from "@pipeline/process/Types";
+import { Message, MessageComplete } from "@pipeline/process/Types";
 import { BitAddress, BitStream } from "@pipeline/serialization/BitStream";
 import { readIndexCounts, skipIndexCounts } from "@pipeline/serialization/IndexCountsSerialization";
 import { MessageBitConfig, MessageFlags } from "@pipeline/serialization/MessageSerialization";
@@ -12,6 +12,7 @@ import { MessageBitConfig, MessageFlags } from "@pipeline/serialization/MessageS
  */
 export class MessageView implements Message {
     // provided for convenience
+    guildIndex: Index = -1;
     channelIndex: Index = -1;
 
     readonly dayIndex: Index;
@@ -111,7 +112,7 @@ export class MessageView implements Message {
         return readIndexCounts(this.stream, this.config.domainsIdxBits);
     }
 
-    getFullMessage(): FullMessage {
+    getFullMessage(): MessageComplete {
         return {
             dayIndex: this.dayIndex,
             secondOfDay: this.secondOfDay,
@@ -125,6 +126,8 @@ export class MessageView implements Message {
             reactions: this.reactions,
             mentions: this.mentions,
             domains: this.domains,
+
+            guildIndex: this.guildIndex,
             channelIndex: this.channelIndex,
         };
     }

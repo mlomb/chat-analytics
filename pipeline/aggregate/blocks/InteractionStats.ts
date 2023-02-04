@@ -1,14 +1,14 @@
 import { BlockDescription, BlockFn } from "@pipeline/aggregate/Blocks";
 import { parseAndFilterMessages } from "@pipeline/aggregate/Helpers";
-import { FullMessage } from "@pipeline/process/Types";
+import { MessageComplete } from "@pipeline/process/Types";
 import { MessageView } from "@pipeline/serialization/MessageView";
 
 export interface InteractionStats {
     mentionsCount: number[];
     authorsReplyCount: number[];
 
-    topTotalReactions: FullMessage[];
-    topSingleReactions: FullMessage[];
+    topTotalReactions: MessageComplete[];
+    topSingleReactions: MessageComplete[];
 }
 
 const fn: BlockFn<InteractionStats> = (database, filters, common) => {

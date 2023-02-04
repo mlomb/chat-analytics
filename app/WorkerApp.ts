@@ -1,12 +1,12 @@
 import { WebEnv, wrapFile } from "@app/WebEnv";
 import { ProgressStats, ProgressTask } from "@pipeline/Progress";
-import { ReportConfig } from "@pipeline/Types";
+import { Config } from "@pipeline/Types";
 import { generateDatabase, generateReport } from "@pipeline/index";
 
 /** Message sent by the UI to start the generation process */
 export interface InitMessage {
     files: File[];
-    config: ReportConfig;
+    config: Config;
     origin: string;
 }
 

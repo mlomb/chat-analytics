@@ -1,16 +1,14 @@
 import { AttachmentType } from "@pipeline/Attachments";
 import { DateKey } from "@pipeline/Time";
-import { ChannelType, Index, ReportConfig } from "@pipeline/Types";
+import { ChannelType, Config, Index } from "@pipeline/Types";
 import { RawID } from "@pipeline/parse/Types";
 import { IndexCounts } from "@pipeline/process/IndexCounts";
 import { BitAddress } from "@pipeline/serialization/BitStream";
 import { MessageBitConfig } from "@pipeline/serialization/MessageSerialization";
 
-// TODO: we want to change all this interfaces
-// we are keeping they this way for now to avoid breaking the UI
-
+/** All the information processed */
 export interface Database {
-    config: ReportConfig;
+    config: Config;
     title: string;
 
     time: {
@@ -31,6 +29,7 @@ export interface Database {
     mentions: string[];
     domains: string[];
 
+    /** Messages are serialized and must be read using `readMessage` or the `MessageView` class */
     messages: Uint8Array;
     numMessages: number;
     bitConfig: MessageBitConfig;
@@ -53,19 +52,32 @@ export interface Channel {
     msgCount?: number;
 }
 
+// names are shortened to bytes during JSON serialization ReportWorker → UI (can add quickly with 300k members)
 export interface Author {
-    n: string; // name
-    b?: undefined | true; // bot
-    a?: string; // avatar
+    /** name */
+    n: string;
+    /** bot */
+    b?: undefined | true;
+    /** avatar */
+    a?: string;
 }
 
 export interface Message {
+    // time
     dayIndex: number;
     secondOfDay: number;
+
+    // author
     authorIndex: Index;
+
+    // reply
     replyOffset?: number;
+
+    // analysis
     langIndex?: Index;
     sentiment?: number;
+
+    // content
     words?: IndexCounts;
     emojis?: IndexCounts;
     mentions?: IndexCounts;
@@ -74,18 +86,18 @@ export interface Message {
     attachments?: IndexCounts<AttachmentType>;
 }
 
-// TODO: remove
-// used in the UI, basically a Message but with the channel
-export interface FullMessage extends Message {
+/** Esentially a Message but with extra information needed in the UI */
+export interface MessageComplete extends Message {
+    guildIndex: Index;
     channelIndex: Index;
 }
 
-// change to CustomEmoji | UnicodeEmoji ?
+// TODO: change to CustomEmoji | UnicodeEmoji ?
 export interface Emoji {
-    // platform's emoji ID (if custom and available)
+    /** Platform's emoji ID (if custom and available)  */
     id?: RawID;
-    // name of the emoji ("fire" or "custom_emoji")
+    /** Name of the emoji ("fire" or "custom_emoji") */
     name: string;
-    // unicode symbol (e.g. 🔥) (not for custom emojis)
+    /** Unicode symbol (e.g. 🔥) (not for custom emojis) */
     symbol?: string;
 }

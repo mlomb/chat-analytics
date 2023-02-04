@@ -1,6 +1,6 @@
 import { AttachmentType } from "@pipeline/Attachments";
 import { Day, formatTime } from "@pipeline/Time";
-import { FullMessage } from "@pipeline/process/Types";
+import { MessageComplete } from "@pipeline/process/Types";
 import { useDataProvider } from "@report/DataProvider";
 import { Tooltip } from "@report/components/core/Tooltip";
 import { AuthorLabel } from "@report/components/core/labels/AuthorLabel";
@@ -31,7 +31,7 @@ const sortFn = (a: ChipProps, b: ChipProps) => {
     }
 };
 
-export const MessageLabel = (props: { message?: FullMessage }) => {
+export const MessageLabel = (props: { message?: MessageComplete }) => {
     const dp = useDataProvider();
     const msg = props.message;
 

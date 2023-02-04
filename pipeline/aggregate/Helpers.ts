@@ -24,6 +24,7 @@ export const parseAndFilterMessages = (
         // read messages
         for (let read = 0; read < channel.msgCount; read++) {
             const message = new MessageView(stream, database.bitConfig);
+            message.guildIndex = channel.guildIndex;
             message.channelIndex = ch;
             // filter author
             if (!activeFilters.authors || filters.hasAuthor(message.authorIndex)) {
