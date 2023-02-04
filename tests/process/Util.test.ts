@@ -17,6 +17,12 @@ test.each([
     expect(rank(input)).toEqual(expected);
 });
 
+test("`rank` filters out negative values as -1", () => {
+    const values = [-1, 4, -1, -1, 2, 3];
+    const expected = [-1, 0, -1, -1, 2, 1];
+    expect(rank(values)).toEqual(expected);
+});
+
 test.each([
     [
         [1, 2, 3],
@@ -31,8 +37,8 @@ test.each([
     expect(remap((v) => v * 10, input, rank(input))).toEqual(expected);
 });
 
-test("`remap` filters out undefined", () => {
-    const input = [1, 2, 3];
-    const expected = [30, 10];
-    expect(remap((v) => (v === 2 ? undefined : v * 10), input, rank(input))).toEqual(expected);
+test("`remap` does not return undefined when some ranks are undefined", () => {
+    const input = [3, -1, -1, 2, 4, -1];
+    const expected = [40, 30, 20];
+    expect(remap((v) => v * 10, input, rank(input))).toEqual(expected);
 });

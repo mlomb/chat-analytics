@@ -1,7 +1,7 @@
 import { unzipSync } from "fflate";
 
 import { Env } from "@pipeline/Env";
-import { LanguageCodes } from "@pipeline/Languages";
+import { Language, LanguageCodes } from "@pipeline/Languages";
 import { Progress } from "@pipeline/Progress";
 import { Index } from "@pipeline/Types";
 import { Emojis } from "@pipeline/process/nlp/Emojis";
@@ -35,7 +35,7 @@ export class Sentiment {
         let processed = 0;
         for (const filename in filesAsStrings) {
             if (filename.startsWith("AFINN-")) {
-                const lang = filename.substring(6, filename.length - 5);
+                const lang = filename.substring(6, filename.length - 5) as Language;
                 const langIndex = LanguageCodes.indexOf(lang);
                 if (langIndex === -1) {
                     // TODO: fixme

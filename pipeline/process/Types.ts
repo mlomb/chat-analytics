@@ -1,4 +1,5 @@
 import { AttachmentType } from "@pipeline/Attachments";
+import { Language } from "@pipeline/Languages";
 import { DateKey } from "@pipeline/Time";
 import { ChannelType, Config, Index } from "@pipeline/Types";
 import { RawID } from "@pipeline/parse/Types";
@@ -10,6 +11,7 @@ import { MessageBitConfig } from "@pipeline/serialization/MessageSerialization";
 export interface Database {
     config: Config;
     title: string;
+    langs: Language[];
 
     time: {
         minDate: DateKey;

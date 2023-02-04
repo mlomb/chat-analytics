@@ -1,15 +1,18 @@
 import { Env } from "@pipeline/Env";
+import { Language, LanguageCodes } from "@pipeline/Languages";
 import { Day, genTimeKeys } from "@pipeline/Time";
 import { Config, Index } from "@pipeline/Types";
 import { createParser } from "@pipeline/parse";
 import { FileInput } from "@pipeline/parse/File";
 import { Parser } from "@pipeline/parse/Parser";
-import { PAuthor, PChannel, PGuild, RawID } from "@pipeline/parse/Types";
+import { PAuthor, PChannel, PGuild, PMessage, RawID } from "@pipeline/parse/Types";
 import { ChannelMessages, ProcessGroupFn } from "@pipeline/process/ChannelMessages";
+import { IndexCountsBuilder } from "@pipeline/process/IndexCounts";
 import { IndexedMap } from "@pipeline/process/IndexedMap";
 import { MessageProcessor } from "@pipeline/process/MessageProcessor";
-import { Author, Channel, Database, Emoji, Guild } from "@pipeline/process/Types";
+import { Author, Channel, Database, Emoji, Guild, Message } from "@pipeline/process/Types";
 import { rank, remap } from "@pipeline/process/Util";
+import { Stopwords } from "@pipeline/process/nlp/Stopwords";
 import { MessageBitConfig } from "@pipeline/serialization/MessageSerialization";
 import { MessagesArray } from "@pipeline/serialization/MessagesArray";
 
@@ -35,8 +38,6 @@ export class DatabaseBuilder {
 
     /** Global messages processor */
     messageProcessor = new MessageProcessor(this);
-    /** Function used to process a group of messages */
-    processFn: ProcessGroupFn = this.messageProcessor.processGroupToIntermediate.bind(this.messageProcessor);
 
     get numChannels() { return this.channels.size; } // prettier-ignore
     get numAuthors() { return this.authors.size; } // prettier-ignore
@@ -59,9 +60,13 @@ export class DatabaseBuilder {
         });
     }
 
+    // static data
+    private stopwords?: Stopwords;
+
     /** Initialize static data. Must be called before `processFiles` */
     async init() {
         await this.messageProcessor.init(this.env);
+        this.stopwords = await Stopwords.load(this.env);
     }
 
     /** Process the provided files */
@@ -99,7 +104,15 @@ export class DatabaseBuilder {
     /** Goes through all ChannelMessage and process all the messages that remain pending */
     private processPendingMessages() {
         for (const chMsgs of this.messagesInChannel.values()) {
-            chMsgs.process(this.processFn);
+            chMsgs.process((group) => {
+                const processed = this.messageProcessor.processGroupToIntermediate(group);
+
+                for (let i = 0; i < processed.length; i++) {
+                    this.postProcessMessage(group[i], processed[i]);
+                }
+
+                return processed;
+            });
         }
 
         // update stats
@@ -124,6 +137,12 @@ export class DatabaseBuilder {
     minDate = Day.HIGHEST;
     maxDate = Day.LOWEST;
 
+    guildCounts: number[] = [];
+    channelCounts: number[] = [];
+    authorCounts: number[] = [];
+    wordsCounts: number[] = [];
+    langCounts: number[] = [];
+
     guildsRank: Index[] = [];
     channelsRank: Index[] = [];
     authorsRank: Index[] = [];
@@ -131,6 +150,79 @@ export class DatabaseBuilder {
 
     /** We want to store participants for DM chats to later override the channel name with "Alice & Bob" */
     dmParticipants = new Map<RawID, Index[]>();
+
+    private postProcessMessage(pmsg: PMessage, msg: Message) {
+        const channelIndex = this.channels.getIndex(pmsg.channelId)!;
+        const channel = this.channels.getByIndex(channelIndex)!;
+        const guildIndex = this.guilds.getIndex(channel.guildId)!;
+
+        // count stuff
+        this.guildCounts[guildIndex] = (this.guildCounts[guildIndex] || 0) + 1;
+        this.channelCounts[channelIndex] = (this.channelCounts[channelIndex] || 0) + 1;
+        this.authorCounts[msg.authorIndex] = (this.authorCounts[msg.authorIndex] || 0) + 1;
+        if (msg.words) {
+            for (const [idx, count] of msg.words) {
+                this.wordsCounts[idx] = (this.wordsCounts[idx] || 0) + count;
+            }
+        }
+        if (msg.langIndex !== undefined) {
+            this.langCounts[msg.langIndex] = (this.langCounts[msg.langIndex] || 0) + 1;
+        }
+
+        // if this channel is a DM, store participants
+        if (channel.type === "dm") {
+            if (!this.dmParticipants.has(channel.id)) {
+                this.dmParticipants.set(channel.id, []);
+            }
+            const participants = this.dmParticipants.get(channel.id)!;
+            if (!participants.includes(msg.authorIndex)) {
+                participants.push(msg.authorIndex);
+            }
+        }
+
+        // update min/max date
+        const day = Day.fromBinary(msg.dayIndex);
+        if (Day.lt(day, this.minDate)) this.minDate = day;
+        if (Day.gt(day, this.maxDate)) this.maxDate = day;
+    }
+
+    /** Detects languages that appear more than a threshold */
+    private detectLanguages(): Language[] {
+        const langs: Language[] = [];
+
+        // first we determine which languages we have to correctly filter stopwords
+        const totalWithLang = this.langCounts.reduce((a, b) => a + b, 0);
+        for (let i = 0; i < this.langCounts.length; i++) {
+            // we need AT LEAST 3% to consider reliable
+            if (this.langCounts[i] / totalWithLang > 0.03) {
+                langs.push(LanguageCodes[i]);
+            }
+        }
+
+        return langs;
+    }
+
+    /** Filter words. Skip unfrequent words and stopwords. */
+    private filterWords(langs: Language[]) {
+        this.env.progress?.new("Filtering words...");
+
+        const numWords = this.wordsCounts.length;
+
+        for (let oldIndex = 0; oldIndex < numWords; oldIndex++) {
+            let skip = false;
+            // only keep words if the have been used more than once, IF there are too many (more than 100k words)
+            if (this.wordsCounts[oldIndex] <= 1 && numWords > 100000) skip = true;
+            // only keep words if they are not stopwords
+            if (this.stopwords!.isStopword(this.words.getByIndex(oldIndex)!, langs)) skip = true;
+
+            // set the count to -1 so it gets filtered out
+            if (skip) this.wordsCounts[oldIndex] = -1;
+
+            this.env.progress?.progress("number", oldIndex, numWords);
+        }
+
+        this.env.progress?.success();
+    }
 
     /**
      * [+] Why indexing?
@@ -140,62 +232,16 @@ export class DatabaseBuilder {
      * We want to sort authors, channels and such by the number of messages they have, so it doesn't need to
      * be done in the UI (also all indexes end up being nice :) )
      * [+] How?
-     * During processing we use the index that IndexedMap provides. After all processing is done (in this function)
-     * we count the messages and then generate a mapping between the old index and the "final" ones with `rank`.
+     * During processing we use the index that IndexedMap provides. After all processing is done we use the
+     * counts to generate a mapping between the old index and the "final" ones with `rank`.
      */
     private countAndReindex() {
-        this.env.progress?.new("Counting for reindex...");
-
-        const totalMessages = this.numMessages;
-        let alreadyCounted = 0;
-
-        // we use Uint32Array because it's faster than an array
-        let guildCounts = new Uint32Array(this.guilds.size);
-        let channelCounts = new Uint32Array(this.channels.size);
-        let authorCounts = new Uint32Array(this.authors.size);
-        let wordsCounts = new Uint32Array(this.words.size);
-
-        for (const [id, mc] of this.messagesInChannel) {
-            const channelIndex = this.channels.getIndex(id)!;
-            const channel = this.channels.getByIndex(channelIndex)!;
-            const guildIndex = this.guilds.getIndex(this.channels.getByIndex(channelIndex)!.guildId)!;
-
-            for (const msg of mc.processedMessages()) {
-                // count stuff
-                guildCounts[guildIndex]++;
-                channelCounts[channelIndex]++;
-                authorCounts[msg.authorIndex]++;
-                if (msg.words) {
-                    for (const [idx, count] of msg.words) wordsCounts[idx] += count;
-                }
-
-                // if this channel is a DM, store participants
-                if (channel.type === "dm") {
-                    if (!this.dmParticipants.has(channel.id)) {
-                        this.dmParticipants.set(channel.id, []);
-                    }
-                    const participants = this.dmParticipants.get(channel.id)!;
-                    if (!participants.includes(msg.authorIndex)) {
-                        participants.push(msg.authorIndex);
-                    }
-                }
-
-                // update min/max date
-                const day = Day.fromBinary(msg.dayIndex);
-                if (Day.lt(day, this.minDate)) this.minDate = day;
-                if (Day.gt(day, this.maxDate)) this.maxDate = day;
-
-                this.env.progress?.progress("number", ++alreadyCounted, totalMessages);
-            }
-        }
-
-        this.env.progress?.success();
         this.env.progress?.new("Computing new indexes...");
 
-        this.guildsRank = rank(guildCounts);
-        this.channelsRank = rank(channelCounts);
-        this.authorsRank = rank(authorCounts);
-        this.wordsRank = rank(wordsCounts);
+        this.guildsRank = rank(this.guildCounts);
+        this.channelsRank = rank(this.channelCounts);
+        this.authorsRank = rank(this.authorCounts);
+        this.wordsRank = rank(this.wordsCounts);
 
         this.env.progress?.success();
     }
@@ -204,28 +250,38 @@ export class DatabaseBuilder {
     private makeFinalObjects() {
         this.env.progress?.new("Building final objects...");
 
+        const identity = <T>(x: T) => x;
+
         // prettier-ignore
         const guilds = remap<PGuild, Guild>(
-            (guild) => guild,
+            identity,
             this.guilds.values,
-            this.guildsRank
+            this.guildsRank,
+            this.env.progress
         );
-        // prettier-ignore
         const channels = remap<PChannel, Channel>(
             this.makeFinalChannel.bind(this),
             this.channels.values,
-            this.channelsRank
+            this.channelsRank,
+            this.env.progress
         );
-        // prettier-ignore
         const authors = remap<PAuthor, Author>(
             this.makeFinalAuthor.bind(this),
             this.authors.values,
-            this.authorsRank
+            this.authorsRank,
+            this.env.progress
+        );
+        // prettier-ignore
+        const words = remap<string, string>(
+            identity,
+            this.words.values,
+            this.wordsRank,
+            this.env.progress
         );
 
         this.env.progress?.success();
 
-        return { guilds, channels, authors };
+        return { guilds, channels, authors, words };
     }
 
     /** Transforms a parser PChannel into a final Channel */
@@ -297,10 +353,22 @@ export class DatabaseBuilder {
             channel.msgCount = mc.numMessages;
 
             for (const msg of mc.processedMessages()) {
+                const newWords = new IndexCountsBuilder();
+
+                // reindex and skip words
+                if (msg.words) {
+                    for (const [oldWordIdx, count] of msg.words) {
+                        const newWordIndex = this.wordsRank[oldWordIdx];
+                        // if the index is -1, the word was filtered out
+                        if (newWordIndex >= 0) newWords.incr(newWordIndex, count);
+                    }
+                }
+
                 finalMessages.push({
                     ...msg,
                     dayIndex: dateKeys.indexOf(Day.fromBinary(msg.dayIndex).dateKey),
                     authorIndex: this.authorsRank[msg.authorIndex],
+                    words: newWords.toArray(),
                 });
                 this.env.progress?.progress("number", ++alreadyCounted, totalMessages);
             }
@@ -315,14 +383,17 @@ export class DatabaseBuilder {
         if (this.numMessages === 0)
             throw new Error("No messages found. Are you sure you are using the right platform?");
 
+        const langs = this.detectLanguages();
+        this.filterWords(langs);
         this.countAndReindex();
-        const { guilds, channels, authors } = this.makeFinalObjects();
+        const { guilds, channels, authors, words } = this.makeFinalObjects();
         const { dateKeys, monthKeys, yearKeys } = genTimeKeys(this.minDate, this.maxDate);
         const { finalMessages } = this.compactMessagesData(channels, dateKeys);
 
         return {
             config: this.config,
             title: this.buildTitle(guilds, channels),
+            langs,
 
             time: {
                 minDate: this.minDate.dateKey,
@@ -335,7 +406,7 @@ export class DatabaseBuilder {
             guilds,
             channels,
             authors,
-            words: this.words.values,
+            words,
             emojis: this.emojis.values,
             mentions: this.mentions.values,
             domains: this.domains.values,
