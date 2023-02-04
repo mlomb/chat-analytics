@@ -199,3 +199,8 @@ test("buffer8 returns a buffer aligned to 32bits", () => {
     expect(buffer.byteLength % 4).toBe(0);
     expect(s.buffer.buffer).toBe(buffer.buffer); // test no copy
 });
+
+it("should crash if created with an invalid buffer", () => {
+    expect(() => new BitStream({} as any)).toThrow("buffer must be an ArrayBuffer"); // there was a buffer you could pass that did not work, can't remember what it was
+    expect(() => new BitStream(new ArrayBuffer(7))).toThrow("buffer must be aligned to 32bits"); // must be a multiple of 4 bytes
+});

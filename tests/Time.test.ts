@@ -135,3 +135,7 @@ test("genTimeKeys should generate keys correctly", () => {
     expect(dateToWeekIndex).toEqual([0, 0, 0, 0, 1, 1, 1, 2, 2, 2, 2, 2]);
     expect(dateToYearIndex).toEqual([0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1]);
 });
+
+test("genTimeKeys should throw if start > end", () => {
+    expect(() => genTimeKeys(Day.fromKey("2021-1-5"), Day.fromKey("2020-12-25"))).toThrow();
+});

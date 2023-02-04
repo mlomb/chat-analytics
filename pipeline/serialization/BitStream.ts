@@ -40,8 +40,8 @@ export class BitStream {
 
     constructor(buffer?: ArrayBuffer) {
         if (buffer) {
-            console.assert(buffer instanceof ArrayBuffer);
-            console.assert(buffer.byteLength % 4 === 0, "Buffer must be aligned to 32bits");
+            if (buffer instanceof ArrayBuffer === false) throw new Error("buffer must be an ArrayBuffer");
+            if (buffer.byteLength % 4 !== 0) throw new Error("buffer must be aligned to 32bits");
         }
 
         this.buffer = buffer ? new Uint32Array(buffer) : new Uint32Array(1024); // 1024 u32 by default, 4KB
