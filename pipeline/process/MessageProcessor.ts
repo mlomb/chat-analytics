@@ -34,12 +34,7 @@ export class MessageProcessor {
         this.stopwords = await Stopwords.load(env);
         this.emojis = await Emojis.load(env);
         this.langPredictModel = await FastTextLID176Model.load(env);
-
-        // load sentiment data
-        {
-            const afinnZipBuffer = await env.loadAsset("/data/text/AFINN.zip", "arraybuffer");
-            this.sentiment = new Sentiment(afinnZipBuffer, this.emojis);
-        }
+        this.sentiment = await Sentiment.load(env, this.emojis);
     }
 
     processGroupToIntermediate(group: PMessageGroup): Message[] {
@@ -105,7 +100,7 @@ export class MessageProcessor {
         // sentiment analysis
         let sentiment = 0;
         if (langIndex) {
-            sentiment = this.sentiment?.get(tokens, langIndex) || 0;
+            sentiment = this.sentiment?.calculate(tokens, langIndex) || 0;
         }
 
         // TODO: timezones
