@@ -1,9 +1,12 @@
 import { AttachmentType } from "@pipeline/Attachments";
-import { ChannelType, RawID, Timestamp } from "@pipeline/Types";
+import { ChannelType, Timestamp } from "@pipeline/Types";
 
 // The following interfaces are emitted by the parsers
 // They should be general enough to support all possible chat platforms
 // At the same time they should be as basic as possible and not include any platform-specific data
+
+/** Plaform's own ID (e.g: a Discord Snowflake) */
+export type RawID = string | number;
 
 /** Guild interface produced by parsers */
 export interface PGuild {

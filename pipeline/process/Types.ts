@@ -1,6 +1,7 @@
 import { AttachmentType } from "@pipeline/Attachments";
 import { DateKey } from "@pipeline/Time";
-import { ChannelType, Index, RawID, ReportConfig } from "@pipeline/Types";
+import { ChannelType, Index, ReportConfig } from "@pipeline/Types";
+import { RawID } from "@pipeline/parse/Types";
 import { IndexCounts } from "@pipeline/process/IndexCounts";
 import { BitAddress } from "@pipeline/serialization/BitStream";
 import { MessageBitConfig } from "@pipeline/serialization/MessageSerialization";
