@@ -13,6 +13,7 @@ import { MessageProcessor } from "@pipeline/process/MessageProcessor";
 import { Author, Channel, Database, Emoji, Guild, Message } from "@pipeline/process/Types";
 import { rank, remap } from "@pipeline/process/Util";
 import { Stopwords } from "@pipeline/process/nlp/Stopwords";
+import { BitAddress } from "@pipeline/serialization/BitStream";
 import { MessageBitConfig } from "@pipeline/serialization/MessageSerialization";
 import { MessagesArray } from "@pipeline/serialization/MessagesArray";
 
@@ -43,6 +44,7 @@ export class DatabaseBuilder {
     get numChannels() { return this.channels.size; } // prettier-ignore
     get numAuthors() { return this.authors.size; } // prettier-ignore
     get numMessages() { return [...this.messagesInChannel.values()].reduce((acc, mc) => acc + mc.numMessages, 0); } // prettier-ignore
+    get numBytesAllMessages() { return [...this.messagesInChannel.values()].reduce((acc, mc) => acc + mc.numBytes, 0); } // prettier-ignore
 
     constructor(private readonly config: Config, private readonly env: Env) {
         this.parser = createParser(config.platform);
@@ -335,6 +337,7 @@ export class DatabaseBuilder {
 
         const bitConfig: MessageBitConfig = {
             dayBits: numBitsFor(dateKeys.length),
+            replyBits: numBitsFor(1.2 * this.numBytesAllMessages),
             authorIdxBits: numBitsFor(this.authors.size),
             wordIdxBits: numBitsFor(this.words.size),
             emojiIdxBits: numBitsFor(this.emojis.size),
@@ -342,6 +345,7 @@ export class DatabaseBuilder {
             domainsIdxBits: numBitsFor(this.domains.size),
         };
         const finalMessages = new MessagesArray(bitConfig);
+        const messageAddresses = new Map<RawID, BitAddress>();
 
         const totalMessages = this.numMessages;
         let alreadyCounted = 0;
@@ -354,24 +358,36 @@ export class DatabaseBuilder {
             channel.msgCount = mc.numMessages;
 
             for (const { id, msg } of mc.processedMessages()) {
-                const newWords = new IndexCountsBuilder();
+                // reindex day and author
+                msg.dayIndex = dateKeys.indexOf(Day.fromBinary(msg.dayIndex).dateKey);
+                msg.authorIndex = this.authorsRank[msg.authorIndex];
 
                 // reindex and skip words
                 if (msg.words) {
+                    const newWords = new IndexCountsBuilder();
+
                     for (const [oldWordIdx, count] of msg.words) {
                         const newWordIndex = this.wordsRank[oldWordIdx];
                         // if the index is -1, the word was filtered out
                         if (newWordIndex >= 0) newWords.incr(newWordIndex, count);
                     }
+
+                    msg.words = newWords.toArray();
                 }
 
-                finalMessages.push({
-                    ...msg,
-                    dayIndex: dateKeys.indexOf(Day.fromBinary(msg.dayIndex).dateKey),
-                    replyOffset: 0,
-                    authorIndex: this.authorsRank[msg.authorIndex],
-                    words: newWords.toArray(),
-                });
+                // store the address of the message
+                messageAddresses.set(id, finalMessages.stream.offset);
+                if (msg.replyOffset !== undefined) {
+                    // this is a reply, lookup the original ID
+                    const replyID = this.replyIds[msg.replyOffset];
+                    const replyAddress = messageAddresses.get(replyID);
+                    if (replyID !== undefined && replyAddress !== undefined) {
+                        // the original message was found, store the address
+                        msg.replyOffset = replyAddress;
+                    }
+                }
+
+                finalMessages.push(msg);
                 this.env.progress?.progress("number", ++alreadyCounted, totalMessages);
             }
         }

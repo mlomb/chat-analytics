@@ -39,24 +39,24 @@ export class MessageView implements Message {
     get hasMentions(): boolean { return (this.flags & MessageFlags.Mentions) > 0; } // prettier-ignore
     get hasDomains(): boolean { return (this.flags & MessageFlags.Domains) > 0; } // prettier-ignore
 
-    constructor(private readonly stream: BitStream, private readonly config: MessageBitConfig) {
-        this.dayIndex = stream.getBits(config.dayBits);
+    constructor(private readonly stream: BitStream, private readonly bitConfig: MessageBitConfig) {
+        this.dayIndex = stream.getBits(bitConfig.dayBits);
         this.secondOfDay = stream.getBits(17);
-        this.authorIndex = stream.getBits(config.authorIdxBits);
+        this.authorIndex = stream.getBits(bitConfig.authorIdxBits);
         this.flags = stream.getBits(9);
 
-        if (this.hasReply) this.replyOffset = stream.getBits(10);
+        if (this.hasReply) this.replyOffset = stream.getBits(bitConfig.replyBits);
         if (this.hasText) {
             this.langIndex = stream.getBits(8);
             this.sentiment = stream.getBits(8) - 128;
         }
         if (this.hasWords) {
             this.wordsOffset = stream.offset;
-            skipIndexCounts(stream, config.wordIdxBits);
+            skipIndexCounts(stream, bitConfig.wordIdxBits);
         }
         if (this.hasEmojis) {
             this.emojisOffset = stream.offset;
-            skipIndexCounts(stream, config.emojiIdxBits);
+            skipIndexCounts(stream, bitConfig.emojiIdxBits);
         }
         if (this.hasAttachments) {
             this.attachmentsOffset = stream.offset;
@@ -64,28 +64,28 @@ export class MessageView implements Message {
         }
         if (this.hasReactions) {
             this.reactionsOffset = stream.offset;
-            skipIndexCounts(stream, config.emojiIdxBits);
+            skipIndexCounts(stream, bitConfig.emojiIdxBits);
         }
         if (this.hasMentions) {
             this.mentionsOffset = stream.offset;
-            skipIndexCounts(stream, config.mentionsIdxBits);
+            skipIndexCounts(stream, bitConfig.mentionsIdxBits);
         }
         if (this.hasDomains) {
             this.domainsOffset = stream.offset;
-            skipIndexCounts(stream, config.domainsIdxBits);
+            skipIndexCounts(stream, bitConfig.domainsIdxBits);
         }
     }
 
     get words(): IndexCounts | undefined {
         if (this.wordsOffset === 0) return undefined;
         this.stream.offset = this.wordsOffset;
-        return readIndexCounts(this.stream, this.config.wordIdxBits);
+        return readIndexCounts(this.stream, this.bitConfig.wordIdxBits);
     }
 
     get emojis(): IndexCounts | undefined {
         if (this.emojisOffset === 0) return undefined;
         this.stream.offset = this.emojisOffset;
-        return readIndexCounts(this.stream, this.config.emojiIdxBits);
+        return readIndexCounts(this.stream, this.bitConfig.emojiIdxBits);
     }
 
     get attachments(): IndexCounts | undefined {
@@ -97,19 +97,27 @@ export class MessageView implements Message {
     get reactions(): IndexCounts | undefined {
         if (this.reactionsOffset === 0) return undefined;
         this.stream.offset = this.reactionsOffset;
-        return readIndexCounts(this.stream, this.config.emojiIdxBits);
+        return readIndexCounts(this.stream, this.bitConfig.emojiIdxBits);
     }
 
     get mentions(): IndexCounts | undefined {
         if (this.mentionsOffset === 0) return undefined;
         this.stream.offset = this.mentionsOffset;
-        return readIndexCounts(this.stream, this.config.mentionsIdxBits);
+        return readIndexCounts(this.stream, this.bitConfig.mentionsIdxBits);
     }
 
     get domains(): IndexCounts | undefined {
         if (this.domainsOffset === 0) return undefined;
         this.stream.offset = this.domainsOffset;
-        return readIndexCounts(this.stream, this.config.domainsIdxBits);
+        return readIndexCounts(this.stream, this.bitConfig.domainsIdxBits);
+    }
+
+    get reply(): MessageView | undefined {
+        if (this.hasReply) {
+            this.stream.offset = this.replyOffset!;
+            return new MessageView(this.stream, this.bitConfig);
+        }
+        return undefined;
     }
 
     getFullMessage(): MessageComplete {

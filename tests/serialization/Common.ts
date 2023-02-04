@@ -19,6 +19,7 @@ export const SAMPLE_MESSAGES: Message[] = [
             [8, 9],
             [10, 11],
         ],
+        // it should not have replyOffset (required by test)
     },
     // prettier-ignore
     {
