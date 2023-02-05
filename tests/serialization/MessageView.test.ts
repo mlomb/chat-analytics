@@ -2,7 +2,7 @@ import { BitStream } from "@pipeline/serialization/BitStream";
 import { DefaultMessageBitConfig, writeMessage } from "@pipeline/serialization/MessageSerialization";
 import { MessageView } from "@pipeline/serialization/MessageView";
 
-import { MESSAGE_KEYS, SAMPLE_MESSAGES } from "./Common";
+import { MESSAGE_KEYS, SAMPLE_MESSAGES } from "@tests/serialization/Common";
 
 describe("should deserialize correctly", () => {
     test.each(SAMPLE_MESSAGES)("%p", (message) => {

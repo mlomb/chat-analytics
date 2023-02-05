@@ -1,6 +1,6 @@
 import { DiscordParser } from "@pipeline/parse/parsers/DiscordParser";
 
-import { runParserFromString } from "./Util";
+import { runParserFromString } from "@tests/parse/Parse";
 
 it("should crash if the guild information is not present before the channel", async () => {
     await expect(runParserFromString(DiscordParser, [`{ "channel": {} }`])).rejects.toThrow("Missing guild ID");
