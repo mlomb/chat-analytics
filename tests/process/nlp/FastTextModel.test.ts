@@ -1,11 +1,11 @@
-import { loadNodeAsset } from "@lib/NodeEnv";
 import { FastTextLID176Model } from "@pipeline/process/nlp/FastTextModel";
+import { TestEnv } from "@tests/samples";
 
 describe("FastTextLID176Model", () => {
     let model: FastTextLID176Model;
 
     beforeAll(async () => {
-        model = await FastTextLID176Model.load({ loadAsset: loadNodeAsset });
+        model = await FastTextLID176Model.load(TestEnv);
     });
 
     it("should predict common languages correctly", async () => {

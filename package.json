@@ -103,7 +103,8 @@
       "^@app/(.*)$": "<rootDir>/app/$1",
       "^@assets/(.*)$": "<rootDir>/assets/$1",
       "^@pipeline/(.*)$": "<rootDir>/pipeline/$1",
-      "^@report/(.*)$": "<rootDir>/report/$1"
+      "^@report/(.*)$": "<rootDir>/report/$1",
+      "^@tests/(.*)$": "<rootDir>/tests/$1"
     },
     "transform": {
       "^.+\\.[tj]s$": [

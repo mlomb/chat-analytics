@@ -1,4 +1,3 @@
-import { loadFile } from "@lib/NodeEnv";
 import { Platform } from "@pipeline/Platforms";
 import { Timestamp } from "@pipeline/Types";
 import { createParser } from "@pipeline/parse";
@@ -8,8 +7,9 @@ import { DiscordParser } from "@pipeline/parse/parsers/DiscordParser";
 import { MessengerParser } from "@pipeline/parse/parsers/MessengerParser";
 import { TelegramParser } from "@pipeline/parse/parsers/TelegramParser";
 import { WhatsAppParser } from "@pipeline/parse/parsers/WhatsAppParser";
+import { loadSample } from "@tests/samples";
 
-import { SAMPLE_PATH, checkSamplesAreParsedCorrectly } from "./Util";
+import { checkSamplesAreParsedCorrectly } from "./Util";
 
 describe("should parse correctly", () => {
     // prettier-ignore
@@ -56,7 +56,7 @@ describe("timestamp of the last message at the end of the file", () => {
     ];
 
     test.each(cases)("$file", async ({ file, regex, lastMessageTimestamp }) => {
-        const ts = await tryToFindTimestampAtEnd(regex, loadFile(SAMPLE_PATH(file)));
+        const ts = await tryToFindTimestampAtEnd(regex, loadSample(file));
         expect(ts).toBe(lastMessageTimestamp);
     });
 

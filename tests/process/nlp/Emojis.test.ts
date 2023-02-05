@@ -1,11 +1,11 @@
-import { loadNodeAsset } from "@lib/NodeEnv";
 import { Emojis } from "@pipeline/process/nlp/Emojis";
+import { TestEnv } from "@tests/samples";
 
 describe("Emojis", () => {
     let emojis: Emojis;
 
     beforeAll(async () => {
-        emojis = await Emojis.load({ loadAsset: loadNodeAsset });
+        emojis = await Emojis.load(TestEnv);
     });
 
     it("should have the name of common emojis", async () => {
