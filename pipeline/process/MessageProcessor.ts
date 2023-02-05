@@ -77,7 +77,7 @@ export class MessageProcessor {
             switch (tag) {
                 case "word":
                     const wordIdx = this.processWord(text);
-                    if (wordIdx) wordsCount.incr(wordIdx);
+                    if (wordIdx !== undefined) wordsCount.incr(wordIdx);
                     break;
                 case "emoji":
                 case "custom-emoji":
@@ -88,7 +88,7 @@ export class MessageProcessor {
                     break;
                 case "url":
                     const domainIdx = this.processURL(text);
-                    if (domainIdx) domainsCount.incr(domainIdx);
+                    if (domainIdx !== undefined) domainsCount.incr(domainIdx);
                     break;
             }
         }
