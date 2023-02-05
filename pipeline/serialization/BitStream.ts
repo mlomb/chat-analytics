@@ -40,7 +40,7 @@ export class BitStream {
 
     constructor(buffer?: ArrayBuffer) {
         if (buffer) {
-            if (buffer instanceof ArrayBuffer === false) throw new Error("buffer must be an ArrayBuffer");
+            if (ArrayBuffer.isView(buffer)) throw new Error("buffer must not be a view");
             if (buffer.byteLength % 4 !== 0) throw new Error("buffer must be aligned to 32bits");
         }
 
