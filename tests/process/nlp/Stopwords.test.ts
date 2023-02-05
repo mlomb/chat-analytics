@@ -1,11 +1,11 @@
-import { loadNodeAsset } from "@lib/NodeEnv";
 import { Stopwords } from "@pipeline/process/nlp/Stopwords";
+import { TestEnv } from "@tests/samples";
 
 describe("Stopwords", () => {
     let stopwords: Stopwords;
 
     beforeAll(async () => {
-        stopwords = await Stopwords.load({ loadAsset: loadNodeAsset });
+        stopwords = await Stopwords.load(TestEnv);
     });
 
     it("should match common stopwords", async () => {
