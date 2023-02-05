@@ -3,7 +3,8 @@ import "jest-extended";
 import { FileInput, wrapStringAsFile } from "@pipeline/parse/File";
 import { Parser } from "@pipeline/parse/Parser";
 import { PAuthor, PChannel, PGuild, PMessage } from "@pipeline/parse/Types";
-import { getSamplePath, loadSample } from "@tests/samples";
+
+import { loadSample } from "@tests/samples";
 
 /** True output from the Parser after running the inputs */
 export interface ParseResult {
@@ -58,25 +59,18 @@ export const runParser = async (klass: new () => Parser, inputs: FileInput[]): P
 export const runParserFromString = async (klass: new () => Parser, inputs: string[]): Promise<ParseResult> =>
     runParser(klass, inputs.map(wrapStringAsFile));
 
-/**
- * Convenient function to inspect the objects emitted by a parser from sample files
- *
- * @param samples it expects the path relative to `@tests/samples`, e.g. `discord/DM_2A_2M.json`
- */
-export const runParserFromSamples = async (klass: new () => Parser, samples: string[]): Promise<ParseResult> =>
-    runParser(klass, await Promise.all(samples.map(loadSample)));
-
 /** Checks if a group of samples matches the set of expected parse results */
-export const checkSamplesAreParsedCorrectly = async (klass: new () => Parser, samples: string[]) => {
-    const parsed = await runParserFromSamples(klass, samples);
+export const checkSamplesAreParsedCorrectly = async (klass: new () => Parser, filenames: string[]) => {
+    const samples = await Promise.all(filenames.map((sample) => loadSample(sample)));
+    const parsed = await runParser(
+        klass,
+        samples.map((s) => s.input)
+    );
 
-    for (const filename of samples) {
-        const sampleModule = await import(getSamplePath(filename) + ".ts");
-        const expectedParse: ExpectedPartialParseResult = sampleModule.expectedParse;
-
-        expect(parsed.guilds).toIncludeAllPartialMembers(expectedParse.guilds);
-        expect(parsed.channels).toIncludeAllPartialMembers(expectedParse.channels);
-        expect(parsed.authors).toIncludeAllPartialMembers(expectedParse.authors);
-        expect(parsed.messages).toIncludeAllPartialMembers(expectedParse.messages);
+    for (const sample of samples) {
+        expect(parsed.guilds).toIncludeAllPartialMembers(sample.expectedParse.guilds);
+        expect(parsed.channels).toIncludeAllPartialMembers(sample.expectedParse.channels);
+        expect(parsed.authors).toIncludeAllPartialMembers(sample.expectedParse.authors);
+        expect(parsed.messages).toIncludeAllPartialMembers(sample.expectedParse.messages);
     }
 };

@@ -1,4 +1,5 @@
 import { Stopwords } from "@pipeline/process/nlp/Stopwords";
+
 import { TestEnv } from "@tests/samples";
 
 describe("Stopwords", () => {

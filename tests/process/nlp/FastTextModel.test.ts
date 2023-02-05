@@ -1,4 +1,5 @@
 import { FastTextLID176Model } from "@pipeline/process/nlp/FastTextModel";
+
 import { TestEnv } from "@tests/samples";
 
 describe("FastTextLID176Model", () => {

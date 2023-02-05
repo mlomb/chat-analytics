@@ -1,9 +1,8 @@
-import type { ExpectedPartialParseResult } from "@tests/parse/Util";
-
-import { AUTHOR_MLOMB, AUTHOR_SOMEONE, GUILD_DM } from "./Common";
+import type { ExpectedPartialParseResult } from "@tests/parse/Parse";
+import { PAUTHOR_MLOMB, PAUTHOR_SOMEONE, PGUILD_DM } from "@tests/samples/discord/Common";
 
 export const expectedParse: ExpectedPartialParseResult = {
-    guilds: [GUILD_DM],
+    guilds: [PGUILD_DM],
     channels: [
         {
             id: "530805775262679064",
@@ -11,18 +10,18 @@ export const expectedParse: ExpectedPartialParseResult = {
             avatar: undefined,
         },
     ],
-    authors: [AUTHOR_MLOMB, AUTHOR_SOMEONE],
+    authors: [PAUTHOR_MLOMB, PAUTHOR_SOMEONE],
     messages: [
         {
             id: "530805779645595660",
-            authorId: AUTHOR_MLOMB.id,
+            authorId: PAUTHOR_MLOMB.id,
             channelId: "530805775262679064",
             textContent: "blah",
             timestamp: Date.parse("2019-01-04T17:52:39.762+00:00"),
         },
         {
             id: "538148765782114306",
-            authorId: AUTHOR_SOMEONE.id,
+            authorId: PAUTHOR_SOMEONE.id,
             channelId: "530805775262679064",
             textContent: "something something text",
             timestamp: Date.parse("2019-01-25T00:11:04.083+00:00"),

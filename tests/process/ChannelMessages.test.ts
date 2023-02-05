@@ -17,7 +17,7 @@ it("should wait for EOF before processing last messages", () => {
     cm.process(fn);
     expect(fn).toHaveBeenCalledWith([makePMessage(1, 0)]); // should not process last two messages (more messages from the same author may appear)
     fn.mockClear();
-    cm.markEOF(); // mark end of file, so it know no more messages will be added
+    cm.markEOF(); // mark end of file, so it knows no more messages will be added
     cm.process(fn); // process all remaining messages
     cm.process(fn); // show not process anything
     expect(fn).toHaveBeenCalledWith([makePMessage(2, 1), makePMessage(3, 1)]);

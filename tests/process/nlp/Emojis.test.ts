@@ -1,4 +1,5 @@
 import { Emojis } from "@pipeline/process/nlp/Emojis";
+
 import { TestEnv } from "@tests/samples";
 
 describe("Emojis", () => {

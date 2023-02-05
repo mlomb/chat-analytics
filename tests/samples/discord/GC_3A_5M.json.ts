@@ -1,9 +1,8 @@
-import type { ExpectedPartialParseResult } from "@tests/parse/Util";
-
-import { AUTHOR_LOMBI, AUTHOR_MLOMB, AUTHOR_THEPLANT, GUILD_DM } from "./Common";
+import type { ExpectedPartialParseResult } from "@tests/parse/Parse";
+import { PAUTHOR_LOMBI, PAUTHOR_MLOMB, PAUTHOR_THEPLANT, PGUILD_DM } from "@tests/samples/discord/Common";
 
 export const expectedParse: ExpectedPartialParseResult = {
-    guilds: [GUILD_DM],
+    guilds: [PGUILD_DM],
     channels: [
         {
             id: "1064990764406419508",
@@ -13,27 +12,27 @@ export const expectedParse: ExpectedPartialParseResult = {
             avatar: "253913584806",
         },
     ],
-    authors: [AUTHOR_MLOMB, AUTHOR_THEPLANT, AUTHOR_LOMBI],
+    authors: [PAUTHOR_MLOMB, PAUTHOR_THEPLANT, PAUTHOR_LOMBI],
     messages: [
         {
             id: "1064990824305274930",
             channelId: "1064990764406419508",
             textContent: "Should honor nickname over name",
-            authorId: AUTHOR_THEPLANT.id,
+            authorId: PAUTHOR_THEPLANT.id,
             timestamp: Date.parse("2023-01-17T19:33:19.087+00:00"),
         },
         {
             id: "1064991070322180096",
             channelId: "1064990764406419508",
             textContent: "hey!!",
-            authorId: AUTHOR_LOMBI.id,
+            authorId: PAUTHOR_LOMBI.id,
             timestamp: Date.parse("2023-01-17T19:34:17.742+00:00"),
         },
         {
             id: "530805779645595660",
             channelId: "1064990764406419508",
             textContent: "hey whats up",
-            authorId: AUTHOR_MLOMB.id,
+            authorId: PAUTHOR_MLOMB.id,
             timestamp: Date.parse("2023-01-18T20:12:12.123+00:00"),
             replyTo: "1064990824305274930",
         },

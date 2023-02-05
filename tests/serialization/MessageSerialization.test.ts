@@ -1,7 +1,7 @@
 import { BitStream } from "@pipeline/serialization/BitStream";
 import { DefaultMessageBitConfig, readMessage, writeMessage } from "@pipeline/serialization/MessageSerialization";
 
-import { SAMPLE_MESSAGES } from "./Common";
+import { SAMPLE_MESSAGES } from "@tests/serialization/Common";
 
 describe("obj -> (serialize) -> (deserialize) -> obj", () => {
     test.each(SAMPLE_MESSAGES)("%p", (message) => {

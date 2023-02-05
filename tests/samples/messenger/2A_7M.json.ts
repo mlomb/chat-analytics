@@ -1,10 +1,10 @@
 import { AttachmentType } from "@pipeline/Attachments";
-import type { ExpectedPartialParseResult } from "@tests/parse/Util";
 
-import { GUILD_DEFAULT } from "./Common";
+import type { ExpectedPartialParseResult } from "@tests/parse/Parse";
+import { PGUILD_DEFAULT } from "@tests/samples/messenger/Common";
 
 export const expectedParse: ExpectedPartialParseResult = {
-    guilds: [GUILD_DEFAULT],
+    guilds: [PGUILD_DEFAULT],
     channels: [{ id: "inbox/alice_aaaaaaaaaa", guildId: 0, type: "dm" }],
     authors: [
         { id: "Alice", name: "Alice", bot: false },
