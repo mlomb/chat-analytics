@@ -253,11 +253,9 @@ export class DatabaseBuilder {
     private makeFinalObjects() {
         this.env.progress?.new("Building final objects...");
 
-        const identity = <T>(x: T) => x;
-
         // prettier-ignore
         const guilds = remap<PGuild, Guild>(
-            identity,
+            this.makeFinalGuild.bind(this),
             this.guilds.values,
             this.guildsRank,
             this.env.progress
@@ -276,7 +274,7 @@ export class DatabaseBuilder {
         );
         // prettier-ignore
         const words = remap<string, string>(
-            identity,
+            (w) => w,
             this.words.values,
             this.wordsRank,
             this.env.progress
@@ -285,6 +283,15 @@ export class DatabaseBuilder {
         this.env.progress?.success();
 
         return { guilds, channels, authors, words };
+    }
+
+    /** Transforms a parser PGuild into a final Guild */
+    private makeFinalGuild(guild: PGuild): Guild {
+        return {
+            // (just skips the id)
+            name: guild.name,
+            avatar: guild.avatar,
+        };
     }
 
     /** Transforms a parser PChannel into a final Channel */
