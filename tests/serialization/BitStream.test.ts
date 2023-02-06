@@ -68,13 +68,15 @@ describe("writing", () => {
     ];
 
     test.each(cases)("$name: offset=$offset bits=$bits", ({ offset, bits, input, previous, expected }) => {
-        const s = new BitStream(new ArrayBuffer(1024));
-        s.buffer[0] = previous[0];
-        s.buffer[1] = previous[1];
+        const buf = new Uint32Array(1024);
+        buf[0] = previous[0];
+        buf[1] = previous[1];
+        const s = new BitStream(buf.buffer);
         s.offset = offset;
         s.setBits(bits, input);
-        expect(s.buffer[0]).toBe(expected[0]);
-        expect(s.buffer[1]).toBe(expected[1]);
+        s.offset = 0;
+        expect(s.getBits(32)).toBe(expected[0]);
+        expect(s.getBits(32)).toBe(expected[1]);
     });
 });
 
@@ -134,19 +136,21 @@ describe("reading", () => {
     ];
 
     test.each(casesNew)("$name: offset=$offset bits=$bits", async ({ offset, bits, previous, expected }) => {
-        const s = new BitStream(new ArrayBuffer(4 * 2));
+        const buf = new Uint32Array(2);
+        buf[0] = previous[0];
+        buf[1] = previous[1];
+        const s = new BitStream(buf.buffer);
         s.offset = offset;
-        s.buffer[0] = previous[0];
-        s.buffer[1] = previous[1];
         const val = s.getBits(bits);
         expect(val).toBe(expected);
     });
 
     test.each(casesNew)("$name (negated): offset=$offset bits=$bits", async ({ offset, bits, previous, expected }) => {
-        const s = new BitStream(new ArrayBuffer(4 * 2));
+        const buf = new Uint32Array(2);
+        buf[0] = ~previous[0];
+        buf[1] = ~previous[1];
+        const s = new BitStream(buf.buffer);
         s.offset = offset;
-        s.buffer[0] = ~previous[0];
-        s.buffer[1] = ~previous[1];
         const val = s.getBits(bits);
         if (bits === 32) expected = ~expected;
         else expected = ~expected & ((1 << bits) - 1);
@@ -188,7 +192,8 @@ test.each([7, 8, 9, 10, 11, 15, 16, 17, 20, 24, 31, 32])("varint %s bits should 
 });
 
 test("buffer8 returns a buffer aligned to 32bits", () => {
-    const s = new BitStream();
+    const buf = new Uint32Array(1024);
+    const s = new BitStream(buf.buffer);
     s.setBits(32, 42);
     s.setBits(32, 42);
     s.setBits(7, 42);
@@ -197,7 +202,7 @@ test("buffer8 returns a buffer aligned to 32bits", () => {
     const buffer = s.buffer8;
     expect(buffer.length).toBe(12);
     expect(buffer.byteLength % 4).toBe(0);
-    expect(s.buffer.buffer).toBe(buffer.buffer); // test no copy
+    expect(buf.buffer).toBe(buffer.buffer); // test no copy
 });
 
 it("should crash if created with an invalid buffer", () => {
