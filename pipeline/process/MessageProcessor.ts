@@ -147,7 +147,7 @@ export class MessageProcessor {
         const emojiKey = normalizeText(emoji.name).toLowerCase();
 
         const emojiObj: Emoji = {
-            id: emoji.id,
+            id: emoji.id ? emoji.id : undefined,
             name: emoji.id ? emoji.name : this.emojis!.getName(emojiKey),
             symbol: emoji.id ? undefined : emojiKey,
         };
