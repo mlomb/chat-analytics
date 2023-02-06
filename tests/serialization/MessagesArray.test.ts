@@ -30,6 +30,7 @@ test("iterate from existing stream", () => {
     const stream = new BitStream();
     for (const item of TEST_MESSAGES) writeMessage(item, stream, DefaultMessageBitConfig);
 
+    stream.offset = 0;
     const arr = new MessagesArray(DefaultMessageBitConfig, stream, TEST_MESSAGES.length);
     const gotArr: Message[] = [];
     for (const item of arr) gotArr.push(item);
