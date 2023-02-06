@@ -65,4 +65,9 @@ export class MessagesArray implements Iterable<Message> {
 
         this.stream.offset = originalOffset;
     }
+
+    /** @returns the number of bytes occupied by the messages */
+    get byteLength() {
+        return this.stream.offset - this.startOffset;
+    }
 }

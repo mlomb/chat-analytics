@@ -361,7 +361,7 @@ export class DatabaseBuilder {
             const channelIndex = this.channelsRank[this.channels.getIndex(id)!];
             const channel = channels[channelIndex];
 
-            channel.msgAddr = finalMessages.stream.offset;
+            channel.msgAddr = finalMessages.byteLength;
             channel.msgCount = mc.numMessages;
 
             for (const { id, msg } of mc.processedMessages()) {
@@ -383,7 +383,7 @@ export class DatabaseBuilder {
                 }
 
                 // store the address of the message
-                messageAddresses.set(id, finalMessages.stream.offset);
+                messageAddresses.set(id, finalMessages.byteLength);
                 if (msg.replyOffset !== undefined) {
                     // this is a reply, lookup the original ID
                     const replyID = this.replyIds[msg.replyOffset];

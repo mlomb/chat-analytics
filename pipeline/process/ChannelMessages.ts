@@ -208,6 +208,6 @@ export class MessagesInterval {
 
     /** @returns the number of bytes occupied by serialized messages */
     get numBytes() {
-        return this.messages.stream.offset;
+        return this.messages.byteLength;
     }
 }
