@@ -1,4 +1,5 @@
 import { AttachmentType, getAttachmentTypeFromMimeType } from "@pipeline/Attachments";
+import { Progress } from "@pipeline/Progress";
 import { Timestamp } from "@pipeline/Types";
 import { FileInput, streamJSONFromFile, tryToFindTimestampAtEnd } from "@pipeline/parse/File";
 import { JSONStream } from "@pipeline/parse/JSONStream";
@@ -17,7 +18,7 @@ export class TelegramParser extends Parser {
      */
     static readonly TS_MSG_REGEX = /"date_unixtime": ?"([0-9]+)"/gi;
 
-    async *parse(file: FileInput) {
+    async *parse(file: FileInput, progress?: Progress) {
         this.lastMessageTimestampInFile = await tryToFindTimestampAtEnd(TelegramParser.TS_MSG_REGEX, file);
 
         const stream = new JSONStream()
@@ -26,7 +27,7 @@ export class TelegramParser extends Parser {
             .onObject<RawID>("id", this.onChannelId.bind(this))
             .onArrayItem<TelegramMessage>("messages", this.parseMessage.bind(this));
 
-        yield* streamJSONFromFile(stream, file);
+        yield* streamJSONFromFile(stream, file, progress);
 
         this.lastChannelName = undefined;
         this.lastChannelID = undefined;
