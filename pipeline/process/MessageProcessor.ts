@@ -1,5 +1,4 @@
 import { Env } from "@pipeline/Env";
-import { LanguageCodes, getLanguageIndexByCode } from "@pipeline/Languages";
 import { Day } from "@pipeline/Time";
 import { Index } from "@pipeline/Types";
 import { PEmoji, PMessage } from "@pipeline/parse/Types";
@@ -126,8 +125,14 @@ export class MessageProcessor {
         };
     }
 
+    forceStringCopy(str: string): string {
+        return (str = (" " + str).slice(1)); // force string copy, avoid slicing
+    }
+
     processWord(word: string): Index | undefined {
         const { words } = this.builder;
+
+        word = this.forceStringCopy(word);
 
         const wordKey = matchFormat(word);
 
@@ -164,6 +169,8 @@ export class MessageProcessor {
 
     processMention(mention: string): Index {
         const { mentions } = this.builder;
+
+        mention = this.forceStringCopy(mention);
 
         const mentionKey = matchFormat(mention);
 
