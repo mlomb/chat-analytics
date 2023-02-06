@@ -1,4 +1,5 @@
 import { PAuthor, PGuild } from "@pipeline/parse/Types";
+import { Author } from "@pipeline/process/Types";
 
 export const PGUILD_DM: PGuild = {
     id: "0",
@@ -30,4 +31,22 @@ export const PAUTHOR_DELETED: PAuthor = {
     id: "555555555555555555",
     name: "Deleted User #555555555555555555",
     bot: false,
+};
+
+export const AUTHOR_MLOMB: Author = {
+    n: PAUTHOR_MLOMB.name,
+    a: PAUTHOR_MLOMB.avatar,
+};
+export const AUTHOR_LOMBI: Author = {
+    n: PAUTHOR_LOMBI.name,
+};
+export const AUTHOR_THEPLANT: Author = {
+    n: PAUTHOR_THEPLANT.name,
+};
+export const AUTHOR_SOMEONE: Author = {
+    n: PAUTHOR_SOMEONE.name,
+    b: true,
+};
+export const AUTHOR_DELETED: Author = {
+    n: PAUTHOR_DELETED.name,
 };
