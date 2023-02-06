@@ -1,8 +1,9 @@
 import { AttachmentType } from "@pipeline/Attachments";
+import { getLanguageIndexByCode } from "@pipeline/Languages";
 
 import { ExpectedPartialParseResult } from "@tests/parse/Parse";
 import { ExpectedPartialDatabaseResult } from "@tests/process/Process";
-import { PAUTHOR_DELETED, PAUTHOR_MLOMB } from "@tests/samples/discord/Common";
+import { AUTHOR_DELETED, AUTHOR_MLOMB, PAUTHOR_DELETED, PAUTHOR_MLOMB } from "@tests/samples/discord/Common";
 
 export const expectedParse: ExpectedPartialParseResult = {
     guilds: [
@@ -33,7 +34,7 @@ export const expectedParse: ExpectedPartialParseResult = {
             id: "447793085255123004",
             channelId: "253601524398293010",
             textContent:
-                "This author of this message does not have the nickname property, and should fallback to use name.",
+                "The author of this message does not have the nickname property, and should fallback to use name.",
             authorId: PAUTHOR_MLOMB.id,
             timestamp: Date.parse("2018-05-20T16:09:51.118+00:00"),
         },
@@ -63,28 +64,69 @@ export const expectedDatabase: ExpectedPartialDatabaseResult = {
     minDate: "2018-5-20",
     maxDate: "2018-5-20",
     langs: ["en"],
-    guilds: [
+    guild: {
+        name: "DefleMask",
+        avatar: "https://cdn.discordapp.com/icons/253601524398293010/a_801de7dbf6c4b24d8c2c0b576c36150a.png",
+    },
+    channel: {
+        name: "general-chiptune",
+        type: "text",
+        msgCount: 5,
+    },
+    authors: [AUTHOR_MLOMB, AUTHOR_DELETED],
+    messages: [
         {
-            name: "DefleMask",
-            avatar: "https://cdn.discordapp.com/icons/253601524398293010/a_801de7dbf6c4b24d8c2c0b576c36150a.png",
+            // dateKey: "2018-5-20",
+            // secondOfDay: 16 * 3600 + 9 * 60 + 44,
+            authorName: AUTHOR_DELETED.n,
+            langIndex: getLanguageIndexByCode("en"),
+            words: [
+                // stopwords: This has been and by a
+                ["message", 1],
+                ["edited", 1],
+                ["written", 1],
+                ["deleted", 1],
+                ["user", 1],
+            ],
         },
-    ],
-    channels: [
         {
-            name: "general-chiptune",
-            type: "text",
-            guildIndex: 0,
-            msgAddr: 0,
-            msgCount: 5,
-        },
-    ],
-    authors: [
-        {
-            n: "mlomb#5506",
-            a: "111111111111111111/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            authorName: AUTHOR_MLOMB.n,
+            langIndex: getLanguageIndexByCode("en"),
+            words: [
+                // stopwords: The of this does not have and should use name
+                ["author", 1],
+                ["message", 1],
+                ["nickname", 1],
+                ["property", 1],
+                ["fallback", 1],
+            ],
         },
         {
-            n: "Deleted User #555555555555555555",
+            authorName: AUTHOR_MLOMB.n,
+            langIndex: getLanguageIndexByCode("en"),
+            words: [
+                // stopwords: This has and
+                ["message", 1],
+                ["attachments", 1],
+                ["stickers", 1],
+            ],
+            attachments: [
+                [AttachmentType.Image, 1],
+                [AttachmentType.Sticker, 1],
+            ],
+        },
+        {
+            authorName: AUTHOR_MLOMB.n,
+            langIndex: getLanguageIndexByCode("en"),
+            words: [
+                // stopwords: This has
+                ["message", 1],
+                ["reactions", 1],
+            ],
+            reactions: [
+                ["❤", 2],
+                ["paul", 3],
+            ],
         },
     ],
 };

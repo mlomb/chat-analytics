@@ -68,7 +68,7 @@
             "timestampEdited": null,
             "callEndedTimestamp": null,
             "isPinned": false,
-            "content": "This author of this message does not have the nickname property, and should fallback to use name.",
+            "content": "The author of this message does not have the nickname property, and should fallback to use name.",
             "author": {
                 "id": "111111111111111111",
                 "name": "mlomb",

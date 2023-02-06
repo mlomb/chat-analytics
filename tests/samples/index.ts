@@ -24,11 +24,12 @@ export const loadSample = async (filepath: string) => {
     const input = loadFile(samplePath);
     const module = await import(samplePath + ".ts");
 
-    return {
+    const sample: Sample = {
         input,
         expectedParse: module.expectedParse,
         expectedDatabase: module.expectedDatabase,
     };
+    return sample;
 };
 
 export const loadSamples = (filepaths: string[]) => Promise.all(filepaths.map((fp) => loadSample(fp)));
