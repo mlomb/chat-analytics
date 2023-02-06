@@ -126,20 +126,19 @@ export class MessageProcessor {
     }
 
     forceStringCopy(str: string): string {
+        // see https://stackoverflow.com/questions/31712808/how-to-force-javascript-to-deep-copy-a-string
         return (str = (" " + str).slice(1)); // force string copy, avoid slicing
     }
 
     processWord(word: string): Index | undefined {
         const { words } = this.builder;
 
-        word = this.forceStringCopy(word);
-
         const wordKey = matchFormat(word);
 
         // only keep words between [2, 30] chars
         if (word.length > 1 && word.length <= 30) {
             let wordIdx = words.getIndex(wordKey);
-            if (wordIdx === undefined) wordIdx = words.set(wordKey, word);
+            if (wordIdx === undefined) wordIdx = words.set(wordKey, this.forceStringCopy(word));
             return wordIdx;
         }
 
@@ -170,12 +169,10 @@ export class MessageProcessor {
     processMention(mention: string): Index {
         const { mentions } = this.builder;
 
-        mention = this.forceStringCopy(mention);
-
         const mentionKey = matchFormat(mention);
 
         let mentionIdx = mentions.getIndex(mentionKey);
-        if (mentionIdx === undefined) mentionIdx = mentions.set(mentionKey, mention);
+        if (mentionIdx === undefined) mentionIdx = mentions.set(mentionKey, this.forceStringCopy(mention));
         return mentionIdx;
     }
 
