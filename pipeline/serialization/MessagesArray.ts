@@ -18,6 +18,12 @@ export class MessagesArray implements Iterable<Message> {
     public length: number;
 
     /**
+     * The offset where the messages start in the stream.
+     * This is the offset that was initially in the stream when the array was created.
+     */
+    private startOffset: number;
+
+    /**
      * Creates an array. You can provide an existing stream.
      *
      * @param count the number of messages in the stream
@@ -28,10 +34,12 @@ export class MessagesArray implements Iterable<Message> {
 
             this.stream = stream;
             this.length = count;
+            this.startOffset = stream.offset;
         } else {
             // empty
             this.stream = new BitStream();
             this.length = 0;
+            this.startOffset = 0;
         }
     }
 
@@ -49,7 +57,7 @@ export class MessagesArray implements Iterable<Message> {
     *[Symbol.iterator]() {
         // save and later restore the current stream offset
         const originalOffset = this.stream.offset;
-        this.stream.offset = 0; // start from the beginning
+        this.stream.offset = this.startOffset; // start from the beginning
 
         for (let i = 0; i < this.length; i++) {
             yield readMessage(this.stream, this.bitConfig);
