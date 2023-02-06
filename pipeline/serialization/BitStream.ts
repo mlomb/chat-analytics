@@ -33,7 +33,7 @@ export type BitAddress = number;
  * `delta`, `bits`, `aligned32` and `offset` represent the variables in the code.
  */
 export class BitStream {
-    public buffer: Uint32Array;
+    private buffer: Uint32Array;
 
     /** Reading and writing "head", bytes will be read or written starting from this offset */
     public offset: BitAddress;
