@@ -2,7 +2,7 @@
  * A list of [index, count] pairs, sorted by count in descending order.
  *
  * Throughout the pipeline we store linear arrays of objects (authors, words, emojis) to index them.
- * We use this format to point which and how many of each object are used in a given context (e.g. emojis in a message)
+ * We use this format to point out which and how many of each object are used in a given context (e.g. emojis in a message)
  */
 export type IndexCounts<Index extends number = number> = [Index, number][];
 

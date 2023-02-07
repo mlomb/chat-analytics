@@ -2,12 +2,12 @@
 
 ## Parser class
 
-You should implement a class that extends `Parser` and implements `parse(file)`, which parses a file at a time. You can check existing implementations to guide you.  
+You need to implement a class that extends `Parser` and implements `parse(file)`, which parses a file at a time. You can check existing implementations to guide you.  
 
 Basic template:
 ```typescript
 import { Parser } from "@pipeline/parse/Parser";
-import { FileInput } from "@pipeline/File";
+import { FileInput } from "@pipeline/parse/File";
 
 export class MyPlatformParser extends Parser {
 
@@ -30,14 +30,12 @@ import { streamJSONFromFile } from "@pipeline/File";
 And then in your `parse(file)` function you can stream keys in the root like the following:
 
 ```typescript
-const stream = new JSONStream();
-
-stream.onObject<MyObject>("info", this.parseInfo.bind(this));
-stream.onArrayItem<MyMessageItem>("messages", this.parseMessage.bind(this));
+const stream = new JSONStream()
+    .onObject<MyObject>("info", this.parseInfo.bind(this));
+    .onArrayItem<MyMessageItem>("messages", this.parseMessage.bind(this));
 
 yield* streamJSONFromFile(stream, file);
 ```
-
 
 ### Text/binary parsers
 
