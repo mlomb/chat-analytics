@@ -20,7 +20,7 @@ See [DEV.md](./DEV.md) for development instructions and guidelines.
 
 ## About the demo
 
-The [demo](https://chatanalytics.app/demo) is an export from the [DefleMask](https://www.deflemask.com) server which is owned by a friend of mine who gave me permission to use it as a demo. The input files are stored in a Google Drive zip and later downloaded [during CI](/.github/workflows/cicd.yml) to build the demo HTML automatically using the CLI (with `--demo`). It is updated manually by me using (we may want to move to a periodic workflow eventually):
+The [demo](https://chatanalytics.app/demo) is an export from the [DefleMask](https://www.deflemask.com) server, which is owned by a friend of mine who gave allowed me to use it as a demo. The input files are stored in a Google Drive zip and later downloaded [during CI](/.github/workflows/cicd.yml) to build the demo HTML automatically using the CLI (with `--demo`). It is updated manually by me using (we may want to move to a periodic workflow eventually):
 
 ```sh
 docker run --rm -it -v $PWD/out:/out tyrrrz/discordchatexporter:stable exportguild -f json -g 253601524398293010 -t <token>
@@ -28,4 +28,6 @@ docker run --rm -it -v $PWD/out:/out tyrrrz/discordchatexporter:stable exportgui
 
 Zipping and then replacing the file in Google Drive (~280MB uncompressed, 23MB compressed).
 
----
+## Performance
+
+We aim to handle millions of messages in a single report (at least 10M). This is a lot of data and we have to be careful with the amount of memory used when generating the report (since browser tabs like to crash when asking for too much memory). And make sure report don't get extremely big to be impractical.
