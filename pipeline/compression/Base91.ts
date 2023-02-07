@@ -35,6 +35,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // NOTE: the character "<" was replaced by "-" to avoid problems embedding in HTML         ↓
 const TABLE = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!#$%&()*+,./:;-=>?@[]^_`{|}~"';
 const TABLE_AS_BYTES = TABLE.split("").map((c) => c.charCodeAt(0));
+const TABLE_LOOKUP = TABLE_AS_BYTES.reduce((acc, chr, i) => {
+    acc[chr] = i;
+    return acc;
+}, new Uint8Array(256));
 
 const B91_LENGTH_DIGITS = 12;
 
@@ -110,7 +114,7 @@ export const base91encode = (data: Uint8Array): string => {
 };
 
 export const base91decode = (data: string): Uint8Array => {
-    let i = B91_LENGTH_DIGITS;
+    let pos = B91_LENGTH_DIGITS;
     let k = 0;
     let b = 0;
     let n = 0;
@@ -118,10 +122,11 @@ export const base91decode = (data: string): Uint8Array => {
 
     const len = data.length;
     const outputLength = parseInt(data.slice(0, B91_LENGTH_DIGITS));
+
     const ret = new Uint8Array(outputLength);
 
-    while (i < len) {
-        const p = TABLE.indexOf(data[i]);
+    while (pos < len) {
+        const p = TABLE_LOOKUP[data[pos].charCodeAt(0)];
         if (p === -1) continue;
         if (v < 0) {
             v = p;
@@ -136,7 +141,7 @@ export const base91decode = (data: string): Uint8Array => {
             } while (n > 7);
             v = -1;
         }
-        i++;
+        pos++;
     }
 
     if (v > -1) {
