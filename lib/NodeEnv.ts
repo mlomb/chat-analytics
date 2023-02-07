@@ -30,20 +30,24 @@ export const loadFile = (filepath: string): FileInput => {
 
 /** Loads assets when running in a NodeJS process */
 export const loadNodeAsset: LoadAssetFn = async (filepath: string, type: "json" | "text" | "arraybuffer") => {
+    let rootDir: string;
+
     if (process.env.NODE_ENV === "test") {
         // during tests, the tests are run from the original .ts files
-        filepath = path.join(__dirname, "..", "assets", filepath);
+        rootDir = path.join(__dirname, "..");
     } else {
         // otherwise, the package is deployed in dist/
-        filepath = path.join(__dirname, "..", "..", "assets", filepath);
+        rootDir = path.join(__dirname, "..", "..");
     }
+
+    filepath = path.join(rootDir, "assets", filepath);
 
     // hardcode the report.html file
     // we probably don't want to do this, but because all assets live inside the assets folder
-    // but the report is generated in dist_web/ is a bit of a pain
+    // and the report is generated in dist_web/ is a bit of a pain
     if (filepath.endsWith("report.html")) {
         // we assume we don't test with the report.html file
-        filepath = path.join(__dirname, "..", "..", "dist_web", "report.html");
+        filepath = path.join(rootDir, "dist_web", "report.html");
     }
 
     const content = fs.readFileSync(filepath);
