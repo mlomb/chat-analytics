@@ -127,7 +127,6 @@ export const base91decode = (data: string): Uint8Array => {
 
     while (pos < len) {
         const p = TABLE_LOOKUP[data[pos].charCodeAt(0)];
-        if (p === -1) continue;
         if (v < 0) {
             v = p;
         } else {
