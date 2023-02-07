@@ -1,6 +1,6 @@
 import { Env } from "@pipeline/Env";
 import { Config } from "@pipeline/Types";
-import { compress } from "@pipeline/compression/Compression";
+import { compressDatabase } from "@pipeline/compression/Compression";
 import { FileInput } from "@pipeline/parse/File";
 import { DatabaseBuilder } from "@pipeline/process/DatabaseBuilder";
 import { Database } from "@pipeline/process/Types";
@@ -27,7 +27,7 @@ export const generateReport = async (
 }> => {
     // compress data
     env.progress?.new("Compressing");
-    const encodedData = compress(database);
+    const encodedData = compressDatabase(database);
     env.progress?.success();
 
     // build title to avoid HTML injections (just so it doesn't break)

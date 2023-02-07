@@ -2,7 +2,7 @@ import { DateKey, Day, genTimeKeys } from "@pipeline/Time";
 import { Index } from "@pipeline/Types";
 import { BlockDescriptions, BlockInfo, BlockKey, Blocks, CommonBlockData } from "@pipeline/aggregate/Blocks";
 import { Filters } from "@pipeline/aggregate/Filters";
-import { decompress } from "@pipeline/compression/Compression";
+import { decompressDatabase } from "@pipeline/compression/Compression";
 import { Database } from "@pipeline/process/Types";
 import { matchFormat } from "@pipeline/process/nlp/Text";
 import { FormatCache } from "@report/DataProvider";
@@ -42,7 +42,7 @@ let common: CommonBlockData | null = null;
 
 const init = (msg: InitMessage) => {
     console.time("Decompress time");
-    database = decompress(msg.dataStr);
+    database = decompressDatabase(msg.dataStr);
     console.timeEnd("Decompress time");
     filters = new Filters(database);
     common = {
