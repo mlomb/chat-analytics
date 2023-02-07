@@ -34,17 +34,52 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // NOTE: the character "<" was replaced by "-" to avoid problems embedding in HTML         ↓
 const TABLE = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!#$%&()*+,./:;-=>?@[]^_`{|}~"';
+const TABLE_AS_BYTES = TABLE.split("").map((c) => c.charCodeAt(0));
 
 const B91_LENGTH_DIGITS = 12;
 
-// TODO: use buffers
 export const base91encode = (data: Uint8Array): string => {
-    let ret = (data.length + "").padStart(B91_LENGTH_DIGITS, "0");
     const len = data.length;
-
     let i = 0;
     let n = 0;
     let b = 0;
+    let encodedSize = 0;
+
+    // We run the algorithm twice, first to calculate the size of the encoded string, then to actually encode it
+    while (i < len) {
+        b |= data[i] << n;
+        n += 8;
+
+        if (n > 13) {
+            let v = b & 8191;
+            if (v > 88) {
+                b >>= 13;
+                n -= 13;
+            } else {
+                v = b & 16383;
+                b >>= 14;
+                n -= 14;
+            }
+            encodedSize += 2;
+        }
+        i++;
+    }
+
+    if (n) {
+        encodedSize++;
+        if (n > 7 || b > 90) encodedSize++;
+    }
+
+    // Now we actually encode the data
+    const buffer = new Uint8Array(B91_LENGTH_DIGITS + encodedSize);
+
+    let pos = B91_LENGTH_DIGITS;
+    i = 0;
+    n = 0;
+    b = 0;
+
+    const lenText = len.toString().padStart(B91_LENGTH_DIGITS, "0");
+    buffer.set(new TextEncoder().encode(lenText), 0);
 
     while (i < len) {
         b |= data[i] << n;
@@ -60,17 +95,18 @@ export const base91encode = (data: Uint8Array): string => {
                 b >>= 14;
                 n -= 14;
             }
-            ret += TABLE[v % 91] + TABLE[(v / 91) | 0];
+            buffer[pos++] = TABLE_AS_BYTES[v % 91];
+            buffer[pos++] = TABLE_AS_BYTES[(v / 91) | 0];
         }
         i++;
     }
 
     if (n) {
-        ret += TABLE[b % 91];
-        if (n > 7 || b > 90) ret += TABLE[(b / 91) | 0];
+        buffer[pos++] = TABLE_AS_BYTES[b % 91];
+        if (n > 7 || b > 90) buffer[pos++] = TABLE_AS_BYTES[(b / 91) | 0];
     }
 
-    return ret;
+    return new TextDecoder("iso-8859-10").decode(buffer);
 };
 
 export const base91decode = (data: string): Uint8Array => {
