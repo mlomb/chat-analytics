@@ -1,60 +1,25 @@
 # Pipeline
 
+We call **the pipeline** all the steps that chat data goes through before reaching the report UI. This document tries to describe each step so you can get a general idea of how it works.
+
+The following diagram gives an overview of the pipeline:
+
 <img src="./media/pipeline.svg">
 
-TODO: write info
+Quick jump to sections:
 
-## Writing a new parser
-
-### Parser class
-
-You should implement a class that extends `Parser` and implements `parse(file)`, which parses a file at a time. You can check existing implementations to guide you.  
-
-Basic template:
-```typescript
-import { Parser } from "@pipeline/parse/Parser";
-import { FileInput } from "@pipeline/File";
-
-export class MyPlatformParser extends Parser {
-
-    async *parse(file: FileInput) {
-        // parse here
-    }
-
-}
-```
-
-#### JSON-based parser
-
-If your platform exports chats in JSON format and expect multiple GBs, you should stream the JSON object.
-
-```typescript
-import { JSONStream } from "@pipeline/parse/JSONStream";
-import { streamJSONFromFile } from "@pipeline/File";
-```
-
-And then in your `parse(file)` function you can stream keys in the root like the following:
-
-```typescript
-const stream = new JSONStream();
-
-stream.onObject<MyObject>("info", this.parseInfo.bind(this));
-stream.onArrayItem<MyMessageItem>("messages", this.parseMessage.bind(this));
-
-yield* streamJSONFromFile(stream, file);
-```
+1. [Input files](#input-files)
+2. [Parsing](#parsing)
 
 
-#### Text/binary parsers
+## 1. Input files
 
-You can get the raw file bytes using `.slice()`. Then you can use TextEncoder to decode the UTF-8 sequence.
+The input files are chat exports, each platform has its own format. Usually they are provided by the user in the web app UI, using the CLI or calling the npm package.
 
-```typescript
-const fileBuffer: Uint8Array = await file.slice();
-const fileContent: string = new TextDecoder("utf-8").decode(fileBuffer);
-```
+For each file a `FileInput` interface has to be created, which along with metadata, contains the `slice(start?: number, end?: number): ArrayBuffer` function that must return a slice of the file in the specified range. This function is environment dependent. Since files may be large (several GBs) we don't read the whole file content into memory, instead we allow parsers to stream them. 
 
-### Platform specific changes
+## 2. Parsing
 
-You will have to register this new platform in multiple places, start adding the relevant platform name to the `type Platform` in [Types.ts](pipeline/Types.ts). After that, if you try to compile you will get lots of errors of missing keys, you should complete everything (correctly). And probably in some other places I don't remember right now. You'll figure it out.
+[write]
 
+If you want to support a new platform, you can find some guidance in [PARSER.md](./PARSER.md) document.
