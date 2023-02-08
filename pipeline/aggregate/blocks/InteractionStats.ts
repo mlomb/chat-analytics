@@ -53,7 +53,7 @@ const fn: BlockFn<InteractionStats> = (database, filters, common) => {
             }
         }
 
-        if (msg.replyOffset !== undefined) {
+        if (msg.hasReply) {
             authorsReplyCount[msg.authorIndex] += 1;
         }
     };
