@@ -191,16 +191,17 @@ export class DatabaseBuilder {
 
     /** Detects languages that appear more than a threshold */
     private detectLanguages(): Language[] {
-        const langs: Language[] = [];
+        // we determine which languages we have to correctly filter stopwords
 
-        // first we determine which languages we have to correctly filter stopwords
         const totalWithLang = this.langCounts.reduce((a, b) => a + b, 0);
-        for (let i = 0; i < this.langCounts.length; i++) {
+        const langs = this.langCounts
+            .map((count, index) => ({ code: LanguageCodes[index], ratio: count / totalWithLang }))
             // we need AT LEAST 3% to consider reliable
-            if (this.langCounts[i] / totalWithLang > 0.03) {
-                langs.push(LanguageCodes[i]);
-            }
-        }
+            .filter((l) => l.ratio >= 0.03)
+            // sort most used
+            .sort((a, b) => b.ratio - a.ratio)
+            // only keep the code
+            .map((l) => l.code);
 
         return langs;
     }

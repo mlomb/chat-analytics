@@ -109,6 +109,7 @@ export const Steps = () => {
                     channels: numberCategory(data.counts.channels),
                     guilds: numberCategory(data.counts.guilds),
                     time: timeCategory((endTime - startTime) / 1000),
+                    mainLang: data.lang,
                 });
 
                 // give a small delay

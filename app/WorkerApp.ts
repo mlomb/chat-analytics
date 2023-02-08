@@ -1,4 +1,5 @@
 import { WebEnv, wrapFile } from "@app/WebEnv";
+import { Language } from "@pipeline/Languages";
 import { ProgressStats, ProgressTask } from "@pipeline/Progress";
 import { Config } from "@pipeline/Types";
 import { generateDatabase, generateReport } from "@pipeline/index";
@@ -23,6 +24,7 @@ export interface ResultMessage {
     data?: string;
     html: string;
     title: string;
+    lang: Language;
     counts: {
         messages: number;
         authors: number;
@@ -59,6 +61,7 @@ self.onmessage = async (ev: MessageEvent<InitMessage>) => {
             data: env.isDev ? result.data : "",
             html: result.html,
             title: database.title,
+            lang: database.langs.length > 0 ? database.langs[0] : "",
             counts: {
                 messages: database.numMessages,
                 authors: database.authors.length,
