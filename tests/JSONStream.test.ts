@@ -105,12 +105,5 @@ it("crash when the input is a string", () => expectCrash(`"foo"`));
 it("crash when using onArray on something other than an array", async () => {
     const stream = new JSONStream();
     stream.onArrayItem<any>("fakeArr", () => {});
-
-    try {
-        stream.push(`{ "fakeArr": { "a": 5 } }`);
-        // should have crashed
-        expect(true).toBe(false);
-    } catch (_) {
-        // expected
-    }
+    expect(() => stream.push(`{ "fakeArr": { "a": 5 } }`)).toThrow();
 });

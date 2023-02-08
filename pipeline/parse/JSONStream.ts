@@ -55,6 +55,9 @@ const isWhitespace = (c: number) =>
     Only keys on the root can be listened
 
     This class expects well-formed JSONs
+
+    TODO: as of now, the `push` method in this class is 25% of the total CPU time.
+          we should try to move this to a WASM module.
 */
 export class JSONStream {
     private objectCallbacks: Callbacks = {};

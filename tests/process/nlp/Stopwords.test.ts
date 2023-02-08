@@ -10,9 +10,9 @@ describe("Stopwords", () => {
     });
 
     it("should match common stopwords", async () => {
-        expect(stopwords.isStopword("the", ["en"])).toBe(true);
-        expect(stopwords.isStopword("la", ["es"])).toBe(true);
-        expect(stopwords.isStopword("boogie", ["en"])).toBe(false);
-        expect(stopwords.isStopword("calamar", ["es"])).toBe(false);
+        expect(stopwords.isStopword("the", ["en"])).toBeTrue();
+        expect(stopwords.isStopword("la", ["es"])).toBeTrue();
+        expect(stopwords.isStopword("boogie", ["en"])).toBeFalse();
+        expect(stopwords.isStopword("calamar", ["es"])).toBeFalse();
     });
 });
