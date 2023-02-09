@@ -46,8 +46,8 @@ export interface PMessage {
     reactions?: [PEmoji, number][];
 }
 
-/** Emoji interface produced by parsers (for custom emojis) */
+/** Emoji interface produced by parsers */
 export interface PEmoji {
     id?: RawID; // if available
-    name: string; // e.g. "pepe", "pepe_sad"
+    text: string; // e.g. "🔥", "pepe", "pepe_sad"
 }

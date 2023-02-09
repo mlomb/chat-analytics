@@ -53,8 +53,8 @@ export const expectedParse: ExpectedPartialParseResult = {
             textContent: "This message has reactions.",
             timestamp: Date.parse("2018-05-20T16:09:51.118+00:00"),
             reactions: expect.arrayContaining([
-                [{ name: "❤" }, 2],
-                [{ id: "464662216386412545", name: "paul" }, 3],
+                [{ text: "❤" }, 2],
+                [{ id: "464662216386412545", text: "paul" }, 3],
             ]),
         },
     ],

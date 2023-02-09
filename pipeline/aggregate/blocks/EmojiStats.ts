@@ -56,7 +56,7 @@ const fn: BlockFn<EmojiStats> = (database, filters, common) => {
         emojiGroup.count[index] += count;
         emojiGroup.authorCount[authorIndex] += count;
         emojiGroup.channelCount[channelIndex] += count;
-        if (database.emojis[index].symbol === undefined) emojiGroup.custom += count;
+        if (database.emojis[index].type === "custom") emojiGroup.custom += count;
         else emojiGroup.regular += count;
         emojiGroup.set!.add(index);
     };

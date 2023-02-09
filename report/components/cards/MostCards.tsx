@@ -103,8 +103,8 @@ export const MostUsedWords = ({ data, options }: { data?: LanguageStats; options
 ///////////////////////////
 const EmojiFilterFns = {
     "0": undefined, // all emoji
-    "1": (index: number) => useDataProvider().database.emojis[index].symbol !== undefined, // regular emoji
-    "2": (index: number) => useDataProvider().database.emojis[index].symbol === undefined, // custom emoji
+    "1": (index: number) => useDataProvider().database.emojis[index].type === "unicode", // regular emoji
+    "2": (index: number) => useDataProvider().database.emojis[index].type === "custom", // custom emoji
 };
 const EmojiFilterPlaceholders = {
     "0": 'Filter emojis... (e.g. "fire", "🔥" or ":pepe:")',
@@ -113,7 +113,7 @@ const EmojiFilterPlaceholders = {
 };
 const EmojisTransformFilter = (filter: string) => filter.replace(/:/g, "");
 const EmojisIndexOf = (value: string) => {
-    const rawEmoji = useDataProvider().database.emojis.findIndex((e) => e.symbol === value);
+    const rawEmoji = useDataProvider().database.emojis.findIndex((e) => e.name === value);
     if (rawEmoji === -1) return useDataProvider().formatCache.emojis.indexOf(value);
     return rawEmoji;
 };

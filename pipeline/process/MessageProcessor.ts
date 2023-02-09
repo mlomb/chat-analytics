@@ -66,8 +66,23 @@ export class MessageProcessor {
         const domainsCount = new IndexCountsBuilder();
 
         if (msg.reactions) {
-            for (const reaction of msg.reactions) {
-                reactionsCount.incr(this.processEmoji(reaction[0]), reaction[1]);
+            for (const [emoji, count] of msg.reactions) {
+                reactionsCount.incr(
+                    this.processEmoji(
+                        emoji.id === undefined
+                            ? {
+                                  type: "unicode",
+                                  symbol: emoji.text,
+                                  name: this.emojis!.getName(emoji.text),
+                              }
+                            : {
+                                  type: "custom",
+                                  id: emoji.id,
+                                  name: emoji.text,
+                              }
+                    ),
+                    count
+                );
             }
         }
 
@@ -79,8 +94,12 @@ export class MessageProcessor {
                     if (wordIdx !== undefined) wordsCount.incr(wordIdx);
                     break;
                 case "emoji":
+                    emojisCount.incr(
+                        this.processEmoji({ type: "unicode", symbol: text, name: this.emojis!.getName(text) })
+                    );
+                    break;
                 case "custom-emoji":
-                    emojisCount.incr(this.processEmoji({ name: text }));
+                    emojisCount.incr(this.processEmoji({ type: "custom", name: text }));
                     break;
                 case "mention":
                     mentionsCount.incr(this.processMention(text));
@@ -145,24 +164,26 @@ export class MessageProcessor {
         return undefined;
     }
 
-    processEmoji(emoji: PEmoji): Index {
+    processEmoji(emoji: Emoji): Index {
         const { emojis } = this.builder;
 
         const emojiKey = normalizeText(emoji.name).toLowerCase();
 
-        const emojiObj: Emoji = {
-            id: emoji.id ? emoji.id : undefined,
-            name: emoji.id ? emoji.name : this.emojis!.getName(emojiKey),
-            symbol: emoji.id ? undefined : emojiKey,
-        };
-
         let emojiIdx = emojis.getIndex(emojiKey);
         if (emojiIdx === undefined) {
-            emojiIdx = emojis.set(emojiKey, emojiObj);
-        } else if (emojis.getByIndex(emojiIdx)!.id === undefined && emoji.id) {
-            // ID is new, replace
-            emojis.set(emojiKey, emojiObj, 999);
+            emojiIdx = emojis.set(emojiKey, emoji);
+        } else {
+            const oldEmoji = emojis.getByIndex(emojiIdx)!;
+            // prettier-ignore
+            if (
+                oldEmoji.type === "custom" && emoji.type === "custom" &&
+                oldEmoji.id === undefined  && emoji.id !== undefined
+            ) {
+                // ID is new, replace
+                emojis.set(emojiKey, emoji, 999);
+            }
         }
+
         return emojiIdx;
     }
 

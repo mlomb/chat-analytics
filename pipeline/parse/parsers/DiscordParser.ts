@@ -128,7 +128,7 @@ export class DiscordParser extends Parser {
                 reactions: message.reactions.map((r) => [
                     {
                         id: r.emoji.id === null ? undefined : r.emoji.id,
-                        name: r.emoji.name || r.emoji.id || "unknown",
+                        text: r.emoji.name || r.emoji.id || "unknown",
                     },
                     r.count,
                 ]),

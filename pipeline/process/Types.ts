@@ -94,12 +94,20 @@ export interface MessageComplete extends Message {
     channelIndex: Index;
 }
 
-// TODO: change to CustomEmoji | UnicodeEmoji ?
-export interface Emoji {
-    /** Platform's emoji ID (if custom and available)  */
+export interface CustomEmoji {
+    type: "custom";
+    /** Platform's emoji ID (if available)  */
     id?: RawID;
     /** Name of the emoji ("fire" or "custom_emoji") */
     name: string;
-    /** Unicode symbol (e.g. 🔥) (not for custom emojis) */
-    symbol?: string;
 }
+
+export interface UnicodeEmoji {
+    type: "unicode";
+    /** Unicode symbol (e.g. 🔥) */
+    symbol: string;
+    /** Human name of emoji ("smiling face" or "waving hand sign") */
+    name: string;
+}
+
+export type Emoji = CustomEmoji | UnicodeEmoji;

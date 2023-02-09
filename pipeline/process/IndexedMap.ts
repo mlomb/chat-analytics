@@ -22,7 +22,7 @@ export class IndexedMap<Key extends string | number, Value> {
 
         if (info === undefined) {
             // add new value to array and index
-            info = { revision: revision, index: this.array.length };
+            info = { revision: revision || Number.MIN_SAFE_INTEGER, index: this.array.length };
             this.index.set(key, info);
             this.array[info.index] = value;
         } else if (revision > info.revision) {

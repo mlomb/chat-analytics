@@ -89,7 +89,7 @@ export const checkDatabaseIsGeneratedCorrectly = async (platform: Platform, file
             if (expectedMessage.reactions) {
                 toCheck.reactions = expect.arrayContaining(
                     expectedMessage.reactions.map(([name, c]) => [
-                        db.emojis.findIndex((r) => r.name === name || r.symbol === name),
+                        db.emojis.findIndex((r) => r.name === name || (r.type === "unicode" && r.symbol === name)),
                         c,
                     ])
                 );

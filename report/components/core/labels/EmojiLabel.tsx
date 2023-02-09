@@ -11,19 +11,26 @@ const _EmojiLabel = ({ index, hideNameIfPossible }: EmojiLabelProps) => {
     const dp = useDataProvider();
     const emoji = dp.database.emojis[index];
 
-    let image: ReactElement | undefined = undefined;
-    if (emoji.id) {
-        image = <img src={`https://cdn.discordapp.com/emojis/${emoji.id}.png?size=32`} height={16} />;
+    let name: string;
+    let symbol: string | undefined;
+    let image: ReactElement | undefined;
+
+    if (emoji.type === "unicode") {
+        name = emoji.name;
+        symbol = emoji.symbol;
+    } else {
+        name = `:${emoji.name}:`;
+        if (emoji.id !== undefined) {
+            // the only emojis with IDs right now are Discord emojis
+            image = <img src={`https://cdn.discordapp.com/emojis/${emoji.id}.png?size=32`} height={16} />;
+        }
     }
 
-    const showName =
-        emoji.name !== emoji.symbol && (!hideNameIfPossible || (emoji.symbol === undefined && image === null));
+    const showName = name !== symbol && (!hideNameIfPossible || (symbol === undefined && image === null));
 
-    const title = emoji.name;
-    const icon = image ? image : <span style={{ color: "#b9b9b9" }}>{emoji.symbol}</span>;
-    const name = showName ? (emoji.symbol ? emoji.name : `:${emoji.name}:`) : undefined;
+    const icon = image ? image : <span style={{ color: "#b9b9b9" }}>{symbol}</span>;
 
-    return <BaseLabel title={title} icon={icon} name={name} />;
+    return <BaseLabel title={emoji.name} icon={icon} name={showName ? name : undefined} />;
 };
 
 export const EmojiLabel = memo(_EmojiLabel) as typeof _EmojiLabel;

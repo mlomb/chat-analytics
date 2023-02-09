@@ -42,7 +42,7 @@ export const expectedParse: ExpectedPartialParseResult = {
         {
             id: "530805779645595660",
             channelId: "1064990764406419508",
-            textContent: "woah nice",
+            textContent: "woah nice :custom_emoji:",
             authorId: PAUTHOR_MLOMB.id,
             timestamp: Date.parse("2023-01-18T20:12:12.123+00:00"),
             replyTo: "1064990824305274930",
@@ -89,6 +89,7 @@ export const expectedDatabase: ExpectedPartialDatabaseResult = {
                 ["woah", 1],
                 ["nice", 1],
             ],
+            // TODO: test custom_emoji
         },
     ],
 };
