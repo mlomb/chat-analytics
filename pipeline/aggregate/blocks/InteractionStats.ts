@@ -1,5 +1,5 @@
 import { BlockDescription, BlockFn } from "@pipeline/aggregate/Blocks";
-import { parseAndFilterMessages } from "@pipeline/aggregate/Helpers";
+import { filterMessages } from "@pipeline/aggregate/Helpers";
 import { MessageComplete } from "@pipeline/process/Types";
 import { MessageView } from "@pipeline/serialization/MessageView";
 
@@ -58,7 +58,7 @@ const fn: BlockFn<InteractionStats> = (database, filters, common) => {
         }
     };
 
-    parseAndFilterMessages(processMessage, database, filters);
+    filterMessages(processMessage, database, filters);
 
     return {
         mentionsCount,

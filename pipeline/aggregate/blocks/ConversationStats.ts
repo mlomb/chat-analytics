@@ -1,6 +1,6 @@
 import { Day } from "@pipeline/Time";
 import { BlockDescription, BlockFn } from "@pipeline/aggregate/Blocks";
-import { parseAndFilterMessages } from "@pipeline/aggregate/Helpers";
+import { filterMessages } from "@pipeline/aggregate/Helpers";
 import { MessageView } from "@pipeline/serialization/MessageView";
 
 const MAX_AUTHORS = 20;
@@ -28,7 +28,7 @@ const fn: BlockFn<ConversationStats> = (database, filters, common) => {
 
     // first, find the MAX_AUTHORS authors with the most messages
     const authorsCounts: number[] = [...authorConversations];
-    parseAndFilterMessages((msg) => authorsCounts[msg.authorIndex]++, database, filters);
+    filterMessages((msg) => authorsCounts[msg.authorIndex]++, database, filters);
 
     // sort authors by count
     const sortedAuthors = authorsCounts
@@ -110,7 +110,7 @@ const fn: BlockFn<ConversationStats> = (database, filters, common) => {
         }
     };
 
-    parseAndFilterMessages(processMessage, database, filters, { channels: true, authors: false, time: true });
+    filterMessages(processMessage, database, filters, { channels: true, authors: false, time: true });
 
     // generate the nodes
     const nodes: Node[] = [];

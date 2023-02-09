@@ -1,6 +1,6 @@
 import { Day } from "@pipeline/Time";
 import { BlockDescription, BlockFn } from "@pipeline/aggregate/Blocks";
-import { parseAndFilterMessages } from "@pipeline/aggregate/Helpers";
+import { filterMessages } from "@pipeline/aggregate/Helpers";
 import { MessageView } from "@pipeline/serialization/MessageView";
 
 interface Item {
@@ -22,7 +22,7 @@ const fn: BlockFn<TimelineStats> = (database, filters, common) => {
             firstMessageDay[msg.authorIndex] = msg.dayIndex;
     };
 
-    parseAndFilterMessages(processMessage, database, filters, { channels: true, authors: true, time: false });
+    filterMessages(processMessage, database, filters, { channels: true, authors: true, time: false });
 
     const newAuthorsInDay = Object.values(firstMessageDay)
         .filter((day) => day !== -1)

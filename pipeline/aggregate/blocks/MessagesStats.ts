@@ -1,6 +1,6 @@
 import { Day, formatTime } from "@pipeline/Time";
 import { BlockDescription, BlockFn } from "@pipeline/aggregate/Blocks";
-import { parseAndFilterMessages } from "@pipeline/aggregate/Helpers";
+import { filterMessages } from "@pipeline/aggregate/Helpers";
 import { MessageView } from "@pipeline/serialization/MessageView";
 
 interface PeriodStat {
@@ -92,7 +92,7 @@ const fn: BlockFn<MessagesStats> = (database, filters, common) => {
         if (msg.hasDomains) withLinks++;
     };
 
-    parseAndFilterMessages(processMessage, database, filters);
+    filterMessages(processMessage, database, filters);
 
     const longestTimeWithoutMessages: PeriodStat = { minutes: -1, start: "X", end: "Y" };
     const longestActiveConversation: PeriodStat = { minutes: -1, start: "X", end: "Y" };

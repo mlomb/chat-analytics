@@ -1,6 +1,6 @@
 import { Day } from "@pipeline/Time";
 import { BlockDescription, BlockFn } from "@pipeline/aggregate/Blocks";
-import { parseAndFilterMessages } from "@pipeline/aggregate/Helpers";
+import { filterMessages } from "@pipeline/aggregate/Helpers";
 import { MessageView } from "@pipeline/serialization/MessageView";
 
 type MessagesInDate = {
@@ -49,7 +49,7 @@ const fn: BlockFn<MessagesPerCycle> = (database, filters, common) => {
         res.perMonth[dateToMonthIndex[msg.dayIndex]].m++;
     };
 
-    parseAndFilterMessages(processMessage, database, filters, {
+    filterMessages(processMessage, database, filters, {
         authors: true,
         channels: true,
         // do not filter by time

@@ -1,6 +1,6 @@
 import { Day } from "@pipeline/Time";
 import { BlockDescription, BlockFn } from "@pipeline/aggregate/Blocks";
-import { parseAndFilterMessages } from "@pipeline/aggregate/Helpers";
+import { filterMessages } from "@pipeline/aggregate/Helpers";
 import { MessageView } from "@pipeline/serialization/MessageView";
 
 export type SentimentInDate = {
@@ -84,7 +84,7 @@ const fn: BlockFn<SentimentPerCycle> = (database, filters, common) => {
         }
     };
 
-    parseAndFilterMessages(processMessage, database, filters, { channels: true, authors: true, time: false });
+    filterMessages(processMessage, database, filters, { channels: true, authors: true, time: false });
 
     const post = (e: SentimentInDate) => {
         const p = Math.abs(e.p);

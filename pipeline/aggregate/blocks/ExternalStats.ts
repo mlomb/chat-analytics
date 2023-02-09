@@ -1,5 +1,5 @@
 import { BlockDescription, BlockFn } from "@pipeline/aggregate/Blocks";
-import { parseAndFilterMessages } from "@pipeline/aggregate/Helpers";
+import { filterMessages } from "@pipeline/aggregate/Helpers";
 import { MessageView } from "@pipeline/serialization/MessageView";
 
 export interface ExternalStats {
@@ -18,7 +18,7 @@ const fn: BlockFn<ExternalStats> = (database, filters, common) => {
         }
     };
 
-    parseAndFilterMessages(processMessage, database, filters);
+    filterMessages(processMessage, database, filters);
 
     return { domainsCount };
 };

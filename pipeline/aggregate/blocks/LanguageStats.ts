@@ -1,5 +1,5 @@
 import { BlockDescription, BlockFn, IndexEntry } from "@pipeline/aggregate/Blocks";
-import { parseAndFilterMessages } from "@pipeline/aggregate/Helpers";
+import { filterMessages } from "@pipeline/aggregate/Helpers";
 import { MessageView } from "@pipeline/serialization/MessageView";
 
 export interface LanguageStats {
@@ -33,7 +33,7 @@ const fn: BlockFn<LanguageStats> = (database, filters, common) => {
         }
     };
 
-    parseAndFilterMessages(processMessage, database, filters);
+    filterMessages(processMessage, database, filters);
 
     // lang
     const langThreshold = Math.max(1, totalWithLang * 0.03); // at least 3% to be reliable

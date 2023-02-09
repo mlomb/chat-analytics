@@ -1,7 +1,7 @@
 import { Day } from "@pipeline/Time";
 import { Index } from "@pipeline/Types";
 import { BlockDescription, BlockFn } from "@pipeline/aggregate/Blocks";
-import { parseAndFilterMessages } from "@pipeline/aggregate/Helpers";
+import { filterMessages } from "@pipeline/aggregate/Helpers";
 import { MessageView } from "@pipeline/serialization/MessageView";
 
 interface Item {
@@ -23,7 +23,7 @@ const fn: BlockFn<ActiveAuthors> = (database, filters, common) => {
     const processMessage = (msg: MessageView) =>
         authorsPresentInMonth[dateToMonthIndex[msg.dayIndex]].add(msg.authorIndex);
 
-    parseAndFilterMessages(processMessage, database, filters, { channels: true, authors: true, time: false });
+    filterMessages(processMessage, database, filters, { channels: true, authors: true, time: false });
 
     const res: ActiveAuthors = {
         perMonth: [],
