@@ -32,7 +32,7 @@ export class WhatsAppParser extends Parser {
         // try to extract the chat name from the filename
         let name: string | undefined = extractChatName(file.name);
         // otherwise fallback to a generic name
-        name = name || `Chat #${this.channelIndex}`;
+        name = name || `WhatsApp Chat #${this.channelIndex}`;
 
         this.emit("guild", { id: 0, name: "WhatsApp Chats" });
         this.emit("channel", {

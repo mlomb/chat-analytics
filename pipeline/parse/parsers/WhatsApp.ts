@@ -1,4 +1,5 @@
 import { AttachmentType } from "@pipeline/Attachments";
+import { matchFormat } from "@pipeline/process/nlp/Text";
 
 const FilenamePatterns = [
     "WhatsApp Chat - ",
@@ -12,19 +13,24 @@ const FilenamePatterns = [
     "Discussion WhatsApp avec ",
     // TODO: ...
 ];
+// also include versions with _ instead of spaces
+FilenamePatterns.push(...FilenamePatterns.map((pattern) => pattern.replace(/ /g, "_")));
 
 export const extractChatName = (filename: string): string | undefined => {
     let name: string | undefined;
     for (const template of FilenamePatterns) {
         // expected: <pattern><chat name>.txt
-        if (filename.startsWith(template) && (filename.endsWith(".txt") || filename.endsWith(".zip"))) {
+        if (
+            matchFormat(filename).startsWith(matchFormat(template)) &&
+            (filename.endsWith(".txt") || filename.endsWith(".zip"))
+        ) {
             name = filename.slice(template.length, -4);
             break;
         }
     }
     if (name !== undefined) {
         // replace occasional _ that appear in the name by spaces
-        name = name.replace("_", " ").trim();
+        name = name.replace(/_/g, " ").trim();
     }
     return name;
 };
