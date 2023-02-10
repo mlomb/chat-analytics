@@ -1,0 +1,26 @@
+import { Index } from "@pipeline/Types";
+import { BlockDescription, BlockFn } from "@pipeline/aggregate/Blocks";
+
+export interface WordStats {
+    total: number;
+    days: number[];
+}
+
+export interface WordStatsArgs {
+    word: Index;
+}
+
+const fn: BlockFn<WordStats, WordStatsArgs> = (args, database, filters, common) => {
+    /* This is a test block! */
+
+    return {
+        total: 42,
+        days: new Array(database.time.numDays).fill(69),
+    };
+};
+
+export default {
+    key: "word-stats",
+    triggers: ["authors", "channels", "time"],
+    fn,
+} as BlockDescription<"word-stats", WordStats, WordStatsArgs>;

@@ -28,7 +28,7 @@ export interface SentimentPerCycle {
     perWeek: SentimentInDate[];
 }
 
-const fn: BlockFn<SentimentPerCycle> = (database, filters, common) => {
+const fn: BlockFn<SentimentPerCycle> = (args, database, filters, common) => {
     const res: SentimentPerCycle = {
         positiveMessages: 0,
         negativeMessages: 0,

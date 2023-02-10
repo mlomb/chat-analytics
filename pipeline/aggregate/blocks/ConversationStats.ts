@@ -20,7 +20,7 @@ export interface ConversationStats {
     nodes: Node[];
 }
 
-const fn: BlockFn<ConversationStats> = (database, filters, common) => {
+const fn: BlockFn<ConversationStats> = (args, database, filters, common) => {
     const { dateKeys } = common.timeKeys;
 
     const channelConversations: number[] = new Array(database.channels.length).fill(0);

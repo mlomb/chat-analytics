@@ -11,7 +11,7 @@ export interface LanguageStats {
     wordsCount: number[];
 }
 
-const fn: BlockFn<LanguageStats> = (database, filters, common) => {
+const fn: BlockFn<LanguageStats> = (args, database, filters, common) => {
     let totalWithLang = 0;
     let totalWords = 0;
     const languagesCount = new Array(255).fill(0);

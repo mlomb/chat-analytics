@@ -11,7 +11,7 @@ export interface InteractionStats {
     topSingleReactions: MessageComplete[];
 }
 
-const fn: BlockFn<InteractionStats> = (database, filters, common) => {
+const fn: BlockFn<InteractionStats> = (args, database, filters, common) => {
     const mentionsCount = new Array(database.mentions.length).fill(0);
     const authorsReplyCount: number[] = new Array(database.authors.length).fill(0);
 

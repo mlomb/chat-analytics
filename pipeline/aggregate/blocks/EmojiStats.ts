@@ -22,7 +22,7 @@ export interface EmojiStats {
     inReactions: EmojiStatsGroup;
 }
 
-const fn: BlockFn<EmojiStats> = (database, filters, common) => {
+const fn: BlockFn<EmojiStats> = (args, database, filters, common) => {
     const inText: EmojiStatsGroup = {
         regular: 0,
         custom: 0,

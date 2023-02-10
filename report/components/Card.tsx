@@ -1,6 +1,6 @@
 import { ReactElement, useState } from "react";
 
-import { BlockDataType, BlockInfo, BlockKey } from "@pipeline/aggregate/Blocks";
+import { BlockData, BlockInfo, BlockKey } from "@pipeline/aggregate/Blocks";
 import Block from "@report/components/Block";
 import ErrorBoundary from "@report/components/ErrorBoundary";
 import { Tooltip } from "@report/components/core/Tooltip";
@@ -14,7 +14,7 @@ interface Props<K extends BlockKey> {
     num: 1 | 2 | 3;
     title: Title;
     blockKey: K;
-    children: (props: { data?: BlockDataType<K>; options: number[] }) => JSX.Element;
+    children: (props: { data?: BlockData<K>; options: number[] }) => JSX.Element;
     tooltip?: ReactElement | string;
 }
 

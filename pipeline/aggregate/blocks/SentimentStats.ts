@@ -8,7 +8,7 @@ export interface SentimentStats {
     neutralMessages: number;
 }
 
-const fn: BlockFn<SentimentStats> = (database, filters, common) => {
+const fn: BlockFn<SentimentStats> = (args, database, filters, common) => {
     const res: SentimentStats = {
         positiveMessages: 0,
         negativeMessages: 0,

@@ -1,11 +1,22 @@
 import { DateKey, Day, genTimeKeys } from "@pipeline/Time";
 import { Index } from "@pipeline/Types";
-import { BlockDescriptions, BlockInfo, BlockKey, Blocks, CommonBlockData } from "@pipeline/aggregate/Blocks";
+import { BlockData, BlockDescriptions, BlockInfo, BlockKey, Blocks, CommonBlockData } from "@pipeline/aggregate/Blocks";
+import { computeCommonBlockData } from "@pipeline/aggregate/Common";
 import { Filters } from "@pipeline/aggregate/Filters";
 import { decompressDatabase } from "@pipeline/compression/Compression";
 import { Database } from "@pipeline/process/Types";
 import { matchFormat } from "@pipeline/process/nlp/Text";
 import { FormatCache } from "@report/DataProvider";
+
+/**
+ *
+ */
+export type BlockState = "waiting" | "processing" | "ready" | "error";
+
+export type BlockInfo<K extends BlockKey> = {
+    state: BlockState;
+    data: BlockData<K> | null;
+};
 
 export interface InitMessage {
     type: "init";
@@ -45,9 +56,7 @@ const init = (msg: InitMessage) => {
     database = decompressDatabase(msg.dataStr);
     console.timeEnd("Decompress time");
     filters = new Filters(database);
-    common = {
-        timeKeys: genTimeKeys(Day.fromKey(database.time.minDate), Day.fromKey(database.time.maxDate)),
-    };
+    common = computeCommonBlockData(database);
 
     console.time("Build format cache");
     const formatCache = {

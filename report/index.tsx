@@ -6,6 +6,9 @@ import ReportPage from "@report/ReportPage";
 
 import { plausible } from "@assets/Plausible";
 
+import { initBlockStore } from "./BlockStore";
+import { Experiment } from "./Experiments";
+
 document.addEventListener("DOMContentLoaded", async () => {
     try {
         const dataElem = document.getElementById("data")!;
@@ -23,12 +26,20 @@ document.addEventListener("DOMContentLoaded", async () => {
             return;
         }
 
-        initDataProvider(dataStr);
+        //initDataProvider(dataStr);
+        initBlockStore(dataStr);
     } catch (err) {
         // set basic error message
         document.querySelector(".basic")!.textContent = "Error occurred: " + (err as Error).message;
         return;
     }
+
+    createRoot(document.getElementById("app") as HTMLElement).render(
+        <StrictMode>
+            <Experiment />
+        </StrictMode>
+    );
+    return;
 
     createRoot(document.getElementById("app") as HTMLElement).render(
         <StrictMode>
