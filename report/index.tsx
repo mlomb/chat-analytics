@@ -26,7 +26,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             return;
         }
 
-        //initDataProvider(dataStr);
+        initDataProvider(dataStr);
         initBlockStore(dataStr);
     } catch (err) {
         // set basic error message
@@ -37,12 +37,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     createRoot(document.getElementById("app") as HTMLElement).render(
         <StrictMode>
             <Experiment />
-        </StrictMode>
-    );
-    return;
-
-    createRoot(document.getElementById("app") as HTMLElement).render(
-        <StrictMode>
             <ReportPage />
         </StrictMode>
     );

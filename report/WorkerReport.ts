@@ -1,38 +1,58 @@
-import { DateKey, Day, genTimeKeys } from "@pipeline/Time";
+import { DateKey } from "@pipeline/Time";
 import { Index } from "@pipeline/Types";
-import { BlockData, BlockDescriptions, BlockInfo, BlockKey, Blocks, CommonBlockData } from "@pipeline/aggregate/Blocks";
-import { computeCommonBlockData } from "@pipeline/aggregate/Common";
+import { BlockArgs, BlockData, BlockDescription, BlockKey, Blocks } from "@pipeline/aggregate/Blocks";
+import { CommonBlockData, computeCommonBlockData } from "@pipeline/aggregate/Common";
 import { Filters } from "@pipeline/aggregate/Filters";
 import { decompressDatabase } from "@pipeline/compression/Compression";
 import { Database } from "@pipeline/process/Types";
 import { matchFormat } from "@pipeline/process/nlp/Text";
 import { FormatCache } from "@report/DataProvider";
 
-/**
- *
- */
-export type BlockState = "waiting" | "processing" | "ready" | "error";
-
-export type BlockInfo<K extends BlockKey> = {
-    state: BlockState;
-    data: BlockData<K> | null;
+/** Same type as the Blocks object, but skipping the function to compute the blocks, as it's not needed in the UI */
+export type BlockDescriptions = {
+    [K in BlockKey]: Omit<BlockDescription<K, BlockData<K>>, "fn">;
 };
 
+/** A request to compute a block */
+export type BlockRequest<K extends BlockKey> = {
+    blockKey: K;
+    args: BlockArgs<K>;
+};
+
+/** The result of a block computation */
+export type BlockResult<K extends BlockKey> =
+    | {
+          error: true;
+          message: string;
+      }
+    | {
+          error: false;
+          data: BlockData<K>;
+      };
+
+/** Message sent from the UI to the worker to initialize the database (providing it encoded) */
 export interface InitMessage {
     type: "init";
     dataStr: string;
 }
 
+/** Message sent from the worker to the UI with the Database decoded and other information */
 export interface ReadyMessage {
     type: "ready";
     database: Database;
-    blocksDescs: BlockDescriptions;
     formatCache: FormatCache;
+    blocksDescs: BlockDescriptions;
 }
 
+/**
+ * Message sent from the UI to the worker to request a block computation.
+ * It also updates the filters if they changed
+ *
+ * Note that only one block computation can be active at a time!
+ */
 export interface BlockRequestMessage {
     type: "request";
-    blockKey: BlockKey;
+    request: BlockRequest<BlockKey>;
     filters: Partial<{
         authors: Index[];
         channels: Index[];
@@ -41,10 +61,11 @@ export interface BlockRequestMessage {
     }>;
 }
 
+/** Message sent from the worker to the UI with the result of a block computation */
 export interface BlockResultMessage<K extends BlockKey> {
     type: "result";
-    blockKey: K;
-    blockInfo: BlockInfo<K>;
+    request: BlockRequest<K>;
+    result: BlockResult<K>;
 }
 
 let database: Database | null = null;
@@ -55,11 +76,18 @@ const init = (msg: InitMessage) => {
     console.time("Decompress time");
     database = decompressDatabase(msg.dataStr);
     console.timeEnd("Decompress time");
-    filters = new Filters(database);
+
+    console.time("Compute common block data");
     common = computeCommonBlockData(database);
+    console.timeEnd("Compute common block data");
+
+    filters = new Filters(database);
 
     console.time("Build format cache");
-    const formatCache = {
+    // We don't want to stall the UI computing this, so we have to do it in the worker.
+    // We could treat FormatCache as another block and manage it in the UI,
+    // but it's too much trouble imo, just do it here
+    const formatCache: FormatCache = {
         authors: database.authors.map((author) => matchFormat(author.n)),
         channels: database.channels.map((channel) => matchFormat(channel.name)),
         words: database.words.map((word) => matchFormat(word)),
@@ -72,13 +100,13 @@ const init = (msg: InitMessage) => {
         type: "ready",
         database: {
             ...database,
-            // no needed in the UI
-            // force removal
+            // since we don't need serialized messages in the UI
+            // and they are huge, let's remove them
             // @ts-expect-error
             messages: undefined,
         },
         formatCache,
-        // remove functions
+        // JSON trick to remove functions
         blocksDescs: JSON.parse(JSON.stringify(Blocks)) as BlockDescriptions,
     };
 
@@ -90,37 +118,38 @@ const init = (msg: InitMessage) => {
 const request = async (msg: BlockRequestMessage) => {
     if (!database || !filters || !common) throw new Error("No data provided");
 
-    // update active data if provided
+    // update active filters if provided
     if (msg.filters.channels) filters.updateChannels(msg.filters.channels);
     if (msg.filters.authors) filters.updateAuthors(msg.filters.authors);
     if (msg.filters.startDate) filters.updateStartDate(msg.filters.startDate);
     if (msg.filters.endDate) filters.updateEndDate(msg.filters.endDate);
 
-    const result: BlockResultMessage<any> = {
+    const request = msg.request;
+    const resultMsg: BlockResultMessage<any> = {
         type: "result",
-        blockKey: msg.blockKey,
-        blockInfo: {
-            state: "error",
-            data: null,
+        request,
+        result: {
+            error: true,
+            message: "Unknown error",
         },
     };
 
     try {
-        if (!(msg.blockKey in Blocks)) throw new Error("BlockFn not found");
+        if (!(request.blockKey in Blocks)) throw new Error("BlockFn not found");
 
-        console.time(msg.blockKey);
-        const data = Blocks[msg.blockKey].fn(database, filters, common);
-        console.timeEnd(msg.blockKey);
+        console.time(request.blockKey);
+        const data = Blocks[request.blockKey].fn(database, filters, common, request.args);
+        console.timeEnd(request.blockKey);
 
-        result.blockInfo = {
-            state: "ready",
-            data,
-        };
-    } catch (err) {
-        console.error(err);
+        resultMsg.result = { error: false, data };
+    } catch (ex) {
+        // handle exceptions
+        resultMsg.result = { error: true, message: ex instanceof Error ? ex.message : ex + "" };
+        console.log("Error ahead ↓");
+        console.error(ex);
     }
 
-    self.postMessage(result);
+    self.postMessage(resultMsg);
 };
 
 self.onmessage = (ev: MessageEvent<InitMessage | BlockRequestMessage>) => {

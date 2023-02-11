@@ -1,6 +1,7 @@
 import { ReactElement, useState } from "react";
 
-import { BlockData, BlockInfo, BlockKey } from "@pipeline/aggregate/Blocks";
+import { BlockData, BlockKey } from "@pipeline/aggregate/Blocks";
+import { BlockResult } from "@report/WorkerReport";
 import Block from "@report/components/Block";
 import ErrorBoundary from "@report/components/ErrorBoundary";
 import { Tooltip } from "@report/components/core/Tooltip";
@@ -19,7 +20,7 @@ interface Props<K extends BlockKey> {
 }
 
 const Card = <K extends BlockKey>(props: Props<K>) => {
-    const Content = <K extends BlockKey>({ info }: { info: BlockInfo<K> }) => {
+    const Content = <K extends BlockKey>({ info }: { info: BlockResult<K> }) => {
         // normalize title, make sure it's an array
         const title = typeof props.title === "string" ? [props.title] : props.title;
 

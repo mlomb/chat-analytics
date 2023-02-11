@@ -13,7 +13,7 @@ export interface ActiveAuthors {
     perMonth: Item[];
 }
 
-const fn: BlockFn<ActiveAuthors> = (args, database, filters, common) => {
+const fn: BlockFn<ActiveAuthors> = (database, filters, common, args) => {
     const { monthKeys, dateToMonthIndex } = common.timeKeys;
 
     // TODO: optimize this with a bitset or something, using a Set may use too much memory if there are many authors

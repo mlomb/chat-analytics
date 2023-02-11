@@ -1,45 +1,28 @@
 import EventEmitter from "events";
 
-import { BlockResultMessage, InitMessage, ReadyMessage } from "./WorkerReport";
+import { BlockKey } from "@pipeline/aggregate/Blocks";
+
+import { BlockResultMessage, BlockState, InitMessage, ReadyMessage } from "./WorkerReport";
+
+type BlockKeyT = "a" | "b" | BlockKey;
 
 export declare interface BlockStore {
-    emit<K extends BlockKey>(event: `data-${K}`, data: any): boolean;
-    on<K extends BlockKey>(event: `data-${K}`, listener: (data: any) => void): this;
+    emit<K extends BlockKeyT>(event: `data-${K}`, data: any): boolean;
+    on<K extends BlockKeyT>(event: `data-${K}`, listener: (data: any) => void): this;
 
-    emit<K extends BlockKey>(event: `state-${K}`, state: BlockState): boolean;
-    on<K extends BlockKey>(event: `state-${K}`, listener: (state: BlockState) => void): this;
+    emit<K extends BlockKeyT>(event: `state-${K}`, state: BlockState): boolean;
+    on<K extends BlockKeyT>(event: `state-${K}`, listener: (state: BlockState) => void): this;
 }
 
 export class BlockStore extends EventEmitter {
     private worker: Worker;
 
-    private activeBlocks = new Map<BlockKey, number>();
+    private activeBlocks = new Map<BlockKeyT, number>();
 
     constructor(dataStr: string) {
         super();
-        if (env.isDev) {
-            if (document.location.protocol === "blob:") {
-                // this is when we are in a blob, in that case building the URL with import.meta.url will fail
-                // so we use the following workaround to use the correct origin
-                this.worker = new Worker(
-                    new URL(__webpack_require__.u("report_WorkerReport_ts"), document.location.origin)
-                );
-            } else {
-                // normal webpack v5 worker loading
-                // @ts-ignore
-                this.worker = new Worker(new URL("@report/WorkerReport.ts", import.meta.url));
-            }
-        } else {
-            // Why we use base64 instead of Blob+URL.createObjectURL?
-            // Chrome Mobile crashes if you use createObjectURL from an .html file :)
-            // See: https://bugs.chromium.org/p/chromium/issues/detail?id=1150828&q=createObjectURL%20crash
-            // We can work around it using base64, so no requests are made
-            // NOTE: data:application/javascript breaks
-            const workerJs = document.getElementById("worker-script")!.textContent!;
-            this.worker = new Worker(
-                "data:application/javascript;base64," + btoa(unescape(encodeURIComponent(workerJs)))
-            );
-        }
+        // @ts-ignore
+        this.worker = new Worker(new URL("@report/WorkerReport.ts", import.meta.url));
         this.worker.onerror = this.onError.bind(this);
         this.worker.onmessage = this.onMessage.bind(this);
         this.worker.postMessage({ type: "init", dataStr } as InitMessage);

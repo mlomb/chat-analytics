@@ -14,7 +14,7 @@ export interface MessagesPerCycle {
     perMonth: MessagesInDate[];
 }
 
-const fn: BlockFn<MessagesPerCycle> = (args, database, filters, common) => {
+const fn: BlockFn<MessagesPerCycle> = (database, filters, common, args) => {
     const res: MessagesPerCycle = {
         perDay: [],
         perWeek: [],

@@ -1,4 +1,5 @@
-import { BlockDescription, BlockFn, IndexEntry } from "@pipeline/aggregate/Blocks";
+import { BlockDescription, BlockFn } from "@pipeline/aggregate/Blocks";
+import { IndexEntry } from "@pipeline/aggregate/Common";
 import { filterMessages } from "@pipeline/aggregate/Helpers";
 import { MessageView } from "@pipeline/serialization/MessageView";
 
@@ -11,7 +12,7 @@ export interface LanguageStats {
     wordsCount: number[];
 }
 
-const fn: BlockFn<LanguageStats> = (args, database, filters, common) => {
+const fn: BlockFn<LanguageStats> = (database, filters, common, args) => {
     let totalWithLang = 0;
     let totalWords = 0;
     const languagesCount = new Array(255).fill(0);

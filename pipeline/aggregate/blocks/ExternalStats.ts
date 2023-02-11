@@ -6,7 +6,7 @@ export interface ExternalStats {
     domainsCount: number[];
 }
 
-const fn: BlockFn<ExternalStats> = (args, database, filters, common) => {
+const fn: BlockFn<ExternalStats> = (database, filters, common, args) => {
     const domainsCount = new Array(database.domains.length).fill(0);
 
     const processMessage = (msg: MessageView) => {

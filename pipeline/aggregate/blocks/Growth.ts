@@ -12,7 +12,7 @@ export interface TimelineStats {
     growth: Item[];
 }
 
-const fn: BlockFn<TimelineStats> = (args, database, filters, common) => {
+const fn: BlockFn<TimelineStats> = (database, filters, common, args) => {
     const { dateKeys } = common.timeKeys;
 
     const firstMessageDay: number[] = new Array(database.authors.length).fill(-1);

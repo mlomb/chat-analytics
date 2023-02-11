@@ -48,7 +48,7 @@ export interface MessagesStats {
     };
 }
 
-const fn: BlockFn<MessagesStats> = (args, database, filters, common) => {
+const fn: BlockFn<MessagesStats> = (database, filters, common, args) => {
     const { dateKeys, weekKeys, monthKeys, yearKeys, dateToWeekIndex, dateToMonthIndex, dateToYearIndex } =
         common.timeKeys;
 

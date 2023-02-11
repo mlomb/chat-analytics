@@ -10,8 +10,8 @@ import {
     XYChart,
     XYChartScrollbar,
 } from "@amcharts/amcharts5/xy";
-import { BlockInfo } from "@pipeline/aggregate/Blocks";
 import { useDataProvider } from "@report/DataProvider";
+import { BlockResult } from "@report/WorkerReport";
 import Block from "@report/components/Block";
 
 import { Themes } from "./viz/AmCharts5";
@@ -28,7 +28,7 @@ const RESETS = {
     marginRight: 0,
 };
 
-const TimeSelector = (props: { info: BlockInfo<"messages-per-cycle"> }) => {
+const TimeSelector = (props: { info: BlockResult<"messages-per-cycle"> }) => {
     const dataProvider = useDataProvider();
     const chartDiv = useRef<HTMLDivElement>(null);
     const seriesRef = useRef<StepLineSeries | null>(null);

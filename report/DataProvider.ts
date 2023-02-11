@@ -2,9 +2,18 @@ import EventEmitter from "events";
 
 import { Day } from "@pipeline/Time";
 import { Index } from "@pipeline/Types";
-import { BlockDescriptions, BlockInfo, BlockKey, BlockTrigger } from "@pipeline/aggregate/Blocks";
+import { BlockKey, BlockTrigger } from "@pipeline/aggregate/Blocks";
 import { Database } from "@pipeline/process/Types";
-import { BlockRequestMessage, BlockResultMessage, InitMessage, ReadyMessage } from "@report/WorkerReport";
+import {
+    BlockDescriptions,
+    BlockRequestMessage,
+    BlockResult,
+    BlockResultMessage,
+    InitMessage,
+    ReadyMessage,
+} from "@report/WorkerReport";
+
+export type BlockState = "loading" | "stale" | "ready" | "error";
 
 // used in the UI to cache the format of common objects (mostly for searching)
 export interface FormatCache {
@@ -16,10 +25,10 @@ export interface FormatCache {
 }
 
 export declare interface DataProvider {
-    emit<K extends BlockKey>(event: K, info: BlockInfo<K>): boolean;
+    emit<K extends BlockKey>(event: K, info: BlockResult<K>): boolean;
     emit(event: "ready" | `trigger-${BlockTrigger}`): boolean;
 
-    on<K extends BlockKey>(event: K, listener: (info: BlockInfo<K>) => void): this;
+    on<K extends BlockKey>(event: K, listener: (info: BlockResult<K>) => void): this;
     on(event: "ready" | `trigger-${BlockTrigger}`, listener: () => void): this;
 }
 
@@ -45,7 +54,7 @@ export class DataProvider extends EventEmitter {
     public database!: Database;
     public formatCache!: FormatCache;
     private blocksDescs?: BlockDescriptions;
-    private readyBlocks: Map<BlockKey, BlockInfo<any>> = new Map();
+    private readyBlocks: Map<BlockKey, BlockResult<any>> = new Map();
 
     constructor(dataStr: string) {
         super();
@@ -190,7 +199,7 @@ export class DataProvider extends EventEmitter {
         this.worker.postMessage(br);
     }
 
-    private onWorkDone<K extends BlockKey>(blockKey: K, blockInfo: BlockInfo<K>) {
+    private onWorkDone<K extends BlockKey>(blockKey: K, blockInfo: BlockResult<K>) {
         console.assert(this.currentBlock === blockKey);
 
         // make sure the block we were working hasn't been invalidated
@@ -255,7 +264,7 @@ export class DataProvider extends EventEmitter {
         return this.activeEndDate!.nextDay().toDate();
     }
 
-    public getBlockInfo<K extends BlockKey>(blockKey: K): BlockInfo<K> {
+    public getBlockInfo<K extends BlockKey>(blockKey: K): BlockResult<K> {
         if (this.readyBlocks.has(blockKey)) {
             return this.readyBlocks.get(blockKey)!;
         } else {

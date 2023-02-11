@@ -1,6 +1,9 @@
 import { useContext, useEffect, useState } from "react";
 
-import { BlockArgs, BlockKey, BlockState, getBlockStore } from "./BlockStore";
+import { BlockArgs, BlockKey } from "@pipeline/aggregate/Blocks";
+
+import { getBlockStore } from "./BlockStore";
+import { BlockState } from "./WorkerReport";
 import { LoadingContext } from "./components/LoadingGroup";
 
 /**

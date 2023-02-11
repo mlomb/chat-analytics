@@ -1,22 +1,23 @@
 import { useEffect, useRef, useState } from "react";
 import { InView } from "react-intersection-observer";
 
-import { BlockInfo, BlockKey } from "@pipeline/aggregate/Blocks";
+import { BlockKey } from "@pipeline/aggregate/Blocks";
 import { useDataProvider } from "@report/DataProvider";
+import { BlockResult } from "@report/WorkerReport";
 
 interface Props<K extends BlockKey> {
     blockKey: K;
-    children: (props: { info: BlockInfo<K> }) => JSX.Element;
+    children: (props: { info: BlockResult<K> }) => JSX.Element;
 }
 
 const Block = <K extends BlockKey>(props: Props<K>) => {
     const dataProvider = useDataProvider();
     const [id] = useState(Math.floor(Math.random() * 0xffffffff));
-    const [info, setInfo] = useState<BlockInfo<K>>(dataProvider.getBlockInfo(props.blockKey));
+    const [info, setInfo] = useState<BlockResult<K>>(dataProvider.getBlockInfo(props.blockKey));
     const inViewRef = useRef<boolean>(false);
 
     useEffect(() => {
-        const updateInfo = (newInfo: BlockInfo<K>) => {
+        const updateInfo = (newInfo: BlockResult<K>) => {
             // only update if in view
             if (inViewRef.current) {
                 setInfo((prev) => ({
