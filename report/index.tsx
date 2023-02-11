@@ -17,7 +17,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         if (dataStr === "[[[DATA]]]") {
             // load from public/ folder
-            dataStr = await fetch("report_sample.data").then((res) => res.text());
+            const res = await fetch("report_sample.data");
+            if (res.status !== 200) {
+                alert("Could not load `report_sample.data` from `/public` for development, make sure to generate one.");
+                return;
+            }
+            dataStr = await res.text();
         }
 
         if (dataStr.length === 0 || dataStr === "[[[DATA]]]") {
