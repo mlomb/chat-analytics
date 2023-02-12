@@ -3,6 +3,7 @@
 
 ![Logo-Dark](assets/images/logos/app_dark.svg#gh-dark-mode-only)
 ![Logo-Light](assets/images/logos/app_light.svg#gh-light-mode-only)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fmlomb%2Fchat-analytics.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fmlomb%2Fchat-analytics?ref=badge_shield)
 
 <h3>Generate insightful chat analysis reports</h3>
 
@@ -83,3 +84,6 @@ In [docs/TODO.md](/docs/TODO.md) you can find ideas and pending stuff to be impl
 ## License
 
 MIT. See [LICENSE](LICENSE).
+
+
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fmlomb%2Fchat-analytics.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fmlomb%2Fchat-analytics?ref=badge_large)
