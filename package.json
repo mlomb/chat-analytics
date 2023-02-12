@@ -2,7 +2,7 @@
   "name": "chat-analytics",
   "version": "0.1.0",
   "author": "Martin Emiliano Lombardo <to@mlomb.me>",
-  "license": "MIT",
+  "license": "AGPLv3",
   "description": "Generate insightful chat analysis reports in the browser",
   "keywords": [
     "chat",

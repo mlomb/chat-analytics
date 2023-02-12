@@ -82,4 +82,4 @@ In [docs/TODO.md](/docs/TODO.md) you can find ideas and pending stuff to be impl
 
 ## License
 
-MIT. See [LICENSE](LICENSE).
+AGPLv3. See [LICENSE](LICENSE).
