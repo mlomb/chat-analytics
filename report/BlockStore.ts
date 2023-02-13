@@ -23,18 +23,22 @@ export type BlockListener<K extends BlockKey> = (status: BlockStatus<K>) => void
 /** Identifies a block request (the block key and its arguments) */
 export type BlockRequestID = string;
 
+/** Generates a unique identifier for a block request */
 export const idRequest = (request: BlockRequest<BlockKey> | undefined): BlockRequestID => {
     if (request === undefined) return "undefined";
 
     // TODO: fix JSON stringify may not produce the same string for identical objects
+    // for now we don't have arguments with more than one key so it's fine
     return request.blockKey + "--" + JSON.stringify(request.args);
 };
 
 /**
- * Block storage and management
+ * Block storage and management.
+ * It tracks computed blocks and dispatches work to the worker.
  *
- * SUBSCRIBE TO BLOCK - hook
- * ENABLE BLOCK - loading group
+ * The way it works is a two step process:
+ * 1. You have to subscribe (with `subscribe`) to a block to get notified of status changes
+ * 2. You have to enable (with `enable`) a block to make it be computed
  */
 export class BlockStore {
     /** Subscribers of blocks */
@@ -47,13 +51,11 @@ export class BlockStore {
     private storedBlocks = new Map<BlockRequestID, BlockStatus<BlockKey>>();
 
     /** Which requests must be marked as stale after a filter changes */
-    private triggerDependencies: { [trigger in Filter]: Set<BlockRequestID> } = {
+    private filterDependencies: { [filter in Filter]: Set<BlockRequestID> } = {
         authors: new Set(),
         channels: new Set(),
         time: new Set(),
     };
-
-    private currentRequest: BlockRequest<BlockKey> | undefined;
 
     constructor(private readonly worker: WorkerWrapper) {
         worker.on("ready", this.tryToDispatchWork.bind(this));
@@ -63,7 +65,7 @@ export class BlockStore {
 
     private onFilterChange(trigger: Filter) {
         // mark all blocks that depend on this trigger as stale
-        for (const reqId of this.triggerDependencies[trigger]) {
+        for (const reqId of this.filterDependencies[trigger]) {
             this.storedBlocks.delete(reqId);
             this.update(reqId, { state: "waiting" });
         }
@@ -72,22 +74,24 @@ export class BlockStore {
         this.tryToDispatchWork();
     }
 
-    private onWorkDone<K extends BlockKey>(request: BlockRequest<K>, result: BlockResult<K>) {
-        console.assert(idRequest(this.currentRequest) === idRequest(request));
+    private onWorkDone<K extends BlockKey>(request: BlockRequest<K>, result: BlockResult<K>, invalid: boolean) {
+        if (invalid) {
+            // the block was invalidated while being computed
+            this.update(idRequest(request), { state: "waiting" });
+        } else {
+            // the block is valid
+            this.update(idRequest(request), {
+                state: result.success ? "ready" : "error",
+                data: result.data,
+                error: result.errorMessage,
+            });
 
-        this.update(idRequest(request), {
-            state: result.success ? "ready" : "error",
-            data: result.data,
-            error: result.errorMessage,
-        });
-
-        for (const trigger of result.triggers) {
-            this.triggerDependencies[trigger].add(idRequest(request));
+            for (const trigger of result.triggers) {
+                this.filterDependencies[trigger].add(idRequest(request));
+            }
         }
 
-        // make worker available again and try to dispatch more work
-        this.currentRequest = undefined;
-        //this.currentBlockInvalidated = false;
+        // try to dispatch more work
         this.tryToDispatchWork();
     }
 
@@ -130,19 +134,16 @@ export class BlockStore {
             .filter((id) => !this.storedBlocks.has(id) || this.storedBlocks.get(id)?.state === "waiting");
 
         // if there is pending work and the worker is available
-        if (pendingRequests.length > 0 && this.currentRequest === undefined) {
-            // work goes brrr
+        if (pendingRequests.length > 0 && this.worker.available) {
             const id = pendingRequests[0];
             const request = this.enabledBlocks.find((r) => id === idRequest(r))!;
+
+            // work goes brrr
             this.dispatchWork(request);
         }
     }
 
     private dispatchWork(request: BlockRequest<BlockKey>) {
-        // make worker unavailable
-        this.currentRequest = request;
-        //this.currentBlockInvalidated = false;
-
         // notify that this block is loading
         this.update(idRequest(request), { state: "processing" });
 
@@ -160,8 +161,7 @@ export class BlockStore {
     }
 
     getStoredStatus<K extends BlockKey>(request: BlockRequest<K>): BlockStatus<K> {
-        const id = idRequest(request);
-        const status = this.storedBlocks.get(id);
+        const status = this.storedBlocks.get(idRequest(request));
         if (status) return status;
         return { state: "waiting" };
     }

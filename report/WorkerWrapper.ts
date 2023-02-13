@@ -25,13 +25,25 @@ export interface FormatCache {
 export declare interface WorkerWrapper {
     emit(event: "ready"): boolean;
     emit(event: "filter-change", trigger: Filter): boolean;
-    emit<K extends BlockKey>(event: "result", request: BlockRequest<K>, result: BlockResult<K>): boolean;
+    emit<K extends BlockKey>(
+        event: "result",
+        request: BlockRequest<K>,
+        result: BlockResult<K>,
+        invalid: boolean
+    ): boolean;
 
     on(event: "ready", listener: () => void): this;
     on(event: "filter-change", listener: (trigger: Filter) => void): this;
-    on<K extends BlockKey>(event: "result", listener: (request: BlockRequest<K>, result: BlockResult<K>) => void): this;
+    on<K extends BlockKey>(
+        event: "result",
+        listener: (request: BlockRequest<K>, result: BlockResult<K>, invalid: boolean) => void
+    ): this;
 }
 
+/**
+ * This class wraps the native Worker and handles initialization and communication.
+ * It also keeps track of the active filters in the UI and sends them to the worker when a request is made.
+ */
 export class WorkerWrapper extends EventEmitter {
     private worker: Worker;
 
@@ -39,15 +51,18 @@ export class WorkerWrapper extends EventEmitter {
     public formatCache!: FormatCache;
 
     // active filters
-    private activeChannels: Index[] = [];
-    private activeAuthors: Index[] = [];
     private channelsSet: boolean = false;
     private authorsSet: boolean = false;
+    private activeChannels: Index[] = [];
+    private activeAuthors: Index[] = [];
     private activeStartDate: Day | undefined;
     private activeEndDate: Day | undefined;
 
     /** Updated filters since last request */
-    private updatedFilters: Set<Filter> = new Set(["authors", "channels", "time"]);
+    private staleFilters: Set<Filter> = new Set(["authors", "channels", "time"]);
+
+    /** Wether the worker is currently processing a request */
+    private workerBusy: boolean = false;
 
     constructor(dataStr: string) {
         super();
@@ -100,21 +115,24 @@ export class WorkerWrapper extends EventEmitter {
             console.log("Worker is ready");
             this.emit("ready");
         } else if (res.type === "result") {
-            this.emit("result", res.request, res.result);
+            this.workerBusy = false;
+            // a result will be invialid if one of its triggers has been updated since the request was made
+            const invalid = res.result.triggers.some((f) => this.staleFilters.has(f));
+            this.emit("result", res.request, res.result, invalid);
         }
     }
 
     updateChannels(channels: Index[]) {
-        this.activeChannels = channels;
         this.channelsSet = true;
-        this.updatedFilters.add("channels");
+        this.activeChannels = channels;
+        this.staleFilters.add("channels");
         this.emit("filter-change", "channels");
     }
 
     updateAuthors(authors: Index[]) {
-        this.activeAuthors = authors;
         this.authorsSet = true;
-        this.updatedFilters.add("authors");
+        this.activeAuthors = authors;
+        this.staleFilters.add("authors");
         this.emit("filter-change", "authors");
     }
 
@@ -123,7 +141,7 @@ export class WorkerWrapper extends EventEmitter {
             Day.clamp(day, Day.fromKey(this.database.time.minDate), Day.fromKey(this.database.time.maxDate));
         this.activeStartDate = clampDate(Day.fromDate(start));
         this.activeEndDate = clampDate(Day.fromDate(end));
-        this.updatedFilters.add("time");
+        this.staleFilters.add("time");
         this.emit("filter-change", "time");
     }
 
@@ -135,23 +153,24 @@ export class WorkerWrapper extends EventEmitter {
         };
 
         // only update filters if they have changed
-        if (this.updatedFilters.has("channels")) {
+        if (this.staleFilters.has("channels")) {
             br.filters.channels = this.activeChannels;
-            this.updatedFilters.add("channels");
+            this.staleFilters.add("channels");
         }
-        if (this.updatedFilters.has("authors")) {
+        if (this.staleFilters.has("authors")) {
             br.filters.authors = this.activeAuthors;
-            this.updatedFilters.add("authors");
+            this.staleFilters.add("authors");
         }
-        if (this.updatedFilters.has("time")) {
+        if (this.staleFilters.has("time")) {
             br.filters.startDate = this.activeStartDate?.dateKey;
             br.filters.endDate = this.activeEndDate?.dateKey;
-            this.updatedFilters.add("time");
+            this.staleFilters.add("time");
         }
 
         // unmark stale, since we are updating them here
-        this.updatedFilters.clear();
+        this.staleFilters.clear();
 
+        this.workerBusy = false;
         this.worker.postMessage(br);
     }
 
@@ -166,6 +185,10 @@ export class WorkerWrapper extends EventEmitter {
 
     get areFiltersSet() {
         return this.channelsSet && this.authorsSet;
+    }
+
+    get available() {
+        return this.workerBusy === false;
     }
 }
 
