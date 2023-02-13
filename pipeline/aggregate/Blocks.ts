@@ -13,6 +13,8 @@ import SentimentPerCycle from "@pipeline/aggregate/blocks/SentimentPerCycle";
 import SentimentStats from "@pipeline/aggregate/blocks/SentimentStats";
 import { Database } from "@pipeline/process/Types";
 
+import WordStats from "./blocks/WordStats";
+
 /* Function that computes a block */
 export type BlockFn<Data, Args = undefined> = (
     database: Database,
@@ -44,6 +46,12 @@ export const Blocks = {
     [SentimentStats.key]: SentimentStats,
     [Growth.key]: Growth,
     [ActiveAuthors.key]: ActiveAuthors,
+    [WordStats.key]: WordStats,
+
+    a: {} as BlockDescription<"a", any>,
+    b: {} as BlockDescription<"b", any>,
+    c: {} as BlockDescription<"c", any>,
+    d: {} as BlockDescription<"d", any>,
 } as const;
 
 /** Block identifier */

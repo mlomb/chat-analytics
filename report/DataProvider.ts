@@ -13,8 +13,6 @@ import {
     ReadyMessage,
 } from "@report/WorkerReport";
 
-export type BlockState = "loading" | "stale" | "ready" | "error";
-
 // used in the UI to cache the format of common objects (mostly for searching)
 export interface FormatCache {
     authors: string[];
@@ -107,7 +105,7 @@ export class DataProvider extends EventEmitter {
             console.log("Worker is ready");
             this.emit("ready");
         } else if (res.type === "result") {
-            this.onWorkDone(res.blockKey, res.blockInfo);
+            this.onWorkDone(res.request.blockKey, res.result);
         }
     }
 

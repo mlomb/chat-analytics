@@ -1,38 +1,70 @@
-import { createContext, useCallback, useEffect, useRef, useState } from "react";
+import { createContext, useCallback, useEffect, useState } from "react";
 import { InView } from "react-intersection-observer";
 
-import { useBlockState } from "@report/BlockHooks";
+import { BlockKey } from "@pipeline/aggregate/Blocks";
+import { BlockState, getBlockStore } from "@report/BlockStore";
+import { BlockRequest } from "@report/WorkerReport";
 
-export const LoadingContext = createContext<any>(null);
+export const LoadingContext = createContext<LoadingContextValue>(null!);
 
-export const LoadingGroup = (props: any) => {
-    const [keys, setKeys] = useState<any>([]);
-    const state = useBlockState(keys);
-    const inViewRef = useRef<boolean>(false);
+// shorthand for this file only
+type Req = BlockRequest<BlockKey>;
 
-    const addKey = useCallback((key: string) => {
-        setKeys((K: any) => {
-            if (K.includes(key)) {
-                return K;
-            }
-            return [...K, key];
+interface LoadingContextValue {
+    // we expect the request object passed to disable
+    // to be the same instance as the one passed to enable
+    // (comparing with ===)
+    enable: (request: Req) => void;
+    disable: (request: Req) => void;
+}
+
+// resolve based on the rules above
+const resolveStates = (states: BlockState[]): BlockState => {
+    const anyError = states.some((s) => s === "error");
+    const allReady = states.every((s) => s === "ready");
+    const anyProcessing = states.some((s) => s === "processing");
+
+    if (anyError) return "error";
+    if (allReady) return "ready";
+    if (anyProcessing) return "processing";
+    return "waiting";
+};
+
+export const LoadingGroup = (props: { children: any }) => {
+    const store = getBlockStore();
+    const [requests, setRequests] = useState<Req[]>([]);
+    const [state, setState] = useState<BlockState>("waiting");
+
+    const enable = useCallback((request: Req) => setRequests((R) => [...R, request]), []);
+    const disable = useCallback((request: Req) => setRequests((R) => R.filter((r) => r !== request)), []);
+
+    useEffect(() => {
+        const updateState = () => {
+            const states = requests.map((req) => store.getStoredStatus(req).state);
+            setState(resolveStates(states));
+        };
+
+        requests.forEach((req) => {
+            store.enable(req);
+            store.subscribe(req, updateState);
         });
-    }, []);
-    const rmKey = useCallback((key: string) => {
-        setKeys((K: any) => {
-            return K.filter((k: string) => k !== key);
-        });
-    }, []);
 
-    useEffect(() => {}, [keys]);
-    const onChange = (inView: boolean) => {};
+        return () => {
+            requests.forEach((req) => {
+                store.unsubscribe(req, updateState);
+                store.disable(req);
+            });
+        };
+    }, [requests]);
+
+    const onChange = (inView: boolean) => requests.forEach((req) => store[inView ? "enable" : "disable"](req));
 
     return (
         <InView onChange={onChange} fallbackInView={true}>
-            <LoadingContext.Provider value={{ addKey, rmKey }}>
+            <LoadingContext.Provider value={{ enable, disable }}>
                 <fieldset style={{ margin: "revert", padding: "revert", border: "revert" }}>
                     <legend>
-                        LOADING GROUP ({keys.join(",")}): {state}
+                        LOADING GROUP ({requests.map((r) => JSON.stringify(r)).join(",")}): {state}
                     </legend>
                     {props.children}
                 </fieldset>
