@@ -1,10 +1,11 @@
 import { PlatformsInfo } from "@pipeline/Platforms";
 import { EmojiStats } from "@pipeline/aggregate/blocks/EmojiStats";
+import { getDatabase } from "@report/WorkerWrapper";
 import DottedTable, { Line } from "@report/components/viz/DottedTable";
 
 const MessagesStatsTable = ({ data }: { data?: EmojiStats }) => {
-    const dataProvider = useDataProvider();
-    const platformInfo = PlatformsInfo[dataProvider.database.config.platform];
+    const db = getDatabase();
+    const platformInfo = PlatformsInfo[db.config.platform];
 
     const reactionSupportTooltip = platformInfo.support.reactions
         ? undefined

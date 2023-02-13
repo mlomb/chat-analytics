@@ -10,12 +10,14 @@ import {
     XYChart,
     XYCursor,
 } from "@amcharts/amcharts5/xy";
+import { Filter } from "@pipeline/aggregate/Blocks";
 import { SentimentInDate, SentimentPerCycle } from "@pipeline/aggregate/blocks/SentimentPerCycle";
+import { getWorker } from "@report/WorkerWrapper";
 
 import { Themes } from "./AmCharts5";
 
 const SentimentOverTime = ({ data, options }: { data?: SentimentPerCycle; options: number[] }) => {
-    const dataProvider = useDataProvider();
+    const worker = getWorker();
     const chartDiv = useRef<HTMLDivElement>(null);
 
     const xAxisRef = useRef<DateAxis<any> | null>(null);
@@ -72,8 +74,11 @@ const SentimentOverTime = ({ data, options }: { data?: SentimentPerCycle; option
         yAxisRef.current = yAxis;
 
         // handle zoom
-        const onZoom = () => xAxis.zoomToDates(dataProvider.getActiveStartDate(), dataProvider.getActiveEndDate(), 0);
-        dataProvider.on("trigger-time", onZoom);
+        const onZoom = () => xAxis.zoomToDates(worker.getActiveStartDate(), worker.getActiveEndDate(), 0);
+        const onFilterChange = (filter: Filter) => {
+            if (filter === "time") onZoom();
+        };
+        worker.on("filter-change", onFilterChange);
         // must wait to datavalidated before zooming
         seriesRef.current.forEach((c) => {
             c.events.once("datavalidated", onZoom);
@@ -82,7 +87,7 @@ const SentimentOverTime = ({ data, options }: { data?: SentimentPerCycle; option
         });
 
         return () => {
-            dataProvider.off("trigger-time", onZoom);
+            worker.off("trigger-time", onZoom);
             root.dispose();
             xAxisRef.current = null;
             yAxisRef.current = null;

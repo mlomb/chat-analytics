@@ -44,7 +44,7 @@ export interface Section {
 const ReportDashboard = () => {
     const [section, setSection] = useState("messages");
 
-    let sections: Section[] = useMemo(() => {
+    const sections: Section[] = useMemo(() => {
         const database = getDatabase();
         const platformInfo = PlatformsInfo[database.config.platform];
 
@@ -275,8 +275,6 @@ const ReportDashboard = () => {
             },
         ].filter(({ cards }) => env.isDev || cards.length > 0);
     }, []);
-
-    sections = [];
 
     const isDemo = getDatabase().config.demo;
 

@@ -1,11 +1,12 @@
 import { AttachmentType } from "@pipeline/Attachments";
 import { PlatformsInfo } from "@pipeline/Platforms";
 import { MessagesStats } from "@pipeline/aggregate/blocks/MessagesStats";
+import { getDatabase } from "@report/WorkerWrapper";
 import DottedTable, { Line } from "@report/components/viz/DottedTable";
 
 const MessagesStatsTable = ({ data }: { data?: MessagesStats }) => {
-    const dataProvider = useDataProvider();
-    const platformInfo = PlatformsInfo[dataProvider.database.config.platform];
+    const db = getDatabase();
+    const platformInfo = PlatformsInfo[db.config.platform];
 
     const lines: Line[] = [
         {

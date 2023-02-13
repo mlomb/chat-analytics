@@ -57,17 +57,11 @@ export const LoadingGroup = (props: { children: (state: BlockState) => ReactNode
     useEffect(() => {
         const trigger = () => rerender(Math.random());
 
-        requests.forEach((req) => {
-            store.enable(req);
-            store.subscribe(req, trigger);
-        });
+        // subscribe to all
+        requests.forEach((req) => store.subscribe(req, trigger));
 
-        return () => {
-            requests.forEach((req) => {
-                store.unsubscribe(req, trigger);
-                store.disable(req);
-            });
-        };
+        // unsubscribe on unmount
+        return () => requests.forEach((req) => store.unsubscribe(req, trigger));
     }, [requests]);
 
     const state = combineStates(requests.map((req) => store.getStoredStatus(req).state));

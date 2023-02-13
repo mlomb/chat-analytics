@@ -10,12 +10,14 @@ import {
     XYChart,
     XYSeries,
 } from "@amcharts/amcharts5/xy";
+import { Filter } from "@pipeline/aggregate/Blocks";
 import { ActiveAuthors } from "@pipeline/aggregate/blocks/ActiveAuthors";
+import { getWorker } from "@report/WorkerWrapper";
 
 import { Themes } from "./AmCharts5";
 
 const ActiveAuthorsOverTime = ({ data, options }: { data?: ActiveAuthors; options: number[] }) => {
-    const dataProvider = useDataProvider();
+    const worker = getWorker();
     const chartDiv = useRef<HTMLDivElement>(null);
 
     const xAxisRef = useRef<DateAxis<any> | null>(null);
@@ -90,15 +92,18 @@ const ActiveAuthorsOverTime = ({ data, options }: { data?: ActiveAuthors; option
 
         seriesRef.current = series;
 
-        const onZoom = () => xAxis.zoomToDates(dataProvider.getActiveStartDate(), dataProvider.getActiveEndDate(), 0);
-        dataProvider.on("trigger-time", onZoom);
+        const onZoom = () => xAxis.zoomToDates(worker.getActiveStartDate(), worker.getActiveEndDate(), 0);
+        const onFilterChange = (filter: Filter) => {
+            if (filter === "time") onZoom();
+        };
+        worker.on("filter-change", onFilterChange);
         // must wait to datavalidated before zooming
         seriesRef.current!.events.once("datavalidated", onZoom);
         // See: https://github.com/amcharts/amcharts5/issues/236
         seriesRef.current!.events.on("datavalidated", () => yAxis.zoom(0, 1));
 
         return () => {
-            dataProvider.off("trigger-time", onZoom);
+            worker.off("filter-change", onFilterChange);
             root.dispose();
             xAxisRef.current = null;
             seriesRef.current = null;

@@ -1,13 +1,11 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 
+import { initBlockStore } from "@report/BlockStore";
 import ReportPage from "@report/ReportPage";
+import { initWorker } from "@report/WorkerWrapper";
 
 import { plausible } from "@assets/Plausible";
-
-import { initBlockStore } from "./BlockStore";
-import { Experiment } from "./Experiments";
-import { initWorker } from "./WorkerWrapper";
 
 document.addEventListener("DOMContentLoaded", async () => {
     try {
@@ -41,7 +39,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     createRoot(document.getElementById("app") as HTMLElement).render(
         <StrictMode>
-            <Experiment />
             <ReportPage />
         </StrictMode>
     );

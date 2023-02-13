@@ -65,7 +65,7 @@ export class BlockStore {
         // mark all blocks that depend on this trigger as stale
         for (const reqId of this.triggerDependencies[trigger]) {
             this.storedBlocks.delete(reqId);
-            // this.update(reqId, { state: "stale" });
+            this.update(reqId, { state: "waiting" });
         }
 
         // recompute
@@ -75,7 +75,7 @@ export class BlockStore {
     private onWorkDone<K extends BlockKey>(request: BlockRequest<K>, result: BlockResult<K>) {
         console.assert(idRequest(this.currentRequest) === idRequest(request));
 
-        this.update(request, {
+        this.update(idRequest(request), {
             state: result.success ? "ready" : "error",
             data: result.data,
             error: result.errorMessage,
@@ -116,7 +116,6 @@ export class BlockStore {
         // remove first occurrence by id
         const index = this.enabledBlocks.findIndex((r) => id === idRequest(r));
         if (index >= 0) this.enabledBlocks.splice(index, 1);
-        else console.error("trying to disable a block that is not enabled");
     }
 
     private tryToDispatchWork() {
@@ -126,7 +125,9 @@ export class BlockStore {
         }
 
         // pick an active block that is not ready
-        const pendingRequests = this.enabledBlocks.map(idRequest).filter((id) => !this.storedBlocks.has(id));
+        const pendingRequests = this.enabledBlocks
+            .map(idRequest)
+            .filter((id) => !this.storedBlocks.has(id) || this.storedBlocks.get(id)?.state === "waiting");
 
         // if there is pending work and the worker is available
         if (pendingRequests.length > 0 && this.currentRequest === undefined) {
@@ -143,25 +144,19 @@ export class BlockStore {
         //this.currentBlockInvalidated = false;
 
         // notify that this block is loading
-        this.update(request, { state: "processing" });
+        this.update(idRequest(request), { state: "processing" });
 
         // dispatch work
         this.worker.sendBlockRequest(request);
     }
 
-    private update(request: BlockRequest<BlockKey>, status: BlockStatus<BlockKey>) {
-        const id = idRequest(request);
-
+    private update(id: BlockRequestID, status: BlockStatus<BlockKey>) {
         // store block result in case it is needed later
         this.storedBlocks.set(id, status);
 
         // and notify the UI
         const listeners = this.blockListeners.get(id);
-        if (listeners) {
-            for (const listener of listeners) {
-                listener(status);
-            }
-        }
+        listeners?.forEach((listener) => listener(status));
     }
 
     getStoredStatus<K extends BlockKey>(request: BlockRequest<K>): BlockStatus<K> {

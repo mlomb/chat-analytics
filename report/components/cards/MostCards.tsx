@@ -5,6 +5,7 @@ import { ExternalStats } from "@pipeline/aggregate/blocks/ExternalStats";
 import { InteractionStats } from "@pipeline/aggregate/blocks/InteractionStats";
 import { LanguageStats } from "@pipeline/aggregate/blocks/LanguageStats";
 import { MessagesStats } from "@pipeline/aggregate/blocks/MessagesStats";
+import { getDatabase, getFormatCache } from "@report/WorkerWrapper";
 import { AuthorLabel } from "@report/components/core/labels/AuthorLabel";
 import { ChannelLabel } from "@report/components/core/labels/ChannelLabel";
 import { DomainLabel } from "@report/components/core/labels/DomainLabel";
@@ -25,7 +26,7 @@ export const MostMessagesAuthors = ({ data }: { data?: MessagesStats }) => (
         unit="Total messages"
         counts={data?.authorsCount || EmptyArray}
         itemComponent={AuthorLabel}
-        maxItems={Math.min(15, useDataProvider().database.authors.length)}
+        maxItems={Math.min(15, getDatabase().authors.length)}
         colorHue={240}
     />
 );
@@ -35,7 +36,7 @@ export const MostRepliesAuthors = ({ data }: { data?: InteractionStats }) => (
         unit="Number of messages replied"
         counts={data?.authorsReplyCount || EmptyArray}
         itemComponent={AuthorLabel}
-        maxItems={Math.min(15, useDataProvider().database.authors.length)}
+        maxItems={Math.min(15, getDatabase().authors.length)}
         colorHue={240}
     />
 );
@@ -49,10 +50,7 @@ export const MostConversations = ({ data, options }: { data?: ConversationStats;
         unit="Number of conversations started"
         counts={data ? (options[0] === 0 ? data.authorConversations : data.channelConversations) : EmptyArray}
         itemComponent={options[0] === 0 ? AuthorLabel : ChannelLabel}
-        maxItems={Math.min(
-            15,
-            Math.max(useDataProvider().database.authors.length, useDataProvider().database.channels.length)
-        )}
+        maxItems={Math.min(15, Math.max(getDatabase().authors.length, getDatabase().channels.length))}
         colorHue={options[0] === 0 ? 240 : 266}
     />
 );
@@ -66,7 +64,7 @@ export const MostMessagesChannels = ({ data }: { data?: MessagesStats }) => (
         unit="Total messages"
         counts={data?.channelsCount || EmptyArray}
         itemComponent={ChannelLabel}
-        maxItems={Math.min(15, useDataProvider().database.channels.length)}
+        maxItems={Math.min(15, getDatabase().channels.length)}
         colorHue={266}
     />
 );
@@ -74,9 +72,9 @@ export const MostMessagesChannels = ({ data }: { data?: MessagesStats }) => (
 ///////////////////////////
 /// WORDS
 ///////////////////////////
-const WordsIndexOf = (value: string) => useDataProvider().formatCache.words.indexOf(value);
+const WordsIndexOf = (value: string) => getFormatCache().words.indexOf(value);
 const WordsInFilter = (index: number, filter: string | RegExp) => {
-    const word = useDataProvider().formatCache.words[index];
+    const word = getFormatCache().words[index];
     return filter instanceof RegExp ? filter.test(word) : word.startsWith(filter);
 };
 export const MostUsedWords = ({ data, options }: { data?: LanguageStats; options: number[] }) =>
@@ -87,7 +85,7 @@ export const MostUsedWords = ({ data, options }: { data?: LanguageStats; options
             what="Word"
             unit="Times used"
             counts={data?.wordsCount || EmptyArray}
-            maxItems={Math.min(15, useDataProvider().database.words.length)}
+            maxItems={Math.min(15, getDatabase().words.length)}
             itemComponent={WordLabel}
             searchable
             allowRegex
@@ -102,8 +100,8 @@ export const MostUsedWords = ({ data, options }: { data?: LanguageStats; options
 ///////////////////////////
 const EmojiFilterFns = {
     "0": undefined, // all emoji
-    "1": (index: number) => useDataProvider().database.emojis[index].type === "unicode", // regular emoji
-    "2": (index: number) => useDataProvider().database.emojis[index].type === "custom", // custom emoji
+    "1": (index: number) => getDatabase().emojis[index].type === "unicode", // regular emoji
+    "2": (index: number) => getDatabase().emojis[index].type === "custom", // custom emoji
 };
 const EmojiFilterPlaceholders = {
     "0": 'Filter emojis... (e.g. "fire", "🔥" or ":pepe:")',
@@ -112,11 +110,11 @@ const EmojiFilterPlaceholders = {
 };
 const EmojisTransformFilter = (filter: string) => filter.replace(/:/g, "");
 const EmojisIndexOf = (value: string) => {
-    const rawEmoji = useDataProvider().database.emojis.findIndex((e) => e.name === value);
-    if (rawEmoji === -1) return useDataProvider().formatCache.emojis.indexOf(value);
+    const rawEmoji = getDatabase().emojis.findIndex((e) => e.name === value);
+    if (rawEmoji === -1) return getFormatCache().emojis.indexOf(value);
     return rawEmoji;
 };
-const EmojisInFilter = (index: Index, filter: string) => useDataProvider().formatCache.emojis[index].includes(filter);
+const EmojisInFilter = (index: Index, filter: string) => getFormatCache().emojis[index].includes(filter);
 export const MostUsedEmojis = ({ data, options }: { data?: EmojiStats; options: number[] }) => (
     <MostUsed
         what="Emoji"
@@ -129,7 +127,7 @@ export const MostUsedEmojis = ({ data, options }: { data?: EmojiStats; options: 
                 : EmptyArray
         }
         filter={EmojiFilterFns[options[0] as unknown as keyof typeof EmojiFilterFns]}
-        maxItems={Math.min(15, useDataProvider().database.emojis.length)}
+        maxItems={Math.min(15, getDatabase().emojis.length)}
         itemComponent={EmojiLabel}
         searchable
         searchPlaceholder={EmojiFilterPlaceholders[options[0] as unknown as keyof typeof EmojiFilterPlaceholders]}
@@ -143,10 +141,7 @@ export const MostProducerEmojis = ({ data, options }: { data?: EmojiStats; optio
         what={options[0] === 0 ? "Author" : "Channel"}
         unit="Number of emojis used"
         counts={data ? (options[0] === 0 ? data.inText.authorCount : data.inText.channelCount) : EmptyArray}
-        maxItems={Math.min(
-            15,
-            Math.max(useDataProvider().database.authors.length, useDataProvider().database.channels.length)
-        )}
+        maxItems={Math.min(15, Math.max(getDatabase().authors.length, getDatabase().channels.length))}
         itemComponent={options[0] === 0 ? AuthorLabel : ChannelLabel}
         colorHue={options[0] === 0 ? 240 : 266}
     />
@@ -157,10 +152,7 @@ export const MostGetterEmojis = ({ data, options }: { data?: EmojiStats; options
         what={options[0] === 0 ? "Author" : "Channel"}
         unit="Number of reactions received"
         counts={data ? (options[0] === 0 ? data.inReactions.authorCount : data.inReactions.channelCount) : EmptyArray}
-        maxItems={Math.min(
-            15,
-            Math.max(useDataProvider().database.authors.length, useDataProvider().database.channels.length)
-        )}
+        maxItems={Math.min(15, Math.max(getDatabase().authors.length, getDatabase().channels.length))}
         itemComponent={options[0] === 0 ? AuthorLabel : ChannelLabel}
         colorHue={options[0] === 0 ? 240 : 266}
     />
@@ -169,14 +161,14 @@ export const MostGetterEmojis = ({ data, options }: { data?: EmojiStats; options
 ///////////////////////////
 /// DOMAINS
 ///////////////////////////
-const DomainsIndexOf = (value: string) => useDataProvider().database.domains.indexOf(value);
-const DomainsInFilter = (index: number, filter: string) => useDataProvider().database.domains[index].includes(filter);
+const DomainsIndexOf = (value: string) => getDatabase().domains.indexOf(value);
+const DomainsInFilter = (index: number, filter: string) => getDatabase().domains[index].includes(filter);
 export const MostLinkedDomains = ({ data }: { data?: ExternalStats }) => (
     <MostUsed
         what="Domain"
         unit="Times linked"
         counts={data?.domainsCount || EmptyArray}
-        maxItems={Math.min(15, useDataProvider().database.domains.length)}
+        maxItems={Math.min(15, getDatabase().domains.length)}
         itemComponent={DomainLabel}
         searchable
         searchPlaceholder="Filter domains..."
@@ -188,16 +180,15 @@ export const MostLinkedDomains = ({ data }: { data?: ExternalStats }) => (
 ///////////////////////////
 /// MENTIONS
 ///////////////////////////
-const MentionsIndexOf = (value: string) => useDataProvider().formatCache.mentions.indexOf(value);
-const MentionsInFilter = (index: number, filter: string) =>
-    useDataProvider().formatCache.mentions[index].includes(filter);
+const MentionsIndexOf = (value: string) => getFormatCache().mentions.indexOf(value);
+const MentionsInFilter = (index: number, filter: string) => getFormatCache().mentions[index].includes(filter);
 export const MostMentioned = ({ data }: { data?: InteractionStats }) => (
     <MostUsed
         what="Who"
         unit="Times mentioned"
         counts={data?.mentionsCount || EmptyArray}
         itemComponent={MentionLabel}
-        maxItems={Math.min(15, useDataProvider().database.mentions.length)}
+        maxItems={Math.min(15, getDatabase().mentions.length)}
         searchable
         searchPlaceholder="Filter @mentions..."
         indexOf={MentionsIndexOf}

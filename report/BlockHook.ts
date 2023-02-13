@@ -15,17 +15,22 @@ export const useBlockData = <K extends BlockKey>(blockKey: K, args?: BlockArgs<K
     const request: BlockRequest<K> = { blockKey, args };
 
     const [data, setData] = useState<BlockData<K> | undefined>(store.getStoredStatus(request)?.data);
-    const { enable, disable } = useContext(LoadingContext);
+    const ctx = useContext(LoadingContext);
+    if (!ctx) throw new Error("useBlockData must be used inside a LoadingGroup component");
 
     useEffect(() => {
-        const updateData = (status: BlockStatus<K>) => setData(status.data);
+        const updateData = (status: BlockStatus<K>) => {
+            // only update data if the new one is not undefined
+            // so we keep displaying previous data until the new one is ready
+            if (status.data !== undefined) setData(status.data);
+        };
 
         store.subscribe(request, updateData);
-        enable(request);
+        ctx.enable(request);
 
         return () => {
             store.unsubscribe(request, updateData);
-            disable(request);
+            ctx.disable(request);
         };
     }, [idRequest(request)]);
 

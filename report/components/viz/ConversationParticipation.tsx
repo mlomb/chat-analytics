@@ -3,11 +3,12 @@ import { useLayoutEffect, useRef } from "react";
 import { Root } from "@amcharts/amcharts5";
 import { ChordDirected } from "@amcharts/amcharts5/flow";
 import { ConversationStats } from "@pipeline/aggregate/blocks/ConversationStats";
+import { getDatabase } from "@report/WorkerWrapper";
 
 import { Themes } from "./AmCharts5";
 
 const ConversationParticipation = ({ data, options }: { data?: ConversationStats; options: number[] }) => {
-    const dataProvider = useDataProvider();
+    const db = getDatabase();
     const chartDiv = useRef<HTMLDivElement>(null);
     const seriesRef = useRef<ChordDirected | null>(null);
 
@@ -47,8 +48,8 @@ const ConversationParticipation = ({ data, options }: { data?: ConversationStats
             seriesRef.current?.data.clear();
             seriesRef.current?.data.setAll(
                 data.nodes.map((node) => ({
-                    f: dataProvider.database.authors[node.f].n,
-                    t: dataProvider.database.authors[node.t].n,
+                    f: db.authors[node.f].n,
+                    t: db.authors[node.t].n,
                     c: node.c,
                 }))
             );

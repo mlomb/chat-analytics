@@ -1,5 +1,6 @@
 import { ReactElement, memo } from "react";
 
+import { getDatabase } from "@report/WorkerWrapper";
 import { BaseLabel, LabelProps } from "@report/components/core/labels/BaseLabel";
 
 interface EmojiLabelProps extends LabelProps {
@@ -7,8 +8,8 @@ interface EmojiLabelProps extends LabelProps {
 }
 
 const _EmojiLabel = ({ index, hideNameIfPossible }: EmojiLabelProps) => {
-    const dp = useDataProvider();
-    const emoji = dp.database.emojis[index];
+    const db = getDatabase();
+    const emoji = db.emojis[index];
 
     let name: string;
     let symbol: string | undefined;

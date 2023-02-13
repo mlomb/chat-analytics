@@ -2,6 +2,7 @@ import { useLayoutEffect, useRef } from "react";
 
 import { ColorSet, Root } from "@amcharts/amcharts5";
 import { WordCloud as am5WordCloud } from "@amcharts/amcharts5/wc";
+import { getDatabase } from "@report/WorkerWrapper";
 
 import { Themes } from "./AmCharts5";
 
@@ -10,7 +11,7 @@ interface Props {
 }
 
 const WordCloud = (props: Props) => {
-    const dataProvider = useDataProvider();
+    const db = getDatabase();
     const chartDiv = useRef<HTMLDivElement>(null);
     const seriesRef = useRef<am5WordCloud | null>(null);
 
@@ -44,7 +45,7 @@ const WordCloud = (props: Props) => {
     useLayoutEffect(() => {
         const data = props.wordsCount
             .map((c, i) => ({
-                category: dataProvider.database.words[i],
+                category: db.words[i],
                 value: c,
             }))
             .sort((a, b) => b.value - a.value)

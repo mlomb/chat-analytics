@@ -47,7 +47,7 @@ export class WorkerWrapper extends EventEmitter {
     private activeEndDate: Day | undefined;
 
     /** Updated filters since last request */
-    private updatedFilters: Set<Filter> = new Set();
+    private updatedFilters: Set<Filter> = new Set(["authors", "channels", "time"]);
 
     constructor(dataStr: string) {
         super();

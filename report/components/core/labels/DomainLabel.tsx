@@ -1,5 +1,6 @@
 import { memo } from "react";
 
+import { getDatabase } from "@report/WorkerWrapper";
 import { LazyImage } from "@report/components/core/LazyImage";
 import { BaseLabel, LabelProps } from "@report/components/core/labels/BaseLabel";
 
@@ -8,8 +9,8 @@ import DefaultFaviconIcon from "@assets/images/icons/default-favicon.png";
 const DefaultFavicon = <img src={DefaultFaviconIcon} width={16} height={16} />;
 
 const _DomainLabel = ({ index }: LabelProps) => {
-    const dp = useDataProvider();
-    const domain = dp.database.domains[index];
+    const db = getDatabase();
+    const domain = db.domains[index];
 
     // NOTE: we use the icon provided by DuckDuckGo:
     // https://icons.duckduckgo.com/ip3/google.com.ico
