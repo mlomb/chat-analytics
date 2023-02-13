@@ -11,7 +11,6 @@ import {
     XYSeries,
 } from "@amcharts/amcharts5/xy";
 import { ActiveAuthors } from "@pipeline/aggregate/blocks/ActiveAuthors";
-import { useDataProvider } from "@report/DataProvider";
 
 import { Themes } from "./AmCharts5";
 

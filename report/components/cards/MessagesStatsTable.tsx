@@ -1,7 +1,6 @@
 import { AttachmentType } from "@pipeline/Attachments";
 import { PlatformsInfo } from "@pipeline/Platforms";
 import { MessagesStats } from "@pipeline/aggregate/blocks/MessagesStats";
-import { useDataProvider } from "@report/DataProvider";
 import DottedTable, { Line } from "@report/components/viz/DottedTable";
 
 const MessagesStatsTable = ({ data }: { data?: MessagesStats }) => {

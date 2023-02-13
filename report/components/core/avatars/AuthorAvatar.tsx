@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 
-import { useDataProvider } from "@report/DataProvider";
+import { getDatabase } from "@report/WorkerWrapper";
 import { LazyImage } from "@report/components/core/LazyImage";
 import { BackgroundForTelegramAvatar } from "@report/components/core/avatars/Telegram";
 import { TextAvatar } from "@report/components/core/avatars/TextAvatar";
@@ -32,9 +32,9 @@ const RawImg = (src: any) => (
 );
 
 export const AuthorAvatar = ({ index }: { index: number }) => {
-    const dp = useDataProvider();
-    const platform = dp.database.config.platform;
-    const author = dp.database.authors[index];
+    const db = getDatabase();
+    const platform = db.config.platform;
+    const author = db.authors[index];
 
     let url: string | undefined;
     let placeholder: ReactNode | undefined;

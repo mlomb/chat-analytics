@@ -3,8 +3,8 @@ import { CSSProperties, useCallback, useLayoutEffect, useMemo, useState } from "
 import { Index } from "@pipeline/Types";
 import { Database } from "@pipeline/process/Types";
 import { matchFormat } from "@pipeline/process/nlp/Text";
-import { useDataProvider } from "@report/DataProvider";
 import { Section } from "@report/ReportPage";
+import { getDatabase, getFormatCache, getWorker } from "@report/WorkerWrapper";
 import FilterSelect, { FilterOption } from "@report/components/FilterSelect";
 import { TabSwitch } from "@report/components/Tabs";
 import TimeSelector from "@report/components/TimeSelector";
@@ -82,30 +82,32 @@ const authorsFilterOptionsFn: (db: Database) => FilterOption[] = (db) => {
 
 const Header = (props: Props) => {
     const { sections, section, setSection } = props;
-    const dataProvider = useDataProvider();
+    const database = getDatabase();
+    const formatCache = getFormatCache();
+    const worker = getWorker();
 
-    const channelsFilterOptions = useMemo(() => channelsFilterOptionsFn(dataProvider.database), [dataProvider]);
-    const authorsFilterOptions = useMemo(() => authorsFilterOptionsFn(dataProvider.database), [dataProvider]);
+    const channelsFilterOptions = useMemo(() => channelsFilterOptionsFn(database), [database]);
+    const authorsFilterOptions = useMemo(() => authorsFilterOptionsFn(database), [database]);
 
     const [selectedChannels, setSelectedChannels] = useState<Index[]>(channelsFilterOptions[0].options);
     const [selectedAuthors, setSelectedAuthors] = useState<Index[]>(authorsFilterOptions[0].options);
 
-    useLayoutEffect(() => dataProvider.updateAuthors(selectedAuthors), [selectedAuthors]);
-    useLayoutEffect(() => dataProvider.updateChannels(selectedChannels), [selectedChannels]);
+    useLayoutEffect(() => worker.updateAuthors(selectedAuthors), [selectedAuthors]);
+    useLayoutEffect(() => worker.updateChannels(selectedChannels), [selectedChannels]);
 
     const filterChannels = useCallback(
         (_term: string) => {
             const term = matchFormat(_term);
-            return channelsFilterOptions[0].options.filter((i) => dataProvider.formatCache.channels[i].includes(term));
+            return channelsFilterOptions[0].options.filter((i) => formatCache.channels[i].includes(term));
         },
-        [dataProvider]
+        [formatCache]
     );
     const filterAuthors = useCallback(
         (_term: string) => {
             const term = matchFormat(_term);
-            return authorsFilterOptions[0].options.filter((i) => dataProvider.formatCache.authors[i].includes(term));
+            return authorsFilterOptions[0].options.filter((i) => formatCache.authors[i].includes(term));
         },
-        [dataProvider]
+        [formatCache]
     );
 
     return (

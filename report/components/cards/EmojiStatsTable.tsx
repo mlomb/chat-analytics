@@ -1,6 +1,5 @@
 import { PlatformsInfo } from "@pipeline/Platforms";
 import { EmojiStats } from "@pipeline/aggregate/blocks/EmojiStats";
-import { useDataProvider } from "@report/DataProvider";
 import DottedTable, { Line } from "@report/components/viz/DottedTable";
 
 const MessagesStatsTable = ({ data }: { data?: EmojiStats }) => {

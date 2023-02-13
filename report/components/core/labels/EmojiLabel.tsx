@@ -1,6 +1,5 @@
 import { ReactElement, memo } from "react";
 
-import { useDataProvider } from "@report/DataProvider";
 import { BaseLabel, LabelProps } from "@report/components/core/labels/BaseLabel";
 
 interface EmojiLabelProps extends LabelProps {

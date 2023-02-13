@@ -2,7 +2,6 @@ import { useLayoutEffect, useRef } from "react";
 
 import { ColorSet, Root } from "@amcharts/amcharts5";
 import { WordCloud as am5WordCloud } from "@amcharts/amcharts5/wc";
-import { useDataProvider } from "@report/DataProvider";
 
 import { Themes } from "./AmCharts5";
 

@@ -12,7 +12,6 @@ import {
     XYSeries,
 } from "@amcharts/amcharts5/xy";
 import { TimelineStats } from "@pipeline/aggregate/blocks/Growth";
-import { useDataProvider } from "@report/DataProvider";
 
 import { Themes } from "./AmCharts5";
 

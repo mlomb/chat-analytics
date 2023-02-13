@@ -24,14 +24,20 @@ export type BlockFn<Data, Args = undefined> = (
 ) => Data;
 
 /** Triggers that should make a block data stale (e.g. changes to this filters in the UI) */
-export type BlockTrigger = "authors" | "channels" | "time";
+export type Filter = "authors" | "channels" | "time";
 
 /** A description of a block */
 export type BlockDescription<K, Data, Args = undefined> = {
     key: K;
-    triggers: BlockTrigger[];
+    triggers: Filter[];
     fn: BlockFn<Data, Args>;
 };
+
+const buildTestBlock = (key: string): BlockDescription<string, string> => ({
+    key,
+    triggers: ["authors", "channels", "time"],
+    fn: () => key.repeat(100) + `${Math.random()}`,
+});
 
 /** All existing blocks must be defined here, so the UI can dynamically load them */
 export const Blocks = {
@@ -48,10 +54,10 @@ export const Blocks = {
     [ActiveAuthors.key]: ActiveAuthors,
     [WordStats.key]: WordStats,
 
-    a: {} as BlockDescription<"a", any>,
-    b: {} as BlockDescription<"b", any>,
-    c: {} as BlockDescription<"c", any>,
-    d: {} as BlockDescription<"d", any>,
+    a: buildTestBlock("a"),
+    b: buildTestBlock("b"),
+    c: buildTestBlock("c"),
+    d: buildTestBlock("d"),
 } as const;
 
 /** Block identifier */

@@ -3,7 +3,6 @@ import { useLayoutEffect, useRef } from "react";
 import { Root } from "@amcharts/amcharts5";
 import { ChordDirected } from "@amcharts/amcharts5/flow";
 import { ConversationStats } from "@pipeline/aggregate/blocks/ConversationStats";
-import { useDataProvider } from "@report/DataProvider";
 
 import { Themes } from "./AmCharts5";
 

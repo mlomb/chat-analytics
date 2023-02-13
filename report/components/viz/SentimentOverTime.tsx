@@ -11,7 +11,6 @@ import {
     XYCursor,
 } from "@amcharts/amcharts5/xy";
 import { SentimentInDate, SentimentPerCycle } from "@pipeline/aggregate/blocks/SentimentPerCycle";
-import { useDataProvider } from "@report/DataProvider";
 
 import { Themes } from "./AmCharts5";
 

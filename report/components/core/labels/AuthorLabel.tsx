@@ -1,20 +1,20 @@
 import { ReactNode, memo } from "react";
 
-import { useDataProvider } from "@report/DataProvider";
+import { getDatabase } from "@report/WorkerWrapper";
 import { AuthorAvatar } from "@report/components/core/avatars/AuthorAvatar";
 import { BaseLabel, LabelProps } from "@report/components/core/labels/BaseLabel";
 
 const _AuthorLabel = ({ index }: LabelProps) => {
-    const dp = useDataProvider();
-    const isDemo = dp.database.config.demo;
-    const author = dp.database.authors[index];
+    const db = getDatabase();
+    const isDemo = db.config.demo;
+    const author = db.authors[index];
 
     const title = author.n;
     const avatar = <AuthorAvatar index={index} />;
     let name: ReactNode = author.n;
 
     // add discriminator in Discord
-    if (dp.database.config.platform === "discord") {
+    if (db.config.platform === "discord") {
         let n = author.n;
         let discr = n.split("#").pop();
 

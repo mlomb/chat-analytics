@@ -14,7 +14,6 @@ import {
     XYSeries,
 } from "@amcharts/amcharts5/xy";
 import { MessagesPerCycle } from "@pipeline/aggregate/blocks/MessagesPerCycle";
-import { useDataProvider } from "@report/DataProvider";
 
 import { Themes } from "./AmCharts5";
 

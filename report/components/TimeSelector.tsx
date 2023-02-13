@@ -10,9 +10,9 @@ import {
     XYChart,
     XYChartScrollbar,
 } from "@amcharts/amcharts5/xy";
-import { useDataProvider } from "@report/DataProvider";
-import { BlockResult } from "@report/WorkerReport";
-import Block from "@report/components/Block";
+import { useBlockData } from "@report/BlockHook";
+import { getWorker } from "@report/WorkerWrapper";
+import { LoadingGroup } from "@report/components/LoadingGroup";
 
 import { Themes } from "./viz/AmCharts5";
 
@@ -28,8 +28,8 @@ const RESETS = {
     marginRight: 0,
 };
 
-const TimeSelector = (props: { info: BlockResult<"messages-per-cycle"> }) => {
-    const dataProvider = useDataProvider();
+const TimeSelector = () => {
+    const data = useBlockData("messages-per-cycle");
     const chartDiv = useRef<HTMLDivElement>(null);
     const seriesRef = useRef<StepLineSeries | null>(null);
 
@@ -101,7 +101,7 @@ const TimeSelector = (props: { info: BlockResult<"messages-per-cycle"> }) => {
             let end = xAxis.positionToDate(ev.end);
             if (start > end) [start, end] = [end, start];
             if (!isNaN(start.getTime()) && !isNaN(end.getTime())) {
-                dataProvider.updateTimeRange(start, end);
+                getWorker().updateTimeRange(start, end);
             }
         };
         scrollbarX.events.on("rangechanged", dateAxisChanged);
@@ -110,11 +110,11 @@ const TimeSelector = (props: { info: BlockResult<"messages-per-cycle"> }) => {
     }, []);
 
     useEffect(() => {
-        if (props.info.state === "ready") {
+        if (data) {
             // TODO: update efficient
-            seriesRef.current?.data.setAll(props.info.data!.perDay);
+            seriesRef.current?.data.setAll(data.perDay);
         }
-    }, [props.info, seriesRef]);
+    }, [data, seriesRef]);
 
     return (
         <div
@@ -127,4 +127,4 @@ const TimeSelector = (props: { info: BlockResult<"messages-per-cycle"> }) => {
     );
 };
 
-export default () => <Block blockKey="messages-per-cycle" children={TimeSelector} />;
+export default () => <LoadingGroup children={() => <TimeSelector />} />;

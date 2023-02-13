@@ -1,6 +1,5 @@
 import { memo } from "react";
 
-import { useDataProvider } from "@report/DataProvider";
 import { LazyImage } from "@report/components/core/LazyImage";
 import { BaseLabel, LabelProps } from "@report/components/core/labels/BaseLabel";
 

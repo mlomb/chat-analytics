@@ -1,7 +1,7 @@
 import { Fragment, ReactNode, useEffect, useMemo, useState } from "react";
 
 import { PlatformsInfo } from "@pipeline/Platforms";
-import { useDataProvider } from "@report/DataProvider";
+import { getDatabase, getWorker } from "@report/WorkerWrapper";
 import Card from "@report/components/Card";
 import Footer from "@report/components/Footer";
 import Header from "@report/components/Header";
@@ -44,8 +44,8 @@ export interface Section {
 const ReportDashboard = () => {
     const [section, setSection] = useState("messages");
 
-    const sections: Section[] = useMemo(() => {
-        const { database } = useDataProvider();
+    let sections: Section[] = useMemo(() => {
+        const database = getDatabase();
         const platformInfo = PlatformsInfo[database.config.platform];
 
         const conversationTooltip = (
@@ -276,7 +276,9 @@ const ReportDashboard = () => {
         ].filter(({ cards }) => env.isDev || cards.length > 0);
     }, []);
 
-    const isDemo = useDataProvider().database.config.demo;
+    sections = [];
+
+    const isDemo = getDatabase().config.demo;
 
     return (
         <>
@@ -300,11 +302,10 @@ const ReportDashboard = () => {
 
 const ReportPage = () => {
     const [loading, setLoading] = useState(true);
-    const dataProvider = useDataProvider();
 
     useEffect(
         () =>
-            void dataProvider.once("ready", () =>
+            void getWorker().once("ready", () =>
                 setTimeout(() => setLoading(false), 1000 - Math.min(performance.now(), 1000))
             ),
         []

@@ -2,7 +2,6 @@ import { ReactElement, useState } from "react";
 
 import { BlockData, BlockKey } from "@pipeline/aggregate/Blocks";
 import { BlockResult } from "@report/WorkerReport";
-import Block from "@report/components/Block";
 import ErrorBoundary from "@report/components/ErrorBoundary";
 import { Tooltip } from "@report/components/core/Tooltip";
 

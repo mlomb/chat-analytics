@@ -1,17 +1,12 @@
 import { DateKey } from "@pipeline/Time";
 import { Index } from "@pipeline/Types";
-import { BlockArgs, BlockData, BlockDescription, BlockKey, Blocks } from "@pipeline/aggregate/Blocks";
+import { BlockArgs, BlockData, BlockKey, Blocks, Filter } from "@pipeline/aggregate/Blocks";
 import { CommonBlockData, computeCommonBlockData } from "@pipeline/aggregate/Common";
 import { Filters } from "@pipeline/aggregate/Filters";
 import { decompressDatabase } from "@pipeline/compression/Compression";
 import { Database } from "@pipeline/process/Types";
 import { matchFormat } from "@pipeline/process/nlp/Text";
-import { FormatCache } from "@report/DataProvider";
-
-/** Same type as the Blocks object, but skipping the function to compute the blocks, as it's not needed in the UI */
-export type BlockDescriptions = {
-    [K in BlockKey]: Omit<BlockDescription<K, BlockData<K>>, "fn">;
-};
+import { FormatCache } from "@report/WorkerWrapper";
 
 /** A request to compute a block */
 export type BlockRequest<K extends BlockKey> = {
@@ -20,15 +15,12 @@ export type BlockRequest<K extends BlockKey> = {
 };
 
 /** The result of a block computation */
-export type BlockResult<K extends BlockKey> =
-    | {
-          error: true;
-          message: string;
-      }
-    | {
-          error: false;
-          data: BlockData<K>;
-      };
+export type BlockResult<K extends BlockKey> = {
+    success: boolean;
+    triggers: Filter[];
+    errorMessage?: string;
+    data?: BlockData<K>;
+};
 
 /** Message sent from the UI to the worker to initialize the database (providing it encoded) */
 export interface InitMessage {
@@ -41,7 +33,6 @@ export interface ReadyMessage {
     type: "ready";
     database: Database;
     formatCache: FormatCache;
-    blocksDescs: BlockDescriptions;
 }
 
 /**
@@ -106,8 +97,6 @@ const init = (msg: InitMessage) => {
             messages: undefined,
         },
         formatCache,
-        // JSON trick to remove functions
-        blocksDescs: JSON.parse(JSON.stringify(Blocks)) as BlockDescriptions,
     };
 
     self.postMessage(message);
@@ -129,23 +118,29 @@ const request = async (msg: BlockRequestMessage) => {
         type: "result",
         request,
         result: {
-            error: true,
-            message: "Unknown error",
+            success: false,
+            triggers: [],
+            errorMessage: "Unknown error",
         },
     };
 
     try {
         if (!(request.blockKey in Blocks)) throw new Error("BlockFn not found");
 
+        // set triggers
+        resultMsg.result.triggers = Blocks[request.blockKey].triggers;
+
         console.time(request.blockKey);
         // @ts-expect-error (BlockArgs<any>)
         const data = Blocks[request.blockKey].fn(database, filters, common, request.args);
         console.timeEnd(request.blockKey);
 
-        resultMsg.result = { error: false, data };
+        resultMsg.result.success = true;
+        resultMsg.result.data = data;
+        resultMsg.result.errorMessage = undefined;
     } catch (ex) {
         // handle exceptions
-        resultMsg.result = { error: true, message: ex instanceof Error ? ex.message : ex + "" };
+        resultMsg.result.errorMessage = ex instanceof Error ? ex.message : ex + "";
         console.log("Error ahead ↓");
         console.error(ex);
     }

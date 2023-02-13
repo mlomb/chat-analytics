@@ -1,4 +1,4 @@
-import { useDataProvider } from "@report/DataProvider";
+import { getDatabase } from "@report/WorkerWrapper";
 import { AuthorAvatar } from "@report/components/core/avatars/AuthorAvatar";
 import { AvatarStack } from "@report/components/core/avatars/AvatarStack";
 import { GuildAvatar } from "@report/components/core/avatars/GuildAvatar";
@@ -27,9 +27,9 @@ const DiscordDefaultGroupAvatars = [
 ];
 
 export const ChannelAvatar = ({ index }: { index: number }) => {
-    const dp = useDataProvider();
-    const platform = dp.database.config.platform;
-    const channel = dp.database.channels[index];
+    const db = getDatabase();
+    const platform = db.config.platform;
+    const channel = db.channels[index];
 
     if (channel.type === "dm") {
         // if the channel is a DM, show the avatar of the authors

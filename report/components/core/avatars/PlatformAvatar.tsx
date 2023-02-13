@@ -1,5 +1,4 @@
 import { PlatformsInfo } from "@pipeline/Platforms";
-import { useDataProvider } from "@report/DataProvider";
 
 import { PlatformLogos } from "@assets/PlatformLogos";
 

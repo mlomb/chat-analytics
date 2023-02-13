@@ -1,13 +1,13 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 
-import { initDataProvider } from "@report/DataProvider";
 import ReportPage from "@report/ReportPage";
 
 import { plausible } from "@assets/Plausible";
 
 import { initBlockStore } from "./BlockStore";
 import { Experiment } from "./Experiments";
+import { initWorker } from "./WorkerWrapper";
 
 document.addEventListener("DOMContentLoaded", async () => {
     try {
@@ -31,8 +31,8 @@ document.addEventListener("DOMContentLoaded", async () => {
             return;
         }
 
-        initDataProvider(dataStr);
-        initBlockStore(dataStr);
+        initWorker(dataStr);
+        initBlockStore();
     } catch (err) {
         // set basic error message
         document.querySelector(".basic")!.textContent = "Error occurred: " + (err as Error).message;

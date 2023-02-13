@@ -5,7 +5,6 @@ import { ExternalStats } from "@pipeline/aggregate/blocks/ExternalStats";
 import { InteractionStats } from "@pipeline/aggregate/blocks/InteractionStats";
 import { LanguageStats } from "@pipeline/aggregate/blocks/LanguageStats";
 import { MessagesStats } from "@pipeline/aggregate/blocks/MessagesStats";
-import { useDataProvider } from "@report/DataProvider";
 import { AuthorLabel } from "@report/components/core/labels/AuthorLabel";
 import { ChannelLabel } from "@report/components/core/labels/ChannelLabel";
 import { DomainLabel } from "@report/components/core/labels/DomainLabel";
