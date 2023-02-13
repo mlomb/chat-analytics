@@ -1,4 +1,4 @@
-import { createContext, useCallback, useEffect, useState } from "react";
+import { ReactNode, createContext, useCallback, useEffect, useMemo, useState } from "react";
 import { InView } from "react-intersection-observer";
 
 import { BlockKey } from "@pipeline/aggregate/Blocks";
@@ -18,8 +18,14 @@ interface LoadingContextValue {
     disable: (request: Req) => void;
 }
 
-// resolve based on the rules above
-const resolveStates = (states: BlockState[]): BlockState => {
+/**
+ * Combines the states provided based on the following rules:
+ * - If ANY state is `error`, `error` is returned
+ * - If ALL states are `ready`, `ready` is returned
+ * - If ANY state is `processing`, `processing` is returned
+ * - else `waiting` is returned
+ */
+const combineStates = (states: BlockState[]): BlockState => {
     const anyError = states.some((s) => s === "error");
     const allReady = states.every((s) => s === "ready");
     const anyProcessing = states.some((s) => s === "processing");
@@ -30,45 +36,45 @@ const resolveStates = (states: BlockState[]): BlockState => {
     return "waiting";
 };
 
-export const LoadingGroup = (props: { children: any }) => {
+/**
+ * Wraps a component which receives a combined BlockState for all block requests inside its children.
+ * It enables the computation of those block requests.
+ */
+export const LoadingGroup = (props: { children: (state: BlockState) => ReactNode }) => {
     const store = getBlockStore();
     const [requests, setRequests] = useState<Req[]>([]);
-    const [state, setState] = useState<BlockState>("waiting");
+    const [_, rerender] = useState(0);
 
     const enable = useCallback((request: Req) => setRequests((R) => [...R, request]), []);
     const disable = useCallback((request: Req) => setRequests((R) => R.filter((r) => r !== request)), []);
+    const ctxValue: LoadingContextValue = useMemo(() => ({ enable, disable }), [enable, disable]);
+
+    const onChange = useCallback(
+        (inView: boolean) => requests.forEach((req) => store[inView ? "enable" : "disable"](req)),
+        [requests]
+    );
 
     useEffect(() => {
-        const updateState = () => {
-            const states = requests.map((req) => store.getStoredStatus(req).state);
-            setState(resolveStates(states));
-        };
+        const trigger = () => rerender(Math.random());
 
         requests.forEach((req) => {
             store.enable(req);
-            store.subscribe(req, updateState);
+            store.subscribe(req, trigger);
         });
 
         return () => {
             requests.forEach((req) => {
-                store.unsubscribe(req, updateState);
+                store.unsubscribe(req, trigger);
                 store.disable(req);
             });
         };
     }, [requests]);
 
-    const onChange = (inView: boolean) => requests.forEach((req) => store[inView ? "enable" : "disable"](req));
+    const state = combineStates(requests.map((req) => store.getStoredStatus(req).state));
 
     return (
         <InView onChange={onChange} fallbackInView={true}>
-            <LoadingContext.Provider value={{ enable, disable }}>
-                <fieldset style={{ margin: "revert", padding: "revert", border: "revert" }}>
-                    <legend>
-                        LOADING GROUP ({requests.map((r) => JSON.stringify(r)).join(",")}): {state}
-                    </legend>
-                    {props.children}
-                </fieldset>
-            </LoadingContext.Provider>
+            <LoadingContext.Provider value={ctxValue} children={props.children(state)} />
         </InView>
     );
 };

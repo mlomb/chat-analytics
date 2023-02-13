@@ -12,7 +12,7 @@ const Card = (props: any) => {
 };
 
 const CosoParaId = (props: any) => {
-    const dataC = useBlockData("word-stats", { word: 5 });
+    const dataC = useBlockData("word-stats", { word: props.id });
 
     return <div>c: {JSON.stringify(dataC)}</div>;
 };
@@ -34,14 +34,29 @@ export const Experiment = () => {
     return (
         <>
             <LoadingGroup>
-                <Card blockKey="a" />
-                <Card blockKey="a" />
+                {(state) => (
+                    <>
+                        {state}
+                        <Card blockKey="a" />
+                        <Card blockKey="a" />
+                    </>
+                )}
             </LoadingGroup>
             <LoadingGroup>
-                <Card blockKey="b" />
+                {(state) => (
+                    <>
+                        {state}
+                        <Card blockKey="b" />
+                    </>
+                )}
             </LoadingGroup>
             <LoadingGroup>
-                <Card blockKey="a" />
+                {(state) => (
+                    <>
+                        {state}
+                        <Card blockKey="a" />
+                    </>
+                )}
             </LoadingGroup>
             <br />
             <br />
@@ -68,13 +83,23 @@ export const Experiment = () => {
             <br />
             <br />
             <LoadingGroup>
-                <Card blockKey="a" />
-                <Card blockKey="b" />
-                <Card blockKey="c" />
-                <Card blockKey="d" />
-                <LoadingGroup>
-                    <Test />
-                </LoadingGroup>
+                {(state) => (
+                    <>
+                        {state}
+                        <Card blockKey="a" />
+                        <Card blockKey="b" />
+                        <Card blockKey="c" />
+                        <Card blockKey="d" />
+                        <LoadingGroup>
+                            {(state) => (
+                                <>
+                                    {state}
+                                    <Test />
+                                </>
+                            )}
+                        </LoadingGroup>
+                    </>
+                )}
             </LoadingGroup>
         </>
     );

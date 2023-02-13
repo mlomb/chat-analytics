@@ -138,6 +138,7 @@ const request = async (msg: BlockRequestMessage) => {
         if (!(request.blockKey in Blocks)) throw new Error("BlockFn not found");
 
         console.time(request.blockKey);
+        // @ts-expect-error (BlockArgs<any>)
         const data = Blocks[request.blockKey].fn(database, filters, common, request.args);
         console.timeEnd(request.blockKey);
 
