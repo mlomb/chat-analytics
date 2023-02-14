@@ -170,7 +170,7 @@ export class WorkerWrapper extends EventEmitter {
         // unmark stale, since we are updating them here
         this.staleFilters.clear();
 
-        this.workerBusy = false;
+        this.workerBusy = true;
         this.worker.postMessage(br);
     }
 
