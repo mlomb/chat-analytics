@@ -7,10 +7,10 @@ import ExternalStats from "@pipeline/aggregate/blocks/ExternalStats";
 import Growth from "@pipeline/aggregate/blocks/Growth";
 import InteractionStats from "@pipeline/aggregate/blocks/InteractionStats";
 import LanguageStats from "@pipeline/aggregate/blocks/LanguageStats";
-import MessagesPerCycle from "@pipeline/aggregate/blocks/MessagesPerCycle";
 import MessagesStats from "@pipeline/aggregate/blocks/MessagesStats";
 import SentimentPerCycle from "@pipeline/aggregate/blocks/SentimentPerCycle";
 import SentimentStats from "@pipeline/aggregate/blocks/SentimentStats";
+import MessagesPerCycle from "@pipeline/aggregate/blocks/messages/MessagesPerCycle";
 import { Database } from "@pipeline/process/Types";
 
 import WordStats from "./blocks/WordStats";

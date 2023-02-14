@@ -14,7 +14,7 @@ import {
     XYSeries,
 } from "@amcharts/amcharts5/xy";
 import { Filter } from "@pipeline/aggregate/Blocks";
-import { MessagesPerCycle } from "@pipeline/aggregate/blocks/MessagesPerCycle";
+import { MessagesPerCycle } from "@pipeline/aggregate/blocks/messages/MessagesPerCycle";
 import { getWorker } from "@report/WorkerWrapper";
 
 import { Themes } from "./AmCharts5";

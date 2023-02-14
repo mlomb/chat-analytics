@@ -8,13 +8,17 @@ type MessagesInDate = {
     m: number; // messages
 };
 
+/**
+ * Number of messages per different time cycles.
+ * It ignores the time filter completely, all cycles are included.
+ */
 export interface MessagesPerCycle {
     perDay: MessagesInDate[];
     perWeek: MessagesInDate[];
     perMonth: MessagesInDate[];
 }
 
-const fn: BlockFn<MessagesPerCycle> = (database, filters, common, args) => {
+const fn: BlockFn<MessagesPerCycle> = (database, filters, common) => {
     const res: MessagesPerCycle = {
         perDay: [],
         perWeek: [],
