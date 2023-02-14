@@ -50,6 +50,7 @@
   },
   "devDependencies": {
     "@amcharts/amcharts5": "^5.2.48",
+    "@faker-js/faker": "^7.6.0",
     "@tippyjs/react": "^4.2.6",
     "@trivago/prettier-plugin-sort-imports": "^4.0.0",
     "@types/glob": "^8.0.0",
@@ -88,7 +89,9 @@
     "webpack-dev-server": "^4.11.1"
   },
   "jest": {
-    "setupFilesAfterEnv": ["jest-extended/all"],
+    "setupFilesAfterEnv": [
+      "jest-extended/all"
+    ],
     "collectCoverageFrom": [
       "assets/Plausible.ts",
       "lib/**",

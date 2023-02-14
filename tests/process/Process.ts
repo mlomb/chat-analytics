@@ -46,7 +46,7 @@ export const checkDatabaseIsGeneratedCorrectly = async (platform: Platform, file
     const Day_gteq = (a: Day, b: Day) => Day.gt(a, b) || Day.eq(a, b);
 
     for (const sample of samples) {
-        const expected = sample.expectedDatabase;
+        const expected = sample.expectedDatabase!;
 
         expect(Day_lteq(Day.fromKey(db.time.minDate), Day.fromKey(expected.minDate))).toBeTrue();
         expect(Day_gteq(Day.fromKey(db.time.maxDate), Day.fromKey(expected.maxDate))).toBeTrue();
