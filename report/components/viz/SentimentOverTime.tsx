@@ -10,16 +10,12 @@ import {
     XYChart,
     XYCursor,
 } from "@amcharts/amcharts5/xy";
-import { Filter } from "@pipeline/aggregate/Blocks";
 import { SentimentInDate, SentimentPerCycle } from "@pipeline/aggregate/blocks/SentimentPerCycle";
-import { getWorker } from "@report/WorkerWrapper";
 
 import { Themes, syncAxisWithTimeFilter } from "./AmCharts5";
 
 const SentimentOverTime = ({ data, options }: { data?: SentimentPerCycle; options: number[] }) => {
-    const worker = getWorker();
     const chartDiv = useRef<HTMLDivElement>(null);
-
     const xAxisRef = useRef<DateAxis<any> | null>(null);
     const yAxisRef = useRef<ValueAxis<any> | null>(null);
     const seriesRef = useRef<ColumnSeries[]>([]);

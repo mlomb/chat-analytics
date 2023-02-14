@@ -10,16 +10,12 @@ import {
     XYChart,
     XYSeries,
 } from "@amcharts/amcharts5/xy";
-import { Filter } from "@pipeline/aggregate/Blocks";
 import { ActiveAuthors } from "@pipeline/aggregate/blocks/ActiveAuthors";
-import { getWorker } from "@report/WorkerWrapper";
 
 import { Themes, syncAxisWithTimeFilter } from "./AmCharts5";
 
 const ActiveAuthorsOverTime = ({ data, options }: { data?: ActiveAuthors; options: number[] }) => {
-    const worker = getWorker();
     const chartDiv = useRef<HTMLDivElement>(null);
-
     const xAxisRef = useRef<DateAxis<any> | null>(null);
     const seriesRef = useRef<XYSeries | null>(null);
 

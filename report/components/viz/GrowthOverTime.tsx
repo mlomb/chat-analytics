@@ -11,16 +11,12 @@ import {
     XYChart,
     XYSeries,
 } from "@amcharts/amcharts5/xy";
-import { Filter } from "@pipeline/aggregate/Blocks";
 import { TimelineStats } from "@pipeline/aggregate/blocks/Growth";
-import { getWorker } from "@report/WorkerWrapper";
 
 import { Themes, syncAxisWithTimeFilter } from "./AmCharts5";
 
 const GrowthOverTime = ({ data, options }: { data?: TimelineStats; options: number[] }) => {
-    const worker = getWorker();
     const chartDiv = useRef<HTMLDivElement>(null);
-
     const xAxisRef = useRef<DateAxis<any> | null>(null);
     const seriesRef = useRef<XYSeries | null>(null);
 

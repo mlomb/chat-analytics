@@ -13,16 +13,12 @@ import {
     XYCursor,
     XYSeries,
 } from "@amcharts/amcharts5/xy";
-import { Filter } from "@pipeline/aggregate/Blocks";
 import { MessagesPerCycle } from "@pipeline/aggregate/blocks/messages/MessagesPerCycle";
-import { getWorker } from "@report/WorkerWrapper";
 
 import { Themes, syncAxisWithTimeFilter } from "./AmCharts5";
 
 const MessagesGraph = ({ data, options }: { data?: MessagesPerCycle; options: number[] }) => {
-    const worker = getWorker();
     const chartDiv = useRef<HTMLDivElement>(null);
-
     const xAxisRef = useRef<DateAxis<any> | null>(null);
     const seriesRef = useRef<XYSeries | null>(null);
 
