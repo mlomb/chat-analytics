@@ -12,15 +12,16 @@ const sample = {
     messages: [],
 };
 
+faker.seed(42);
 const authors = new Array(N_AUTHORS).fill(0).map(() => faker.internet.userName());
 
 for (let i = 0; i < N_MESSAGES; i++) {
-    faker.seed = i;
+    faker.seed(i);
 
     const author = faker.helpers.arrayElement(authors);
     const message = {
         type: "message",
-        date: faker.date.past(N_YEARS),
+        date: faker.date.past(N_YEARS, "2020-01-01T00:00:00.000Z"),
         from: author,
         from_id: authors.indexOf(author),
         text: faker.lorem.sentence(),
@@ -34,4 +35,4 @@ sample.messages = sample.messages.sort((a, b) => a.date - b.date);
 // convert dates to strings
 sample.messages = sample.messages.map((message, i) => ({ id: i + 1, date: message.date.toISOString(), ...message }));
 
-fs.writeFileSync(`./BIG_${authors.length}A_${sample.messages.length}M.json`, JSON.stringify(sample, null, 4));
+fs.writeFileSync(`./BIG_${authors.length}A_${sample.messages.length}M.json`, JSON.stringify(sample, null, 4) + "\n");
