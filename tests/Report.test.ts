@@ -9,6 +9,7 @@ test("report should contain data and title", async () => {
         config: {
             platform: "discord",
         },
+        generatedAt: "2023-02-14T00:36:19.676Z",
         title: "This is the report title that should end up in the title of the report HTML",
         langs: ["en"],
         time: {
