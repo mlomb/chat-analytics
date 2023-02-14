@@ -15,7 +15,7 @@ import { Filter } from "@pipeline/aggregate/Blocks";
 import { TimelineStats } from "@pipeline/aggregate/blocks/Growth";
 import { getWorker } from "@report/WorkerWrapper";
 
-import { Themes } from "./AmCharts5";
+import { Themes, syncAxisWithTimeFilter } from "./AmCharts5";
 
 const GrowthOverTime = ({ data, options }: { data?: TimelineStats; options: number[] }) => {
     const worker = getWorker();
@@ -76,18 +76,10 @@ const GrowthOverTime = ({ data, options }: { data?: TimelineStats; options: numb
         xAxisRef.current = xAxis;
         seriesRef.current = stepSeries;
 
-        const onZoom = () => xAxis.zoomToDates(worker.getActiveStartDate(), worker.getActiveEndDate(), 0);
-        const onFilterChange = (filter: Filter) => {
-            if (filter === "time") onZoom();
-        };
-        worker.on("filter-change", onFilterChange);
-        // must wait to datavalidated before zooming
-        seriesRef.current!.events.once("datavalidated", onZoom);
-        // See: https://github.com/amcharts/amcharts5/issues/236
-        seriesRef.current!.events.on("datavalidated", () => yAxis.zoom(0, 1));
+        const cleanup = syncAxisWithTimeFilter([seriesRef.current], xAxis, yAxis);
 
         return () => {
-            worker.off("filter-change", onFilterChange);
+            cleanup();
             root.dispose();
             xAxisRef.current = null;
             seriesRef.current = null;

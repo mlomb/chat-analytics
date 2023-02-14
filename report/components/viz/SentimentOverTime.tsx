@@ -14,7 +14,7 @@ import { Filter } from "@pipeline/aggregate/Blocks";
 import { SentimentInDate, SentimentPerCycle } from "@pipeline/aggregate/blocks/SentimentPerCycle";
 import { getWorker } from "@report/WorkerWrapper";
 
-import { Themes } from "./AmCharts5";
+import { Themes, syncAxisWithTimeFilter } from "./AmCharts5";
 
 const SentimentOverTime = ({ data, options }: { data?: SentimentPerCycle; options: number[] }) => {
     const worker = getWorker();
@@ -73,21 +73,10 @@ const SentimentOverTime = ({ data, options }: { data?: SentimentPerCycle; option
         xAxisRef.current = xAxis;
         yAxisRef.current = yAxis;
 
-        // handle zoom
-        const onZoom = () => xAxis.zoomToDates(worker.getActiveStartDate(), worker.getActiveEndDate(), 0);
-        const onFilterChange = (filter: Filter) => {
-            if (filter === "time") onZoom();
-        };
-        worker.on("filter-change", onFilterChange);
-        // must wait to datavalidated before zooming
-        seriesRef.current.forEach((c) => {
-            c.events.once("datavalidated", onZoom);
-            // See: https://github.com/amcharts/amcharts5/issues/236
-            c.events.on("datavalidated", () => yAxis.zoom(0, 1));
-        });
+        const cleanup = syncAxisWithTimeFilter(seriesRef.current, xAxis, yAxis);
 
         return () => {
-            worker.off("trigger-time", onZoom);
+            cleanup();
             root.dispose();
             xAxisRef.current = null;
             yAxisRef.current = null;
