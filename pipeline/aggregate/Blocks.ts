@@ -10,10 +10,9 @@ import LanguageStats from "@pipeline/aggregate/blocks/LanguageStats";
 import MessagesStats from "@pipeline/aggregate/blocks/MessagesStats";
 import SentimentPerCycle from "@pipeline/aggregate/blocks/SentimentPerCycle";
 import SentimentStats from "@pipeline/aggregate/blocks/SentimentStats";
+import WordStats from "@pipeline/aggregate/blocks/WordStats";
 import MessagesPerCycle from "@pipeline/aggregate/blocks/messages/MessagesPerCycle";
 import { Database } from "@pipeline/process/Types";
-
-import WordStats from "./blocks/WordStats";
 
 /* Function that computes a block */
 export type BlockFn<Data, Args = undefined> = (
@@ -33,12 +32,6 @@ export type BlockDescription<K, Data, Args = undefined> = {
     fn: BlockFn<Data, Args>;
 };
 
-const buildTestBlock = (key: string): BlockDescription<string, string> => ({
-    key,
-    triggers: ["authors", "channels", "time"],
-    fn: () => key.repeat(100) + `${Math.random()}`,
-});
-
 /** All existing blocks must be defined here, so the UI can dynamically load them */
 export const Blocks = {
     [MessagesPerCycle.key]: MessagesPerCycle,
@@ -53,11 +46,6 @@ export const Blocks = {
     [Growth.key]: Growth,
     [ActiveAuthors.key]: ActiveAuthors,
     [WordStats.key]: WordStats,
-
-    a: buildTestBlock("a"),
-    b: buildTestBlock("b"),
-    c: buildTestBlock("c"),
-    d: buildTestBlock("d"),
 } as const;
 
 /** Block identifier */
