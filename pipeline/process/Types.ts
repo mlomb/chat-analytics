@@ -10,6 +10,8 @@ import { MessageBitConfig } from "@pipeline/serialization/MessageSerialization";
 /** All the information processed */
 export interface Database {
     config: Config;
+    generatedAt: string;
+
     title: string;
     langs: Language[];
 

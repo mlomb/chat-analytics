@@ -1,16 +1,14 @@
-import { ReactElement, useContext, useState } from "react";
+import { ReactElement, useState } from "react";
 
 import { BlockData, BlockKey } from "@pipeline/aggregate/Blocks";
 import { useBlockData } from "@report/BlockHook";
 import { BlockState } from "@report/BlockStore";
-import { BlockResult } from "@report/WorkerReport";
 import ErrorBoundary from "@report/components/ErrorBoundary";
+import { LoadingGroup } from "@report/components/LoadingGroup";
 import { Tooltip } from "@report/components/core/Tooltip";
 
 import InfoIcon from "@assets/images/icons/info.svg";
 import "@assets/styles/Card.less";
-
-import { LoadingContext, LoadingGroup } from "./LoadingGroup";
 
 type Title = string | (string | string[])[];
 

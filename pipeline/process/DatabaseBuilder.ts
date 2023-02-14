@@ -418,6 +418,8 @@ export class DatabaseBuilder {
 
         return {
             config: this.config,
+            generatedAt: new Date().toISOString(),
+
             title: this.buildTitle(guilds, channels),
             langs,
 
