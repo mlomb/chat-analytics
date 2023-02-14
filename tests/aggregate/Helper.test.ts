@@ -38,13 +38,18 @@ beforeEach(async () => {
     const dateKeys = computeCommonBlockData(db).timeKeys.dateKeys;
     allowedAuthors = db.authors.slice(0, db.authors.length / 2).map((_, i) => i);
     allowedChannels = db.channels.slice(0, db.channels.length / 2).map((_, i) => i);
-    const days = dateKeys.slice(0, dateKeys.length / 2);
-    allowedDays = days.map((_, i) => i);
+    const days = dateKeys.slice(dateKeys.length / 3, (dateKeys.length / 3) * 2);
+    allowedDays = days.map((_, i) => dateKeys.length / 3 + i);
 
     filters = new Filters(db);
     filters.updateAuthors(allowedAuthors);
     filters.updateChannels(allowedChannels);
+    filters.updateStartDate(days[0]);
     filters.updateEndDate(days[days.length - 1]);
+});
+
+it("should have the correct number of active days", () => {
+    expect(filters.numActiveDays).toBe(allowedDays.length);
 });
 
 describe("filterMessages", () => {
