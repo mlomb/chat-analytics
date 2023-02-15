@@ -42,11 +42,9 @@ const combineStates = (states: BlockState[]): BlockState => {
  */
 export const LoadingGroup = (props: { children: (state: BlockState) => ReactNode }) => {
     const store = getBlockStore();
-    const inViewRef = useRef(false);
     const [requests, setRequests] = useState<Req[]>([]);
+    const [inView, setInView] = useState(true);
     const [_, rerender] = useState(0);
-
-    const onChange = useCallback((inView: boolean) => (inViewRef.current = inView), []);
 
     // ctx
     const enable = useCallback((request: Req) => setRequests((R) => [...R, request]), []);
@@ -54,14 +52,14 @@ export const LoadingGroup = (props: { children: (state: BlockState) => ReactNode
     const ctxValue: LoadingContextValue = useMemo(() => ({ enable, disable }), [enable, disable]);
 
     useEffect(() => {
-        if (inViewRef.current === false) return;
+        if (inView === false) return;
 
         // enable in store
         requests.forEach((req) => store.enable(req));
 
         // disable in store
         return () => requests.forEach((req) => store.disable(req));
-    }, [requests, inViewRef.current]);
+    }, [requests, inView]);
 
     useEffect(() => {
         const trigger = () => rerender(Math.random());
@@ -76,7 +74,7 @@ export const LoadingGroup = (props: { children: (state: BlockState) => ReactNode
     const state = combineStates(requests.map((req) => store.getStoredStatus(req).state));
 
     return (
-        <InView onChange={onChange} fallbackInView={true}>
+        <InView onChange={setInView} fallbackInView={true}>
             <LoadingContext.Provider value={ctxValue} children={props.children(state)} />
         </InView>
     );
