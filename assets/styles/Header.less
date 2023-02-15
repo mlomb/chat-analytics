@@ -1,30 +1,30 @@
 .Header {
-    @tab-width: 90px;
-    @tab-padding: 10px;
-    @tab-stride: @tab-width + 2 * @tab-padding;
-    @line-size: 5px;
-
     padding: 15px 15px 0;
     margin-bottom: 10px;
     background-color: #22292f;
-    border-bottom: @line-size solid #282f35;
+    border-bottom: 5px solid #282f35;
 
     .Header__Tabs {
         position: relative;
         display: flex;
         flex-wrap: wrap;
-        margin-bottom: 5px;
+        gap: 5px;
+        margin: 17px 0 10px 0;
+        justify-content: center;
         @media (max-width: 678px) {
             justify-content: space-between;
         }
 
         a {
             display: block;
-            color: #535a65;
+            border-radius: 20px;
+            background-color: #1e2529;
+            border: 2px solid #596570;
+            color: #596570;
             text-decoration: none;
             text-transform: uppercase;
-            padding: @tab-padding;
-            font-size: 18px;
+            font-size: 16px;
+            padding: 6px 8px;
             font-weight: bold;
             text-align: center;
             transition: color 0.1s;
@@ -33,31 +33,14 @@
             position: relative;
 
             &:hover {
+                background-color: #21282b;
                 color: #636b77;
             }
 
-            &::after {
-                content: "";
-                background: linear-gradient(90deg, #9c00ff, #385bf7);
-                height: 1px;
-                position: absolute;
-                left: 5px;
-                right: 5px;
-                bottom: 2.5px;
-                transition: all 250ms ease 0s;
-                transform: scaleX(0);
-                border-radius: 5px;
-            }
-            &.active::after,
-            &:hover::after {
-                transform: scaleX(1);
-            }
-
             &.active {
+                background-color: #373f46;
+                border-color: #626ec3;
                 color: white;
-                &::after {
-                    height: 3px;
-                }
             }
         }
     }
