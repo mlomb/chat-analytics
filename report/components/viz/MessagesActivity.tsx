@@ -12,7 +12,7 @@ import {
 } from "@amcharts/amcharts5/xy";
 import { MessagesStats } from "@pipeline/aggregate/blocks/MessagesStats";
 
-import { Themes } from "./AmCharts5";
+import { Themes, enableDebouncedResize } from "./AmCharts5";
 
 const MIN_COLOR = Color.fromHex(0xfefa76);
 const MAX_COLOR = Color.fromHex(0xfe3527);
@@ -218,6 +218,7 @@ const MessageActivity = ({ data, options }: { data?: MessagesStats; options: num
     useEffect(() => {
         const root = Root.new(chartDiv.current!);
         root.setThemes(Themes(root, false));
+        const cleanupDebounce = enableDebouncedResize(root);
 
         const container = root.container.children.push(
             Container.new(root, {
@@ -248,6 +249,7 @@ const MessageActivity = ({ data, options }: { data?: MessagesStats; options: num
         return () => {
             seriesRef.current = [];
             xAxisRef.current = [];
+            cleanupDebounce();
             root.dispose();
         };
     }, [options[0]]);

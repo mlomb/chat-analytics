@@ -12,7 +12,7 @@ import {
 } from "@amcharts/amcharts5/xy";
 import { SentimentInDate, SentimentPerCycle } from "@pipeline/aggregate/blocks/SentimentPerCycle";
 
-import { Themes, syncAxisWithTimeFilter } from "./AmCharts5";
+import { Themes, enableDebouncedResize, syncAxisWithTimeFilter } from "./AmCharts5";
 
 const SentimentOverTime = ({ data, options }: { data?: SentimentPerCycle; options: number[] }) => {
     const chartDiv = useRef<HTMLDivElement>(null);
@@ -23,6 +23,7 @@ const SentimentOverTime = ({ data, options }: { data?: SentimentPerCycle; option
     useLayoutEffect(() => {
         const root = Root.new(chartDiv.current!);
         root.setThemes(Themes(root, false));
+        const cleanupDebounce = enableDebouncedResize(root);
 
         const chart = root.container.children.push(
             XYChart.new(root, {
@@ -73,6 +74,7 @@ const SentimentOverTime = ({ data, options }: { data?: SentimentPerCycle; option
 
         return () => {
             cleanup();
+            cleanupDebounce();
             root.dispose();
             xAxisRef.current = null;
             yAxisRef.current = null;

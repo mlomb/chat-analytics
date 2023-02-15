@@ -5,7 +5,7 @@ import { ChordDirected } from "@amcharts/amcharts5/flow";
 import { ConversationStats } from "@pipeline/aggregate/blocks/ConversationStats";
 import { getDatabase } from "@report/WorkerWrapper";
 
-import { Themes } from "./AmCharts5";
+import { Themes, enableDebouncedResize } from "./AmCharts5";
 
 const ConversationParticipation = ({ data, options }: { data?: ConversationStats; options: number[] }) => {
     const db = getDatabase();
@@ -15,6 +15,7 @@ const ConversationParticipation = ({ data, options }: { data?: ConversationStats
     useLayoutEffect(() => {
         const root = Root.new(chartDiv.current!);
         root.setThemes(Themes(root, true));
+        const cleanupDebounce = enableDebouncedResize(root);
 
         const series = root.container.children.push(
             ChordDirected.new(root, {
@@ -38,6 +39,7 @@ const ConversationParticipation = ({ data, options }: { data?: ConversationStats
 
         return () => {
             seriesRef.current = null;
+            cleanupDebounce();
             root.dispose();
         };
     }, []);

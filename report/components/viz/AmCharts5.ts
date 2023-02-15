@@ -1,4 +1,4 @@
-import { Series } from "@amcharts/amcharts5";
+import { Root, Series } from "@amcharts/amcharts5";
 import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 import am5themes_Dark from "@amcharts/amcharts5/themes/Dark";
 import { DateAxis, ValueAxis } from "@amcharts/amcharts5/xy";
@@ -28,5 +28,25 @@ export const syncAxisWithTimeFilter = (series: Series[], xAxis: DateAxis<any>, y
 
     return () => {
         worker.off("filter-change", onFilterChange);
+    };
+};
+
+/** Makes the chart resize operation debounced. */
+export const enableDebouncedResize = (root: Root, waitTime = 150) => {
+    root.autoResize = false;
+
+    let timeoutID: ReturnType<typeof setTimeout>;
+
+    const onResize = () => {
+        if (timeoutID) clearTimeout(timeoutID);
+        timeoutID = setTimeout(() => {
+            root.resize();
+        }, waitTime);
+    };
+
+    window.addEventListener("resize", onResize);
+
+    return () => {
+        window.removeEventListener("resize", onResize);
     };
 };

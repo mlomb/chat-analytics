@@ -4,7 +4,7 @@ import { ColorSet, Root } from "@amcharts/amcharts5";
 import { WordCloud as am5WordCloud } from "@amcharts/amcharts5/wc";
 import { getDatabase } from "@report/WorkerWrapper";
 
-import { Themes } from "./AmCharts5";
+import { Themes, enableDebouncedResize } from "./AmCharts5";
 
 interface Props {
     wordsCount: number[];
@@ -18,6 +18,7 @@ const WordCloud = (props: Props) => {
     useLayoutEffect(() => {
         const root = Root.new(chartDiv.current!);
         root.setThemes(Themes(root, false));
+        const cleanupDebounce = enableDebouncedResize(root);
 
         seriesRef.current = root.container.children.push(
             am5WordCloud.new(root, {
@@ -38,6 +39,7 @@ const WordCloud = (props: Props) => {
 
         return () => {
             seriesRef.current = null;
+            cleanupDebounce();
             root.dispose();
         };
     }, []);
