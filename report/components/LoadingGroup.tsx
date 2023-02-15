@@ -1,4 +1,4 @@
-import { ReactNode, createContext, useCallback, useEffect, useMemo, useState } from "react";
+import { ReactNode, createContext, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { InView } from "react-intersection-observer";
 
 import { BlockKey } from "@pipeline/aggregate/Blocks";
@@ -42,17 +42,26 @@ const combineStates = (states: BlockState[]): BlockState => {
  */
 export const LoadingGroup = (props: { children: (state: BlockState) => ReactNode }) => {
     const store = getBlockStore();
+    const inViewRef = useRef(false);
     const [requests, setRequests] = useState<Req[]>([]);
     const [_, rerender] = useState(0);
 
+    const onChange = useCallback((inView: boolean) => (inViewRef.current = inView), []);
+
+    // ctx
     const enable = useCallback((request: Req) => setRequests((R) => [...R, request]), []);
     const disable = useCallback((request: Req) => setRequests((R) => R.filter((r) => r !== request)), []);
     const ctxValue: LoadingContextValue = useMemo(() => ({ enable, disable }), [enable, disable]);
 
-    const onChange = useCallback(
-        (inView: boolean) => requests.forEach((req) => store[inView ? "enable" : "disable"](req)),
-        [requests]
-    );
+    useEffect(() => {
+        if (inViewRef.current === false) return;
+
+        // enable in store
+        requests.forEach((req) => store.enable(req));
+
+        // disable in store
+        return () => requests.forEach((req) => store.disable(req));
+    }, [requests, inViewRef.current]);
 
     useEffect(() => {
         const trigger = () => rerender(Math.random());
