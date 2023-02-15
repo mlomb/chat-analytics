@@ -17,6 +17,7 @@ export class MessageView implements Message {
 
     readonly dayIndex: Index;
     readonly secondOfDay: number;
+    readonly editedAfter?: number;
     readonly authorIndex: Index;
     readonly replyOffset?: number;
     readonly langIndex?: Index;
@@ -32,6 +33,7 @@ export class MessageView implements Message {
 
     get hasText(): boolean { return (this.flags & MessageFlags.Text) > 0; } // prettier-ignore
     get hasReply(): boolean { return (this.flags & MessageFlags.Reply) > 0; } // prettier-ignore
+    get hasEdits(): boolean { return (this.flags & MessageFlags.Edited) > 0; } // prettier-ignore
     get hasWords(): boolean { return (this.flags & MessageFlags.Words) > 0; } // prettier-ignore
     get hasEmojis(): boolean { return (this.flags & MessageFlags.Emojis) > 0; } // prettier-ignore
     get hasAttachments(): boolean { return (this.flags & MessageFlags.Attachments) > 0; } // prettier-ignore
@@ -45,7 +47,8 @@ export class MessageView implements Message {
         this.authorIndex = stream.getBits(bitConfig.authorIdxBits);
         this.flags = stream.getBits(9);
 
-        if (this.hasReply) this.replyOffset = stream.getBits(bitConfig.replyBits);
+        if (this.hasEdits) this.editedAfter = stream.readVarInt();
+        if (this.hasReply) this.replyOffset = stream.readVarInt();
         if (this.hasText) {
             this.langIndex = stream.getBits(8);
             this.sentiment = stream.getBits(8) - 128;
@@ -124,6 +127,7 @@ export class MessageView implements Message {
         return {
             dayIndex: this.dayIndex,
             secondOfDay: this.secondOfDay,
+            editedAfter: this.editedAfter,
             authorIndex: this.authorIndex,
             replyOffset: this.replyOffset,
             langIndex: this.langIndex,

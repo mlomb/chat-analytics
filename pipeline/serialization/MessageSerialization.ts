@@ -20,7 +20,6 @@ export enum MessageFlags {
 /** Defines how many bits are used for various fields in a Message */
 export interface MessageBitConfig {
     dayBits: number;
-    replyBits: number;
     authorIdxBits: number;
     wordIdxBits: number;
     emojiIdxBits: number;
@@ -37,7 +36,6 @@ export interface MessageBitConfig {
  */
 export const DefaultMessageBitConfig: MessageBitConfig = {
     dayBits: 21, // 12 + 4 + 5
-    replyBits: 21,
     authorIdxBits: 21,
     wordIdxBits: 21,
     emojiIdxBits: 18,
@@ -53,6 +51,7 @@ export const writeMessage = (message: Message, stream: BitStream, bitConfig: Mes
 
     let flags = MessageFlags.None;
     if (message.replyOffset) flags |= MessageFlags.Reply;
+    if (message.editedAfter !== undefined) flags |= MessageFlags.Edited;
     if (message.langIndex !== undefined) flags |= MessageFlags.Text;
     if (message.words?.length) flags |= MessageFlags.Words;
     if (message.emojis?.length) flags |= MessageFlags.Emojis;
@@ -62,7 +61,8 @@ export const writeMessage = (message: Message, stream: BitStream, bitConfig: Mes
     if (message.domains?.length) flags |= MessageFlags.Domains;
     stream.setBits(9, flags);
 
-    if (flags & MessageFlags.Reply) stream.setBits(bitConfig.replyBits, message.replyOffset!); // 1024
+    if (flags & MessageFlags.Reply) stream.writeVarInt(message.replyOffset!);
+    if (flags & MessageFlags.Edited) stream.writeVarInt(message.editedAfter!);
     if (flags & MessageFlags.Text) {
         stream.setBits(8, message.langIndex!); // 0-255
         stream.setBits(8, message.sentiment! + 128); // 0-255
@@ -91,7 +91,8 @@ export const readMessage = (stream: BitStream, bitConfig: MessageBitConfig): Mes
         authorIndex,
     };
 
-    if (flags & MessageFlags.Reply) message.replyOffset = stream.getBits(bitConfig.replyBits);
+    if (flags & MessageFlags.Reply) message.replyOffset = stream.readVarInt();
+    if (flags & MessageFlags.Edited) message.editedAfter = stream.readVarInt();
     if (flags & MessageFlags.Text) {
         message.langIndex = stream.getBits(8);
         message.sentiment = stream.getBits(8) - 128;

@@ -117,7 +117,7 @@ export class MessageProcessor {
             sentiment = this.sentiment?.calculate(tokens, langIndex) || 0;
         }
 
-        let replyOffset = undefined;
+        let replyOffset: number | undefined = undefined;
         if (msg.replyTo) {
             // store replyTo index
             replyOffset = this.builder.replyIds.length;
@@ -128,9 +128,16 @@ export class MessageProcessor {
         const date = new Date(msg.timestamp);
         const day = Day.fromDate(date);
 
+        let editedAfter: number | undefined = undefined;
+        if (msg.timestampEdit !== undefined) {
+            // time difference between sending the message and its last edit
+            editedAfter = (new Date(msg.timestampEdit).getTime() - date.getTime()) / 1000;
+        }
+
         return {
             dayIndex: day.toBinary(),
             secondOfDay: date.getSeconds() + 60 * (date.getMinutes() + 60 * date.getHours()),
+            editedAfter,
             authorIndex: this.builder.authors.getIndex(msg.authorId)!,
             replyOffset,
             langIndex,

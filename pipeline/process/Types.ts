@@ -70,6 +70,7 @@ export interface Message {
     // time
     dayIndex: number;
     secondOfDay: number;
+    editedAfter?: number; // seconds
 
     // author
     authorIndex: Index;
