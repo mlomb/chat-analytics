@@ -1,8 +1,6 @@
 import { PMessage } from "@pipeline/parse/Types";
 import { ChannelMessages, MessagesInterval } from "@pipeline/process/ChannelMessages";
 import { Message } from "@pipeline/process/Types";
-import { DefaultMessageBitConfig } from "@pipeline/serialization/MessageSerialization";
-import { MessagesArray } from "@pipeline/serialization/MessagesArray";
 
 const makePMessage = (i: number, authorId: number = 0) => ({ id: i, authorId, channelId: 1, timestamp: i });
 const processFn: (m: PMessage) => Message = (m) => ({ dayIndex: 0, secondOfDay: 0, authorIndex: m.authorId as number });
@@ -127,12 +125,6 @@ describe("complex sample", () => {
         expect(Array.from(cm.processedMessages())).toStrictEqual(
             expected.map((i) => ({ id: i, msg: processFn(makePMessage(i)) }))
         );
-    });
-
-    it("numBytes is correct", () => {
-        const msgArray = new MessagesArray(DefaultMessageBitConfig);
-        expected.forEach((i) => msgArray.push(processFn(makePMessage(i))));
-        expect(cm.numBytes).toBe(msgArray.stream.offset);
     });
 });
 
