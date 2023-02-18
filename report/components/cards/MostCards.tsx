@@ -5,6 +5,7 @@ import { ExternalStats } from "@pipeline/aggregate/blocks/ExternalStats";
 import { InteractionStats } from "@pipeline/aggregate/blocks/InteractionStats";
 import { LanguageStats } from "@pipeline/aggregate/blocks/LanguageStats";
 import { MessagesStats } from "@pipeline/aggregate/blocks/MessagesStats";
+import { MessagesEdited } from "@pipeline/aggregate/blocks/messages/MessagesEdited";
 import { getDatabase, getFormatCache } from "@report/WorkerWrapper";
 import { AuthorLabel } from "@report/components/core/labels/AuthorLabel";
 import { ChannelLabel } from "@report/components/core/labels/ChannelLabel";
@@ -193,5 +194,19 @@ export const MostMentioned = ({ data }: { data?: InteractionStats }) => (
         searchPlaceholder="Filter @mentions..."
         indexOf={MentionsIndexOf}
         inFilter={MentionsInFilter}
+    />
+);
+
+///////////////////////////
+/// EDITS
+///////////////////////////
+export const MostMessagesEdited = ({ data, options }: { data?: MessagesEdited; options: number[] }) => (
+    <MostUsed
+        what={options[0] === 0 ? "Author" : "Channel"}
+        unit="# of messages edited"
+        counts={data ? (options[0] === 0 ? data.authorsCount : data.channelsCount) : EmptyArray}
+        itemComponent={options[0] === 0 ? AuthorLabel : ChannelLabel}
+        maxItems={Math.min(15, Math.max(getDatabase().authors.length, getDatabase().channels.length))}
+        colorHue={options[0] === 0 ? 240 : 266}
     />
 );

@@ -11,6 +11,7 @@ import MessagesStats from "@pipeline/aggregate/blocks/MessagesStats";
 import SentimentPerCycle from "@pipeline/aggregate/blocks/SentimentPerCycle";
 import SentimentStats from "@pipeline/aggregate/blocks/SentimentStats";
 import WordStats from "@pipeline/aggregate/blocks/WordStats";
+import MessagesEdited from "@pipeline/aggregate/blocks/messages/MessagesEdited";
 import MessagesPerCycle from "@pipeline/aggregate/blocks/messages/MessagesPerCycle";
 import { Database } from "@pipeline/process/Types";
 
@@ -35,6 +36,7 @@ export type BlockDescription<K, Data, Args = undefined> = {
 /** All existing blocks must be defined here, so the UI can dynamically load them */
 export const Blocks = {
     [MessagesPerCycle.key]: MessagesPerCycle,
+    [MessagesEdited.key]: MessagesEdited,
     [MessagesStats.key]: MessagesStats,
     [LanguageStats.key]: LanguageStats,
     [EmojiStats.key]: EmojiStats,

@@ -17,6 +17,7 @@ import {
     MostMentioned,
     MostMessagesAuthors,
     MostMessagesChannels,
+    MostMessagesEdited,
     MostProducerEmojis,
     MostRepliesAuthors,
     MostUsedEmojis,
@@ -105,6 +106,13 @@ const ReportDashboard = () => {
                         blockKey="messages-stats"
                         title="Messages sent by channel"
                         children={MostMessagesChannels}
+                    />,
+                    <Card
+                        num={1}
+                        blockKey="messages-edited"
+                        title={["Number of edited messages", ["by author", "in channel"]]}
+                        children={MostMessagesEdited}
+                        tooltip="If a message has been edited multiple times, it will count as if it was edited only once"
                     />,
                 ],
             },
