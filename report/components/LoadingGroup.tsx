@@ -1,5 +1,5 @@
 import { ReactNode, createContext, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { InView } from "react-intersection-observer";
+import { useInView } from "react-intersection-observer";
 
 import { BlockKey } from "@pipeline/aggregate/Blocks";
 import { BlockState, getBlockStore } from "@report/BlockStore";
@@ -43,8 +43,11 @@ const combineStates = (states: BlockState[]): BlockState => {
 export const LoadingGroup = (props: { children: (state: BlockState) => ReactNode }) => {
     const store = getBlockStore();
     const [requests, setRequests] = useState<Req[]>([]);
-    const [inView, setInView] = useState(true);
     const [_, rerender] = useState(0);
+    const { inView, ref } = useInView({
+        threshold: 0,
+        fallbackInView: true,
+    });
 
     // ctx
     const enable = useCallback((request: Req) => setRequests((R) => [...R, request]), []);
@@ -74,8 +77,8 @@ export const LoadingGroup = (props: { children: (state: BlockState) => ReactNode
     const state = combineStates(requests.map((req) => store.getStoredStatus(req).state));
 
     return (
-        <InView onChange={setInView} fallbackInView={true}>
+        <div ref={ref}>
             <LoadingContext.Provider value={ctxValue} children={props.children(state)} />
-        </InView>
+        </div>
     );
 };
