@@ -68,7 +68,7 @@ const authorsFilterOptionsFn: (db: Database) => FilterOption[] = (db) => {
         const allIndexes = new Array(db.authors.length).fill(0).map((_, i) => i);
         options.push(
             {
-                name: "Select only non-bot authors (🧍)",
+                name: "Select only human authors (🧍)",
                 options: allIndexes.filter((i) => db.authors[i].b !== true),
             },
             {
