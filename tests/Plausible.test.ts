@@ -4,6 +4,7 @@
 import { plausible } from "@assets/Plausible";
 
 const testPageview = ({ location, expectedPath }: { location: string; expectedPath: string }) => {
+    // @ts-ignore
     const fetchMock = (global.fetch = jest.fn(() => Promise.resolve()) as jest.Mock);
 
     // The URL object has a lot of the same functionality as the Location object
