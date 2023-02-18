@@ -44,7 +44,7 @@ export const Landing = ({ onStart }: Props) => {
                 <Button hueColor={[258, 90, 61]} className="Landing__cta" onClick={onStart}>
                     Generate a report
                 </Button>
-                <Button hueColor={[244, 90, 61]} href="/demo" target="_blank">
+                <Button hueColor={[244, 90, 61]} href={env.isDev ? "/report.html" : "/demo"} target="_blank">
                     View Demo
                 </Button>
                 <Button hueColor={[207, 23, 8]} href="https://github.com/mlomb/chat-analytics" target="_blank">
