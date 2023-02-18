@@ -1,79 +1,48 @@
 import { useLayoutEffect, useRef } from "react";
 
-import { Root, Tooltip } from "@amcharts/amcharts5";
-import { AxisRendererX, AxisRendererY, CategoryAxis, ColumnSeries, ValueAxis, XYChart } from "@amcharts/amcharts5/xy";
+import { Container, Root, p100 } from "@amcharts/amcharts5";
+import type { VariableDistribution } from "@pipeline/aggregate/Common";
 import { MessagesEdited } from "@pipeline/aggregate/blocks/messages/MessagesEdited";
+import { createHistogramWithBoxplot } from "@report/components/viz/amcharts/Distribution";
 
 import { Themes, enableDebouncedResize } from "../viz/AmCharts5";
 
 const EditTime = ({ data }: { data?: MessagesEdited }) => {
     const chartDiv = useRef<HTMLDivElement>(null);
-    const seriesRef = useRef<ColumnSeries | null>(null);
+    const setDataRef = useRef<(data: VariableDistribution) => void>(() => {});
 
     useLayoutEffect(() => {
         const root = Root.new(chartDiv.current!);
         root.setThemes(Themes(root, true));
         const cleanupDebounce = enableDebouncedResize(root);
 
-        const chart = root.container.children.push(
-            XYChart.new(root, {
+        const container = root.container.children.push(
+            Container.new(root, {
+                width: p100,
+                height: p100,
                 layout: root.verticalLayout,
             })
         );
 
-        const xAxis = chart.xAxes.push(
-            CategoryAxis.new(root, {
-                categoryField: "second",
-                renderer: AxisRendererX.new(root, {}),
-            })
-        );
-        const yAxis = chart.yAxes.push(
-            ValueAxis.new(root, {
-                renderer: AxisRendererY.new(root, {}),
-            })
-        );
-
-        const series = chart.series.push(
-            ColumnSeries.new(root, {
-                xAxis,
-                yAxis,
-                categoryXField: "second",
-                valueYField: "edits",
-                tooltip: Tooltip.new(root, {
-                    labelText: "{valueY}",
-                }),
-            })
-        );
-
-        seriesRef.current = series;
+        const { chart, setData } = createHistogramWithBoxplot(root);
+        container.children.push(chart);
+        setDataRef.current = setData;
 
         return () => {
-            seriesRef.current = null;
             cleanupDebounce();
             root.dispose();
         };
     }, []);
 
     useLayoutEffect(() => {
-        if (data === undefined) return;
-
-        const chartData = data.timeDistribution.count.map((edits, second) => ({
-            second,
-            edits,
-        }));
-
-        seriesRef.current!.chart!.xAxes.getIndex(0)!.data.setAll(chartData);
-        seriesRef.current!.data.setAll(chartData);
-
-        seriesRef.current!.appear(1000);
-        seriesRef.current!.chart!.appear(1000, 100);
+        if (data !== undefined) setDataRef.current(data.timeDistribution);
     }, [data]);
 
     return (
         <div
             ref={chartDiv}
             style={{
-                minHeight: 200,
+                minHeight: 250,
                 marginLeft: 5,
                 marginBottom: 8,
             }}
