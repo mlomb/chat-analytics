@@ -7,6 +7,7 @@ import Footer from "@report/components/Footer";
 import Header from "@report/components/Header";
 import LoadingOverlay from "@report/components/LoadingOverlay";
 import { TabContainer } from "@report/components/Tabs";
+import EditTime from "@report/components/cards/EditTime";
 import EmojiStatsTable from "@report/components/cards/EmojiStatsTable";
 import LanguageStatsTable from "@report/components/cards/LanguageStatsTable";
 import MessagesStatsTable from "@report/components/cards/MessagesStatsTable";
@@ -107,14 +108,26 @@ const ReportDashboard = () => {
                         title="Messages sent by channel"
                         children={MostMessagesChannels}
                     />,
-                    <Card
-                        num={1}
-                        blockKey="messages-edited"
-                        title={["Number of edited messages", ["by author", "in channel"]]}
-                        children={MostMessagesEdited}
-                        tooltip="If a message has been edited multiple times, it will count as if it was edited only once"
-                    />,
-                ],
+                ].concat(
+                    platformInfo.support.edits
+                        ? [
+                              <Card
+                                  num={1}
+                                  blockKey="messages-edited"
+                                  title={["Number of edited messages", ["by author", "in channel"]]}
+                                  children={MostMessagesEdited}
+                                  tooltip="If a message has been edited multiple times, it will count as if it was edited only once"
+                              />,
+                              <Card
+                                  num={1}
+                                  blockKey="messages-edited"
+                                  title={"Time from creation to edit"}
+                                  children={EditTime}
+                                  tooltip="If a message has been edited multiple times, we take the time of the last edit"
+                              />,
+                          ]
+                        : []
+                ),
             },
             {
                 name: "🅰️ Language",
