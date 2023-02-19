@@ -33,6 +33,9 @@ export const syncAxisWithTimeFilter = (series: Series[], xAxis: DateAxis<any>, y
 
 /** Makes the chart resize operation debounced. */
 export const enableDebouncedResize = (root: Root, waitTime = 150) => {
+    // Temporary disable debounce, charts are not resizing when out of view (expected). Not sure how to fix cleanly.
+    return () => {};
+
     root.autoResize = false;
 
     let timeoutID: ReturnType<typeof setTimeout>;
