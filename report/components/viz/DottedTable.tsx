@@ -73,7 +73,7 @@ const numberFormatterFns = {
     },
     "seconds-or-time": (n: number) => {
         if (n < 60) {
-            return n + " seconds";
+            return Math.floor(n) + " seconds";
         } else {
             return numberFormatterFns.time(n);
         }
