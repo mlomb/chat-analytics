@@ -21,7 +21,7 @@ interface TextLine {
 
 interface NumberLine {
     type: "number";
-    formatter: "integer" | "decimal" | "time";
+    formatter: "integer" | "decimal" | "time" | "seconds-or-time" | ((n: number) => string);
     value?: number;
 }
 
@@ -71,6 +71,13 @@ const numberFormatterFns = {
 
         return result;
     },
+    "seconds-or-time": (n: number) => {
+        if (n < 60) {
+            return n + " seconds";
+        } else {
+            return numberFormatterFns.time(n);
+        }
+    },
 };
 
 const LineItem = ({ line }: { line: Line }) => {
@@ -94,7 +101,9 @@ const LineItem = ({ line }: { line: Line }) => {
                     duration={0.2}
                     preserveValue
                     decimals={2}
-                    formattingFn={numberFormatterFns[line.formatter]}
+                    formattingFn={
+                        typeof line.formatter === "string" ? numberFormatterFns[line.formatter] : line.formatter
+                    }
                 />
             );
             break;

@@ -15,28 +15,34 @@ export const computeCommonBlockData = (database: Database): CommonBlockData => {
 };
 
 export interface VariableDistribution {
+    total: number;
     /** Aggregation in `count.length` buckets of `(whiskerMax-whiskerMin)/count.length` */
     count: number[];
     /** Boxplot */
     boxplot: {
+        min: number;
         whiskerMin: number;
         q1: number;
         median: number;
         q3: number;
         whiskerMax: number;
+        max: number;
         outliers: number;
     };
 }
 
 export const computeVariableDistribution = (values: Uint32Array, count: number): VariableDistribution => {
     const res: VariableDistribution = {
+        total: count,
         count: [],
         boxplot: {
+            min: 0,
             whiskerMin: 0,
             q1: 0,
             median: 0,
             q3: 0,
             whiskerMax: 0,
+            max: 0,
             outliers: 0,
         },
     };
@@ -66,11 +72,13 @@ export const computeVariableDistribution = (values: Uint32Array, count: number):
     const buckets = Math.min(upper - lower, 3 * 60) || 0; // up to 180 divisions
     res.count = new Array(buckets).fill(0);
     res.boxplot = {
+        min,
         whiskerMin: lower,
         q1,
         median: q2,
         q3,
         whiskerMax: upper,
+        max,
         outliers: 0,
     };
 

@@ -11,13 +11,17 @@ export interface MessagesEdited {
         channels: number[];
     };
 
+    /* Edited in less than 1 second */
+    editedInLessThan1Second: number;
+
     /** Edit time distribution in seconds */
-    timeDistribution: VariableDistribution;
+    editTimeDistribution: VariableDistribution;
 }
 
 const fn: BlockFn<MessagesEdited> = (database, filters) => {
     const authorsCount = new Array(database.authors.length).fill(0);
     const channelsCount = new Array(database.channels.length).fill(0);
+    let editedInLessThan1Second = 0;
 
     const editTimes = new Uint32Array(database.numMessages).fill(0xfffffff0);
     let editTimesCount = 0;
@@ -26,7 +30,11 @@ const fn: BlockFn<MessagesEdited> = (database, filters) => {
         if (msg.hasEdits) {
             authorsCount[msg.authorIndex]++;
             channelsCount[msg.channelIndex]++;
-            editTimes[editTimesCount++] = msg.editedAfter!;
+
+            const editTime = msg.editedAfter!;
+
+            editTimes[editTimesCount++] = editTime;
+            if (editTime <= 1) editedInLessThan1Second++;
         }
     };
 
@@ -37,7 +45,8 @@ const fn: BlockFn<MessagesEdited> = (database, filters) => {
             authors: authorsCount,
             channels: channelsCount,
         },
-        timeDistribution: computeVariableDistribution(editTimes, editTimesCount),
+        editedInLessThan1Second,
+        editTimeDistribution: computeVariableDistribution(editTimes, editTimesCount),
     };
 };
 
