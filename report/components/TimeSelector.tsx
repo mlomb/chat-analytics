@@ -14,7 +14,7 @@ import { useBlockData } from "@report/BlockHook";
 import { getWorker } from "@report/WorkerWrapper";
 import { LoadingGroup } from "@report/components/LoadingGroup";
 
-import { Themes, enableDebouncedResize } from "./viz/AmCharts5";
+import { Themes, enableDebouncedResize } from "./viz/amcharts/AmCharts5";
 
 const SB_HEIGHT = 50;
 const RESETS = {

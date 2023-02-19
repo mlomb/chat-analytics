@@ -7,10 +7,6 @@ import Footer from "@report/components/Footer";
 import Header from "@report/components/Header";
 import LoadingOverlay from "@report/components/LoadingOverlay";
 import { TabContainer } from "@report/components/Tabs";
-import EditTime from "@report/components/cards/EditTime";
-import EmojiStatsTable from "@report/components/cards/EmojiStatsTable";
-import LanguageStatsTable from "@report/components/cards/LanguageStatsTable";
-import MessagesStatsTable from "@report/components/cards/MessagesStatsTable";
 import {
     MostConversations,
     MostGetterEmojis,
@@ -24,14 +20,18 @@ import {
     MostUsedEmojis,
     MostUsedWords,
 } from "@report/components/cards/MostCards";
-import SentimentStatsTable from "@report/components/cards/SentimentStatsTable";
 import { TopReacted } from "@report/components/cards/TopCards";
-import ActiveAuthorsOverTime from "@report/components/viz/ActiveAuthorsOverTime";
-import ConversationParticipation from "@report/components/viz/ConversationParticipation";
-import GrowthOverTime from "@report/components/viz/GrowthOverTime";
-import MessagesActivity from "@report/components/viz/MessagesActivity";
-import MessagesOverTime from "@report/components/viz/MessagesOverTime";
-import SentimentOverTime from "@report/components/viz/SentimentOverTime";
+import EmojiStatsTable from "@report/components/cards/emojis/EmojiStatsTable";
+import ConversationParticipation from "@report/components/cards/interaction/ConversationParticipation";
+import LanguageStatsTable from "@report/components/cards/language/LanguageStatsTable";
+import EditTime from "@report/components/cards/messages/EditTime";
+import MessagesActivity from "@report/components/cards/messages/MessagesActivity";
+import MessagesOverTime from "@report/components/cards/messages/MessagesOverTime";
+import MessagesStatsTable from "@report/components/cards/messages/MessagesStatsTable";
+import SentimentOverTime from "@report/components/cards/sentiment/SentimentOverTime";
+import SentimentStatsTable from "@report/components/cards/sentiment/SentimentStatsTable";
+import ActiveAuthorsOverTime from "@report/components/cards/timeline/ActiveAuthorsOverTime";
+import GrowthOverTime from "@report/components/cards/timeline/GrowthOverTime";
 
 import "@assets/styles/ReportPage.less";
 

@@ -1,6 +1,6 @@
-import { SentimentStats } from "@pipeline/aggregate/blocks/SentimentStats";
+import { SentimentStats } from "@pipeline/aggregate/blocks/sentiment/SentimentStats";
+import SentimentPieChart from "@report/components/cards/sentiment/SentimentPieChart";
 import DottedTable, { Line } from "@report/components/viz/DottedTable";
-import SentimentPieChart from "@report/components/viz/SentimentPieChart";
 
 const SentimentStatsTable = ({ data }: { data?: SentimentStats }) => {
     const lines: Line[] = [

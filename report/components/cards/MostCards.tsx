@@ -1,12 +1,13 @@
 import { Index } from "@pipeline/Types";
-import { ConversationStats } from "@pipeline/aggregate/blocks/ConversationStats";
-import { EmojiStats } from "@pipeline/aggregate/blocks/EmojiStats";
-import { ExternalStats } from "@pipeline/aggregate/blocks/ExternalStats";
-import { InteractionStats } from "@pipeline/aggregate/blocks/InteractionStats";
-import { LanguageStats } from "@pipeline/aggregate/blocks/LanguageStats";
-import { MessagesStats } from "@pipeline/aggregate/blocks/MessagesStats";
+import { EmojiStats } from "@pipeline/aggregate/blocks/emojis/EmojiStats";
+import { ConversationStats } from "@pipeline/aggregate/blocks/interaction/ConversationStats";
+import { InteractionStats } from "@pipeline/aggregate/blocks/interaction/InteractionStats";
+import { LanguageStats } from "@pipeline/aggregate/blocks/language/LanguageStats";
+import { ExternalStats } from "@pipeline/aggregate/blocks/links/ExternalStats";
 import { MessagesEdited } from "@pipeline/aggregate/blocks/messages/MessagesEdited";
+import { MessagesStats } from "@pipeline/aggregate/blocks/messages/MessagesStats";
 import { getDatabase, getFormatCache } from "@report/WorkerWrapper";
+import WordCloud from "@report/components/cards/language/WordCloud";
 import { AuthorLabel } from "@report/components/core/labels/AuthorLabel";
 import { ChannelLabel } from "@report/components/core/labels/ChannelLabel";
 import { DomainLabel } from "@report/components/core/labels/DomainLabel";
@@ -14,7 +15,6 @@ import { EmojiLabel } from "@report/components/core/labels/EmojiLabel";
 import { MentionLabel } from "@report/components/core/labels/MentionLabel";
 import { WordLabel } from "@report/components/core/labels/WordLabel";
 import MostUsed from "@report/components/viz/MostUsed";
-import WordCloud from "@report/components/viz/WordCloud";
 
 const EmptyArray: any[] = [];
 

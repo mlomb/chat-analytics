@@ -1,4 +1,4 @@
-import { InteractionStats } from "@pipeline/aggregate/blocks/InteractionStats";
+import { InteractionStats } from "@pipeline/aggregate/blocks/interaction/InteractionStats";
 import { MessageComplete } from "@pipeline/process/Types";
 import { TopMessages } from "@report/components/viz/TopMessages";
 

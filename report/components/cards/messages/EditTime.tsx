@@ -4,8 +4,13 @@ import { Container, Root, Tooltip, p100 } from "@amcharts/amcharts5";
 import { XYCursor } from "@amcharts/amcharts5/xy";
 import type { VariableDistribution } from "@pipeline/aggregate/Common";
 import { MessagesEdited } from "@pipeline/aggregate/blocks/messages/MessagesEdited";
-import { Themes, createXAxisLabel, createYAxisLabel, enableDebouncedResize } from "@report/components/viz/AmCharts5";
 import DottedTable, { Line } from "@report/components/viz/DottedTable";
+import {
+    Themes,
+    createXAxisLabel,
+    createYAxisLabel,
+    enableDebouncedResize,
+} from "@report/components/viz/amcharts/AmCharts5";
 import { createHistogramWithBoxplot } from "@report/components/viz/amcharts/Distribution";
 
 /*

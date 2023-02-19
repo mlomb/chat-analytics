@@ -1,5 +1,5 @@
 import { PlatformsInfo } from "@pipeline/Platforms";
-import { EmojiStats } from "@pipeline/aggregate/blocks/EmojiStats";
+import { EmojiStats } from "@pipeline/aggregate/blocks/emojis/EmojiStats";
 import { getDatabase } from "@report/WorkerWrapper";
 import DottedTable, { Line } from "@report/components/viz/DottedTable";
 

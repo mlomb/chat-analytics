@@ -1,20 +1,21 @@
 import { useLayoutEffect, useRef } from "react";
 
-import { Bullet, Circle, Color, Label, Root, Tooltip, p50 } from "@amcharts/amcharts5";
+import { Color, Label, Root, p50 } from "@amcharts/amcharts5";
+import { TimeUnit } from "@amcharts/amcharts5/.internal/core/util/Time";
 import {
     AxisRendererX,
     AxisRendererY,
     DateAxis,
-    SmoothedXLineSeries,
+    StepLineSeries,
     ValueAxis,
     XYChart,
     XYSeries,
 } from "@amcharts/amcharts5/xy";
-import { ActiveAuthors } from "@pipeline/aggregate/blocks/ActiveAuthors";
+import { TimelineStats } from "@pipeline/aggregate/blocks/timeline/Growth";
 
-import { Themes, enableDebouncedResize, syncAxisWithTimeFilter } from "./AmCharts5";
+import { Themes, enableDebouncedResize, syncAxisWithTimeFilter } from "../../viz/amcharts/AmCharts5";
 
-const ActiveAuthorsOverTime = ({ data, options }: { data?: ActiveAuthors; options: number[] }) => {
+const GrowthOverTime = ({ data, options }: { data?: TimelineStats; options: number[] }) => {
     const chartDiv = useRef<HTMLDivElement>(null);
     const xAxisRef = useRef<DateAxis<any> | null>(null);
     const seriesRef = useRef<XYSeries | null>(null);
@@ -24,11 +25,7 @@ const ActiveAuthorsOverTime = ({ data, options }: { data?: ActiveAuthors; option
         root.setThemes(Themes(root, false)); // Do not animate!
         const cleanupDebounce = enableDebouncedResize(root);
 
-        const chart = root.container.children.push(
-            XYChart.new(root, {
-                layout: root.verticalLayout,
-            })
-        );
+        const chart = root.container.children.push(XYChart.new(root, {}));
         chart.zoomOutButton.set("forceHidden", true);
 
         const xAxis = chart.xAxes.push(
@@ -47,53 +44,40 @@ const ActiveAuthorsOverTime = ({ data, options }: { data?: ActiveAuthors; option
         yAxis.children.unshift(
             Label.new(root, {
                 rotation: -90,
-                text: "Active authors in period",
+                text: "Total authors",
                 y: p50,
                 centerX: p50,
             })
         );
-        xAxisRef.current = xAxis;
 
-        const series = chart.series.push(
-            SmoothedXLineSeries.new(root, {
+        const stepSeries = chart.series.push(
+            StepLineSeries.new(root, {
                 valueXField: "ts",
                 valueYField: "value",
                 xAxis: xAxis,
                 yAxis: yAxis,
-                stroke: Color.fromHex(0x57b1ff),
-                fill: Color.fromHex(0x57b1ff),
-                tooltip: Tooltip.new(root, {
-                    labelText: "{valueY}",
-                }),
+                stroke: Color.fromHex(0x479adb),
+                fill: Color.fromHex(0x479adb),
             })
         );
-        series.fills.template.setAll({
+        stepSeries.strokes.template.setAll({
+            visible: true,
+            strokeWidth: 2,
+            strokeOpacity: 0.8,
+        });
+        stepSeries.fills.template.setAll({
             visible: true,
             fillOpacity: 0.2,
-            templateField: "lineSettings",
         });
-        series.strokes.template.setAll({
-            templateField: "lineSettings",
-        });
-        series.bullets.push(() =>
-            Bullet.new(root, {
-                locationY: 0,
-                sprite: Circle.new(root, {
-                    radius: 4,
-                    stroke: Color.fromHex(0x57b1ff),
-                    strokeWidth: 2,
-                    fill: Color.fromHex(0x1861a1),
-                }),
-            })
-        );
 
-        seriesRef.current = series;
+        xAxisRef.current = xAxis;
+        seriesRef.current = stepSeries;
 
         const cleanup = syncAxisWithTimeFilter([seriesRef.current], xAxis, yAxis);
 
         return () => {
-            cleanupDebounce();
             cleanup();
+            cleanupDebounce();
             root.dispose();
             xAxisRef.current = null;
             seriesRef.current = null;
@@ -101,15 +85,13 @@ const ActiveAuthorsOverTime = ({ data, options }: { data?: ActiveAuthors; option
     }, []);
 
     useLayoutEffect(() => {
+        xAxisRef.current?.set("baseInterval", {
+            timeUnit: "day" as TimeUnit,
+            count: 1,
+        });
         if (data) {
-            if (data.perMonth.length > 1) {
-                // @ts-ignore
-                data.perMonth[data.perMonth.length - 2].lineSettings = {
-                    strokeDasharray: [3, 3],
-                    fillOpacity: 0.1,
-                };
-            }
-            seriesRef.current?.data.setAll(data.perMonth);
+            // TODO: update efficient
+            seriesRef.current?.data.setAll(data.growth);
         }
     }, [seriesRef.current, data]);
 
@@ -125,4 +107,4 @@ const ActiveAuthorsOverTime = ({ data, options }: { data?: ActiveAuthors; option
     );
 };
 
-export default ActiveAuthorsOverTime;
+export default GrowthOverTime;

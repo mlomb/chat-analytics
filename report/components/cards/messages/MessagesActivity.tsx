@@ -10,9 +10,9 @@ import {
     XYChart,
     XYCursor,
 } from "@amcharts/amcharts5/xy";
-import { MessagesStats } from "@pipeline/aggregate/blocks/MessagesStats";
+import { MessagesStats } from "@pipeline/aggregate/blocks/messages/MessagesStats";
 
-import { Themes, enableDebouncedResize } from "./AmCharts5";
+import { Themes, enableDebouncedResize } from "../../viz/amcharts/AmCharts5";
 
 const MIN_COLOR = Color.fromHex(0xfefa76);
 const MAX_COLOR = Color.fromHex(0xfe3527);

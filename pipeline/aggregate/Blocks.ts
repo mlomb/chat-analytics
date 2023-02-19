@@ -1,18 +1,18 @@
 import { CommonBlockData } from "@pipeline/aggregate/Common";
 import { Filters } from "@pipeline/aggregate/Filters";
-import ActiveAuthors from "@pipeline/aggregate/blocks/ActiveAuthors";
-import ConversationStats from "@pipeline/aggregate/blocks/ConversationStats";
-import EmojiStats from "@pipeline/aggregate/blocks/EmojiStats";
-import ExternalStats from "@pipeline/aggregate/blocks/ExternalStats";
-import Growth from "@pipeline/aggregate/blocks/Growth";
-import InteractionStats from "@pipeline/aggregate/blocks/InteractionStats";
-import LanguageStats from "@pipeline/aggregate/blocks/LanguageStats";
-import MessagesStats from "@pipeline/aggregate/blocks/MessagesStats";
-import SentimentPerCycle from "@pipeline/aggregate/blocks/SentimentPerCycle";
-import SentimentStats from "@pipeline/aggregate/blocks/SentimentStats";
-import WordStats from "@pipeline/aggregate/blocks/WordStats";
+import EmojiStats from "@pipeline/aggregate/blocks/emojis/EmojiStats";
+import ConversationStats from "@pipeline/aggregate/blocks/interaction/ConversationStats";
+import InteractionStats from "@pipeline/aggregate/blocks/interaction/InteractionStats";
+import LanguageStats from "@pipeline/aggregate/blocks/language/LanguageStats";
+import WordStats from "@pipeline/aggregate/blocks/language/WordStats";
+import ExternalStats from "@pipeline/aggregate/blocks/links/ExternalStats";
 import MessagesEdited from "@pipeline/aggregate/blocks/messages/MessagesEdited";
 import MessagesPerCycle from "@pipeline/aggregate/blocks/messages/MessagesPerCycle";
+import MessagesStats from "@pipeline/aggregate/blocks/messages/MessagesStats";
+import SentimentPerCycle from "@pipeline/aggregate/blocks/sentiment/SentimentPerCycle";
+import SentimentStats from "@pipeline/aggregate/blocks/sentiment/SentimentStats";
+import ActiveAuthors from "@pipeline/aggregate/blocks/timeline/ActiveAuthors";
+import Growth from "@pipeline/aggregate/blocks/timeline/Growth";
 import { Database } from "@pipeline/process/Types";
 
 /* Function that computes a block */

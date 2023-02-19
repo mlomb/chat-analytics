@@ -3,7 +3,7 @@ import { useLayoutEffect, useRef } from "react";
 import { Color, Percent, Root, Tooltip } from "@amcharts/amcharts5";
 import { PieChart, PieSeries } from "@amcharts/amcharts5/percent";
 
-import { Themes, enableDebouncedResize } from "./AmCharts5";
+import { Themes, enableDebouncedResize } from "../../viz/amcharts/AmCharts5";
 
 interface Props {
     n: number; // -

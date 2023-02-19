@@ -1,6 +1,6 @@
 import { AttachmentType } from "@pipeline/Attachments";
 import { PlatformsInfo } from "@pipeline/Platforms";
-import { MessagesStats } from "@pipeline/aggregate/blocks/MessagesStats";
+import { MessagesStats } from "@pipeline/aggregate/blocks/messages/MessagesStats";
 import { getDatabase } from "@report/WorkerWrapper";
 import DottedTable, { Line } from "@report/components/viz/DottedTable";
 

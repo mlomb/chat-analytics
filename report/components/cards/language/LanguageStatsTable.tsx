@@ -1,5 +1,5 @@
 import { LanguageNames } from "@pipeline/Languages";
-import { LanguageStats } from "@pipeline/aggregate/blocks/LanguageStats";
+import { LanguageStats } from "@pipeline/aggregate/blocks/language/LanguageStats";
 import DottedTable, { Line } from "@report/components/viz/DottedTable";
 
 const LanguageStatsTable = ({ data }: { data?: LanguageStats }) => {

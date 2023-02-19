@@ -15,7 +15,7 @@ import {
 } from "@amcharts/amcharts5/xy";
 import { MessagesPerCycle } from "@pipeline/aggregate/blocks/messages/MessagesPerCycle";
 
-import { Themes, enableDebouncedResize, syncAxisWithTimeFilter } from "./AmCharts5";
+import { Themes, enableDebouncedResize, syncAxisWithTimeFilter } from "../../viz/amcharts/AmCharts5";
 
 const MessagesGraph = ({ data, options }: { data?: MessagesPerCycle; options: number[] }) => {
     const chartDiv = useRef<HTMLDivElement>(null);

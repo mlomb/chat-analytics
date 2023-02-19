@@ -4,7 +4,7 @@ import { ColorSet, Root } from "@amcharts/amcharts5";
 import { WordCloud as am5WordCloud } from "@amcharts/amcharts5/wc";
 import { getDatabase } from "@report/WorkerWrapper";
 
-import { Themes, enableDebouncedResize } from "./AmCharts5";
+import { Themes, enableDebouncedResize } from "../../viz/amcharts/AmCharts5";
 
 interface Props {
     wordsCount: number[];

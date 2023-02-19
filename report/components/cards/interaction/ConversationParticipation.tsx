@@ -2,10 +2,10 @@ import { useLayoutEffect, useRef } from "react";
 
 import { Root } from "@amcharts/amcharts5";
 import { ChordDirected } from "@amcharts/amcharts5/flow";
-import { ConversationStats } from "@pipeline/aggregate/blocks/ConversationStats";
+import { ConversationStats } from "@pipeline/aggregate/blocks/interaction/ConversationStats";
 import { getDatabase } from "@report/WorkerWrapper";
 
-import { Themes, enableDebouncedResize } from "./AmCharts5";
+import { Themes, enableDebouncedResize } from "../../viz/amcharts/AmCharts5";
 
 const ConversationParticipation = ({ data, options }: { data?: ConversationStats; options: number[] }) => {
     const db = getDatabase();
