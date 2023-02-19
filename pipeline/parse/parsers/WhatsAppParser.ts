@@ -1,6 +1,6 @@
 import { unzipSync } from "fflate";
 // There is a convenient parser already out there
-import { parseStringSync } from "whatsapp-chat-parser";
+import { parseString } from "whatsapp-chat-parser";
 
 import { AttachmentType } from "@pipeline/Attachments";
 import { FileInput } from "@pipeline/parse/File";
@@ -20,7 +20,7 @@ export class WhatsAppParser extends Parser {
         const fileContent = new TextDecoder("utf-8").decode(txtBuffer);
 
         // use whatsapp-chat-parser
-        const parsed = parseStringSync(fileContent);
+        const parsed = parseString(fileContent);
 
         // sometimes messages are out of order, make sure to sort them
         // is this something that whatsapp-chat-parser should fix?
@@ -54,7 +54,7 @@ export class WhatsAppParser extends Parser {
                 continue;
             }
 
-            if (message.author === "System") {
+            if (message.author === null) {
                 // parse system messages?
             } else {
                 this.emit("author", {
