@@ -1,4 +1,4 @@
-import { Color, Root, Tooltip, percent } from "@amcharts/amcharts5";
+import { Color, Root, percent } from "@amcharts/amcharts5";
 import {
     Axis,
     AxisRendererX,
@@ -17,6 +17,10 @@ export const createHistogramWithBoxplot = (root: Root) => {
     const chart = XYChart.new(root, {
         // stack vertically
         layout: root.verticalLayout,
+
+        // allow zooming
+        panX: true,
+        wheelY: "zoomX",
     });
 
     // X-axis, shared by all series
@@ -31,22 +35,35 @@ export const createHistogramWithBoxplot = (root: Root) => {
 
     const setData = (data: VariableDistribution) => {
         // set boxplot data
-        quantileSeries.chart?.yAxes.getIndex(0)?.data.setAll([data.boxplot]);
+        quantileSeries.chart?.yAxes.getIndex(0)?.data.setAll([data.boxplot]); // needed for the dummy category to work
         quantileSeries.data.setAll([data.boxplot]);
         medianSeries.data.setAll([data.boxplot]);
 
         // set histogram data
-        histogramSeries.data.setAll(
-            data.count.map((value, category) => ({
-                category,
-                value,
-            }))
-        );
+        const values = [];
+        const step = (data.boxplot.whiskerMax - data.boxplot.whiskerMin) / data.count.length;
+        let accum = data.boxplot.whiskerMin;
+
+        for (let i = 0; i < data.count.length; i++) {
+            values.push({
+                value: data.count[i],
+                from: accum,
+                to: accum + step,
+            });
+            accum += step;
+        }
+
+        histogramSeries.data.setAll(values);
     };
 
     return {
         chart,
         setData,
+        quantileSeries,
+        medianSeries,
+        histogramSeries,
+        xAxis,
+        yAxis: chart.yAxes.getIndex(1)! as ValueAxis<any>, // histogram Y-axis
     };
 };
 
@@ -56,6 +73,8 @@ const createBoxplot = (root: Root, chart: XYChart, xAxis: Axis<any>) => {
         CategoryAxis.new(root, {
             categoryField: "q1", // dummy field, must exist
             renderer: AxisRendererY.new(root, {}),
+
+            // top, from top to 20%
             y: 0,
             height: percent(20),
         })
@@ -92,8 +111,8 @@ const createBoxplot = (root: Root, chart: XYChart, xAxis: Axis<any>) => {
     const medianSeries = chart.series.push(
         StepLineSeries.new(root, {
             stroke: Color.fromHex(0xd0db2d),
-            xAxis: xAxis,
-            yAxis: yAxis,
+            xAxis,
+            yAxis,
             valueXField: "median",
             noRisers: true,
 
@@ -110,6 +129,10 @@ const createHistogram = (root: Root, chart: XYChart, xAxis: Axis<any>) => {
     const yAxis = chart.yAxes.push(
         ValueAxis.new(root, {
             renderer: AxisRendererY.new(root, {}),
+
+            // bottom, from 20% to bottom
+            y: percent(20),
+            height: percent(80),
         })
     );
 
@@ -118,15 +141,14 @@ const createHistogram = (root: Root, chart: XYChart, xAxis: Axis<any>) => {
         ColumnSeries.new(root, {
             xAxis,
             yAxis,
-            valueXField: "category",
+            valueXField: "from",
+            openValueXField: "to",
             valueYField: "value",
-            tooltip: Tooltip.new(root, {
-                labelText: "{valueY}",
-            }),
             fill: Color.fromHex(0xd0db2d),
-            stroke: Color.fromHex(0xd0db2d),
         })
     );
+
+    series.columns.template.set("strokeOpacity", 0);
 
     return series;
 };

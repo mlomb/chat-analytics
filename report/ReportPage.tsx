@@ -121,7 +121,7 @@ const ReportDashboard = () => {
                               <Card
                                   num={1}
                                   blockKey="messages-edited"
-                                  title={"Time from creation to edit"}
+                                  title={"Time between sending and editing"}
                                   children={EditTime}
                                   tooltip="If a message has been edited multiple times, we take the time of the last edit"
                               />,

@@ -1,14 +1,14 @@
-import { Root, Series } from "@amcharts/amcharts5";
+import { Label, Root, Series, p50 } from "@amcharts/amcharts5";
 import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 import am5themes_Dark from "@amcharts/amcharts5/themes/Dark";
-import { DateAxis, ValueAxis } from "@amcharts/amcharts5/xy";
+import { Axis, DateAxis, ValueAxis } from "@amcharts/amcharts5/xy";
 import { Filter } from "@pipeline/aggregate/Blocks";
 import { getWorker } from "@report/WorkerWrapper";
 
 export const Themes = (root: any, animated: boolean) =>
     animated ? [am5themes_Animated.new(root), am5themes_Dark.new(root)] : [am5themes_Dark.new(root)];
 
-/** Syncs the x-axis with the time filter, so the chart is zoomed to the current time filter. */
+/** Syncs the X-axis with the time filter, so the chart is zoomed to the current time filter. */
 export const syncAxisWithTimeFilter = (series: Series[], xAxis: DateAxis<any>, yAxis: ValueAxis<any>) => {
     const worker = getWorker();
 
@@ -49,4 +49,43 @@ export const enableDebouncedResize = (root: Root, waitTime = 150) => {
     return () => {
         window.removeEventListener("resize", onResize);
     };
+};
+
+/** Creates and positions a label on the X-axis. */
+export const createXAxisLabel = (axis: Axis<any>, text: string) => {
+    axis.children.push(
+        Label.new(axis.root, {
+            text,
+            x: p50,
+            centerX: p50,
+            marginBottom: 0,
+            marginLeft: 0,
+            marginRight: 0,
+            marginTop: 0,
+            paddingBottom: 0,
+            paddingLeft: 0,
+            paddingRight: 0,
+            paddingTop: 0,
+        })
+    );
+};
+
+/** Creates and positions a label on the Y-axis. */
+export const createYAxisLabel = (axis: Axis<any>, text: string) => {
+    axis.children.unshift(
+        Label.new(axis.root, {
+            rotation: -90,
+            text,
+            y: p50,
+            centerX: p50,
+            marginBottom: 0,
+            marginLeft: 0,
+            marginRight: 0,
+            marginTop: 0,
+            paddingBottom: 5,
+            paddingLeft: 0,
+            paddingRight: 0,
+            paddingTop: 0,
+        })
+    );
 };
