@@ -115,20 +115,14 @@ const createActivityHeatmap = (c: Container) => {
     };
 };
 
-const MessageActivity = ({ data, options }: { data?: MessagesStats; options: number[] }) => {
-    return (
-        <>
-            <AmCharts5Chart
-                style={{
-                    minHeight: 617,
-                    marginLeft: 5,
-                    marginBottom: 8,
-                }}
-                data={data}
-                create={options[0] === 0 ? createActivitySplit : createActivityHeatmap}
-            />
-        </>
-    );
-};
-
-export default MessageActivity;
+export const WeekdayHourActivity = ({ data, options }: { data?: MessagesStats; options: number[] }) => (
+    <AmCharts5Chart
+        style={{
+            minHeight: 617,
+            marginLeft: 5,
+            marginBottom: 8,
+        }}
+        data={data}
+        create={options[0] === 0 ? createActivitySplit : createActivityHeatmap}
+    />
+);
