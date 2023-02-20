@@ -203,7 +203,7 @@ export const MostMentioned = ({ data }: { data?: InteractionStats }) => (
 export const MostMessagesEdited = ({ data, options }: { data?: MessagesEdited; options: number[] }) => (
     <MostUsed
         what={options[0] === 0 ? "Author" : "Channel"}
-        unit="# of messages edited"
+        unit="# of messages edited ✏️"
         counts={data ? (options[0] === 0 ? data.count.authors : data.count.channels) : EmptyArray}
         itemComponent={options[0] === 0 ? AuthorLabel : ChannelLabel}
         maxItems={Math.min(15, Math.max(getDatabase().authors.length, getDatabase().channels.length))}

@@ -73,6 +73,7 @@ const ReportDashboard = () => {
                     <Card
                         num={2}
                         title={["Messages sent over time", ["by day", "by week", "by month"]]}
+                        defaultOptions={database.time.numDays < 365 * 2 ? [0] : [2]}
                         blockKey="messages-per-cycle"
                         children={MessagesOverTime}
                     />,

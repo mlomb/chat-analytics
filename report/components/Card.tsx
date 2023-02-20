@@ -15,6 +15,7 @@ type Title = string | (string | string[])[];
 interface Props<K extends BlockKey> {
     num: 1 | 2 | 3;
     title: Title;
+    defaultOptions?: number[];
     blockKey: K;
     children: (props: { data?: BlockData<K>; options: number[] }) => JSX.Element;
     tooltip?: ReactElement | string;
@@ -28,7 +29,9 @@ const Card = <K extends BlockKey>(props: Props<K>) => {
         const title = typeof props.title === "string" ? [props.title] : props.title;
 
         // by default all options are 0
-        const [options, setOptions] = useState<number[]>(title.filter((a) => typeof a !== "string").map((_) => 0));
+        const [options, setOptions] = useState<number[]>(
+            props.defaultOptions || title.filter((a) => typeof a !== "string").map((_) => 0)
+        );
 
         const elements: JSX.Element[] = [];
 
