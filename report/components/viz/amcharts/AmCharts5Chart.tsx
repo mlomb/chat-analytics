@@ -5,11 +5,15 @@ import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 import am5themes_Dark from "@amcharts/amcharts5/themes/Dark";
 import { enableDebouncedResize } from "@report/components/viz/amcharts/AmCharts5";
 
+export type SetDataFn<Data> = (data: Data) => void;
+export type DisposeFn = () => void;
+export type CreateFn<Data> = (c: Container) => SetDataFn<Data> | [SetDataFn<Data>, DisposeFn];
+
 interface Props<Data extends any> {
     style?: React.CSSProperties;
     animated?: true;
     data: Data | undefined;
-    create: (c: Container) => (data: Data) => void;
+    create: CreateFn<Data>;
 }
 
 /**
@@ -36,11 +40,24 @@ export const AmCharts5Chart = <Data extends any>(props: Props<Data>) => {
             })
         );
 
-        setDataRef.current = props.create(container);
+        const ret = props.create(container);
+
+        let setData: SetDataFn<Data>;
+        let cleanup: DisposeFn | undefined;
+
+        if (Array.isArray(ret)) {
+            setData = ret[0];
+            cleanup = ret[1];
+        } else {
+            setData = ret;
+        }
+
+        setDataRef.current = setData;
 
         const cleanupDebounce = enableDebouncedResize(root);
 
         return () => {
+            if (cleanup) cleanup();
             cleanupDebounce();
             root.dispose();
         };
