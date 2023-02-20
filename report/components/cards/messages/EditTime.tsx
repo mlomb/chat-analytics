@@ -53,19 +53,19 @@ const EditTime = ({ data }: { data?: MessagesEdited }) => {
         },
         {
             type: "number",
-            formatter: "seconds-or-time",
+            formatter: "time",
             label: "Median time for editing a message",
             value: data?.editTimeDistribution.boxplot.median,
         },
         {
             type: "number",
-            formatter: "seconds-or-time",
+            formatter: "time",
             label: "Three out of four messages were edited within",
             value: data?.editTimeDistribution.boxplot.q3,
         },
         {
             type: "number",
-            formatter: "seconds-or-time",
+            formatter: "time",
             label: "Highest edit time difference",
             value: data?.editTimeDistribution.boxplot.max,
         },

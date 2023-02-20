@@ -21,7 +21,7 @@ interface TextLine {
 
 interface NumberLine {
     type: "number";
-    formatter: "integer" | "decimal" | "time" | "seconds-or-time" | ((n: number) => string);
+    formatter: "integer" | "decimal" | "time" | ((n: number) => string);
     value?: number;
 }
 
@@ -41,15 +41,16 @@ const numberFormatterFns = {
     integer: (n: number) => Math.round(n).toLocaleString(),
     decimal: (n: number) => n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
     time: (n: number) => {
-        // n in seconds
         // expected formats:
         // XXd XXh
         // XXh XXm
-        // XXm
+        // XXm XXs
+        // XX seconds
 
         const days = Math.floor(n / (24 * 60 * 60));
         const hours = Math.floor((n % (24 * 60 * 60)) / (60 * 60));
         const minutes = Math.floor((n % (60 * 60)) / 60);
+        const seconds = Math.floor(n % 60);
         let result = "";
         let unitsShown = 0;
 
@@ -62,21 +63,18 @@ const numberFormatterFns = {
             unitsShown++;
         }
         if (unitsShown < 2 && minutes > 0) {
-            result += minutes + "m";
+            result += minutes + "m ";
+            unitsShown++;
+        }
+        if (unitsShown < 2 && seconds > 0) {
+            result += seconds + (unitsShown > 0 ? "s" : " seconds");
             unitsShown++;
         }
         if (unitsShown === 0) {
-            result += "0m";
+            result += "0 seconds";
         }
 
-        return result;
-    },
-    "seconds-or-time": (n: number) => {
-        if (n < 60) {
-            return Math.floor(n) + " seconds";
-        } else {
-            return numberFormatterFns.time(n);
-        }
+        return result.trim();
     },
 };
 
