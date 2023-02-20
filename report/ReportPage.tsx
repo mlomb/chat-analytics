@@ -25,7 +25,7 @@ import EmojiStatsTable from "@report/components/cards/emojis/EmojiStatsTable";
 import ConversationParticipation from "@report/components/cards/interaction/ConversationParticipation";
 import LanguageStatsTable from "@report/components/cards/language/LanguageStatsTable";
 import EditTime from "@report/components/cards/messages/EditTime";
-import MessagesOverTime from "@report/components/cards/messages/MessagesOverTime";
+import { MessagesOverTime } from "@report/components/cards/messages/MessagesOverTime";
 import MessagesStatsTable from "@report/components/cards/messages/MessagesStatsTable";
 import { WeekdayHourActivity } from "@report/components/cards/messages/WeekdayHourActivity";
 import SentimentOverTime from "@report/components/cards/sentiment/SentimentOverTime";
