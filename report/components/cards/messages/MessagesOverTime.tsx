@@ -47,9 +47,9 @@ export const MessagesOverTime = ({ data, options }: { data?: MessagesPerCycle; o
 
             const tooltip = Tooltip.new(c.root, {
                 labelText: {
-                    day: "[bold]{valueX.formatDate('dd MMM yyyy')}[/]: {valueY} messages sent",
-                    week: "[bold]A week of {valueX.formatDate('MMM yyyy')}[/]: {valueY} messages sent",
-                    month: "[bold]{valueX.formatDate('MMM yyyy')}[/]: {valueY} messages sent",
+                    day: "[bold]{valueX.formatDate('dd MMMM yyyy')}[/]: {valueY} messages sent",
+                    week: "[bold]A week of {valueX.formatDate('MMMM yyyy')}[/]: {valueY} messages sent",
+                    month: "[bold]{valueX.formatDate('MMMM yyyy')}[/]: {valueY} messages sent",
                 }[period],
             });
 
@@ -65,18 +65,18 @@ export const MessagesOverTime = ({ data, options }: { data?: MessagesPerCycle; o
                     xAxis: xAxis,
                     yAxis: yAxis,
                     noRisers: true,
-                    stroke: Color.fromHex(0x57b1ff),
-                    fill: Color.fromHex(0x57b1ff),
+                    stroke: Color.fromHex(0x008cff),
+                    fill: Color.fromHex(0x008cff),
                     tooltip,
                 });
                 series.strokes.template.setAll({
                     visible: true,
-                    strokeWidth: 2,
-                    strokeOpacity: 0.8,
+                    strokeWidth: 3,
+                    strokeOpacity: 1,
                 });
                 series.fills.template.setAll({
                     visible: true,
-                    fillOpacity: 0.2,
+                    fillOpacity: 0.3,
                 });
             } else {
                 // for weeks and months
@@ -85,8 +85,14 @@ export const MessagesOverTime = ({ data, options }: { data?: MessagesPerCycle; o
                     valueYField: "m",
                     xAxis: xAxis,
                     yAxis: yAxis,
-                    fill: Color.fromHex(0x479adb),
+                    fill: Color.fromHex(0x008cff),
                     tooltip,
+                });
+                // rounded corners
+                series.columns.template.setAll({
+                    cornerRadiusTL: 3,
+                    cornerRadiusTR: 3,
+                    strokeOpacity: 0,
                 });
             }
 
