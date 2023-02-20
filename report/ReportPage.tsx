@@ -93,7 +93,7 @@ const ReportDashboard = () => {
                     <Card
                         num={1}
                         blockKey="messages-stats"
-                        title={["Activity by week day & hour", ["(split)", "(combined)"]]}
+                        title={["Activity by week day & hour", ["(split)", "(heatmap)"]]}
                         children={MessagesActivity}
                     />,
                     <Card

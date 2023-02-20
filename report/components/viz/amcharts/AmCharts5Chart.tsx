@@ -48,7 +48,7 @@ export const AmCharts5Chart = <Data extends any>(props: Props<Data>) => {
 
     useLayoutEffect(() => {
         if (props.data !== undefined) setDataRef.current(props.data);
-    }, [props.data]);
+    }, [props.create, props.data]);
 
     return <div ref={chartDiv} style={props.style} />;
 };

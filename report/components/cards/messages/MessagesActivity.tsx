@@ -1,192 +1,84 @@
-import { useEffect, useRef } from "react";
-
-import { Color, Container, HeatLegend, Label, Percent, Root, Tooltip, p50, p100, percent } from "@amcharts/amcharts5";
-import {
-    AxisRendererX,
-    AxisRendererY,
-    CategoryAxis,
-    ColumnSeries,
-    ValueAxis,
-    XYChart,
-    XYCursor,
-} from "@amcharts/amcharts5/xy";
+import { Color, Container, Tooltip, p100, percent } from "@amcharts/amcharts5";
+import { AxisRendererX } from "@amcharts/amcharts5/xy";
 import { MessagesStats } from "@pipeline/aggregate/blocks/messages/MessagesStats";
+import { createYAxisLabel } from "@report/components/viz/amcharts/AmCharts5";
+import { AmCharts5Chart } from "@report/components/viz/amcharts/AmCharts5Chart";
+import { createBarChart } from "@report/components/viz/amcharts/BarChart";
+import { createHeatmap } from "@report/components/viz/amcharts/Heatmap";
 
-import { Themes, enableDebouncedResize } from "../../viz/amcharts/AmCharts5";
+const HOURS = [...Array(24).keys()]; // [0, 1, 2, ..., 22, 23]
 
 const MIN_COLOR = Color.fromHex(0xfefa76);
 const MAX_COLOR = Color.fromHex(0xfe3527);
 
-function createBarChart(root: Root, container: Container, xField: string) {
-    const chart = container.children.push(
-        XYChart.new(root, {
-            panX: false,
-            panY: false,
-            wheelX: "none",
-            wheelY: "none",
-        })
-    );
-    const cursor = chart.set("cursor", XYCursor.new(root, {}));
-    cursor.lineX.set("visible", false);
-    cursor.lineY.set("visible", false);
+const createActivitySplit = (c: Container) => {
+    const { series: weekdaySeries, xAxis: weekdayXAxis } = createBarChart(c.root, "weekday", "value");
+    const { series: hourSeries, xAxis: hourXAxis } = createBarChart(c.root, "hour", "value");
 
-    const xAxis = chart.xAxes.push(
-        CategoryAxis.new(root, {
-            renderer: AxisRendererX.new(root, { minGridDistance: 30 }),
-            categoryField: xField,
-        })
-    );
+    // set height to 50%
+    weekdaySeries.chart!.set("height", percent(50));
 
-    const yAxis = chart.yAxes.push(
-        ValueAxis.new(root, {
-            renderer: AxisRendererY.new(root, {}),
-        })
-    );
-    yAxis.children.unshift(
-        Label.new(root, {
-            rotation: -90,
-            text: "Messages sent",
-            y: p50,
-            centerX: p50,
-            marginBottom: 0,
-            marginLeft: 0,
-            marginRight: 0,
-            marginTop: 0,
-            paddingBottom: 5,
-            paddingLeft: 0,
-            paddingRight: 0,
-            paddingTop: 0,
-        })
-    );
+    [weekdaySeries, hourSeries].forEach((s, i) => {
+        // rounded corners
+        s.columns.template.setAll({
+            cornerRadiusTL: 5,
+            cornerRadiusTR: 5,
+            strokeOpacity: 0,
+        });
 
-    const series = chart.series.push(
-        ColumnSeries.new(root, {
-            xAxis: xAxis,
-            yAxis: yAxis,
-            categoryXField: xField,
-            valueYField: "value",
-            valueField: "value",
-            calculateAggregates: true,
-            tooltip: Tooltip.new(root, {
-                labelText: "[bold]{categoryX}:[/] {valueY} messages sent",
+        // heatmap colors
+        s.set("heatRules", [
+            {
+                target: s.columns.template,
+                min: MIN_COLOR,
+                max: MAX_COLOR,
+                dataField: "valueY",
+                key: "fill",
+            },
+        ]);
+
+        // tooltip
+        s.setAll({
+            calculateAggregates: true, // needed for heatRules
+            tooltip: Tooltip.new(c.root, {
+                labelText: `[bold]{categoryX}${i == 0 ? "" : "hs"}[/]: {valueY} messages sent`,
             }),
-        })
-    );
-    series.columns.template.setAll({
-        cornerRadiusTL: 5,
-        cornerRadiusTR: 5,
-        strokeOpacity: 0,
+        });
+
+        s.chart!.xAxes.getIndex(0)!.get("renderer").setAll({
+            minGridDistance: 20, // make sure all labels are visible
+        });
+
+        createYAxisLabel(s.chart!.yAxes.getIndex(0)!, "Messages sent");
     });
 
-    series.set("heatRules", [
-        {
-            target: series.columns.template,
-            min: MIN_COLOR,
-            max: MAX_COLOR,
-            dataField: "value",
-            key: "fill",
-        },
-    ]);
+    c.children.push(weekdaySeries.chart!);
+    c.children.push(hourSeries.chart!);
 
-    return {
-        series,
-        xAxis,
-        yAxis,
+    return (data: MessagesStats) => {
+        const aggrWeekdays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((weekday) => ({
+            weekday,
+            value: data.activity.filter(({ weekday: w }) => w === weekday).reduce((acc, { value }) => acc + value, 0),
+        }));
+        const aggrHours = HOURS.map((h) => ({
+            hour: h,
+            value: data.activity.filter(({ hour: hh }) => hh === `${h}hs`).reduce((acc, { value }) => acc + value, 0),
+        }));
+
+        weekdaySeries.data.setAll(aggrWeekdays.filter((x) => x.value > 0));
+        weekdayXAxis.data.setAll(aggrWeekdays);
+        hourSeries.data.setAll(aggrHours.filter((x) => x.value > 0));
+        hourXAxis.data.setAll(aggrHours);
     };
-}
+};
 
-function createHeatmap(root: Root, container: Container, xField: string, yField: string) {
-    const chart = root.container.children.push(
-        XYChart.new(root, {
-            panX: false,
-            panY: false,
-            wheelX: "none",
-            wheelY: "none",
-        })
-    );
+const createActivityHeatmap = (c: Container) => {
+    const { chart, series, xAxis, yAxis } = createHeatmap(c.root, "weekday", "hour", "value", MIN_COLOR, MAX_COLOR);
 
-    const yRenderer = AxisRendererY.new(root, {
-        visible: false,
-        minGridDistance: 20,
-        inversed: true,
+    (xAxis.get("renderer") as AxisRendererX).setAll({
+        minGridDistance: 20, // make sure all weekdays are listed
+        opposite: true, // weekdays at the top (labels)
     });
-    yRenderer.grid.template.set("visible", false);
-
-    const yAxis = chart.yAxes.push(
-        CategoryAxis.new(root, {
-            maxDeviation: 0,
-            renderer: yRenderer,
-            categoryField: yField,
-        })
-    );
-
-    const xRenderer = AxisRendererX.new(root, {
-        visible: false,
-        minGridDistance: 30,
-        opposite: true,
-    });
-
-    xRenderer.grid.template.set("visible", false);
-
-    const xAxis = chart.xAxes.push(
-        CategoryAxis.new(root, {
-            renderer: xRenderer,
-            categoryField: xField,
-        })
-    );
-
-    const series = chart.series.push(
-        ColumnSeries.new(root, {
-            calculateAggregates: true,
-            stroke: Color.fromHex(0xffffff),
-            clustered: false,
-            xAxis: xAxis,
-            yAxis: yAxis,
-            categoryXField: xField,
-            categoryYField: yField,
-            valueField: "value",
-        })
-    );
-
-    series.columns.template.setAll({
-        tooltipText: "{value} messages sent",
-        strokeOpacity: 1,
-        strokeWidth: 2,
-        width: new Percent(100),
-        height: new Percent(100),
-    });
-
-    series.columns.template.events.on("pointerover", (event) => {
-        const di = event.target.dataItem;
-        if (di) {
-            // @ts-ignore
-            heatLegend.showValue(di.get("value", 0));
-        }
-    });
-
-    series.events.on("datavalidated", () => {
-        heatLegend.set("startValue", series.getPrivate("valueHigh"));
-        heatLegend.set("endValue", series.getPrivate("valueLow"));
-    });
-
-    series.set("heatRules", [
-        {
-            target: series.columns.template,
-            min: MIN_COLOR,
-            max: MAX_COLOR,
-            dataField: "value",
-            key: "fill",
-        },
-    ]);
-
-    const heatLegend = chart.bottomAxesContainer.children.push(
-        HeatLegend.new(root, {
-            orientation: "horizontal",
-            startColor: MAX_COLOR,
-            endColor: MIN_COLOR,
-        })
-    );
-
     xAxis.data.setAll([
         { weekday: "Mon" },
         { weekday: "Tue" },
@@ -197,98 +89,45 @@ function createHeatmap(root: Root, container: Container, xField: string, yField:
         { weekday: "Sun" },
     ]);
 
+    yAxis.get("renderer").setAll({
+        minGridDistance: 20, // make sure all hours are listed
+        inversed: true, // from 0hs to 23hs
+    });
     yAxis.data.setAll(
-        new Array(24).fill(0).map((_, h) => ({
+        HOURS.map((h) => ({
             hour: `${h}hs`,
         }))
     );
 
-    return {
-        series,
-        xAxis,
-        yAxis,
+    series.columns.template.setAll({
+        tooltipText: "[bold]{categoryX} at {categoryY}[/]: {value} messages sent",
+        stroke: Color.fromHex(0xffffff),
+        strokeOpacity: 1,
+        strokeWidth: 1,
+        width: p100,
+        height: p100,
+    });
+
+    c.children.push(chart);
+
+    return (data: MessagesStats) => {
+        series.data.setAll(data.activity.filter((x) => x.value > 0));
     };
-}
+};
 
 const MessageActivity = ({ data, options }: { data?: MessagesStats; options: number[] }) => {
-    const chartDiv = useRef<HTMLDivElement>(null);
-    const seriesRef = useRef<ColumnSeries[]>([]);
-    const xAxisRef = useRef<CategoryAxis<any>[]>([]);
-
-    useEffect(() => {
-        const root = Root.new(chartDiv.current!);
-        root.setThemes(Themes(root, false));
-        const cleanupDebounce = enableDebouncedResize(root);
-
-        const container = root.container.children.push(
-            Container.new(root, {
-                width: p100,
-                height: p100,
-                layout: root.verticalLayout,
-            })
-        );
-
-        if (options[0] === 0) {
-            {
-                const { series, xAxis } = createBarChart(root, container, "weekday");
-                seriesRef.current.push(series);
-                xAxisRef.current.push(xAxis);
-                series.chart?.set("height", percent(50));
-            }
-            {
-                const { series, xAxis } = createBarChart(root, container, "hour");
-                seriesRef.current.push(series);
-                xAxisRef.current.push(xAxis);
-            }
-        } else {
-            const { series, xAxis } = createHeatmap(root, container, "weekday", "hour");
-            seriesRef.current = [series];
-            xAxisRef.current = [xAxis];
-        }
-
-        return () => {
-            seriesRef.current = [];
-            xAxisRef.current = [];
-            cleanupDebounce();
-            root.dispose();
-        };
-    }, [options[0]]);
-
-    useEffect(() => {
-        if (!data) return;
-
-        if (options[0] === 0) {
-            const aggrWeekdays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((weekday) => ({
-                weekday,
-                value: data.activity
-                    .filter(({ weekday: w }) => w === weekday)
-                    .reduce((acc, { value }) => acc + value, 0),
-            }));
-            const aggrHours = [...Array(24).keys()].map((h) => ({
-                hour: h,
-                value: data.activity
-                    .filter(({ hour: hh }) => hh === `${h}hs`)
-                    .reduce((acc, { value }) => acc + value, 0),
-            }));
-
-            seriesRef.current[1].data.setAll(aggrHours.filter((x) => x.value > 0));
-            xAxisRef.current[1].data.setAll(aggrHours);
-            seriesRef.current[0].data.setAll(aggrWeekdays.filter((x) => x.value > 0));
-            xAxisRef.current[0].data.setAll(aggrWeekdays);
-        } else {
-            seriesRef.current[0].data.setAll(data.activity.filter((x) => x.value > 0));
-        }
-    }, [options[0], data]);
-
     return (
-        <div
-            ref={chartDiv}
-            style={{
-                minHeight: 617,
-                marginLeft: 5,
-                marginBottom: 8,
-            }}
-        />
+        <>
+            <AmCharts5Chart
+                style={{
+                    minHeight: 617,
+                    marginLeft: 5,
+                    marginBottom: 8,
+                }}
+                data={data}
+                create={options[0] === 0 ? createActivitySplit : createActivityHeatmap}
+            />
+        </>
     );
 };
 
