@@ -4,7 +4,8 @@ import "@assets/styles/AnimatedBars.less";
 
 const ITEM_STRIDE = 40;
 const HEADER_HEIGHT = 27; // hmmm
-const formattingFn = (n: number) => n.toLocaleString();
+
+const defaultFormatting = (n: number) => n.toLocaleString();
 
 type Index = number;
 type ItemComponent = (props: { index: Index; pin: boolean }) => JSX.Element;
@@ -16,12 +17,15 @@ export interface AnimatedBarEntry {
 }
 
 interface Props {
-    colorHue?: number;
+    /** It should have less thans `maxItems` items. The component DOES NOT slice the data. */
     data: AnimatedBarEntry[];
+    colorHue?: number;
     itemComponent: ItemComponent;
     maxItems: number;
     unit: string;
     what: string;
+    maxValue?: number;
+    formatNumber?: (n: number) => string;
 }
 
 const Item = (props: {
@@ -30,6 +34,7 @@ const Item = (props: {
     itemComponent: ItemComponent;
     percent: number;
     rank: number;
+    formatNumber?: (n: number) => string;
 }) => (
     <div className="AnimatedBars__item" style={{ top: props.rank * ITEM_STRIDE + "px" }}>
         <div
@@ -49,7 +54,7 @@ const Item = (props: {
             delay={0}
             duration={0.5}
             end={props.entry.value}
-            formattingFn={formattingFn}
+            formattingFn={props.formatNumber}
         />
     </div>
 );
@@ -59,7 +64,10 @@ const AnimatedBars = (props: Props) => {
     const sortedByValue = props.data
         .slice()
         .sort((a, b) => (a.pin === b.pin ? b.value - a.value : +(b.pin || 0) - +(a.pin || 0)));
-    const maxValue = sortedByValue.reduce((max, entry) => Math.max(max, entry.value), 0);
+    const maxValue =
+        props.maxValue !== undefined
+            ? props.maxValue
+            : sortedByValue.reduce((max, entry) => Math.max(max, entry.value), 0);
 
     return (
         <div className="AnimatedBars" style={{ minHeight: ITEM_STRIDE * props.maxItems + HEADER_HEIGHT }}>
@@ -76,6 +84,7 @@ const AnimatedBars = (props: Props) => {
                         percent={Math.max((entry.value / maxValue) * 100, 1)}
                         itemComponent={props.itemComponent}
                         colorHue={props.colorHue}
+                        formatNumber={props.formatNumber || defaultFormatting}
                     ></Item>
                 ))}
             </div>
@@ -84,7 +93,7 @@ const AnimatedBars = (props: Props) => {
                     ? "No data to show"
                     : sortedById.length < props.maxItems
                     ? "No more entries to show"
-                    : ""}
+                    : undefined}
             </div>
         </div>
     );

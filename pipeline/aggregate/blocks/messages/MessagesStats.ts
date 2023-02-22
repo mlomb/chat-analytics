@@ -36,8 +36,10 @@ export interface MessagesStats {
     withText: number;
     withLinks: number;
 
-    authorsCount: number[];
-    channelsCount: number[];
+    counts: {
+        authors: number[];
+        channels: number[];
+    };
 
     activity: ActivityEntry[];
     mostActive: {
@@ -163,8 +165,10 @@ const fn: BlockFn<MessagesStats> = (database, filters, common, args) => {
         withText,
         withLinks,
 
-        authorsCount,
-        channelsCount,
+        counts: {
+            authors: authorsCount,
+            channels: channelsCount,
+        },
 
         activity,
         // prettier-ignore

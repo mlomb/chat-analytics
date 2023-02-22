@@ -19,8 +19,8 @@ export interface MessagesEdited {
 }
 
 const fn: BlockFn<MessagesEdited> = (database, filters) => {
-    const authorsCount = new Array(database.authors.length).fill(0);
-    const channelsCount = new Array(database.channels.length).fill(0);
+    const authorsEdited = new Array(database.authors.length).fill(0);
+    const channelsEdited = new Array(database.channels.length).fill(0);
     let editedInLessThan1Second = 0;
 
     const editTimes = new Uint32Array(database.numMessages).fill(0xfffffff0);
@@ -28,8 +28,8 @@ const fn: BlockFn<MessagesEdited> = (database, filters) => {
 
     const processMessage = (msg: MessageView) => {
         if (msg.hasEdits) {
-            authorsCount[msg.authorIndex]++;
-            channelsCount[msg.channelIndex]++;
+            authorsEdited[msg.authorIndex]++;
+            channelsEdited[msg.channelIndex]++;
 
             const editTime = msg.editedAfter!;
 
@@ -42,8 +42,8 @@ const fn: BlockFn<MessagesEdited> = (database, filters) => {
 
     return {
         count: {
-            authors: authorsCount,
-            channels: channelsCount,
+            authors: authorsEdited,
+            channels: channelsEdited,
         },
         editedInLessThan1Second,
         editTimeDistribution: computeVariableDistribution(editTimes, editTimesCount),

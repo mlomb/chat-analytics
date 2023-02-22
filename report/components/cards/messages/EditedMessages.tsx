@@ -1,17 +1,36 @@
-import { MessagesEdited } from "@pipeline/aggregate/blocks/messages/MessagesEdited";
+import { useBlockData } from "@report/BlockHook";
 import { AuthorLabel } from "@report/components/core/labels/AuthorLabel";
 import { ChannelLabel } from "@report/components/core/labels/ChannelLabel";
 import AnimatedBars, { AnimatedBarEntry } from "@report/components/viz/AnimatedBars";
 
-const EditedMessages = ({ data, options }: { data?: MessagesEdited; options: number[] }) => {
-    // test
-    const bars: AnimatedBarEntry[] =
-        ((options[0] === 0 ? data?.count.authors : data?.count.channels) || [])
+const formatPercent = (value: number) => `${value.toFixed(0)}%`;
+
+const EditedMessages = ({ options }: { options: number[] }) => {
+    const msgEdited = useBlockData("messages-edited");
+    const msgStats = useBlockData("messages-stats");
+
+    let byCount: AnimatedBarEntry[] = [];
+    let byPercent: AnimatedBarEntry[] = [];
+
+    if (msgEdited && msgStats) {
+        const key = options[0] === 0 ? "authors" : "channels";
+
+        byCount = msgEdited.count[key]
             .map((value, index) => ({
                 index,
                 value,
             }))
-            .slice(0, 5) || [];
+            .sort((a, b) => b.value - a.value)
+            .slice(0, 5);
+        byPercent = msgEdited.count[key]
+            .map((value, index) => ({
+                index,
+                value: (value / msgStats.counts[key][index]) * 100,
+            }))
+            .filter((entry) => msgStats.counts[key][entry.index] > 100)
+            .sort((a, b) => b.value - a.value)
+            .slice(0, 5);
+    }
 
     const what = options[0] === 0 ? "Author" : "Channel";
     const itemComponent = options[0] === 0 ? AuthorLabel : ChannelLabel;
@@ -23,7 +42,7 @@ const EditedMessages = ({ data, options }: { data?: MessagesEdited; options: num
             <AnimatedBars
                 what={what}
                 unit="# of messages edited ✏️"
-                data={bars}
+                data={byCount}
                 itemComponent={itemComponent}
                 maxItems={maxItems}
                 colorHue={colorHue}
@@ -31,10 +50,12 @@ const EditedMessages = ({ data, options }: { data?: MessagesEdited; options: num
             <AnimatedBars
                 what={what}
                 unit="% of messages edited ✏️"
-                data={bars}
+                data={byPercent}
                 itemComponent={itemComponent}
                 maxItems={maxItems}
                 colorHue={colorHue}
+                maxValue={100}
+                formatNumber={formatPercent}
             />
         </>
     );

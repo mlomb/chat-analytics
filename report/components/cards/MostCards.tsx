@@ -25,7 +25,7 @@ export const MostMessagesAuthors = ({ data }: { data?: MessagesStats }) => (
     <MostUsed
         what="Author"
         unit="Total messages"
-        counts={data?.authorsCount || EmptyArray}
+        counts={data?.counts.authors || EmptyArray}
         itemComponent={AuthorLabel}
         maxItems={Math.min(15, getDatabase().authors.length)}
         colorHue={240}
@@ -63,7 +63,7 @@ export const MostMessagesChannels = ({ data }: { data?: MessagesStats }) => (
     <MostUsed
         what="Channel"
         unit="Total messages"
-        counts={data?.channelsCount || EmptyArray}
+        counts={data?.counts.channels || EmptyArray}
         itemComponent={ChannelLabel}
         maxItems={Math.min(15, getDatabase().channels.length)}
         colorHue={266}
