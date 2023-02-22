@@ -5,6 +5,7 @@ import { LazyImage } from "@report/components/core/LazyImage";
 import { BaseLabel, LabelProps } from "@report/components/core/labels/BaseLabel";
 
 import DefaultFaviconIcon from "@assets/images/icons/default-favicon.png";
+import LinkOutIcon from "@assets/images/icons/link-out-blue.svg";
 
 const DefaultFavicon = <img src={DefaultFaviconIcon} width={16} height={16} />;
 
@@ -18,13 +19,18 @@ const _DomainLabel = ({ index }: LabelProps) => {
     // https://www.google.com/s2/favicons?domain=google.com
     // but you know... privacy
 
-    const icon = (
+    const domainIcon = (
         <div style={{ width: 16, height: 16 }}>
             <LazyImage src={`https://icons.duckduckgo.com/ip3/${domain}.ico`} placeholder={DefaultFavicon} />
         </div>
     );
+    const linkoutIcon = <img src={LinkOutIcon} width={12} height={12} />;
 
-    return <BaseLabel title={domain} icon={icon} name={domain} link={`http://${domain}`} />;
+    return (
+        <a className="Label" href={`http://${domain}`} target="_blank" rel="noopener noreferrer">
+            <BaseLabel title={domain} leftIcon={domainIcon} name={domain} rightIcon={linkoutIcon} />
+        </a>
+    );
 };
 
 export const DomainLabel = memo(_DomainLabel) as typeof _DomainLabel;

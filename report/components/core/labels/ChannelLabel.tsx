@@ -38,7 +38,7 @@ const _ChannelLabel = ({ index }: LabelProps) => {
         avatar = <ChannelAvatar index={index} />;
     }
 
-    return <BaseLabel title={title} name={name} icon={icon} avatar={avatar} />;
+    return <BaseLabel title={title} name={name} leftIcon={icon} avatar={avatar} />;
 };
 
 export const ChannelLabel = memo(_ChannelLabel) as typeof _ChannelLabel;

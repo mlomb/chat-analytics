@@ -30,7 +30,7 @@ const _EmojiLabel = ({ index, hideNameIfPossible }: EmojiLabelProps) => {
 
     const icon = image ? image : <span style={{ color: "#b9b9b9" }}>{symbol}</span>;
 
-    return <BaseLabel title={emoji.name} icon={icon} name={showName ? name : undefined} />;
+    return <BaseLabel title={emoji.name} leftIcon={icon} name={showName ? name : undefined} />;
 };
 
 export const EmojiLabel = memo(_EmojiLabel) as typeof _EmojiLabel;

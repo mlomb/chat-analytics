@@ -2,7 +2,6 @@ import { ReactNode } from "react";
 
 import { Index } from "@pipeline/Types";
 
-import LinkOutIcon from "@assets/images/icons/link-out-blue.svg";
 import "@assets/styles/Labels.less";
 
 // common props for all labels
@@ -14,32 +13,19 @@ interface BaseLabelProps {
     title: string;
     name?: ReactNode;
     avatar?: ReactNode;
-    icon?: ReactNode;
-    link?: string;
+    leftIcon?: ReactNode;
+    rightIcon?: ReactNode;
 }
 
-export const BaseLabel = ({ title, name, avatar, icon, link }: BaseLabelProps) => {
+export const BaseLabel = ({ title, name, avatar, leftIcon, rightIcon }: BaseLabelProps) => {
     const content = (
         <>
             {avatar && <div className="Label__avatar" children={avatar} />}
-            {icon && <div className="Label__icon" children={icon} />}
+            {leftIcon && <div className="Label__icon Label__icon--left" children={leftIcon} />}
             {name && <span className="Label__name" children={name} />}
-            {link && <img className="Label__linkout" src={LinkOutIcon} width={12} height={12} />}
+            {rightIcon && <div className="Label__icon Label__icon--right" children={rightIcon} />}
         </>
     );
 
-    if (link) {
-        return (
-            <a
-                className="Label"
-                title={title}
-                href={link}
-                target="_blank"
-                rel="noopener noreferrer"
-                children={content}
-            />
-        );
-    } else {
-        return <div className="Label" title={title} children={content} />;
-    }
+    return <div className="Label" title={title} children={content} />;
 };
