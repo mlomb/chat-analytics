@@ -115,9 +115,19 @@ const ReportDashboard = () => {
                               <Card
                                   num={1}
                                   blockKey="messages-edited"
-                                  title={["Number of edited messages", ["by author", "in channel"]]}
+                                  title={["Edited messages", ["by author", "in channel"]]}
                                   children={EditedMessages}
-                                  tooltip="If a message has been edited multiple times, it will count as if it was edited only once"
+                                  tooltip={
+                                      <>
+                                          If a message has been edited multiple times, it will count as if it was edited
+                                          only once.
+                                          <br />
+                                          For the percentage, the author/channel <b>
+                                              must have at least 100 messages
+                                          </b>{" "}
+                                          with the current filters
+                                      </>
+                                  }
                               />,
                               <Card
                                   num={1}

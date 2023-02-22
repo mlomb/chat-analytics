@@ -27,7 +27,8 @@ const EditedMessages = ({ options }: { options: number[] }) => {
                 index,
                 value: (value / msgStats.counts[key][index]) * 100,
             }))
-            .filter((entry) => msgStats.counts[key][entry.index] > 100)
+            .filter((entry) => msgStats.counts[key][entry.index] > 100) // filter out less than 100 messages
+            .filter((entry) => entry.value > 0) // filter out 0% edits
             .sort((a, b) => b.value - a.value)
             .slice(0, 5);
     }
