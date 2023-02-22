@@ -196,17 +196,3 @@ export const MostMentioned = ({ data }: { data?: InteractionStats }) => (
         inFilter={MentionsInFilter}
     />
 );
-
-///////////////////////////
-/// EDITS
-///////////////////////////
-export const MostMessagesEdited = ({ data, options }: { data?: MessagesEdited; options: number[] }) => (
-    <MostUsed
-        what={options[0] === 0 ? "Author" : "Channel"}
-        unit="# of messages edited ✏️"
-        counts={data ? (options[0] === 0 ? data.count.authors : data.count.channels) : EmptyArray}
-        itemComponent={options[0] === 0 ? AuthorLabel : ChannelLabel}
-        maxItems={Math.min(15, Math.max(getDatabase().authors.length, getDatabase().channels.length))}
-        colorHue={options[0] === 0 ? 240 : 266}
-    />
-);

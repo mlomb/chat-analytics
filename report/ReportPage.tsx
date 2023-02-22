@@ -14,7 +14,6 @@ import {
     MostMentioned,
     MostMessagesAuthors,
     MostMessagesChannels,
-    MostMessagesEdited,
     MostProducerEmojis,
     MostRepliesAuthors,
     MostUsedEmojis,
@@ -25,6 +24,7 @@ import EmojiStatsTable from "@report/components/cards/emojis/EmojiStatsTable";
 import ConversationParticipation from "@report/components/cards/interaction/ConversationParticipation";
 import LanguageStatsTable from "@report/components/cards/language/LanguageStatsTable";
 import EditTime from "@report/components/cards/messages/EditTime";
+import EditedMessages from "@report/components/cards/messages/EditedMessages";
 import { MessagesOverTime } from "@report/components/cards/messages/MessagesOverTime";
 import MessagesStatsTable from "@report/components/cards/messages/MessagesStatsTable";
 import { WeekdayHourActivity } from "@report/components/cards/messages/WeekdayHourActivity";
@@ -116,7 +116,7 @@ const ReportDashboard = () => {
                                   num={1}
                                   blockKey="messages-edited"
                                   title={["Number of edited messages", ["by author", "in channel"]]}
-                                  children={MostMessagesEdited}
+                                  children={EditedMessages}
                                   tooltip="If a message has been edited multiple times, it will count as if it was edited only once"
                               />,
                               <Card
