@@ -4,24 +4,42 @@ interface Props {
     children: ReactNode;
 }
 
-export default class ErrorBoundary extends React.Component<Props> {
-    state = {
-        hasError: false,
+interface State {
+    error: any | undefined;
+}
+
+export default class ErrorBoundary extends React.Component<Props, State> {
+    state: State = {
+        error: undefined,
     };
 
-    static getDerivedStateFromError(error: Error) {
-        return { hasError: true };
-    }
-
-    componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-        console.log("Error component stack:", errorInfo.componentStack);
+    static getDerivedStateFromError(error: any) {
+        return { error };
     }
 
     render() {
-        if (this.state.hasError) {
+        if (this.state.error !== undefined) {
+            const displayError = () => {
+                let desc: string;
+
+                if (this.state.error instanceof Error) {
+                    desc = this.state.error.message + "\n\n" + this.state.error.stack;
+                } else {
+                    desc = (this.state.error + "").slice(0, 1000);
+                }
+
+                alert(desc);
+            };
+
             return (
                 <div className="ErrorBoundary">
-                    <h1>This component crashed, please check the console for more details</h1>
+                    <h1>
+                        This component crashed, please{" "}
+                        <a target="_blank" href="https://github.com/mlomb/chat-analytics/issues">
+                            report the issue here
+                        </a>
+                    </h1>
+                    <button onClick={displayError}>View error</button>
                 </div>
             );
         }
