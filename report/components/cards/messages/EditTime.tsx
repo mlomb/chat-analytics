@@ -1,6 +1,5 @@
 import { Container, Tooltip } from "@amcharts/amcharts5";
 import { XYCursor } from "@amcharts/amcharts5/xy";
-import { MessagesEdited } from "@pipeline/aggregate/blocks/messages/MessagesEdited";
 import { useBlockData } from "@report/BlockHook";
 import DottedTable, { Line } from "@report/components/viz/DottedTable";
 import { createXAxisLabel, createYAxisLabel } from "@report/components/viz/amcharts/AmCharts5";

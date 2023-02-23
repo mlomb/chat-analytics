@@ -8,7 +8,7 @@ import AnimatedBars, { AnimatedBarEntry } from "@report/components/viz/AnimatedB
 interface BaseProps {
     what: string;
     unit: string;
-    counts: number[];
+    counts?: number[];
     filter?: (index: number) => boolean;
     itemComponent: (props: { index: Index }) => JSX.Element;
     maxItems: number;
@@ -30,6 +30,8 @@ interface SearchProps extends BaseProps {
 
 type Props = SimpleProps | SearchProps;
 
+const EmptyArray: number[] = [];
+
 const MostUsed = (props: Props) => {
     const [filter, setFilter] = useState<string | RegExp>("");
 
@@ -43,7 +45,7 @@ const MostUsed = (props: Props) => {
     }
 
     let entries: AnimatedBarEntry[] = [];
-    for (const [i, c] of props.counts.entries()) {
+    for (const [i, c] of (props.counts || EmptyArray).entries()) {
         entries.push({
             index: i,
             value: c,

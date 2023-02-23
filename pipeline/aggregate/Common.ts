@@ -1,4 +1,4 @@
-import { DateKey, Day, TimeKeysResult, genTimeKeys } from "@pipeline/Time";
+import { Day, TimeKeysResult, genTimeKeys } from "@pipeline/Time";
 import { Index } from "@pipeline/Types";
 import { Database } from "@pipeline/process/Types";
 
@@ -51,8 +51,8 @@ export const computeVariableDistribution = (values: Uint32Array, count: number):
     if (count <= 1) return res;
 
     // sort times ascending
-    // IMPORTANT: it assumes that all values AFTER `count` are bigger than all values BEFORE
-    //            preferably, initialize the values with a big value like 0xfffffff0
+    // IMPORTANT: it assumes that all values AFTER `count` are bigger than all values BEFORE.
+    //            Preferably, initialize the values with a big value like 0xfffffff0
     values.sort();
 
     // calculate boxplot
@@ -98,10 +98,4 @@ export const computeVariableDistribution = (values: Uint32Array, count: number):
 export interface IndexEntry {
     index: Index;
     value: number;
-}
-
-/** Specific point in time */
-export interface Datetime {
-    day: DateKey;
-    secondOfDay: number;
 }

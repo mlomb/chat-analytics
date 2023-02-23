@@ -1,5 +1,5 @@
+import { Datetime } from "@pipeline/Time";
 import { BlockDescription, BlockFn } from "@pipeline/aggregate/Blocks";
-import { Datetime } from "@pipeline/aggregate/Common";
 import { filterMessages } from "@pipeline/aggregate/Helpers";
 import { MessageView } from "@pipeline/serialization/MessageView";
 
@@ -44,11 +44,11 @@ const fn: BlockFn<ConversationDuration> = (database, filters, common, args) => {
                     longestTimeWithoutMessages = {
                         minutes: diff,
                         start: {
-                            day: dateKeys[Math.floor(prevMessage / 288)],
+                            key: dateKeys[Math.floor(prevMessage / 288)],
                             secondOfDay: (prevMessage % 288) * 300,
                         },
                         end: {
-                            day: dateKeys[Math.floor(i / 288)],
+                            key: dateKeys[Math.floor(i / 288)],
                             secondOfDay: (i % 288) * 300,
                         },
                     };
@@ -64,11 +64,11 @@ const fn: BlockFn<ConversationDuration> = (database, filters, common, args) => {
                 longestActiveConversation = {
                     minutes: diff,
                     start: {
-                        day: dateKeys[Math.floor(startMessage / 288)],
+                        key: dateKeys[Math.floor(startMessage / 288)],
                         secondOfDay: (startMessage % 288) * 300,
                     },
                     end: {
-                        day: dateKeys[Math.floor(i / 288)],
+                        key: dateKeys[Math.floor(i / 288)],
                         secondOfDay: (i % 288) * 300,
                     },
                 };

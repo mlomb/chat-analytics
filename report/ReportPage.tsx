@@ -74,13 +74,11 @@ const ReportDashboard = () => {
                         num={2}
                         title={["Messages sent over time", ["by day", "by week", "by month"]]}
                         defaultOptions={database.time.numDays < 365 * 2 ? [0] : [2]}
-                        blockKey="messages/per-period"
                         children={MessagesOverTime}
                     />,
                     <Card
                         num={1}
                         title="Message statistics"
-                        blockKey="messages/stats"
                         children={MessagesStatsTable}
                         tooltip={
                             database.config.platform === "whatsapp" ? (
@@ -93,28 +91,16 @@ const ReportDashboard = () => {
                     />,
                     <Card
                         num={1}
-                        blockKey="messages/stats"
                         title={["Activity by week day & hour", ["(split)", "(heatmap)"]]}
                         children={WeekdayHourActivity}
                     />,
-                    <Card
-                        num={1}
-                        blockKey="messages/stats"
-                        title="Messages sent by author"
-                        children={MostMessagesAuthors}
-                    />,
-                    <Card
-                        num={1}
-                        blockKey="messages/stats"
-                        title="Messages sent by channel"
-                        children={MostMessagesChannels}
-                    />,
+                    <Card num={1} title="Messages sent by author" children={MostMessagesAuthors} />,
+                    <Card num={1} title="Messages sent by channel" children={MostMessagesChannels} />,
                 ].concat(
                     platformInfo.support.edits
                         ? [
                               <Card
                                   num={1}
-                                  blockKey="messages/edited"
                                   title={["Edited messages", ["by author", "in channel"]]}
                                   children={EditedMessages}
                                   tooltip={
@@ -131,7 +117,6 @@ const ReportDashboard = () => {
                               />,
                               <Card
                                   num={1}
-                                  blockKey="messages/edited"
                                   title={"Time between sending and editing"}
                                   children={EditTime}
                                   tooltip="If a message has been edited multiple times, we take the time of the last edit"
@@ -147,14 +132,12 @@ const ReportDashboard = () => {
                     <Card
                         num={1}
                         title={["Most used words", ["(as table)", "(as word cloud)"]]}
-                        blockKey="language-stats"
                         children={MostUsedWords}
                         tooltip={stopwordsTooltip}
                     />,
                     <Card
                         num={1}
                         title="Language statistics"
-                        blockKey="language-stats"
                         children={LanguageStatsTable}
                         tooltip={stopwordsTooltip}
                     />,
@@ -169,7 +152,6 @@ const ReportDashboard = () => {
                         title={["Most used", ["emojis (all)", "regular emojis", "custom emojis"]].concat(
                             platformInfo.support.reactions ? ["in", ["text", "reactions"]] : []
                         )}
-                        blockKey="emoji-stats"
                         children={MostUsedEmojis}
                         tooltip={
                             platformInfo.support.reactions
@@ -177,32 +159,25 @@ const ReportDashboard = () => {
                                 : undefined
                         }
                     />,
-                    <Card
-                        num={1}
-                        title={["Emojis sent", ["by author", "in channel"]]}
-                        blockKey="emoji-stats"
-                        children={MostProducerEmojis}
-                    />,
-                    <Card num={1} title="Emoji statistics" blockKey="emoji-stats" children={EmojiStatsTable} />,
+                    <Card num={1} title={["Emojis sent", ["by author", "in channel"]]} children={MostProducerEmojis} />,
+                    <Card num={1} title="Emoji statistics" children={EmojiStatsTable} />,
                 ],
             },
             {
                 name: "🌀 Interaction",
                 value: "interaction",
-                cards: [<Card num={1} title="Most mentioned" blockKey="interaction-stats" children={MostMentioned} />]
+                cards: [<Card num={1} title="Most mentioned" children={MostMentioned} />]
                     .concat(
                         platformInfo.support.reactions
                             ? [
                                   <Card
                                       num={1}
                                       title={["Top reacted messages", ["(total)", "(single)"]]}
-                                      blockKey="interaction-stats"
                                       children={TopReacted}
                                   />,
                                   <Card
                                       num={1}
                                       title={[["Authors", "Channels"], "that get the most reactions"]}
-                                      blockKey="emoji-stats"
                                       children={MostGetterEmojis}
                                   />,
                               ]
@@ -214,7 +189,6 @@ const ReportDashboard = () => {
                                   <Card
                                       num={1}
                                       title="Authors that reply the most messages"
-                                      blockKey="interaction-stats"
                                       children={MostRepliesAuthors}
                                       tooltip={'This is clicking "Reply" in the app'}
                                   />,
@@ -227,7 +201,6 @@ const ReportDashboard = () => {
                                   <Card
                                       num={2}
                                       title="Participation in conversations between the top"
-                                      blockKey="conversation-stats"
                                       children={ConversationParticipation}
                                       tooltip={
                                           <>
@@ -246,7 +219,6 @@ const ReportDashboard = () => {
                         <Card
                             num={1}
                             title={["Conversations started", ["by author", "in channel"]]}
-                            blockKey="conversation-stats"
                             children={MostConversations}
                             tooltip={conversationTooltip}
                         />,
@@ -263,23 +235,15 @@ const ReportDashboard = () => {
                             ["by week", "by month"],
                             ["(% of total)", "(# messages)", "(# messages diff)"],
                         ]}
-                        blockKey="sentiment-per-cycle"
                         children={SentimentOverTime}
                     />,
-                    <Card
-                        num={1}
-                        title="Sentiment overview"
-                        blockKey="sentiment-stats"
-                        children={SentimentStatsTable}
-                    />,
+                    <Card num={1} title="Sentiment overview" children={SentimentStatsTable} />,
                 ],
             },
             {
                 name: "🔗 External",
                 value: "external",
-                cards: [
-                    <Card num={1} title="Most linked domains" blockKey="external-stats" children={MostLinkedDomains} />,
-                ],
+                cards: [<Card num={1} title="Most linked domains" children={MostLinkedDomains} />],
             },
 
             {
@@ -292,14 +256,12 @@ const ReportDashboard = () => {
                               <Card
                                   num={3}
                                   title="Active authors over time by month"
-                                  blockKey="active-authors"
                                   children={ActiveAuthorsOverTime}
                                   tooltip="Authors that have sent at least one message in the month"
                               />,
                               <Card
                                   num={3}
                                   title="Server/group growth"
-                                  blockKey="growth"
                                   children={GrowthOverTime}
                                   tooltip="Only authors that sent at least one message are considered"
                               />,

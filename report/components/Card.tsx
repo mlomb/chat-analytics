@@ -12,16 +12,15 @@ import "@assets/styles/Card.less";
 
 type Title = string | (string | string[])[];
 
-interface Props<K extends BlockKey> {
+interface Props {
     num: 1 | 2 | 3;
     title: Title;
-    defaultOptions?: number[];
-    blockKey: K;
-    children: (props: { data?: BlockData<K>; options: number[] }) => JSX.Element;
     tooltip?: ReactElement | string;
+    defaultOptions?: number[];
+    children: (props: { options: number[] }) => JSX.Element;
 }
 
-const Card = <K extends BlockKey>(props: Props<K>) => {
+const Card = (props: Props) => {
     const Content = (pp: { state: BlockState }) => {
         const { state } = pp;
 
@@ -67,8 +66,6 @@ const Card = <K extends BlockKey>(props: Props<K>) => {
             }
         }
 
-        const data = useBlockData<K>(props.blockKey);
-
         return (
             <>
                 <ErrorBoundary>
@@ -95,7 +92,7 @@ const Card = <K extends BlockKey>(props: Props<K>) => {
                         ) : null}
                     </div>
                     <div className={state === "ready" ? "" : "Card__gray"}>
-                        <props.children data={data || undefined} options={options} />
+                        <props.children options={options} />
                     </div>
                 </ErrorBoundary>
             </>

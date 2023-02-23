@@ -1,20 +1,10 @@
-import { Day, formatTime } from "@pipeline/Time";
+import { AttachmentType } from "@pipeline/Attachments";
+import { Datetime, Day } from "@pipeline/Time";
 import { BlockDescription, BlockFn } from "@pipeline/aggregate/Blocks";
 import { filterMessages } from "@pipeline/aggregate/Helpers";
 import { MessageView } from "@pipeline/serialization/MessageView";
 
-interface PeriodStat {
-    minutes: number;
-    start: string;
-    end: string;
-}
-
-interface AttachmentCount {
-    // type is AttachmentType
-    [type: string]: number;
-}
-
-interface ActivityEntry {
+export interface WeekdayHourEntry {
     value: number;
     hour: `${number}hs`;
     weekday: "Sun" | "Mon" | "Tue" | "Wed" | "Thu" | "Fri" | "Sat";
@@ -22,23 +12,31 @@ interface ActivityEntry {
 
 interface MostActiveEntry {
     messages: number;
-    text: string;
+    at?: Datetime;
 }
 
 export interface MessagesStats {
+    /** Total number of messages sent */
     total: number;
+    /** Number of active days given the time filter */
+    numActiveDays: number;
+
+    /** Number of messages that contain attachments of each type */
+    withAttachmentsCount: { [type in AttachmentType]: number };
+    /** Number of messages that contain text */
+    withText: number;
+    /** Number of messages that contain links */
+    withLinks: number;
+
     counts: {
+        /** Number of messages edited by each author */
         authors: number[];
+        /** Number of messages edited in each channel */
         channels: number[];
     };
 
-    numActiveDays: number;
+    weekdayHourActivity: WeekdayHourEntry[];
 
-    attachmentsCount: AttachmentCount;
-    withText: number;
-    withLinks: number;
-
-    activity: ActivityEntry[];
     mostActive: {
         hour: MostActiveEntry;
         day: MostActiveEntry;
@@ -56,14 +54,21 @@ const fn: BlockFn<MessagesStats> = (database, filters, common, args) => {
         withLinks = 0;
     const authorsCount = new Array(database.authors.length).fill(0);
     const channelsCount = new Array(database.channels.length).fill(0);
-    const attachmentsCount: AttachmentCount = { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0 };
+    const attachmentsCount = {
+        [AttachmentType.Image]: 0,
+        [AttachmentType.ImageAnimated]: 0,
+        [AttachmentType.Video]: 0,
+        [AttachmentType.Sticker]: 0,
+        [AttachmentType.Audio]: 0,
+        [AttachmentType.Document]: 0,
+        [AttachmentType.Other]: 0,
+    };
 
     const hourlyCounts: number[] = new Array(24 * database.time.numDays).fill(0);
     const dailyCounts: number[] = new Array(database.time.numDays).fill(0);
     const monthlyCounts: number[] = new Array(database.time.numMonths).fill(0);
     const yearlyCounts: number[] = new Array(database.time.numYears).fill(0);
-
-    const activityCounts: number[] = new Array(7 * 24).fill(0);
+    const weekdayHourCounts: number[] = new Array(7 * 24).fill(0);
 
     const processMessage = (msg: MessageView) => {
         total++;
@@ -75,7 +80,7 @@ const fn: BlockFn<MessagesStats> = (database, filters, common, args) => {
         yearlyCounts[dateToYearIndex[msg.dayIndex]]++;
 
         const dayOfWeek = Day.fromKey(dateKeys[msg.dayIndex]).toDate().getDay();
-        activityCounts[dayOfWeek * 24 + Math.floor(msg.secondOfDay / 3600)]++;
+        weekdayHourCounts[dayOfWeek * 24 + Math.floor(msg.secondOfDay / 3600)]++;
 
         const attachments = msg.attachments;
         if (attachments) {
@@ -90,7 +95,7 @@ const fn: BlockFn<MessagesStats> = (database, filters, common, args) => {
 
     filterMessages(processMessage, database, filters);
 
-    const activity: ActivityEntry[] = activityCounts.map((count, i) => {
+    const weekdayHourActivity: WeekdayHourEntry[] = weekdayHourCounts.map((count, i) => {
         const weekday = Math.floor(i / 24);
         const hour = i % 24;
         return {
@@ -100,7 +105,7 @@ const fn: BlockFn<MessagesStats> = (database, filters, common, args) => {
         };
     });
 
-    const findMostActive = (counts: number[], formatFn: (index: number) => string): MostActiveEntry => {
+    const findMostActive = (counts: number[], buildDatetimeFn: (index: number) => Datetime): MostActiveEntry => {
         let max = 0,
             maxIndex = -1;
         for (let i = 0; i < counts.length; i++) {
@@ -109,14 +114,14 @@ const fn: BlockFn<MessagesStats> = (database, filters, common, args) => {
                 maxIndex = i;
             }
         }
-        return { messages: max, text: maxIndex === -1 ? "-" : formatFn(maxIndex) };
+        return { messages: max, at: maxIndex === -1 ? undefined : buildDatetimeFn(maxIndex) };
     };
 
     return {
         total,
         numActiveDays: filters.numActiveDays,
 
-        attachmentsCount,
+        withAttachmentsCount: attachmentsCount,
         withText,
         withLinks,
 
@@ -125,13 +130,14 @@ const fn: BlockFn<MessagesStats> = (database, filters, common, args) => {
             channels: channelsCount,
         },
 
-        activity,
+        weekdayHourActivity,
+
         // prettier-ignore
         mostActive: {
-            hour: findMostActive(hourlyCounts, i => formatTime("ymdh", Day.fromKey(dateKeys[Math.floor(i / 24)]), (i % 24) * 3600)),
-            day: findMostActive(dailyCounts, i => formatTime("ymd", Day.fromKey(dateKeys[i]))),
-            month: findMostActive(monthlyCounts, i => formatTime("ym", Day.fromKey(monthKeys[i]))),
-            year: findMostActive(yearlyCounts, i => formatTime("y", Day.fromKey(yearKeys[i]))),
+            hour: findMostActive(hourlyCounts, i => ({ key: dateKeys[Math.floor(i / 24)], secondOfDay: (i % 24) * 3600 })),
+            day: findMostActive(dailyCounts, i => ({ key: dateKeys[i] })),
+            month: findMostActive(monthlyCounts, i => ({ key: monthKeys[i] })),
+            year: findMostActive(yearlyCounts, i => ({ key: yearKeys[i] })),
         },
     };
 };

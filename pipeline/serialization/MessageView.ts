@@ -1,3 +1,4 @@
+import { AttachmentType } from "@pipeline/Attachments";
 import { Index } from "@pipeline/Types";
 import { IndexCounts } from "@pipeline/process/IndexCounts";
 import { Message, MessageComplete } from "@pipeline/process/Types";
@@ -91,7 +92,7 @@ export class MessageView implements Message {
         return readIndexCounts(this.stream, this.bitConfig.emojiIdxBits);
     }
 
-    get attachments(): IndexCounts | undefined {
+    get attachments(): IndexCounts<AttachmentType> | undefined {
         if (this.attachmentsOffset === 0) return undefined;
         this.stream.offset = this.attachmentsOffset;
         return readIndexCounts(this.stream, 3);

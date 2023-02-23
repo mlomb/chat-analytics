@@ -1,7 +1,6 @@
 import { AttachmentType } from "@pipeline/Attachments";
 import { PlatformsInfo } from "@pipeline/Platforms";
-import { Day, formatTime } from "@pipeline/Time";
-import type { Datetime } from "@pipeline/aggregate/Common";
+import { formatDatetime } from "@pipeline/Time";
 import { useBlockData } from "@report/BlockHook";
 import { getDatabase } from "@report/WorkerWrapper";
 import DottedTable, { Line } from "@report/components/viz/DottedTable";
@@ -12,12 +11,6 @@ const MessagesStatsTable = () => {
 
     const db = getDatabase();
     const platformInfo = PlatformsInfo[db.config.platform];
-
-    const formatDatetime = (datetime?: Datetime) => {
-        if (datetime === undefined) return "-";
-
-        return formatTime("ymdhm", Day.fromKey(datetime.day), datetime.secondOfDay);
-    };
 
     const lines: Line[] = [
         {
@@ -45,28 +38,28 @@ const MessagesStatsTable = () => {
             formatter: "integer",
             label: "📷 with images",
             depth: 1,
-            value: stats?.attachmentsCount[AttachmentType.Image],
+            value: stats?.withAttachmentsCount[AttachmentType.Image],
         },
         {
             type: "number",
             formatter: "integer",
             label: "👾 with GIFs",
             depth: 1,
-            value: stats?.attachmentsCount[AttachmentType.ImageAnimated],
+            value: stats?.withAttachmentsCount[AttachmentType.ImageAnimated],
         },
         {
             type: "number",
             formatter: "integer",
             label: "📹 with videos",
             depth: 1,
-            value: stats?.attachmentsCount[AttachmentType.Video],
+            value: stats?.withAttachmentsCount[AttachmentType.Video],
         },
         {
             type: "number",
             formatter: "integer",
             label: "🎉 with stickers",
             depth: 1,
-            value: stats?.attachmentsCount[AttachmentType.Sticker],
+            value: stats?.withAttachmentsCount[AttachmentType.Sticker],
             tooltip: platformInfo.support.stickers
                 ? undefined
                 : platformInfo.name + " does not support stickers or the information is not present in export files",
@@ -76,21 +69,21 @@ const MessagesStatsTable = () => {
             formatter: "integer",
             label: "🎵 with audio files",
             depth: 1,
-            value: stats?.attachmentsCount[AttachmentType.Audio],
+            value: stats?.withAttachmentsCount[AttachmentType.Audio],
         },
         {
             type: "number",
             formatter: "integer",
             label: "📄 with documents",
             depth: 1,
-            value: stats?.attachmentsCount[AttachmentType.Document],
+            value: stats?.withAttachmentsCount[AttachmentType.Document],
         },
         {
             type: "number",
             formatter: "integer",
             label: "📁 with other files",
             depth: 1,
-            value: stats?.attachmentsCount[AttachmentType.Other],
+            value: stats?.withAttachmentsCount[AttachmentType.Other],
         },
         {
             type: "number",
@@ -111,9 +104,9 @@ const MessagesStatsTable = () => {
                     Longest inactivity period:
                     <br />
                     <b>
-                        from {formatDatetime(duration?.longestTimeWithoutMessages?.start)}
+                        from {formatDatetime("ymdhm", duration?.longestTimeWithoutMessages?.start)}
                         <br />
-                        to {formatDatetime(duration?.longestTimeWithoutMessages?.end)}
+                        to {formatDatetime("ymdhm", duration?.longestTimeWithoutMessages?.end)}
                     </b>
                     <br />
                     (rounded to 5 minutes)
@@ -133,9 +126,9 @@ const MessagesStatsTable = () => {
                     Longest active conversation:
                     <br />
                     <b>
-                        from {formatDatetime(duration?.longestActiveConversation?.start)}
+                        from {formatDatetime("ymdhm", duration?.longestActiveConversation?.start)}
                         <br />
-                        to {formatDatetime(duration?.longestActiveConversation?.end)}
+                        to {formatDatetime("ymdhm", duration?.longestActiveConversation?.end)}
                     </b>
                     <br />
                     (rounded to 5 minutes)
@@ -157,28 +150,28 @@ const MessagesStatsTable = () => {
             type: "text",
             label: "year ever",
             depth: 1,
-            value: stats?.mostActive.year.text,
+            value: formatDatetime("y", stats?.mostActive.year.at),
             tooltip: <>with {stats?.mostActive.year.messages.toLocaleString()} messages</>,
         },
         {
             type: "text",
             label: "month ever",
             depth: 1,
-            value: stats?.mostActive.month.text,
+            value: formatDatetime("ym", stats?.mostActive.month.at),
             tooltip: <>with {stats?.mostActive.month.messages.toLocaleString()} messages</>,
         },
         {
             type: "text",
             label: "day ever",
             depth: 1,
-            value: stats?.mostActive.day.text,
+            value: formatDatetime("ymd", stats?.mostActive.day.at),
             tooltip: <>with {stats?.mostActive.day.messages.toLocaleString()} messages</>,
         },
         {
             type: "text",
             label: "hour ever",
             depth: 1,
-            value: stats?.mostActive.hour.text,
+            value: formatDatetime("ymdh", stats?.mostActive.hour.at),
             tooltip: <>with {stats?.mostActive.hour.messages.toLocaleString()} messages</>,
         },
     ];

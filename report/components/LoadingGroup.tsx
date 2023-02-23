@@ -77,7 +77,7 @@ export const LoadingGroup = (props: { children: (state: BlockState) => ReactNode
     const state = combineStates(requests.map((req) => store.getStoredStatus(req).state));
 
     return (
-        <div ref={ref}>
+        <div ref={ref} data-info="observer">
             <LoadingContext.Provider value={ctxValue} children={props.children(state)} />
         </div>
     );

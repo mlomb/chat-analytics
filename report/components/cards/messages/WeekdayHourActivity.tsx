@@ -1,6 +1,7 @@
 import { Color, Container, Tooltip, p100, percent } from "@amcharts/amcharts5";
 import { AxisRendererX } from "@amcharts/amcharts5/xy";
-import { MessagesStats } from "@pipeline/aggregate/blocks/messages/MessagesStats";
+import { MessagesStats, WeekdayHourEntry } from "@pipeline/aggregate/blocks/messages/MessagesStats";
+import { useBlockData } from "@report/BlockHook";
 import { createYAxisLabel } from "@report/components/viz/amcharts/AmCharts5";
 import { AmCharts5Chart } from "@report/components/viz/amcharts/AmCharts5Chart";
 import { createBarChart } from "@report/components/viz/amcharts/BarChart";
@@ -55,14 +56,14 @@ const createActivitySplit = (c: Container) => {
     c.children.push(weekdaySeries.chart!);
     c.children.push(hourSeries.chart!);
 
-    return (data: MessagesStats) => {
+    return (data: WeekdayHourEntry[]) => {
         const aggrWeekdays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((weekday) => ({
             weekday,
-            value: data.activity.filter(({ weekday: w }) => w === weekday).reduce((acc, { value }) => acc + value, 0),
+            value: data.filter(({ weekday: w }) => w === weekday).reduce((acc, { value }) => acc + value, 0),
         }));
         const aggrHours = HOURS.map((h) => ({
             hour: h,
-            value: data.activity.filter(({ hour: hh }) => hh === `${h}hs`).reduce((acc, { value }) => acc + value, 0),
+            value: data.filter(({ hour: hh }) => hh === `${h}hs`).reduce((acc, { value }) => acc + value, 0),
         }));
 
         weekdaySeries.data.setAll(aggrWeekdays.filter((x) => x.value > 0));
@@ -110,19 +111,17 @@ const createActivityHeatmap = (c: Container) => {
 
     c.children.push(chart);
 
-    return (data: MessagesStats) => {
-        series.data.setAll(data.activity.filter((x) => x.value > 0));
-    };
+    return (data: WeekdayHourEntry[]) => series.data.setAll(data.filter((x) => x.value > 0));
 };
 
-export const WeekdayHourActivity = ({ data, options }: { data?: MessagesStats; options: number[] }) => (
+export const WeekdayHourActivity = ({ options }: { options: number[] }) => (
     <AmCharts5Chart
         style={{
             minHeight: 617,
             marginLeft: 5,
             marginBottom: 8,
         }}
-        data={data}
+        data={useBlockData("messages/stats")?.weekdayHourActivity}
         create={options[0] === 0 ? createActivitySplit : createActivityHeatmap}
     />
 );
