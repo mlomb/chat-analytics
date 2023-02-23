@@ -6,8 +6,8 @@ import AnimatedBars, { AnimatedBarEntry } from "@report/components/viz/AnimatedB
 const formatPercent = (value: number) => `${value.toFixed(0)}%`;
 
 const EditedMessages = ({ options }: { options: number[] }) => {
-    const msgEdited = useBlockData("messages-edited");
-    const msgStats = useBlockData("messages-stats");
+    const msgEdited = useBlockData("messages/edited");
+    const msgStats = useBlockData("messages/stats");
 
     let byCount: AnimatedBarEntry[] = [];
     let byPercent: AnimatedBarEntry[] = [];

@@ -29,7 +29,7 @@ const RESETS = {
 };
 
 const TimeSelector = () => {
-    const data = useBlockData("messages-per-cycle");
+    const data = useBlockData("messages/per-period");
     const chartDiv = useRef<HTMLDivElement>(null);
     const seriesRef = useRef<StepLineSeries | null>(null);
 

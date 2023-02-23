@@ -6,8 +6,9 @@ import InteractionStats from "@pipeline/aggregate/blocks/interaction/Interaction
 import LanguageStats from "@pipeline/aggregate/blocks/language/LanguageStats";
 import WordStats from "@pipeline/aggregate/blocks/language/WordStats";
 import ExternalStats from "@pipeline/aggregate/blocks/links/ExternalStats";
+import ConversationsDuration from "@pipeline/aggregate/blocks/messages/ConversationsDuration";
 import MessagesEdited from "@pipeline/aggregate/blocks/messages/MessagesEdited";
-import MessagesPerCycle from "@pipeline/aggregate/blocks/messages/MessagesPerCycle";
+import MessagesPerCycle from "@pipeline/aggregate/blocks/messages/MessagesPerPeriod";
 import MessagesStats from "@pipeline/aggregate/blocks/messages/MessagesStats";
 import SentimentPerCycle from "@pipeline/aggregate/blocks/sentiment/SentimentPerCycle";
 import SentimentStats from "@pipeline/aggregate/blocks/sentiment/SentimentStats";
@@ -35,18 +36,19 @@ export type BlockDescription<K, Data, Args = undefined> = {
 
 /** All existing blocks must be defined here, so the UI can dynamically load them */
 export const Blocks = {
-    [MessagesPerCycle.key]: MessagesPerCycle,
-    [MessagesEdited.key]: MessagesEdited,
-    [MessagesStats.key]: MessagesStats,
-    [LanguageStats.key]: LanguageStats,
-    [EmojiStats.key]: EmojiStats,
-    [InteractionStats.key]: InteractionStats,
-    [ExternalStats.key]: ExternalStats,
-    [SentimentPerCycle.key]: SentimentPerCycle,
-    [ConversationStats.key]: ConversationStats,
-    [SentimentStats.key]: SentimentStats,
-    [Growth.key]: Growth,
     [ActiveAuthors.key]: ActiveAuthors,
+    [ConversationsDuration.key]: ConversationsDuration,
+    [ConversationStats.key]: ConversationStats,
+    [EmojiStats.key]: EmojiStats,
+    [ExternalStats.key]: ExternalStats,
+    [Growth.key]: Growth,
+    [InteractionStats.key]: InteractionStats,
+    [LanguageStats.key]: LanguageStats,
+    [MessagesEdited.key]: MessagesEdited,
+    [MessagesPerCycle.key]: MessagesPerCycle,
+    [MessagesStats.key]: MessagesStats,
+    [SentimentPerCycle.key]: SentimentPerCycle,
+    [SentimentStats.key]: SentimentStats,
     [WordStats.key]: WordStats,
 } as const;
 

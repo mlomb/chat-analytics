@@ -1,4 +1,4 @@
-import { Day, TimeKeysResult, genTimeKeys } from "@pipeline/Time";
+import { DateKey, Day, TimeKeysResult, genTimeKeys } from "@pipeline/Time";
 import { Index } from "@pipeline/Types";
 import { Database } from "@pipeline/process/Types";
 
@@ -98,4 +98,10 @@ export const computeVariableDistribution = (values: Uint32Array, count: number):
 export interface IndexEntry {
     index: Index;
     value: number;
+}
+
+/** Specific point in time */
+export interface Datetime {
+    day: DateKey;
+    secondOfDay: number;
 }

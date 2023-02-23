@@ -51,7 +51,7 @@ const fn: BlockFn<MessagesEdited> = (database, filters) => {
 };
 
 export default {
-    key: "messages-edited",
+    key: "messages/edited",
     triggers: ["authors", "channels", "time"],
     fn,
-} as BlockDescription<"messages-edited", MessagesEdited>;
+} as BlockDescription<"messages/edited", MessagesEdited>;

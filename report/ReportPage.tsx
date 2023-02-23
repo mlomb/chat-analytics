@@ -74,13 +74,13 @@ const ReportDashboard = () => {
                         num={2}
                         title={["Messages sent over time", ["by day", "by week", "by month"]]}
                         defaultOptions={database.time.numDays < 365 * 2 ? [0] : [2]}
-                        blockKey="messages-per-cycle"
+                        blockKey="messages/per-period"
                         children={MessagesOverTime}
                     />,
                     <Card
                         num={1}
                         title="Message statistics"
-                        blockKey="messages-stats"
+                        blockKey="messages/stats"
                         children={MessagesStatsTable}
                         tooltip={
                             database.config.platform === "whatsapp" ? (
@@ -93,19 +93,19 @@ const ReportDashboard = () => {
                     />,
                     <Card
                         num={1}
-                        blockKey="messages-stats"
+                        blockKey="messages/stats"
                         title={["Activity by week day & hour", ["(split)", "(heatmap)"]]}
                         children={WeekdayHourActivity}
                     />,
                     <Card
                         num={1}
-                        blockKey="messages-stats"
+                        blockKey="messages/stats"
                         title="Messages sent by author"
                         children={MostMessagesAuthors}
                     />,
                     <Card
                         num={1}
-                        blockKey="messages-stats"
+                        blockKey="messages/stats"
                         title="Messages sent by channel"
                         children={MostMessagesChannels}
                     />,
@@ -114,7 +114,7 @@ const ReportDashboard = () => {
                         ? [
                               <Card
                                   num={1}
-                                  blockKey="messages-edited"
+                                  blockKey="messages/edited"
                                   title={["Edited messages", ["by author", "in channel"]]}
                                   children={EditedMessages}
                                   tooltip={
@@ -131,7 +131,7 @@ const ReportDashboard = () => {
                               />,
                               <Card
                                   num={1}
-                                  blockKey="messages-edited"
+                                  blockKey="messages/edited"
                                   title={"Time between sending and editing"}
                                   children={EditTime}
                                   tooltip="If a message has been edited multiple times, we take the time of the last edit"

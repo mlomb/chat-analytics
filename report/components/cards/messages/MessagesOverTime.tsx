@@ -11,12 +11,15 @@ import {
     XYChart,
     XYCursor,
 } from "@amcharts/amcharts5/xy";
-import { MessagesPerCycle } from "@pipeline/aggregate/blocks/messages/MessagesPerCycle";
+import { MessagesPerPeriod } from "@pipeline/aggregate/blocks/messages/MessagesPerPeriod";
+import { useBlockData } from "@report/BlockHook";
 import { createYAxisLabel, syncAxisWithTimeFilter } from "@report/components/viz/amcharts/AmCharts5";
 import { AmCharts5Chart, CreateFn } from "@report/components/viz/amcharts/AmCharts5Chart";
 
-export const MessagesOverTime = ({ data, options }: { data?: MessagesPerCycle; options: number[] }) => {
-    const createMessagesChart = useCallback<CreateFn<MessagesPerCycle>>(
+export const MessagesOverTime = ({ options }: { options: number[] }) => {
+    const data = useBlockData("messages/per-period");
+
+    const createMessagesChart = useCallback<CreateFn<MessagesPerPeriod>>(
         (c) => {
             const period = ["day", "week", "month"][options[0]] as "day" | "week" | "month";
 
@@ -98,7 +101,7 @@ export const MessagesOverTime = ({ data, options }: { data?: MessagesPerCycle; o
 
             chart.series.push(series);
 
-            const setData = (data: MessagesPerCycle) => {
+            const setData = (data: MessagesPerPeriod) => {
                 series.data.setAll(
                     {
                         day: data.perDay,

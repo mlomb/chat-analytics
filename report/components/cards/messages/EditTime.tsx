@@ -1,17 +1,11 @@
 import { Container, Tooltip } from "@amcharts/amcharts5";
 import { XYCursor } from "@amcharts/amcharts5/xy";
 import { MessagesEdited } from "@pipeline/aggregate/blocks/messages/MessagesEdited";
+import { useBlockData } from "@report/BlockHook";
 import DottedTable, { Line } from "@report/components/viz/DottedTable";
 import { createXAxisLabel, createYAxisLabel } from "@report/components/viz/amcharts/AmCharts5";
 import { AmCharts5Chart } from "@report/components/viz/amcharts/AmCharts5Chart";
 import { createHistogramWithBoxplot } from "@report/components/viz/amcharts/Distribution";
-
-/*
-// test
-import { AuthorLabel } from "../core/labels/AuthorLabel";
-import AnimatedBars, { AnimatedBarEntry } from "../viz/AnimatedBars";
-import MostUsed from "../viz/MostUsed";
-*/
 
 const createChart = (c: Container) => {
     const { chart, setData, histogramSeries, xAxis, yAxis } = createHistogramWithBoxplot(c.root);
@@ -46,7 +40,9 @@ const createChart = (c: Container) => {
     return setData;
 };
 
-const EditTime = ({ data }: { data?: MessagesEdited }) => {
+const EditTime = () => {
+    const data = useBlockData("messages/edited");
+
     const lines: Line[] = [
         {
             type: "separator",
@@ -79,17 +75,6 @@ const EditTime = ({ data }: { data?: MessagesEdited }) => {
             type: "separator",
         },
     ];
-
-    /*
-    // test
-    const bars: AnimatedBarEntry[] =
-        data?.count.authors
-            .map((author, i) => ({
-                index: i,
-                value: 8000 - author,
-            }))
-            .slice(0, 5) || [];
-    */
 
     return (
         <>

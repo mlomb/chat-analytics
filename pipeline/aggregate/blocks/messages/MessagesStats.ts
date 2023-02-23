@@ -27,19 +27,16 @@ interface MostActiveEntry {
 
 export interface MessagesStats {
     total: number;
-    numActiveDays: number;
-
-    longestTimeWithoutMessages: PeriodStat;
-    longestActiveConversation: PeriodStat;
-
-    attachmentsCount: AttachmentCount;
-    withText: number;
-    withLinks: number;
-
     counts: {
         authors: number[];
         channels: number[];
     };
+
+    numActiveDays: number;
+
+    attachmentsCount: AttachmentCount;
+    withText: number;
+    withLinks: number;
 
     activity: ActivityEntry[];
     mostActive: {
@@ -60,9 +57,7 @@ const fn: BlockFn<MessagesStats> = (database, filters, common, args) => {
     const authorsCount = new Array(database.authors.length).fill(0);
     const channelsCount = new Array(database.channels.length).fill(0);
     const attachmentsCount: AttachmentCount = { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0 };
-    const numFiveMinBlocks = 24 * 12 * database.time.numDays;
 
-    const fiveMinMessagesCount = new Array(numFiveMinBlocks).fill(0);
     const hourlyCounts: number[] = new Array(24 * database.time.numDays).fill(0);
     const dailyCounts: number[] = new Array(database.time.numDays).fill(0);
     const monthlyCounts: number[] = new Array(database.time.numMonths).fill(0);
@@ -74,7 +69,6 @@ const fn: BlockFn<MessagesStats> = (database, filters, common, args) => {
         total++;
         authorsCount[msg.authorIndex]++;
         channelsCount[msg.channelIndex]++;
-        fiveMinMessagesCount[msg.dayIndex * 288 + Math.floor(msg.secondOfDay / 300)]++;
         hourlyCounts[msg.dayIndex * 24 + Math.floor(msg.secondOfDay / 3600)]++;
         dailyCounts[msg.dayIndex]++;
         monthlyCounts[dateToMonthIndex[msg.dayIndex]]++;
@@ -95,42 +89,6 @@ const fn: BlockFn<MessagesStats> = (database, filters, common, args) => {
     };
 
     filterMessages(processMessage, database, filters);
-
-    const longestTimeWithoutMessages: PeriodStat = { minutes: -1, start: "X", end: "Y" };
-    const longestActiveConversation: PeriodStat = { minutes: -1, start: "X", end: "Y" };
-    // NOTE: doing it this way, we are not counting the periods in the sides (which is what we want)
-    // if the first message ever is in the last 5m block of the day, it should not count 0-23.55 as "no messages"
-    let prevMessage = -1, // used for time without messages
-        startMessage = -1; // used for active conversations
-    for (let i = 0; i < numFiveMinBlocks; i++) {
-        // found a 5 minute block with messages
-        if (fiveMinMessagesCount[i] > 0) {
-            // [longestTimeWithoutMessages]
-            // did we find one before?
-            if (prevMessage !== -1) {
-                // check the difference
-                const diff = (i - prevMessage) * 5;
-                if (diff > longestTimeWithoutMessages.minutes) {
-                    longestTimeWithoutMessages.minutes = diff;
-                    longestTimeWithoutMessages.start = formatTime("ymdhm", Day.fromKey(dateKeys[Math.floor(prevMessage / 288)]), (prevMessage % 288) * 5 * 60); // prettier-ignore
-                    longestTimeWithoutMessages.end = formatTime("ymdhm", Day.fromKey(dateKeys[Math.floor(i / 288)]), (i % 288) * 5 * 60); // prettier-ignore
-                }
-            }
-            // set the last message as i
-            prevMessage = i;
-
-            // [longestActiveConversation]
-            if (startMessage === -1) startMessage = i;
-            const diff = (i - startMessage + 1) * 5;
-            if (diff > longestActiveConversation.minutes) {
-                longestActiveConversation.minutes = diff;
-                longestActiveConversation.start = formatTime("ymdhm", Day.fromKey(dateKeys[Math.floor(startMessage / 288)]), (startMessage % 288) * 5 * 60); // prettier-ignore
-                longestActiveConversation.end = formatTime("ymdhm", Day.fromKey(dateKeys[Math.floor(i / 288)]), (i % 288) * 5 * 60); // prettier-ignore
-            }
-        } else {
-            startMessage = -1;
-        }
-    }
 
     const activity: ActivityEntry[] = activityCounts.map((count, i) => {
         const weekday = Math.floor(i / 24);
@@ -158,9 +116,6 @@ const fn: BlockFn<MessagesStats> = (database, filters, common, args) => {
         total,
         numActiveDays: filters.numActiveDays,
 
-        longestTimeWithoutMessages,
-        longestActiveConversation,
-
         attachmentsCount,
         withText,
         withLinks,
@@ -182,7 +137,7 @@ const fn: BlockFn<MessagesStats> = (database, filters, common, args) => {
 };
 
 export default {
-    key: "messages-stats",
+    key: "messages/stats",
     triggers: ["authors", "channels", "time"],
     fn,
-} as BlockDescription<"messages-stats", MessagesStats>;
+} as BlockDescription<"messages/stats", MessagesStats>;

@@ -12,14 +12,14 @@ type MessagesInDate = {
  * Number of messages per different time cycles.
  * It ignores the time filter completely, all cycles are included.
  */
-export interface MessagesPerCycle {
+export interface MessagesPerPeriod {
     perDay: MessagesInDate[];
     perWeek: MessagesInDate[];
     perMonth: MessagesInDate[];
 }
 
-const fn: BlockFn<MessagesPerCycle> = (database, filters, common) => {
-    const res: MessagesPerCycle = {
+const fn: BlockFn<MessagesPerPeriod> = (database, filters, common) => {
+    const res: MessagesPerPeriod = {
         perDay: [],
         perWeek: [],
         perMonth: [],
@@ -64,7 +64,7 @@ const fn: BlockFn<MessagesPerCycle> = (database, filters, common) => {
 };
 
 export default {
-    key: "messages-per-cycle",
+    key: "messages/per-period",
     triggers: ["authors", "channels"],
     fn,
-} as BlockDescription<"messages-per-cycle", MessagesPerCycle>;
+} as BlockDescription<"messages/per-period", MessagesPerPeriod>;
