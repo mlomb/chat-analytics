@@ -20,6 +20,7 @@ const EditedMessages = ({ options }: { options: number[] }) => {
                 index,
                 value,
             }))
+            .filter((a) => a.value > 0) // filter out 0 edits
             .sort((a, b) => b.value - a.value)
             .slice(0, 5);
         byPercent = msgEdited.count[key]
