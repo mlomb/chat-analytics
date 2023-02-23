@@ -18,6 +18,8 @@ interface MostActiveEntry {
 export interface MessagesStats {
     /** Total number of messages sent */
     total: number;
+    /** Total number of messages edited */
+    edited: number;
     /** Number of active days given the time filter */
     numActiveDays: number;
 
@@ -50,6 +52,7 @@ const fn: BlockFn<MessagesStats> = (database, filters, common, args) => {
         common.timeKeys;
 
     let total = 0,
+        edited = 0,
         withText = 0,
         withLinks = 0;
     const authorsCount = new Array(database.authors.length).fill(0);
@@ -72,6 +75,10 @@ const fn: BlockFn<MessagesStats> = (database, filters, common, args) => {
 
     const processMessage = (msg: MessageView) => {
         total++;
+        if (msg.hasEdits) edited++;
+        if (msg.hasDomains) withLinks++;
+        if (msg.langIndex !== undefined) withText++;
+
         authorsCount[msg.authorIndex]++;
         channelsCount[msg.channelIndex]++;
         hourlyCounts[msg.dayIndex * 24 + Math.floor(msg.secondOfDay / 3600)]++;
@@ -88,9 +95,6 @@ const fn: BlockFn<MessagesStats> = (database, filters, common, args) => {
                 attachmentsCount[attachment[0]] += attachment[1];
             }
         }
-
-        if (msg.langIndex !== undefined) withText++;
-        if (msg.hasDomains) withLinks++;
     };
 
     filterMessages(processMessage, database, filters);
@@ -119,6 +123,7 @@ const fn: BlockFn<MessagesStats> = (database, filters, common, args) => {
 
     return {
         total,
+        edited,
         numActiveDays: filters.numActiveDays,
 
         withAttachmentsCount: attachmentsCount,

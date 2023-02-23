@@ -87,6 +87,17 @@ const MessagesStatsTable = () => {
         },
         {
             type: "number",
+            formatter: "integer",
+            label: "Edited messages",
+            value: stats?.edited,
+            tooltip: (
+                <>
+                    <b>{stats ? ((stats.edited / stats.total) * 100).toFixed(2) : "-"}%</b> of all messages were edited
+                </>
+            ),
+        },
+        {
+            type: "number",
             formatter: "decimal",
             label: "Average messages per day",
             value: stats ? stats.total / stats.numActiveDays : undefined,
