@@ -8,11 +8,11 @@ interface Item {
     value: number;
 }
 
-export interface TimelineStats {
+export interface GrowthTimeline {
     growth: Item[];
 }
 
-const fn: BlockFn<TimelineStats> = (database, filters, common, args) => {
+const fn: BlockFn<GrowthTimeline> = (database, filters, common, args) => {
     const { dateKeys } = common.timeKeys;
 
     const firstMessageDay: number[] = new Array(database.authors.length).fill(-1);
@@ -57,4 +57,4 @@ export default {
     key: "timeline/growth",
     triggers: ["authors", "channels"],
     fn,
-} as BlockDescription<"timeline/growth", TimelineStats>;
+} as BlockDescription<"timeline/growth", GrowthTimeline>;
