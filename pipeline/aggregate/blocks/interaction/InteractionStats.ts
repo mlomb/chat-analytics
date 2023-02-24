@@ -70,7 +70,7 @@ const fn: BlockFn<InteractionStats> = (database, filters, common, args) => {
 };
 
 export default {
-    key: "interaction-stats",
+    key: "interaction/stats",
     triggers: ["authors", "channels", "time"],
     fn,
-} as BlockDescription<"interaction-stats", InteractionStats>;
+} as BlockDescription<"interaction/stats", InteractionStats>;

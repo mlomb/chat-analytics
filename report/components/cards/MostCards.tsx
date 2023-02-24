@@ -190,11 +190,11 @@ export const MostLinks = ({ options }: { options: number[] }) => (
 ///////////////////////////
 const MentionsIndexOf = (value: string) => getFormatCache().mentions.indexOf(value);
 const MentionsInFilter = (index: number, filter: string) => getFormatCache().mentions[index].includes(filter);
-export const MostMentioned = ({ data }: { data?: InteractionStats }) => (
+export const MostMentioned = () => (
     <MostUsed
         what="Who"
         unit="Times mentioned"
-        counts={data?.mentionsCount}
+        counts={useBlockData("interaction/stats")?.mentionsCount}
         itemComponent={MentionLabel}
         maxItems={Math.min(15, getDatabase().mentions.length)}
         searchable
