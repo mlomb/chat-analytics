@@ -8,10 +8,16 @@ interface EmojiStatsGroup {
     regular: number;
     custom: number;
     unique: number; // regular & custom
-    oncePerMessage: number; // +1 per message that contains at least one emoji
-    count: number[];
-    authorCount: number[];
-    channelCount: number[];
+    messagesWithAtLeastOneEmoji: number; // +1 per message that contains at least one emoji (reaction or text)
+
+    counts: {
+        /** Number of times each emoji has been sent */
+        emojis: number[];
+        /** Number of emojis each author has sent */
+        authors: number[];
+        /** Number of emojis sent in each channel */
+        channels: number[];
+    };
 
     // only available during computation
     set?: Set<number>;
@@ -27,24 +33,26 @@ const fn: BlockFn<EmojiStats> = (database, filters, common, args) => {
         regular: 0,
         custom: 0,
         unique: 0,
-        oncePerMessage: 0,
-        count: new Array(database.emojis.length).fill(0),
-        authorCount: new Array(database.authors.length).fill(0),
-        channelCount: new Array(database.channels.length).fill(0),
+        messagesWithAtLeastOneEmoji: 0,
+        counts: {
+            emojis: new Array(database.emojis.length).fill(0),
+            authors: new Array(database.authors.length).fill(0),
+            channels: new Array(database.channels.length).fill(0),
+        },
         set: new Set(),
     };
     const inReactions: EmojiStatsGroup = {
         regular: 0,
         custom: 0,
         unique: 0,
-        oncePerMessage: 0,
-        count: new Array(database.emojis.length).fill(0),
-        authorCount: new Array(database.authors.length).fill(0),
-        channelCount: new Array(database.channels.length).fill(0),
+        messagesWithAtLeastOneEmoji: 0,
+        counts: {
+            emojis: new Array(database.emojis.length).fill(0),
+            authors: new Array(database.authors.length).fill(0),
+            channels: new Array(database.channels.length).fill(0),
+        },
         set: new Set(),
     };
-    const authorEmojiCount = new Array(database.authors.length).fill(0);
-    const channelEmojiCount = new Array(database.channels.length).fill(0);
 
     const processEmojiInGroup = (
         emojiGroup: EmojiStatsGroup,
@@ -53,9 +61,9 @@ const fn: BlockFn<EmojiStats> = (database, filters, common, args) => {
         authorIndex: Index,
         channelIndex: Index
     ) => {
-        emojiGroup.count[index] += count;
-        emojiGroup.authorCount[authorIndex] += count;
-        emojiGroup.channelCount[channelIndex] += count;
+        emojiGroup.counts.emojis[index] += count;
+        emojiGroup.counts.authors[authorIndex] += count;
+        emojiGroup.counts.channels[channelIndex] += count;
         if (database.emojis[index].type === "custom") emojiGroup.custom += count;
         else emojiGroup.regular += count;
         emojiGroup.set!.add(index);
@@ -66,14 +74,14 @@ const fn: BlockFn<EmojiStats> = (database, filters, common, args) => {
         if (emojis) {
             for (const emoji of emojis) {
                 processEmojiInGroup(inText, emoji[0], emoji[1], msg.authorIndex, msg.channelIndex);
-                inText.oncePerMessage++;
+                inText.messagesWithAtLeastOneEmoji++;
             }
         }
         const reactions = msg.reactions;
         if (reactions) {
             for (const reaction of reactions) {
                 processEmojiInGroup(inReactions, reaction[0], reaction[1], msg.authorIndex, msg.channelIndex);
-                inReactions.oncePerMessage++;
+                inReactions.messagesWithAtLeastOneEmoji++;
             }
         }
     };
@@ -88,13 +96,11 @@ const fn: BlockFn<EmojiStats> = (database, filters, common, args) => {
     return {
         inText,
         inReactions,
-        authorEmojiCount,
-        channelEmojiCount,
     };
 };
 
 export default {
-    key: "emoji-stats",
+    key: "emoji/stats",
     triggers: ["authors", "channels", "time"],
     fn,
-} as BlockDescription<"emoji-stats", EmojiStats>;
+} as BlockDescription<"emoji/stats", EmojiStats>;

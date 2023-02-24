@@ -1,5 +1,4 @@
 import { Index } from "@pipeline/Types";
-import { DomainsStats } from "@pipeline/aggregate/blocks/domains/DomainsStats";
 import { EmojiStats } from "@pipeline/aggregate/blocks/emojis/EmojiStats";
 import { ConversationStats } from "@pipeline/aggregate/blocks/interaction/ConversationStats";
 import { InteractionStats } from "@pipeline/aggregate/blocks/interaction/InteractionStats";
@@ -113,31 +112,38 @@ const EmojisIndexOf = (value: string) => {
     return rawEmoji;
 };
 const EmojisInFilter = (index: Index, filter: string) => getFormatCache().emojis[index].includes(filter);
-export const MostUsedEmojis = ({ data, options }: { data?: EmojiStats; options: number[] }) => (
-    <MostUsed
-        what="Emoji"
-        unit={options[1] === 0 || options[1] === undefined ? "Times used" : "Times reacted"}
-        counts={options[1] === 0 || options[1] === undefined ? data.inText.count : data.inReactions.count}
-        filter={EmojiFilterFns[options[0] as unknown as keyof typeof EmojiFilterFns]}
-        maxItems={Math.min(15, getDatabase().emojis.length)}
-        itemComponent={EmojiLabel}
-        searchable
-        searchPlaceholder={EmojiFilterPlaceholders[options[0] as unknown as keyof typeof EmojiFilterPlaceholders]}
-        transformFilter={EmojisTransformFilter}
-        indexOf={EmojisIndexOf}
-        inFilter={EmojisInFilter}
-    />
-);
-export const MostProducerEmojis = ({ data, options }: { data?: EmojiStats; options: number[] }) => (
-    <MostUsed
-        what={options[0] === 0 ? "Author" : "Channel"}
-        unit="Number of emojis used"
-        counts={options[0] === 0 ? data.inText.authorCount : data.inText.channelCount}
-        maxItems={Math.min(15, Math.max(getDatabase().authors.length, getDatabase().channels.length))}
-        itemComponent={options[0] === 0 ? AuthorLabel : ChannelLabel}
-        colorHue={options[0] === 0 ? 240 : 266}
-    />
-);
+export const MostUsedEmojis = ({ options }: { options: number[] }) => {
+    const emojiStats = useBlockData("emoji/stats");
+    return (
+        <MostUsed
+            what="Emoji"
+            unit={options[1] === 0 ? "Times used" : "Times reacted"}
+            counts={emojiStats ? emojiStats[options[1] === 0 ? "inText" : "inReactions"].counts.emojis : undefined}
+            filter={EmojiFilterFns[options[0] as unknown as keyof typeof EmojiFilterFns]}
+            maxItems={Math.min(15, getDatabase().emojis.length)}
+            itemComponent={EmojiLabel}
+            searchable
+            searchPlaceholder={EmojiFilterPlaceholders[options[0] as unknown as keyof typeof EmojiFilterPlaceholders]}
+            transformFilter={EmojisTransformFilter}
+            indexOf={EmojisIndexOf}
+            inFilter={EmojisInFilter}
+        />
+    );
+};
+export const MostProducerEmojis = ({ options }: { options: number[] }) => {
+    const emojiStats = useBlockData("emoji/stats");
+    return (
+        <MostUsed
+            what={options[0] === 0 ? "Author" : "Channel"}
+            unit="Number of emojis used"
+            counts={emojiStats ? emojiStats.inText.counts[options[0] === 0 ? "authors" : "channels"] : undefined}
+            maxItems={Math.min(15, Math.max(getDatabase().authors.length, getDatabase().channels.length))}
+            itemComponent={options[0] === 0 ? AuthorLabel : ChannelLabel}
+            colorHue={options[0] === 0 ? 240 : 266}
+        />
+    );
+};
+
 // at this point in the project, I just can't come up with new names
 export const MostGetterEmojis = ({ data, options }: { data?: EmojiStats; options: number[] }) => (
     <MostUsed
