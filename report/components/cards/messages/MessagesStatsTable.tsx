@@ -92,7 +92,8 @@ const MessagesStatsTable = () => {
             value: stats?.edited,
             tooltip: (
                 <>
-                    <b>{stats ? ((stats.edited / stats.total) * 100).toFixed(2) : "-"}%</b> of all messages were edited
+                    <b>{stats ? ((stats.edited / stats.total) * 100).toFixed(2) : "-"}%</b> of total messages were
+                    edited
                 </>
             ),
         },

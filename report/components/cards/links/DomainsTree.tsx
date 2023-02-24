@@ -1,4 +1,4 @@
-import { Bullet, Color, Container, Picture, Root, Theme, object, p50, percent } from "@amcharts/amcharts5";
+import { Bullet, Color, Container, Picture, Root, Theme, p50 } from "@amcharts/amcharts5";
 import { BreadcrumbBar, Treemap } from "@amcharts/amcharts5/hierarchy";
 import { DomainTreeEntry } from "@pipeline/aggregate/blocks/domains/DomainsStats";
 import { useBlockData } from "@report/BlockHook";
@@ -7,34 +7,12 @@ import { AmCharts5Chart } from "@report/components/viz/amcharts/AmCharts5Chart";
 const createTreeTheme = (root: Root) => {
     const treeTheme = Theme.new(root);
 
-    treeTheme.rule("RoundedRectangle", ["hierarchy", "node", "shape", "depth1"]).setAll({
-        strokeWidth: 2,
-        stroke: Color.fromHex(0x393f44),
-    });
-
-    treeTheme.rule("Label", ["node", "depth1"]).setAll({
-        centerY: 32,
-    });
-
-    /*
-    treeTheme.rule("RoundedRectangle", ["hierarchy", "node", "shape", "depth1"]).setAll({
-        strokeWidth: 2,
-    });
-
-    treeTheme.rule("RoundedRectangle", ["hierarchy", "node", "shape", "depth2"]).setAll({
-        fillOpacity: 0,
-        strokeWidth: 1,
-        strokeOpacity: 0.2,
-    });
-
-    treeTheme.rule("Label", ["node", "depth1"]).setAll({
-        forceHidden: true,
-    });
-
-    treeTheme.rule("Label", ["node", "depth2"]).setAll({
-        fontSize: 10,
-    });
-    */
+    for (let depth = 0; depth < 10; depth++) {
+        treeTheme.rule("RoundedRectangle", ["hierarchy", "node", "shape", "depth" + depth]).setAll({
+            strokeWidth: 2,
+            stroke: Color.fromHex(0x232930),
+        });
+    }
 
     return treeTheme;
 };
@@ -51,22 +29,25 @@ const createChart = (c: Container) => {
             childDataField: "subdomains",
             nodePaddingOuter: 0,
             nodePaddingInner: 0,
+            nodePaddingTop: 0,
+            nodePaddingBottom: 0,
         })
     );
 
     //series.get("colors")!.set("step", 1);
 
-    c.children.moveValue(
+    const nav = c.children.unshift(
         BreadcrumbBar.new(c.root, {
             series: series,
-        }),
-        0
+        })
     );
+    nav.labels.template.setAll({
+        fontSize: 20,
+        fill: Color.fromHex(0x7ed0ff),
+    });
 
     series.bullets.push(function (root, series, dataItem) {
         let depth = dataItem.get("depth");
-
-        console.log(depth);
 
         let domain = (dataItem.dataContext as DomainTreeEntry).domain;
 
@@ -79,7 +60,7 @@ const createChart = (c: Container) => {
         // remove front dot
         if (domain.startsWith(".")) domain = domain.substr(1);
 
-        let picture = Picture.new(root, {
+        const picture = Picture.new(root, {
             src: "https://icons.duckduckgo.com/ip3/" + domain + ".ico",
             centerX: p50,
             centerY: p50,

@@ -10,8 +10,15 @@ export type DomainTreeEntry = {
 };
 
 export interface DomainsStats {
-    /** Number of times each domain has been linked */
-    count: number[];
+    counts: {
+        /** Number of times each domain has been linked */
+        domains: number[];
+        /** Number of links each author has sent */
+        authors: number[];
+        /** Number of links sent in each channel */
+        channels: number[];
+    };
+
     /** Tree of domains with counts in the leafs */
     tree: DomainTreeEntry;
 }
@@ -128,13 +135,14 @@ const buildDomainTree = (domains: string[], counts: number[]) => {
     const finalTreeRoot = cleanup(treeRoot);
 
     console.log("Domain tree node count: " + numNodes);
-    console.log(finalTreeRoot);
 
     return finalTreeRoot;
 };
 
 const fn: BlockFn<DomainsStats> = (database, filters, common, args) => {
     const domainsCount = new Array(database.domains.length).fill(0);
+    const authorsCount = new Array(database.authors.length).fill(0);
+    const channelsCount = new Array(database.channels.length).fill(0);
 
     const processMessage = (msg: MessageView) => {
         const domains = msg.domains;
@@ -143,13 +151,19 @@ const fn: BlockFn<DomainsStats> = (database, filters, common, args) => {
         for (const domain of domains) {
             // count
             domainsCount[domain[0]] += domain[1];
+            authorsCount[msg.authorIndex] += domain[1];
+            channelsCount[msg.channelIndex] += domain[1];
         }
     };
 
     filterMessages(processMessage, database, filters);
 
     return {
-        count: domainsCount,
+        counts: {
+            domains: domainsCount,
+            authors: authorsCount,
+            channels: channelsCount,
+        },
         tree: buildDomainTree(database.domains, domainsCount),
     };
 };

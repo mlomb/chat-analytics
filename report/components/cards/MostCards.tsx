@@ -159,13 +159,23 @@ export const MostLinkedDomains = () => (
     <MostUsed
         what="Domain"
         unit="Times linked"
-        counts={useBlockData("domains/stats")?.count}
+        counts={useBlockData("domains/stats")?.counts.domains}
         maxItems={Math.min(15, getDatabase().domains.length)}
         itemComponent={DomainLabel}
         searchable
         searchPlaceholder="Filter domains..."
         indexOf={DomainsIndexOf}
         inFilter={DomainsInFilter}
+    />
+);
+export const MostLinks = ({ options }: { options: number[] }) => (
+    <MostUsed
+        what={options[0] === 0 ? "Author" : "Channel"}
+        unit="Total links sent"
+        counts={useBlockData("domains/stats")?.counts[options[0] === 0 ? "authors" : "channels"]}
+        itemComponent={options[0] === 0 ? AuthorLabel : ChannelLabel}
+        maxItems={Math.min(15, options[0] === 0 ? getDatabase().authors.length : getDatabase().channels.length)}
+        colorHue={options[0] === 0 ? 240 : 266}
     />
 );
 

@@ -11,6 +11,7 @@ import {
     MostConversations,
     MostGetterEmojis,
     MostLinkedDomains,
+    MostLinks,
     MostMentioned,
     MostMessagesAuthors,
     MostMessagesChannels,
@@ -247,6 +248,7 @@ const ReportDashboard = () => {
                 cards: [
                     <Card num={1} title="Most linked domains" children={MostLinkedDomains} />,
                     <Card num={2} title="Linked by domain hierarchy" children={DomainsTree} />,
+                    <Card num={1} title={["Most links sent", ["by author", "in channel"]]} children={MostLinks} />,
                 ],
             },
             {
