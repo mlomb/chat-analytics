@@ -84,7 +84,7 @@ const WordsInFilter = (index: number, filter: string | RegExp) => {
 export const MostUsedWords = ({ options }: { options: number[] }) => {
     const languageStats = useBlockData("language/stats");
     return options[0] === 1 ? (
-        <WordCloud wordsCount={languageStats?.wordsCount || []} />
+        <WordCloud wordsCount={languageStats?.wordsCount} />
     ) : (
         <MostUsed
             what="Word"

@@ -17,7 +17,7 @@ const createTreeTheme = (root: Root) => {
     return treeTheme;
 };
 
-const createChart = (c: Container) => {
+const createTreeChart = (c: Container) => {
     let series = c.children.push(
         Treemap.new(c.root, {
             sort: "descending",
@@ -88,7 +88,7 @@ const DomainsTree = () => (
     <AmCharts5Chart
         /* TreeMap appears to be broken if animations are disabled, wtf? */
         animated={true}
-        create={createChart}
+        create={createTreeChart}
         createTheme={createTreeTheme}
         data={useBlockData("domains/stats")?.tree}
         style={{

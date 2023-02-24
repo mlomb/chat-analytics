@@ -1,6 +1,6 @@
-import { useLayoutEffect, useRef } from "react";
+import { useCallback } from "react";
 
-import { Color, Root, Tooltip } from "@amcharts/amcharts5";
+import { Color, Container, Tooltip } from "@amcharts/amcharts5";
 import {
     AxisRendererX,
     AxisRendererY,
@@ -10,94 +10,70 @@ import {
     XYChart,
     XYCursor,
 } from "@amcharts/amcharts5/xy";
-import { SentimentInDate } from "@pipeline/aggregate/blocks/sentiment/SentimentPerPeriod";
+import { SentimentInDate, SentimentPerPeriod } from "@pipeline/aggregate/blocks/sentiment/SentimentPerPeriod";
 import { useBlockData } from "@report/BlockHook";
-
-import { Themes, enableDebouncedResize, syncAxisWithTimeFilter } from "../../viz/amcharts/AmCharts5";
+import { syncAxisWithTimeFilter } from "@report/components/viz/amcharts/AmCharts5";
+import { AmCharts5Chart, CreateFn } from "@report/components/viz/amcharts/AmCharts5Chart";
 
 const SentimentOverTime = ({ options }: { options: number[] }) => {
-    const chartDiv = useRef<HTMLDivElement>(null);
-    const xAxisRef = useRef<DateAxis<any> | null>(null);
-    const yAxisRef = useRef<ValueAxis<any> | null>(null);
-    const seriesRef = useRef<ColumnSeries[]>([]);
-    const data = useBlockData("sentiment/per-period");
-
-    useLayoutEffect(() => {
-        const root = Root.new(chartDiv.current!);
-        root.setThemes(Themes(root, false));
-        const cleanupDebounce = enableDebouncedResize(root);
-
-        const chart = root.container.children.push(
-            XYChart.new(root, {
-                layout: root.verticalLayout,
-            })
-        );
-        chart.zoomOutButton.set("forceHidden", true);
-
-        const cursor = chart.set("cursor", XYCursor.new(root, {}));
-        cursor.lineX.set("visible", false);
-        cursor.lineY.set("visible", false);
-
-        const xAxis = chart.xAxes.push(
-            DateAxis.new(root, {
-                baseInterval: { timeUnit: "week", count: 1 },
-                renderer: AxisRendererX.new(root, {}),
-            })
-        );
-        const yAxis = chart.yAxes.push(
-            ValueAxis.new(root, {
-                renderer: AxisRendererY.new(root, {}),
-            })
-        );
-
-        function createSeries(field: keyof SentimentInDate, color: Color) {
-            let series = chart.series.push(
-                ColumnSeries.new(root, {
-                    xAxis: xAxis,
-                    yAxis: yAxis,
-                    valueXField: "t",
-                    valueYField: field,
-                    fill: color,
-                    stacked: true,
-                    tooltip: Tooltip.new(root, {}),
+    const createSentimentChart = useCallback<CreateFn<SentimentPerPeriod>>(
+        (c: Container) => {
+            const chart = c.root.container.children.push(
+                XYChart.new(c.root, {
+                    layout: c.root.verticalLayout,
                 })
             );
 
-            seriesRef.current.push(series);
-        }
+            const cursor = chart.set("cursor", XYCursor.new(c.root, {}));
+            cursor.lineX.set("visible", false);
+            cursor.lineY.set("visible", false);
 
-        createSeries("p", root.interfaceColors.get("positive")!); // positive messages
-        createSeries("n", root.interfaceColors.get("negative")!); // negative messages
+            const xAxis = chart.xAxes.push(
+                DateAxis.new(c.root, {
+                    baseInterval: { timeUnit: options[0] === 0 ? "week" : "month", count: 1 },
+                    renderer: AxisRendererX.new(c.root, {}),
+                })
+            );
+            const yAxis = chart.yAxes.push(
+                ValueAxis.new(c.root, {
+                    renderer: AxisRendererY.new(c.root, {}),
+                })
+            );
+            yAxis.setAll(
+                options[1] === 0
+                    ? {
+                          min: -100,
+                          max: 100,
+                          numberFormat: "#s'%'",
+                      }
+                    : {
+                          min: undefined,
+                          max: undefined,
+                          numberFormat: "#s",
+                      }
+            );
 
-        xAxisRef.current = xAxis;
-        yAxisRef.current = yAxis;
+            const series: ColumnSeries[] = [];
 
-        const cleanup = syncAxisWithTimeFilter(seriesRef.current, xAxis, yAxis);
+            function createSeries(field: keyof SentimentInDate, color: Color) {
+                series.push(
+                    chart.series.push(
+                        ColumnSeries.new(c.root, {
+                            xAxis: xAxis,
+                            yAxis: yAxis,
+                            valueXField: "t",
+                            valueYField: field,
+                            fill: color,
+                            stacked: true,
+                            tooltip: Tooltip.new(c.root, {}),
+                        })
+                    )
+                );
+            }
 
-        return () => {
-            cleanup();
-            cleanupDebounce();
-            root.dispose();
-            xAxisRef.current = null;
-            yAxisRef.current = null;
-            seriesRef.current = [];
-        };
-    }, []);
+            createSeries("p", c.root.interfaceColors.get("positive")!); // positive messages
+            createSeries("n", c.root.interfaceColors.get("negative")!); // negative messages
 
-    useLayoutEffect(() => {
-        xAxisRef.current?.set("baseInterval", { timeUnit: options[0] === 0 ? "week" : "month", count: 1 });
-        // prettier-ignore
-        yAxisRef.current?.setAll(options[1] === 0 ? {
-            min: -100,
-            max: 100,
-            numberFormat: "#s'%'",
-        } : {
-            min: undefined,
-            max: undefined,
-            numberFormat: "#s",
-        });
-        const series = seriesRef.current;
-        if (series) {
             if (options[1] === 0) {
                 series[0].set("valueYField", "percP");
                 series[1].set("valueYField", "percN");
@@ -114,21 +90,30 @@ const SentimentOverTime = ({ options }: { options: number[] }) => {
                 series[0].get("tooltip")!.set("labelText", "{valueY} more positive messages than negative sent");
                 series[1].get("tooltip")!.set("labelText", "{valueY} more negative messages than positive sent");
             }
-            if (data) {
+
+            const cleanupAxisSync = syncAxisWithTimeFilter(series, xAxis, yAxis);
+            // since we are syncing the axis, we don't want the zoom out button
+            chart.zoomOutButton.set("forceHidden", true);
+
+            const setData = (data: SentimentPerPeriod) => {
                 series.forEach((s) => s.data.setAll([data.perWeek, data.perMonth][options[0]]));
-            }
-        }
-    }, [data, options]);
+            };
+
+            return [setData, cleanupAxisSync];
+        },
+        [options[0], options[1]]
+    );
 
     return (
-        <div
-            ref={chartDiv}
+        <AmCharts5Chart
+            create={createSentimentChart}
+            data={useBlockData("sentiment/per-period")}
             style={{
                 minHeight: 550,
                 marginLeft: 5,
                 marginBottom: 8,
             }}
-        ></div>
+        />
     );
 };
 
