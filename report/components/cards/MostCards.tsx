@@ -1,9 +1,9 @@
 import { Index } from "@pipeline/Types";
+import { DomainsStats } from "@pipeline/aggregate/blocks/domains/DomainsStats";
 import { EmojiStats } from "@pipeline/aggregate/blocks/emojis/EmojiStats";
 import { ConversationStats } from "@pipeline/aggregate/blocks/interaction/ConversationStats";
 import { InteractionStats } from "@pipeline/aggregate/blocks/interaction/InteractionStats";
 import { LanguageStats } from "@pipeline/aggregate/blocks/language/LanguageStats";
-import { ExternalStats } from "@pipeline/aggregate/blocks/links/ExternalStats";
 import { useBlockData } from "@report/BlockHook";
 import { getDatabase, getFormatCache } from "@report/WorkerWrapper";
 import WordCloud from "@report/components/cards/language/WordCloud";
@@ -155,11 +155,11 @@ export const MostGetterEmojis = ({ data, options }: { data?: EmojiStats; options
 ///////////////////////////
 const DomainsIndexOf = (value: string) => getDatabase().domains.indexOf(value);
 const DomainsInFilter = (index: number, filter: string) => getDatabase().domains[index].includes(filter);
-export const MostLinkedDomains = ({ data }: { data?: ExternalStats }) => (
+export const MostLinkedDomains = () => (
     <MostUsed
         what="Domain"
         unit="Times linked"
-        counts={data?.domainsCount}
+        counts={useBlockData("domains/stats")?.count}
         maxItems={Math.min(15, getDatabase().domains.length)}
         itemComponent={DomainLabel}
         searchable

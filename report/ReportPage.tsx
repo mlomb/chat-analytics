@@ -23,6 +23,7 @@ import { TopReacted } from "@report/components/cards/TopCards";
 import EmojiStatsTable from "@report/components/cards/emojis/EmojiStatsTable";
 import ConversationParticipation from "@report/components/cards/interaction/ConversationParticipation";
 import LanguageStatsTable from "@report/components/cards/language/LanguageStatsTable";
+import DomainsTree from "@report/components/cards/links/DomainsTree";
 import EditTime from "@report/components/cards/messages/EditTime";
 import EditedMessages from "@report/components/cards/messages/EditedMessages";
 import { MessagesOverTime } from "@report/components/cards/messages/MessagesOverTime";
@@ -241,11 +242,13 @@ const ReportDashboard = () => {
                 ],
             },
             {
-                name: "🔗 External",
-                value: "external",
-                cards: [<Card num={1} title="Most linked domains" children={MostLinkedDomains} />],
+                name: "🔗 Links",
+                value: "links",
+                cards: [
+                    <Card num={1} title="Most linked domains" children={MostLinkedDomains} />,
+                    <Card num={2} title="Linked by domain hierarchy" children={DomainsTree} />,
+                ],
             },
-
             {
                 name: "📅 Timeline",
                 value: "timeline",

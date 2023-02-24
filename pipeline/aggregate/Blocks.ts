@@ -1,14 +1,14 @@
 import { CommonBlockData } from "@pipeline/aggregate/Common";
 import { Filters } from "@pipeline/aggregate/Filters";
+import DomainsStats from "@pipeline/aggregate/blocks/domains/DomainsStats";
 import EmojiStats from "@pipeline/aggregate/blocks/emojis/EmojiStats";
 import ConversationStats from "@pipeline/aggregate/blocks/interaction/ConversationStats";
 import ConversationsDuration from "@pipeline/aggregate/blocks/interaction/ConversationsDuration";
 import InteractionStats from "@pipeline/aggregate/blocks/interaction/InteractionStats";
 import LanguageStats from "@pipeline/aggregate/blocks/language/LanguageStats";
 import WordStats from "@pipeline/aggregate/blocks/language/WordStats";
-import ExternalStats from "@pipeline/aggregate/blocks/links/ExternalStats";
 import MessagesEdited from "@pipeline/aggregate/blocks/messages/MessagesEdited";
-import MessagesPerCycle from "@pipeline/aggregate/blocks/messages/MessagesPerPeriod";
+import MessagesPerPeriod from "@pipeline/aggregate/blocks/messages/MessagesPerPeriod";
 import MessagesStats from "@pipeline/aggregate/blocks/messages/MessagesStats";
 import SentimentPerCycle from "@pipeline/aggregate/blocks/sentiment/SentimentPerCycle";
 import SentimentStats from "@pipeline/aggregate/blocks/sentiment/SentimentStats";
@@ -40,12 +40,12 @@ export const Blocks = {
     [ConversationsDuration.key]: ConversationsDuration,
     [ConversationStats.key]: ConversationStats,
     [EmojiStats.key]: EmojiStats,
-    [ExternalStats.key]: ExternalStats,
+    [DomainsStats.key]: DomainsStats,
     [Growth.key]: Growth,
     [InteractionStats.key]: InteractionStats,
     [LanguageStats.key]: LanguageStats,
     [MessagesEdited.key]: MessagesEdited,
-    [MessagesPerCycle.key]: MessagesPerCycle,
+    [MessagesPerPeriod.key]: MessagesPerPeriod,
     [MessagesStats.key]: MessagesStats,
     [SentimentPerCycle.key]: SentimentPerCycle,
     [SentimentStats.key]: SentimentStats,

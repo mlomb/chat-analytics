@@ -1,6 +1,6 @@
 import { useLayoutEffect, useRef } from "react";
 
-import { Container, Root, p100 } from "@amcharts/amcharts5";
+import { Container, Root, Theme, p100 } from "@amcharts/amcharts5";
 import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 import am5themes_Dark from "@amcharts/amcharts5/themes/Dark";
 import { enableDebouncedResize } from "@report/components/viz/amcharts/AmCharts5";
@@ -12,6 +12,7 @@ export type CreateFn<Data> = (c: Container) => SetDataFn<Data> | [SetDataFn<Data
 interface Props<Data extends any> {
     style?: React.CSSProperties;
     animated?: true;
+    createTheme?: (root: Root) => Theme;
     data: Data | undefined;
     create: CreateFn<Data>;
 }
@@ -27,9 +28,11 @@ export const AmCharts5Chart = <Data extends any>(props: Props<Data>) => {
     useLayoutEffect(() => {
         const root = Root.new(chartDiv.current!);
         root.setThemes(
-            props.animated === true
-                ? [am5themes_Dark.new(root), am5themes_Animated.new(root)]
-                : [am5themes_Dark.new(root)]
+            (
+                (props.animated === true
+                    ? [am5themes_Dark.new(root), am5themes_Animated.new(root)]
+                    : [am5themes_Dark.new(root)]) as Theme[]
+            ).concat(props.createTheme ? [props.createTheme(root)] : [])
         );
 
         const container = root.container.children.push(
@@ -61,11 +64,11 @@ export const AmCharts5Chart = <Data extends any>(props: Props<Data>) => {
             cleanupDebounce();
             root.dispose();
         };
-    }, [props.animated, props.create]);
+    }, [props.animated, props.createTheme, props.create]);
 
     useLayoutEffect(() => {
         if (props.data !== undefined) setDataRef.current(props.data);
-    }, [props.animated, props.create, props.data]);
+    }, [props.animated, props.createTheme, props.create, props.data]);
 
     return <div ref={chartDiv} style={props.style} />;
 };
