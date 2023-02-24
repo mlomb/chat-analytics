@@ -1,34 +1,36 @@
 import { LanguageNames } from "@pipeline/Languages";
-import { LanguageStats } from "@pipeline/aggregate/blocks/language/LanguageStats";
+import { useBlockData } from "@report/BlockHook";
 import DottedTable, { Line } from "@report/components/viz/DottedTable";
 
-const LanguageStatsTable = ({ data }: { data?: LanguageStats }) => {
+const LanguageStatsTable = () => {
+    const languageStats = useBlockData("language/stats");
+
     const lines: Line[] = [
         {
             type: "number",
             formatter: "integer",
             label: "Total words used",
-            value: data?.totalWords,
+            value: languageStats?.totalWords,
         },
         {
             type: "number",
             formatter: "integer",
             label: "Unique words used",
-            value: data?.uniqueWords,
+            value: languageStats?.uniqueWords,
         },
         {
             type: "number",
             formatter: "decimal",
             label: "Average words per message",
-            value: data?.avgWordsPerMessage,
+            value: languageStats?.avgWordsPerMessage,
         },
         {
             type: "number",
             formatter: "integer",
             label: "Languages used",
-            value: data ? data.languages.reduce((acc, lang) => acc + +(lang.index > 0), 0) : 0,
+            value: languageStats ? languageStats.languages.reduce((acc, lang) => acc + +(lang.index > 0), 0) : 0,
         },
-        ...(data?.languages.map(
+        ...(languageStats?.languages.map(
             (language) =>
                 ({
                     type: "number",

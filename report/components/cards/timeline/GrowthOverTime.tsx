@@ -11,14 +11,15 @@ import {
     XYChart,
     XYSeries,
 } from "@amcharts/amcharts5/xy";
-import { TimelineStats } from "@pipeline/aggregate/blocks/timeline/Growth";
+import { useBlockData } from "@report/BlockHook";
 
 import { Themes, enableDebouncedResize, syncAxisWithTimeFilter } from "../../viz/amcharts/AmCharts5";
 
-const GrowthOverTime = ({ data, options }: { data?: TimelineStats; options: number[] }) => {
+const GrowthOverTime = () => {
     const chartDiv = useRef<HTMLDivElement>(null);
     const xAxisRef = useRef<DateAxis<any> | null>(null);
     const seriesRef = useRef<XYSeries | null>(null);
+    const data = useBlockData("growth");
 
     useLayoutEffect(() => {
         const root = Root.new(chartDiv.current!);

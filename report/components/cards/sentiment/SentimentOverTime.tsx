@@ -11,14 +11,16 @@ import {
     XYCursor,
 } from "@amcharts/amcharts5/xy";
 import { SentimentInDate, SentimentPerCycle } from "@pipeline/aggregate/blocks/sentiment/SentimentPerCycle";
+import { useBlockData } from "@report/BlockHook";
 
 import { Themes, enableDebouncedResize, syncAxisWithTimeFilter } from "../../viz/amcharts/AmCharts5";
 
-const SentimentOverTime = ({ data, options }: { data?: SentimentPerCycle; options: number[] }) => {
+const SentimentOverTime = ({ options }: { options: number[] }) => {
     const chartDiv = useRef<HTMLDivElement>(null);
     const xAxisRef = useRef<DateAxis<any> | null>(null);
     const yAxisRef = useRef<ValueAxis<any> | null>(null);
     const seriesRef = useRef<ColumnSeries[]>([]);
+    const data = useBlockData("sentiment-per-cycle");
 
     useLayoutEffect(() => {
         const root = Root.new(chartDiv.current!);

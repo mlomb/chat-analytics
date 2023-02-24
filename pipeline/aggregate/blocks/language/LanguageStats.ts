@@ -57,7 +57,7 @@ const fn: BlockFn<LanguageStats> = (database, filters, common, args) => {
 };
 
 export default {
-    key: "language-stats",
+    key: "language/stats",
     triggers: ["authors", "channels", "time"],
     fn,
-} as BlockDescription<"language-stats", LanguageStats>;
+} as BlockDescription<"language/stats", LanguageStats>;

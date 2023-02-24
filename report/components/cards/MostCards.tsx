@@ -27,11 +27,11 @@ export const MostMessagesAuthors = () => (
         colorHue={240}
     />
 );
-export const MostRepliesAuthors = ({ data }: { data?: InteractionStats }) => (
+export const MostRepliesAuthors = () => (
     <MostUsed
         what="Author"
         unit="Number of messages replied"
-        counts={data?.authorsReplyCount}
+        counts={useBlockData("interaction/stats")?.authorsReplyCount}
         itemComponent={AuthorLabel}
         maxItems={Math.min(15, getDatabase().authors.length)}
         colorHue={240}
@@ -55,16 +55,23 @@ export const MostMessagesChannels = () => (
 ///////////////////////////
 /// CONVERSATIONS
 ///////////////////////////
-export const MostConversations = ({ data, options }: { data?: ConversationStats; options: number[] }) => (
-    <MostUsed
-        what={options[0] === 0 ? "Author" : "Channel"}
-        unit="Number of conversations started"
-        counts={options[0] === 0 ? data.authorConversations : data.channelConversations}
-        itemComponent={options[0] === 0 ? AuthorLabel : ChannelLabel}
-        maxItems={Math.min(15, Math.max(getDatabase().authors.length, getDatabase().channels.length))}
-        colorHue={options[0] === 0 ? 240 : 266}
-    />
-);
+export const MostConversations = ({ options }: { options: number[] }) => {
+    const conversationStats = useBlockData("interaction/conversation-stats");
+    return (
+        <MostUsed
+            what={options[0] === 0 ? "Author" : "Channel"}
+            unit="Number of conversations started"
+            counts={
+                conversationStats
+                    ? conversationStats[options[0] === 0 ? "authorConversations" : "channelConversations"]
+                    : undefined
+            }
+            itemComponent={options[0] === 0 ? AuthorLabel : ChannelLabel}
+            maxItems={Math.min(15, Math.max(getDatabase().authors.length, getDatabase().channels.length))}
+            colorHue={options[0] === 0 ? 240 : 266}
+        />
+    );
+};
 
 ///////////////////////////
 /// WORDS
@@ -74,14 +81,15 @@ const WordsInFilter = (index: number, filter: string | RegExp) => {
     const word = getFormatCache().words[index];
     return filter instanceof RegExp ? filter.test(word) : word.startsWith(filter);
 };
-export const MostUsedWords = ({ data, options }: { data?: LanguageStats; options: number[] }) =>
-    options[0] === 1 ? (
-        <WordCloud wordsCount={data?.wordsCount} />
+export const MostUsedWords = ({ options }: { options: number[] }) => {
+    const languageStats = useBlockData("language/stats");
+    return options[0] === 1 ? (
+        <WordCloud wordsCount={languageStats?.wordsCount || []} />
     ) : (
         <MostUsed
             what="Word"
             unit="Times used"
-            counts={data?.wordsCount}
+            counts={languageStats?.wordsCount}
             maxItems={Math.min(15, getDatabase().words.length)}
             itemComponent={WordLabel}
             searchable
@@ -91,6 +99,7 @@ export const MostUsedWords = ({ data, options }: { data?: LanguageStats; options
             inFilter={WordsInFilter}
         />
     );
+};
 
 ///////////////////////////
 /// EMOJIS
@@ -143,18 +152,19 @@ export const MostProducerEmojis = ({ options }: { options: number[] }) => {
         />
     );
 };
-
-// at this point in the project, I just can't come up with new names
-export const MostGetterEmojis = ({ data, options }: { data?: EmojiStats; options: number[] }) => (
-    <MostUsed
-        what={options[0] === 0 ? "Author" : "Channel"}
-        unit="Number of reactions received"
-        counts={options[0] === 0 ? data.inReactions.authorCount : data.inReactions.channelCount}
-        maxItems={Math.min(15, Math.max(getDatabase().authors.length, getDatabase().channels.length))}
-        itemComponent={options[0] === 0 ? AuthorLabel : ChannelLabel}
-        colorHue={options[0] === 0 ? 240 : 266}
-    />
-);
+export const MostReactionReceiver = ({ options }: { options: number[] }) => {
+    const emojiStats = useBlockData("emoji/stats");
+    return (
+        <MostUsed
+            what={options[0] === 0 ? "Author" : "Channel"}
+            unit="Number of reactions received"
+            counts={emojiStats ? emojiStats.inReactions.counts[options[0] === 0 ? "authors" : "channels"] : undefined}
+            maxItems={Math.min(15, Math.max(getDatabase().authors.length, getDatabase().channels.length))}
+            itemComponent={options[0] === 0 ? AuthorLabel : ChannelLabel}
+            colorHue={options[0] === 0 ? 240 : 266}
+        />
+    );
+};
 
 ///////////////////////////
 /// DOMAINS

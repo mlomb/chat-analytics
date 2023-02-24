@@ -9,13 +9,13 @@ import LoadingOverlay from "@report/components/LoadingOverlay";
 import { TabContainer } from "@report/components/Tabs";
 import {
     MostConversations,
-    MostGetterEmojis,
     MostLinkedDomains,
     MostLinks,
     MostMentioned,
     MostMessagesAuthors,
     MostMessagesChannels,
     MostProducerEmojis,
+    MostReactionReceiver,
     MostRepliesAuthors,
     MostUsedEmojis,
     MostUsedWords,
@@ -166,6 +166,15 @@ const ReportDashboard = () => {
                 ],
             },
             {
+                name: "🔗 Links",
+                value: "links",
+                cards: [
+                    <Card num={1} title="Most linked domains" children={MostLinkedDomains} />,
+                    <Card num={2} title="Linked by domain hierarchy" children={DomainsTree} />,
+                    <Card num={1} title={["Most links sent", ["by author", "in channel"]]} children={MostLinks} />,
+                ],
+            },
+            {
                 name: "🌀 Interaction",
                 value: "interaction",
                 cards: [<Card num={1} title="Most mentioned" children={MostMentioned} />]
@@ -180,7 +189,7 @@ const ReportDashboard = () => {
                                   <Card
                                       num={1}
                                       title={[["Authors", "Channels"], "that get the most reactions"]}
-                                      children={MostGetterEmojis}
+                                      children={MostReactionReceiver}
                                   />,
                               ]
                             : []
@@ -240,15 +249,6 @@ const ReportDashboard = () => {
                         children={SentimentOverTime}
                     />,
                     <Card num={1} title="Sentiment overview" children={SentimentStatsTable} />,
-                ],
-            },
-            {
-                name: "🔗 Links",
-                value: "links",
-                cards: [
-                    <Card num={1} title="Most linked domains" children={MostLinkedDomains} />,
-                    <Card num={2} title="Linked by domain hierarchy" children={DomainsTree} />,
-                    <Card num={1} title={["Most links sent", ["by author", "in channel"]]} children={MostLinks} />,
                 ],
             },
             {

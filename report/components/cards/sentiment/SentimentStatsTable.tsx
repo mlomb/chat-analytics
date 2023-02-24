@@ -1,26 +1,28 @@
-import { SentimentStats } from "@pipeline/aggregate/blocks/sentiment/SentimentStats";
+import { useBlockData } from "@report/BlockHook";
 import SentimentPieChart from "@report/components/cards/sentiment/SentimentPieChart";
 import DottedTable, { Line } from "@report/components/viz/DottedTable";
 
-const SentimentStatsTable = ({ data }: { data?: SentimentStats }) => {
+const SentimentStatsTable = () => {
+    const sentimentStats = useBlockData("sentiment-stats");
+
     const lines: Line[] = [
         {
             type: "number",
             formatter: "integer",
             label: "Positive messages",
-            value: data?.positiveMessages,
+            value: sentimentStats?.positiveMessages,
         },
         {
             type: "number",
             formatter: "integer",
             label: "Negative messages",
-            value: data?.negativeMessages,
+            value: sentimentStats?.negativeMessages,
         },
         {
             type: "number",
             formatter: "integer",
             label: "Neutral messages",
-            value: data?.neutralMessages,
+            value: sentimentStats?.neutralMessages,
         },
     ];
 
@@ -28,9 +30,9 @@ const SentimentStatsTable = ({ data }: { data?: SentimentStats }) => {
         <>
             <DottedTable lines={lines} />
             <SentimentPieChart
-                n={data?.negativeMessages || 0}
-                p={data?.positiveMessages || 0}
-                z={data?.neutralMessages || 0}
+                n={sentimentStats?.negativeMessages || 0}
+                p={sentimentStats?.positiveMessages || 0}
+                z={sentimentStats?.neutralMessages || 0}
             />
         </>
     );

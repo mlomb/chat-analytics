@@ -10,14 +10,15 @@ import {
     XYChart,
     XYSeries,
 } from "@amcharts/amcharts5/xy";
-import { ActiveAuthors } from "@pipeline/aggregate/blocks/timeline/ActiveAuthors";
+import { useBlockData } from "@report/BlockHook";
 
 import { Themes, enableDebouncedResize, syncAxisWithTimeFilter } from "../../viz/amcharts/AmCharts5";
 
-const ActiveAuthorsOverTime = ({ data, options }: { data?: ActiveAuthors; options: number[] }) => {
+const ActiveAuthorsOverTime = () => {
     const chartDiv = useRef<HTMLDivElement>(null);
     const xAxisRef = useRef<DateAxis<any> | null>(null);
     const seriesRef = useRef<XYSeries | null>(null);
+    const data = useBlockData("active-authors");
 
     useLayoutEffect(() => {
         const root = Root.new(chartDiv.current!);
