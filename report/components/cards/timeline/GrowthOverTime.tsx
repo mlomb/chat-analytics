@@ -19,7 +19,7 @@ const GrowthOverTime = () => {
     const chartDiv = useRef<HTMLDivElement>(null);
     const xAxisRef = useRef<DateAxis<any> | null>(null);
     const seriesRef = useRef<XYSeries | null>(null);
-    const data = useBlockData("growth");
+    const data = useBlockData("timeline/growth");
 
     useLayoutEffect(() => {
         const root = Root.new(chartDiv.current!);

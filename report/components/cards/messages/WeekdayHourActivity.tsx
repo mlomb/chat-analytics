@@ -1,6 +1,6 @@
 import { Color, Container, Tooltip, p100, percent } from "@amcharts/amcharts5";
 import { AxisRendererX } from "@amcharts/amcharts5/xy";
-import { MessagesStats, WeekdayHourEntry } from "@pipeline/aggregate/blocks/messages/MessagesStats";
+import { WeekdayHourEntry } from "@pipeline/aggregate/blocks/messages/MessagesStats";
 import { useBlockData } from "@report/BlockHook";
 import { createYAxisLabel } from "@report/components/viz/amcharts/AmCharts5";
 import { AmCharts5Chart } from "@report/components/viz/amcharts/AmCharts5Chart";

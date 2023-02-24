@@ -19,7 +19,7 @@ export type SentimentInDate = {
     percN: number;
 };
 
-export interface SentimentPerCycle {
+export interface SentimentPerPeriod {
     positiveMessages: number;
     negativeMessages: number;
     neutralMessages: number;
@@ -28,8 +28,8 @@ export interface SentimentPerCycle {
     perWeek: SentimentInDate[];
 }
 
-const fn: BlockFn<SentimentPerCycle> = (database, filters, common, args) => {
-    const res: SentimentPerCycle = {
+const fn: BlockFn<SentimentPerPeriod> = (database, filters, common, args) => {
+    const res: SentimentPerPeriod = {
         positiveMessages: 0,
         negativeMessages: 0,
         neutralMessages: 0,
@@ -108,7 +108,7 @@ const fn: BlockFn<SentimentPerCycle> = (database, filters, common, args) => {
 };
 
 export default {
-    key: "sentiment-per-cycle",
+    key: "sentiment/per-period",
     triggers: ["authors", "channels"],
     fn,
-} as BlockDescription<"sentiment-per-cycle", SentimentPerCycle>;
+} as BlockDescription<"sentiment/per-period", SentimentPerPeriod>;

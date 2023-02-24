@@ -18,7 +18,7 @@ const ActiveAuthorsOverTime = () => {
     const chartDiv = useRef<HTMLDivElement>(null);
     const xAxisRef = useRef<DateAxis<any> | null>(null);
     const seriesRef = useRef<XYSeries | null>(null);
-    const data = useBlockData("active-authors");
+    const data = useBlockData("timeline/active-authors");
 
     useLayoutEffect(() => {
         const root = Root.new(chartDiv.current!);

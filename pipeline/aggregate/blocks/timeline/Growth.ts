@@ -54,7 +54,7 @@ const fn: BlockFn<TimelineStats> = (database, filters, common, args) => {
 };
 
 export default {
-    key: "growth",
+    key: "timeline/growth",
     triggers: ["authors", "channels"],
     fn,
-} as BlockDescription<"growth", TimelineStats>;
+} as BlockDescription<"timeline/growth", TimelineStats>;

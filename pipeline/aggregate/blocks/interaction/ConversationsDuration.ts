@@ -85,7 +85,7 @@ const fn: BlockFn<ConversationDuration> = (database, filters, common, args) => {
 };
 
 export default {
-    key: "conversation-duration",
+    key: "interaction/conversation-duration",
     triggers: ["authors", "channels", "time"],
     fn,
-} as BlockDescription<"conversation-duration", ConversationDuration>;
+} as BlockDescription<"interaction/conversation-duration", ConversationDuration>;

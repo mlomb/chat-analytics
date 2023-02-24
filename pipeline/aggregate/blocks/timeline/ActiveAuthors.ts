@@ -40,7 +40,7 @@ const fn: BlockFn<ActiveAuthors> = (database, filters, common, args) => {
 };
 
 export default {
-    key: "active-authors",
+    key: "timeline/active-authors",
     triggers: ["authors", "channels"],
     fn,
-} as BlockDescription<"active-authors", ActiveAuthors>;
+} as BlockDescription<"timeline/active-authors", ActiveAuthors>;

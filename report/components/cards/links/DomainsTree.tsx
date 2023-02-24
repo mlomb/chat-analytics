@@ -1,4 +1,4 @@
-import { Bullet, Color, Container, DataItem, Picture, Root, Theme, p50 } from "@amcharts/amcharts5";
+import { Bullet, Color, Container, Picture, Root, Theme, p50 } from "@amcharts/amcharts5";
 import { BreadcrumbBar, Treemap } from "@amcharts/amcharts5/hierarchy";
 import { DomainTreeEntry } from "@pipeline/aggregate/blocks/domains/DomainsStats";
 import { useBlockData } from "@report/BlockHook";

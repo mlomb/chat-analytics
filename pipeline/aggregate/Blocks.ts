@@ -10,7 +10,7 @@ import WordStats from "@pipeline/aggregate/blocks/language/WordStats";
 import MessagesEdited from "@pipeline/aggregate/blocks/messages/MessagesEdited";
 import MessagesPerPeriod from "@pipeline/aggregate/blocks/messages/MessagesPerPeriod";
 import MessagesStats from "@pipeline/aggregate/blocks/messages/MessagesStats";
-import SentimentPerCycle from "@pipeline/aggregate/blocks/sentiment/SentimentPerCycle";
+import SentimentPerPeriod from "@pipeline/aggregate/blocks/sentiment/SentimentPerPeriod";
 import SentimentStats from "@pipeline/aggregate/blocks/sentiment/SentimentStats";
 import ActiveAuthors from "@pipeline/aggregate/blocks/timeline/ActiveAuthors";
 import Growth from "@pipeline/aggregate/blocks/timeline/Growth";
@@ -47,7 +47,7 @@ export const Blocks = {
     [MessagesEdited.key]: MessagesEdited,
     [MessagesPerPeriod.key]: MessagesPerPeriod,
     [MessagesStats.key]: MessagesStats,
-    [SentimentPerCycle.key]: SentimentPerCycle,
+    [SentimentPerPeriod.key]: SentimentPerPeriod,
     [SentimentStats.key]: SentimentStats,
     [WordStats.key]: WordStats,
 } as const;

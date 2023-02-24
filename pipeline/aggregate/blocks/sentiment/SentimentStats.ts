@@ -30,7 +30,7 @@ const fn: BlockFn<SentimentStats> = (database, filters, common, args) => {
 };
 
 export default {
-    key: "sentiment-stats",
+    key: "sentiment/stats",
     triggers: ["authors", "channels", "time"],
     fn,
-} as BlockDescription<"sentiment-stats", SentimentStats>;
+} as BlockDescription<"sentiment/stats", SentimentStats>;

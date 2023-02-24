@@ -10,7 +10,7 @@ import {
     XYChart,
     XYCursor,
 } from "@amcharts/amcharts5/xy";
-import { SentimentInDate, SentimentPerCycle } from "@pipeline/aggregate/blocks/sentiment/SentimentPerCycle";
+import { SentimentInDate } from "@pipeline/aggregate/blocks/sentiment/SentimentPerPeriod";
 import { useBlockData } from "@report/BlockHook";
 
 import { Themes, enableDebouncedResize, syncAxisWithTimeFilter } from "../../viz/amcharts/AmCharts5";
@@ -20,7 +20,7 @@ const SentimentOverTime = ({ options }: { options: number[] }) => {
     const xAxisRef = useRef<DateAxis<any> | null>(null);
     const yAxisRef = useRef<ValueAxis<any> | null>(null);
     const seriesRef = useRef<ColumnSeries[]>([]);
-    const data = useBlockData("sentiment-per-cycle");
+    const data = useBlockData("sentiment/per-period");
 
     useLayoutEffect(() => {
         const root = Root.new(chartDiv.current!);

@@ -7,7 +7,7 @@ import DottedTable, { Line } from "@report/components/viz/DottedTable";
 
 const MessagesStatsTable = () => {
     const stats = useBlockData("messages/stats");
-    const duration = useBlockData("conversation-duration");
+    const duration = useBlockData("interaction/conversation-duration");
 
     const db = getDatabase();
     const platformInfo = PlatformsInfo[db.config.platform];

@@ -22,7 +22,7 @@ const fn: BlockFn<WordStats, WordStatsArgs> = (database, filters, common, args) 
 };
 
 export default {
-    key: "word-stats",
+    key: "language/word-stats",
     triggers: ["authors", "channels", "time"],
     fn,
-} as BlockDescription<"word-stats", WordStats, WordStatsArgs>;
+} as BlockDescription<"language/word-stats", WordStats, WordStatsArgs>;

@@ -3,7 +3,7 @@ import SentimentPieChart from "@report/components/cards/sentiment/SentimentPieCh
 import DottedTable, { Line } from "@report/components/viz/DottedTable";
 
 const SentimentStatsTable = () => {
-    const sentimentStats = useBlockData("sentiment-stats");
+    const sentimentStats = useBlockData("sentiment/stats");
 
     const lines: Line[] = [
         {
