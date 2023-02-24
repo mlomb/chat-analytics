@@ -1,4 +1,4 @@
-import { Bullet, Color, Container, Picture, Root, Theme, p50 } from "@amcharts/amcharts5";
+import { Bullet, Color, Container, DataItem, Picture, Root, Theme, p50 } from "@amcharts/amcharts5";
 import { BreadcrumbBar, Treemap } from "@amcharts/amcharts5/hierarchy";
 import { DomainTreeEntry } from "@pipeline/aggregate/blocks/domains/DomainsStats";
 import { useBlockData } from "@report/BlockHook";
@@ -46,22 +46,27 @@ const createChart = (c: Container) => {
         fill: Color.fromHex(0x7ed0ff),
     });
 
+    series.events.on("dataitemselected", ({ dataItem }) => {
+        dataItem?._settings.children.forEach((c) => {
+            let domain = (c.dataContext as DomainTreeEntry).domain;
+
+            // skip "Other" nodes
+            if (domain.includes("Other")) return undefined;
+
+            // if TLD, try to load icon from nic site (nic.us, nic.io, etc.)
+            if (domain.startsWith(".") && domain.split(".").length === 2) domain = "nic" + domain;
+
+            // remove front dot
+            if (domain.startsWith(".")) domain = domain.substr(1);
+
+            const imageSrc = "https://icons.duckduckgo.com/ip3/" + domain + ".ico";
+
+            (c.bullets![0].get("sprite") as Picture).set("src", imageSrc);
+        });
+    });
+
     series.bullets.push(function (root, series, dataItem) {
-        let depth = dataItem.get("depth");
-
-        let domain = (dataItem.dataContext as DomainTreeEntry).domain;
-
-        // skip "Other" nodes
-        if (domain.includes("Other")) return undefined;
-
-        // if TLD, try to load icon from nic site (nic.us, nic.io, etc.)
-        if (domain.startsWith(".") && domain.split(".").length === 2) domain = "nic" + domain;
-
-        // remove front dot
-        if (domain.startsWith(".")) domain = domain.substr(1);
-
         const picture = Picture.new(root, {
-            src: "https://icons.duckduckgo.com/ip3/" + domain + ".ico",
             centerX: p50,
             centerY: p50,
             width: 32,
@@ -69,8 +74,6 @@ const createChart = (c: Container) => {
             isMeasured: true,
             dy: -28,
         });
-
-        // picture.states.lookup("default")!.setAll({ forceHidden: true });
 
         return Bullet.new(root, { sprite: picture });
     });
