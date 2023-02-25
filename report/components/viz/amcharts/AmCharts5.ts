@@ -12,6 +12,9 @@ export const Themes = (root: any, animated: boolean) =>
 export const syncAxisWithTimeFilter = (series: Series[], xAxis: DateAxis<any>, yAxis: ValueAxis<any>) => {
     const worker = getWorker();
 
+    // since we are syncing the axis, we don't want the zoom out button
+    xAxis.chart?.zoomOutButton.set("forceHidden", true);
+
     const onZoom = () => xAxis.zoomToDates(worker.getActiveStartDate(), worker.getActiveEndDate(), 0);
     const onFilterChange = (filter: Filter) => {
         if (filter === "time") onZoom();

@@ -92,8 +92,6 @@ const SentimentOverTime = ({ options }: { options: number[] }) => {
             }
 
             const cleanupAxisSync = syncAxisWithTimeFilter(series, xAxis, yAxis);
-            // since we are syncing the axis, we don't want the zoom out button
-            chart.zoomOutButton.set("forceHidden", true);
 
             const setData = (data: SentimentPerPeriod) => {
                 series.forEach((s) => s.data.setAll([data.perWeek, data.perMonth][options[0]]));

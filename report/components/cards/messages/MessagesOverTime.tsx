@@ -113,8 +113,6 @@ export const MessagesOverTime = ({ options }: { options: number[] }) => {
             };
 
             const cleanupAxisSync = syncAxisWithTimeFilter([series], xAxis, yAxis);
-            // since we are syncing the axis, we don't want the zoom out button
-            chart.zoomOutButton.set("forceHidden", true);
 
             return [setData, cleanupAxisSync];
         },

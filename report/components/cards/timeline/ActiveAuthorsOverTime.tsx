@@ -1,4 +1,4 @@
-import { Bullet, Circle, Color, Container, Label, Tooltip, p50 } from "@amcharts/amcharts5";
+import { Bullet, Circle, Color, Container, Legend, Tooltip, p50 } from "@amcharts/amcharts5";
 import {
     AxisRendererX,
     AxisRendererY,
@@ -6,89 +6,119 @@ import {
     SmoothedXLineSeries,
     ValueAxis,
     XYChart,
+    XYCursor,
 } from "@amcharts/amcharts5/xy";
 import { ActiveAuthors } from "@pipeline/aggregate/blocks/timeline/ActiveAuthors";
+import { Guild } from "@pipeline/process/Types";
 import { useBlockData } from "@report/BlockHook";
-import { syncAxisWithTimeFilter } from "@report/components/viz/amcharts/AmCharts5";
+import { getDatabase } from "@report/WorkerWrapper";
+import { createYAxisLabel, syncAxisWithTimeFilter } from "@report/components/viz/amcharts/AmCharts5";
 import { AmCharts5Chart, CreateFn } from "@report/components/viz/amcharts/AmCharts5Chart";
 
 const createChart: CreateFn<ActiveAuthors> = (c: Container) => {
+    const db = getDatabase();
+
+    const cursor = XYCursor.new(c.root, {
+        behavior: "none",
+    });
+    cursor.lineY.set("visible", false);
+
     const chart = c.root.container.children.push(
         XYChart.new(c.root, {
             layout: c.root.verticalLayout,
+            cursor,
         })
     );
-    chart.zoomOutButton.set("forceHidden", true);
+
+    chart.get("colors")!.set("step", 3);
 
     const xAxis = chart.xAxes.push(
         DateAxis.new(c.root, {
-            baseInterval: { timeUnit: "day", count: 1 },
+            baseInterval: { timeUnit: "month", count: 1 },
             renderer: AxisRendererX.new(c.root, {}),
+            tooltip: Tooltip.new(c.root, {}),
         })
     );
     const yAxis = chart.yAxes.push(
         ValueAxis.new(c.root, {
             renderer: AxisRendererY.new(c.root, {}),
-            maxPrecision: 0,
-            min: 0,
-        })
-    );
-    yAxis.children.unshift(
-        Label.new(c.root, {
-            rotation: -90,
-            text: "Active authors in period",
-            y: p50,
-            centerX: p50,
+            maxPrecision: 0, // integers
+            min: 0, // always bottom fixed at 0
         })
     );
 
-    const series = chart.series.push(
-        SmoothedXLineSeries.new(c.root, {
-            valueXField: "ts",
-            valueYField: "value",
-            xAxis: xAxis,
-            yAxis: yAxis,
-            stroke: Color.fromHex(0x57b1ff),
-            fill: Color.fromHex(0x57b1ff),
-            tooltip: Tooltip.new(c.root, {
-                labelText: "{valueY}",
-            }),
-        })
-    );
-    series.fills.template.setAll({
-        visible: true,
-        fillOpacity: 0.2,
-        templateField: "lineSettings",
-    });
-    series.strokes.template.setAll({
-        templateField: "lineSettings",
-    });
-    series.bullets.push(() =>
-        Bullet.new(c.root, {
-            locationY: 0,
-            sprite: Circle.new(c.root, {
-                radius: 4,
-                stroke: Color.fromHex(0x57b1ff),
-                strokeWidth: 2,
-                fill: Color.fromHex(0x1861a1),
-            }),
-        })
-    );
+    createYAxisLabel(yAxis, "Active authors in period");
 
-    const setData = (data: ActiveAuthors) => {
-        if (data.perMonth.length > 1) {
-            // @ts-ignore
-            data.perMonth[data.perMonth.length - 2].lineSettings = {
-                strokeDasharray: [3, 3],
-                fillOpacity: 0.1,
-            };
-        }
-        series.data.setAll(data.perMonth);
+    const createSeries = (guild: Guild) => {
+        const series = chart.series.push(
+            SmoothedXLineSeries.new(c.root, {
+                name: guild.name,
+                valueXField: "ts",
+                valueYField: "value",
+                xAxis: xAxis,
+                yAxis: yAxis,
+                legendLabelText: "[{stroke}]{name}[/][bold #888]{categoryX}[/]",
+                legendRangeLabelText: "[{stroke}]{name}[/]",
+                tooltip: Tooltip.new(c.root, {
+                    labelText: "{name}: {valueY} active authors",
+                }),
+            })
+        );
+        series.fills.template.setAll({
+            visible: true,
+            fillOpacity: 0.1,
+            templateField: "lineSettings",
+        });
+        series.strokes.template.setAll({
+            templateField: "lineSettings",
+        });
+        series.bullets.push(() =>
+            Bullet.new(c.root, {
+                locationY: 0,
+                sprite: Circle.new(c.root, {
+                    radius: 4,
+                    stroke: series.get("fill"),
+                    strokeWidth: 2,
+                    fill: Color.brighten(series.get("fill")!, -0.3),
+                }),
+            })
+        );
+
+        return series;
     };
 
-    const cleanupAxisSync = syncAxisWithTimeFilter([series], xAxis, yAxis);
-    // since we are syncing the axis, we don't want the zoom out button
-    chart.zoomOutButton.set("forceHidden", true);
+    const series = db.guilds.map(createSeries);
+
+    const legend = chart.children.unshift(
+        Legend.new(c.root, {
+            centerX: p50,
+            x: p50,
+            marginTop: -20,
+            marginBottom: 10,
+        })
+    );
+    legend.data.setAll(series);
+
+    const setData = (data: ActiveAuthors) => {
+        for (let i = 0; i < data.perGuild.length; i++) {
+            const items = data.perGuild[i].perMonth;
+
+            if (items.length > 0) series[i].show();
+            else series[i].hide();
+
+            if (items.length > 1) {
+                // @ts-expect-error
+                items[items.length - 2].lineSettings = {
+                    strokeDasharray: [3, 3],
+                    fillOpacity: 0.05,
+                };
+            }
+
+            series[i].data.setAll(items);
+        }
+    };
+
+    const cleanupAxisSync = syncAxisWithTimeFilter(series, xAxis, yAxis);
 
     return [setData, cleanupAxisSync];
 };

@@ -56,8 +56,6 @@ const createChart: CreateFn<GrowthTimeline> = (c: Container) => {
     };
 
     const cleanupAxisSync = syncAxisWithTimeFilter([stepSeries], xAxis, yAxis);
-    // since we are syncing the axis, we don't want the zoom out button
-    chart.zoomOutButton.set("forceHidden", true);
 
     return [setData, cleanupAxisSync];
 };

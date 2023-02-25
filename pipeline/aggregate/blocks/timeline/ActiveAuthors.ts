@@ -10,31 +10,47 @@ interface Item {
 }
 
 export interface ActiveAuthors {
-    perMonth: Item[];
+    perGuild: {
+        perMonth: Item[];
+    }[];
 }
 
 const fn: BlockFn<ActiveAuthors> = (database, filters, common, args) => {
     const { monthKeys, dateToMonthIndex } = common.timeKeys;
 
-    // TODO: optimize this with a bitset or something, using a Set may use too much memory if there are many authors
-    const authorsPresentInMonth: Set<Index>[] = [];
-    for (const _ of monthKeys) authorsPresentInMonth.push(new Set());
+    const computeForGuild = (guildIndex: Index) => {
+        let foundAtLeastOneMessage = false;
 
-    const processMessage = (msg: MessageView) =>
-        authorsPresentInMonth[dateToMonthIndex[msg.dayIndex]].add(msg.authorIndex);
+        // TODO: optimize this with a bitset or something, using a Set may use too much memory if there are many authors
+        const authorsPresentInMonth: Set<Index>[] = [];
+        for (const _ of monthKeys) authorsPresentInMonth.push(new Set());
 
-    filterMessages(processMessage, database, filters, { channels: true, authors: true, time: false });
+        const processMessage = (msg: MessageView) => {
+            if (msg.guildIndex === guildIndex) {
+                authorsPresentInMonth[dateToMonthIndex[msg.dayIndex]].add(msg.authorIndex);
+                foundAtLeastOneMessage = true;
+            }
+        };
 
-    const res: ActiveAuthors = {
-        perMonth: [],
+        filterMessages(processMessage, database, filters, { channels: true, authors: true, time: false });
+
+        const items: Item[] = [];
+
+        if (foundAtLeastOneMessage) {
+            for (let i = 0; i < monthKeys.length; i++) {
+                items.push({
+                    ts: Day.fromKey(monthKeys[i]).toTimestamp(),
+                    value: authorsPresentInMonth[i].size,
+                });
+            }
+        }
+
+        return { perMonth: items };
     };
 
-    for (let i = 0; i < monthKeys.length; i++) {
-        res.perMonth.push({
-            ts: Day.fromKey(monthKeys[i]).toTimestamp(),
-            value: authorsPresentInMonth[i].size,
-        });
-    }
+    const res: ActiveAuthors = {
+        perGuild: database.guilds.map((_, guildIndex) => computeForGuild(guildIndex)),
+    };
 
     return res;
 };
