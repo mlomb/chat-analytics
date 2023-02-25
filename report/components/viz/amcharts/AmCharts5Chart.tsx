@@ -1,4 +1,5 @@
 import { useLayoutEffect, useRef } from "react";
+import { useInView } from "react-intersection-observer";
 
 import { Container, Root, Theme, p100 } from "@amcharts/amcharts5";
 import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
@@ -25,7 +26,16 @@ export const AmCharts5Chart = <Data extends any>(props: Props<Data>) => {
     const chartDiv = useRef<HTMLDivElement>(null);
     const setDataRef = useRef<(data: Data) => void>(() => {});
 
+    // defer chart creation until the component is in view
+    const { inView, ref: inViewRef } = useInView({
+        threshold: 0,
+        triggerOnce: true,
+        initialInView: false,
+        fallbackInView: true,
+    });
+
     useLayoutEffect(() => {
+        if (!inView) return;
         const root = Root.new(chartDiv.current!);
         root.setThemes(
             (
@@ -64,11 +74,16 @@ export const AmCharts5Chart = <Data extends any>(props: Props<Data>) => {
             cleanupDebounce();
             root.dispose();
         };
-    }, [props.animated, props.createTheme, props.create]);
+    }, [inView, props.animated, props.createTheme, props.create]);
 
     useLayoutEffect(() => {
+        if (!inView) return;
         if (props.data !== undefined) setDataRef.current(props.data);
-    }, [props.animated, props.createTheme, props.create, props.data]);
+    }, [inView, props.animated, props.createTheme, props.create, props.data]);
 
-    return <div ref={chartDiv} style={props.style} />;
+    return (
+        <div ref={inViewRef}>
+            <div ref={chartDiv} style={props.style} />
+        </div>
+    );
 };
