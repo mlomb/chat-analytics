@@ -73,6 +73,9 @@ const createTreeChart = (c: Container) => {
             height: 32,
             isMeasured: true,
             dy: -28,
+            // we don't have Access-Control-Allow-Origin in icons.duckduckgo.com
+            // so request using no-cors mode (Opaque Response)
+            cors: null,
         });
 
         return Bullet.new(root, { sprite: picture });
