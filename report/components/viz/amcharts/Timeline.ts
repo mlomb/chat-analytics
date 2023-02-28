@@ -1,19 +1,24 @@
 import { Bullet, Circle, Color, Container, Legend, Tooltip, p50 } from "@amcharts/amcharts5";
+import { TimeUnit } from "@amcharts/amcharts5/.internal/core/util/Time";
 import {
     AxisRendererX,
     AxisRendererY,
     DateAxis,
+    IXYSeriesSettings,
+    LineSeries,
     SmoothedXLineSeries,
+    StepLineSeries,
     ValueAxis,
     XYChart,
     XYCursor,
+    XYSeries,
 } from "@amcharts/amcharts5/xy";
-import { ActiveAuthors } from "@pipeline/aggregate/blocks/timeline/ActiveAuthors";
+import { DateItem } from "@pipeline/aggregate/Common";
 import { Guild } from "@pipeline/process/Types";
 import { getDatabase } from "@report/WorkerWrapper";
 import { syncAxisWithTimeFilter } from "@report/components/viz/amcharts/AmCharts5";
 
-export const createTimeline = (c: Container) => {
+export const createTimeline = (c: Container, timeUnit: TimeUnit, seriesChart: "smoothed" | "step") => {
     const { root } = c;
 
     const db = getDatabase();
@@ -34,7 +39,7 @@ export const createTimeline = (c: Container) => {
 
     const xAxis = chart.xAxes.push(
         DateAxis.new(root, {
-            baseInterval: { timeUnit: "month", count: 1 },
+            baseInterval: { timeUnit, count: 1 },
             renderer: AxisRendererX.new(root, {}),
             tooltip: Tooltip.new(root, {}),
         })
@@ -48,20 +53,43 @@ export const createTimeline = (c: Container) => {
     );
 
     const createSeries = (guild: Guild) => {
-        const series = chart.series.push(
-            SmoothedXLineSeries.new(root, {
-                name: guild.name,
-                valueXField: "ts",
-                valueYField: "value",
-                xAxis: xAxis,
-                yAxis: yAxis,
-                legendLabelText: "[{stroke}]{name}[/][bold #888]{categoryX}[/]",
-                legendRangeLabelText: "[{stroke}]{name}[/]",
-                legendValueText: "{valueY}",
-                legendRangeValueText: "[bold #888]-[/]",
-                minBulletDistance: 8, // hide bullets if they are too close
-            })
-        );
+        let series: LineSeries;
+
+        const settings: IXYSeriesSettings = {
+            name: guild.name,
+            valueXField: "ts",
+            valueYField: "value",
+            xAxis: xAxis,
+            yAxis: yAxis,
+            legendLabelText: "[{stroke}]{name}[/][bold #888]{categoryX}[/]",
+            legendRangeLabelText: "[{stroke}]{name}[/]",
+            legendValueText: "{valueY}",
+            legendRangeValueText: "[bold #888]-[/]",
+            minBulletDistance: 8, // hide bullets if they are too close
+        };
+
+        if (seriesChart === "step") {
+            series = StepLineSeries.new(root, settings);
+            series.strokes.template.setAll({
+                visible: true,
+                strokeWidth: 2,
+                strokeOpacity: 0.8,
+            });
+        } else {
+            // seriesChart === "smoothed"
+            series = SmoothedXLineSeries.new(root, settings);
+            series.bullets.push(() =>
+                Bullet.new(root, {
+                    locationY: 0,
+                    sprite: Circle.new(root, {
+                        radius: 4,
+                        stroke: series.get("fill"),
+                        strokeWidth: 2,
+                        fill: Color.brighten(series.get("fill")!, -0.3),
+                    }),
+                })
+            );
+        }
         series.fills.template.setAll({
             visible: true,
             fillOpacity: 0.1,
@@ -70,17 +98,8 @@ export const createTimeline = (c: Container) => {
         series.strokes.template.setAll({
             templateField: "lineSettings",
         });
-        series.bullets.push(() =>
-            Bullet.new(root, {
-                locationY: 0,
-                sprite: Circle.new(root, {
-                    radius: 4,
-                    stroke: series.get("fill"),
-                    strokeWidth: 2,
-                    fill: Color.brighten(series.get("fill")!, -0.3),
-                }),
-            })
-        );
+
+        chart.series.push(series);
 
         return series;
     };
@@ -97,9 +116,9 @@ export const createTimeline = (c: Container) => {
     );
     legend.data.setAll(series);
 
-    const setData = (data: ActiveAuthors) => {
-        for (let i = 0; i < data.perGuild.length; i++) {
-            const items = data.perGuild[i].perMonth;
+    const setData = (data: DateItem[][]) => {
+        for (let i = 0; i < data.length; i++) {
+            const items = data[i];
 
             if (items.length > 0) series[i].show();
             else series[i].hide();

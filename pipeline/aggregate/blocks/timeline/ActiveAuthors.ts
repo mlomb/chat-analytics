@@ -1,21 +1,15 @@
 import { Day } from "@pipeline/Time";
 import { Index } from "@pipeline/Types";
 import { BlockDescription, BlockFn } from "@pipeline/aggregate/Blocks";
+import { DateItem } from "@pipeline/aggregate/Common";
 import { filterMessages } from "@pipeline/aggregate/Helpers";
 import { MessageView } from "@pipeline/serialization/MessageView";
 
-interface Item {
-    ts: number;
-    value: number;
+export interface ActiveAuthorsTimeline {
+    perGuildPerMonth: DateItem[][];
 }
 
-export interface ActiveAuthors {
-    perGuild: {
-        perMonth: Item[];
-    }[];
-}
-
-const fn: BlockFn<ActiveAuthors> = (database, filters, common, args) => {
+const fn: BlockFn<ActiveAuthorsTimeline> = (database, filters, common, args) => {
     const { monthKeys, dateToMonthIndex } = common.timeKeys;
 
     const computeForGuild = (guildIndex: Index) => {
@@ -34,7 +28,7 @@ const fn: BlockFn<ActiveAuthors> = (database, filters, common, args) => {
 
         filterMessages(processMessage, database, filters, { channels: true, authors: true, time: false });
 
-        const items: Item[] = [];
+        const items: DateItem[] = [];
 
         if (foundAtLeastOneMessage) {
             for (let i = 0; i < monthKeys.length; i++) {
@@ -45,11 +39,11 @@ const fn: BlockFn<ActiveAuthors> = (database, filters, common, args) => {
             }
         }
 
-        return { perMonth: items };
+        return items;
     };
 
-    const res: ActiveAuthors = {
-        perGuild: database.guilds.map((_, guildIndex) => computeForGuild(guildIndex)),
+    const res: ActiveAuthorsTimeline = {
+        perGuildPerMonth: database.guilds.map((_, guildIndex) => computeForGuild(guildIndex)),
     };
 
     return res;
@@ -59,4 +53,4 @@ export default {
     key: "timeline/active-authors",
     triggers: ["authors", "channels"],
     fn,
-} as BlockDescription<"timeline/active-authors", ActiveAuthors>;
+} as BlockDescription<"timeline/active-authors", ActiveAuthorsTimeline>;

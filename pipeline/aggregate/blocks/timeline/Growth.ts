@@ -1,56 +1,68 @@
 import { Day } from "@pipeline/Time";
+import { Index } from "@pipeline/Types";
 import { BlockDescription, BlockFn } from "@pipeline/aggregate/Blocks";
+import { DateItem } from "@pipeline/aggregate/Common";
 import { filterMessages } from "@pipeline/aggregate/Helpers";
 import { MessageView } from "@pipeline/serialization/MessageView";
 
-interface Item {
-    ts: number;
-    value: number;
-}
-
 export interface GrowthTimeline {
-    growth: Item[];
+    perGuildPerDay: DateItem[][];
 }
 
 const fn: BlockFn<GrowthTimeline> = (database, filters, common, args) => {
     const { dateKeys } = common.timeKeys;
 
-    const firstMessageDay: number[] = new Array(database.authors.length).fill(-1);
+    const computeForGuild = (guildIndex: Index) => {
+        let foundAtLeastOneMessage = false;
 
-    const processMessage = (msg: MessageView) => {
-        if (firstMessageDay[msg.authorIndex] === -1 || msg.dayIndex < firstMessageDay[msg.authorIndex])
-            firstMessageDay[msg.authorIndex] = msg.dayIndex;
+        // the day each author posted their first message
+        const firstMessageDay: number[] = new Array(database.authors.length).fill(-1);
+
+        const processMessage = (msg: MessageView) => {
+            if (msg.guildIndex !== guildIndex) return;
+
+            if (firstMessageDay[msg.authorIndex] === -1 || msg.dayIndex < firstMessageDay[msg.authorIndex])
+                firstMessageDay[msg.authorIndex] = msg.dayIndex;
+
+            foundAtLeastOneMessage = true;
+        };
+
+        filterMessages(processMessage, database, filters, { channels: true, authors: true, time: false });
+
+        // count the number of authors who posted their first message on each day
+        const newAuthorsInDay = new Array(database.time.numDays).fill(0);
+        for (const dayIndex of firstMessageDay) {
+            if (dayIndex !== -1) newAuthorsInDay[dayIndex]++;
+        }
+
+        const growth: DateItem[] = [];
+
+        if (foundAtLeastOneMessage) {
+            // compute the growth
+            let accum = 0;
+            for (let i = 0; i < database.time.numDays; i++) {
+                accum += newAuthorsInDay[i];
+                growth.push({
+                    ts: Day.fromKey(dateKeys[i]).toTimestamp(),
+                    value: accum,
+                });
+            }
+
+            // last data point
+            growth.push({
+                ts: Day.fromKey(dateKeys[dateKeys.length - 1]).toTimestamp(),
+                value: accum,
+            });
+        }
+
+        return growth;
     };
 
-    filterMessages(processMessage, database, filters, { channels: true, authors: true, time: false });
+    const res: GrowthTimeline = {
+        perGuildPerDay: database.guilds.map((_, guildIndex) => computeForGuild(guildIndex)),
+    };
 
-    const newAuthorsInDay = Object.values(firstMessageDay)
-        .filter((day) => day !== -1)
-        .sort((a, b) => a - b)
-        .reduce<{ [key: string]: number }>((acc: any, day: number) => {
-            if (day in acc) acc[day]++;
-            else acc[day] = 1;
-            return acc;
-        }, {});
-
-    const growth: Item[] = [];
-    const newAuthorsInDayKeys = Object.keys(newAuthorsInDay);
-    let accum = 0;
-    for (const dayIndex of newAuthorsInDayKeys) {
-        accum += newAuthorsInDay[dayIndex];
-        growth.push({
-            ts: Day.fromKey(dateKeys[dayIndex as unknown as number]).toTimestamp(),
-            value: accum,
-        });
-    }
-
-    // last data point
-    growth.push({
-        ts: Day.fromKey(dateKeys[dateKeys.length - 1]).toTimestamp(),
-        value: accum,
-    });
-
-    return { growth };
+    return res;
 };
 
 export default {

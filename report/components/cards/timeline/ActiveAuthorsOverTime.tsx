@@ -1,12 +1,12 @@
 import { Container } from "@amcharts/amcharts5";
-import { ActiveAuthors } from "@pipeline/aggregate/blocks/timeline/ActiveAuthors";
+import { DateItem } from "@pipeline/aggregate/Common";
 import { useBlockData } from "@report/BlockHook";
 import { createYAxisLabel } from "@report/components/viz/amcharts/AmCharts5";
 import { AmCharts5Chart, CreateFn } from "@report/components/viz/amcharts/AmCharts5Chart";
 import { createTimeline } from "@report/components/viz/amcharts/Timeline";
 
-const createChart: CreateFn<ActiveAuthors> = (c: Container) => {
-    const { yAxis, setData, cleanup } = createTimeline(c);
+const createChart: CreateFn<DateItem[][]> = (c: Container) => {
+    const { yAxis, setData, cleanup } = createTimeline(c, "month", "smoothed");
 
     createYAxisLabel(yAxis, "Active authors during month");
 
@@ -16,7 +16,7 @@ const createChart: CreateFn<ActiveAuthors> = (c: Container) => {
 const ActiveAuthorsOverTime = () => (
     <AmCharts5Chart
         create={createChart}
-        data={useBlockData("timeline/active-authors")}
+        data={useBlockData("timeline/active-authors")?.perGuildPerMonth}
         style={{
             minHeight: 500,
             marginLeft: 5,

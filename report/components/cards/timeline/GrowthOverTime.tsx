@@ -1,69 +1,22 @@
-import { Color, Container, Label, p50 } from "@amcharts/amcharts5";
-import { AxisRendererX, AxisRendererY, DateAxis, StepLineSeries, ValueAxis, XYChart } from "@amcharts/amcharts5/xy";
-import { GrowthTimeline } from "@pipeline/aggregate/blocks/timeline/Growth";
+import { Container } from "@amcharts/amcharts5";
+import { DateItem } from "@pipeline/aggregate/Common";
 import { useBlockData } from "@report/BlockHook";
-import { syncAxisWithTimeFilter } from "@report/components/viz/amcharts/AmCharts5";
+import { createYAxisLabel } from "@report/components/viz/amcharts/AmCharts5";
 import { AmCharts5Chart, CreateFn } from "@report/components/viz/amcharts/AmCharts5Chart";
+import { createTimeline } from "@report/components/viz/amcharts/Timeline";
 
-const createChart: CreateFn<GrowthTimeline> = (c: Container) => {
-    const chart = c.root.container.children.push(XYChart.new(c.root, {}));
-    chart.zoomOutButton.set("forceHidden", true);
+const createChart: CreateFn<DateItem[][]> = (c: Container) => {
+    const { yAxis, setData, cleanup } = createTimeline(c, "day", "step");
 
-    const xAxis = chart.xAxes.push(
-        DateAxis.new(c.root, {
-            baseInterval: { timeUnit: "day", count: 1 },
-            renderer: AxisRendererX.new(c.root, {}),
-        })
-    );
-    const yAxis = chart.yAxes.push(
-        ValueAxis.new(c.root, {
-            renderer: AxisRendererY.new(c.root, {}),
-            maxPrecision: 0,
-            min: 0,
-        })
-    );
-    yAxis.children.unshift(
-        Label.new(c.root, {
-            rotation: -90,
-            text: "Total authors",
-            y: p50,
-            centerX: p50,
-        })
-    );
+    createYAxisLabel(yAxis, "Accumulated unique authors");
 
-    const stepSeries = chart.series.push(
-        StepLineSeries.new(c.root, {
-            valueXField: "ts",
-            valueYField: "value",
-            xAxis: xAxis,
-            yAxis: yAxis,
-            stroke: Color.fromHex(0x479adb),
-            fill: Color.fromHex(0x479adb),
-        })
-    );
-    stepSeries.strokes.template.setAll({
-        visible: true,
-        strokeWidth: 2,
-        strokeOpacity: 0.8,
-    });
-    stepSeries.fills.template.setAll({
-        visible: true,
-        fillOpacity: 0.2,
-    });
-
-    const setData = (data: GrowthTimeline) => {
-        stepSeries.data.setAll(data.growth);
-    };
-
-    const cleanupAxisSync = syncAxisWithTimeFilter([stepSeries], xAxis, yAxis);
-
-    return [setData, cleanupAxisSync];
+    return [setData, cleanup];
 };
 
 const GrowthOverTime = () => (
     <AmCharts5Chart
-        data={useBlockData("timeline/growth")}
         create={createChart}
+        data={useBlockData("timeline/growth")?.perGuildPerDay}
         style={{
             minHeight: 500,
             marginLeft: 5,

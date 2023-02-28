@@ -99,3 +99,9 @@ export interface IndexEntry {
     index: Index;
     value: number;
 }
+
+/** Entry for date based graph */
+export interface DateItem {
+    ts: number;
+    value: number;
+}
