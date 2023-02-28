@@ -102,6 +102,6 @@ export interface IndexEntry {
 
 /** Entry for date based graph */
 export interface DateItem {
-    ts: number;
-    value: number;
+    ts: number; // timestamp
+    v: number; // value
 }

@@ -1,21 +1,17 @@
 import { Day } from "@pipeline/Time";
 import { BlockDescription, BlockFn } from "@pipeline/aggregate/Blocks";
+import { DateItem } from "@pipeline/aggregate/Common";
 import { filterMessages } from "@pipeline/aggregate/Helpers";
 import { MessageView } from "@pipeline/serialization/MessageView";
-
-type MessagesInDate = {
-    d: number; // date, as timestamp
-    m: number; // messages
-};
 
 /**
  * Number of messages per different time cycles.
  * It ignores the time filter completely, all cycles are included.
  */
 export interface MessagesPerPeriod {
-    perDay: MessagesInDate[];
-    perWeek: MessagesInDate[];
-    perMonth: MessagesInDate[];
+    perDay: DateItem[];
+    perWeek: DateItem[];
+    perMonth: DateItem[];
 }
 
 const fn: BlockFn<MessagesPerPeriod> = (database, filters, common) => {
@@ -30,27 +26,27 @@ const fn: BlockFn<MessagesPerPeriod> = (database, filters, common) => {
     // fill empty
     for (const dateKey of dateKeys) {
         res.perDay.push({
-            d: Day.fromKey(dateKey).toTimestamp(),
-            m: 0,
+            ts: Day.fromKey(dateKey).toTimestamp(),
+            v: 0,
         });
     }
     for (const weekKey of weekKeys) {
         res.perWeek.push({
-            d: Day.fromKey(weekKey).toTimestamp(),
-            m: 0,
+            ts: Day.fromKey(weekKey).toTimestamp(),
+            v: 0,
         });
     }
     for (const monthKey of monthKeys) {
         res.perMonth.push({
-            d: Day.fromKey(monthKey).toTimestamp(),
-            m: 0,
+            ts: Day.fromKey(monthKey).toTimestamp(),
+            v: 0,
         });
     }
 
     const processMessage = (msg: MessageView) => {
-        res.perDay[msg.dayIndex].m++;
-        res.perWeek[dateToWeekIndex[msg.dayIndex]].m++;
-        res.perMonth[dateToMonthIndex[msg.dayIndex]].m++;
+        res.perDay[msg.dayIndex].v++;
+        res.perWeek[dateToWeekIndex[msg.dayIndex]].v++;
+        res.perMonth[dateToMonthIndex[msg.dayIndex]].v++;
     };
 
     filterMessages(processMessage, database, filters, {

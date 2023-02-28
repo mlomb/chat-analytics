@@ -44,14 +44,14 @@ const fn: BlockFn<GrowthTimeline> = (database, filters, common, args) => {
                 accum += newAuthorsInDay[i];
                 growth.push({
                     ts: Day.fromKey(dateKeys[i]).toTimestamp(),
-                    value: accum,
+                    v: accum,
                 });
             }
 
             // last data point
             growth.push({
                 ts: Day.fromKey(dateKeys[dateKeys.length - 1]).toTimestamp(),
-                value: accum,
+                v: accum,
             });
         }
 

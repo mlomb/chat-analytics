@@ -63,8 +63,8 @@ export const MessagesOverTime = ({ options }: { options: number[] }) => {
             // for days
             if (graphType === "step") {
                 series = StepLineSeries.new(c.root, {
-                    valueXField: "d",
-                    valueYField: "m",
+                    valueXField: "ts",
+                    valueYField: "v",
                     xAxis: xAxis,
                     yAxis: yAxis,
                     noRisers: true,
@@ -84,8 +84,8 @@ export const MessagesOverTime = ({ options }: { options: number[] }) => {
             } else {
                 // for weeks and months
                 series = ColumnSeries.new(c.root, {
-                    valueXField: "d",
-                    valueYField: "m",
+                    valueXField: "ts",
+                    valueYField: "v",
                     xAxis: xAxis,
                     yAxis: yAxis,
                     fill: Color.fromHex(0x008cff),

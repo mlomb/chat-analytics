@@ -34,7 +34,7 @@ const fn: BlockFn<ActiveAuthorsTimeline> = (database, filters, common, args) => 
             for (let i = 0; i < monthKeys.length; i++) {
                 items.push({
                     ts: Day.fromKey(monthKeys[i]).toTimestamp(),
-                    value: authorsPresentInMonth[i].size,
+                    v: authorsPresentInMonth[i].size,
                 });
             }
         }
