@@ -35,6 +35,11 @@ export const createTimeline = (c: Container, timeUnit: TimeUnit, seriesChart: "s
         })
     );
 
+    chart.setAll({
+        paddingRight: 0,
+        marginRight: 0,
+    });
+
     chart.get("colors")!.set("step", 3);
 
     const xAxis = chart.xAxes.push(
