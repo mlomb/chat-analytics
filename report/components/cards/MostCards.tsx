@@ -74,34 +74,6 @@ export const MostConversations = ({ options }: { options: number[] }) => {
 };
 
 ///////////////////////////
-/// WORDS
-///////////////////////////
-const WordsIndexOf = (value: string) => getFormatCache().words.indexOf(value);
-const WordsInFilter = (index: number, filter: string | RegExp) => {
-    const word = getFormatCache().words[index];
-    return filter instanceof RegExp ? filter.test(word) : word.startsWith(filter);
-};
-export const MostUsedWords = ({ options }: { options: number[] }) => {
-    const languageStats = useBlockData("language/stats");
-    return options[0] === 1 ? (
-        <WordCloud wordsCount={languageStats?.wordsCount} />
-    ) : (
-        <MostUsed
-            what="Word"
-            unit="Times used"
-            counts={languageStats?.wordsCount}
-            maxItems={Math.min(15, getDatabase().words.length)}
-            itemComponent={WordLabel}
-            searchable
-            allowRegex
-            searchPlaceholder="Filter words..."
-            indexOf={WordsIndexOf}
-            inFilter={WordsInFilter}
-        />
-    );
-};
-
-///////////////////////////
 /// EMOJIS
 ///////////////////////////
 const EmojiFilterFns = {

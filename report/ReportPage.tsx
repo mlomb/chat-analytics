@@ -18,12 +18,12 @@ import {
     MostReactionReceiver,
     MostRepliesAuthors,
     MostUsedEmojis,
-    MostUsedWords,
 } from "@report/components/cards/MostCards";
 import { TopReacted } from "@report/components/cards/TopCards";
 import EmojiStatsTable from "@report/components/cards/emojis/EmojiStatsTable";
 import ConversationParticipation from "@report/components/cards/interaction/ConversationParticipation";
 import LanguageStatsTable from "@report/components/cards/language/LanguageStatsTable";
+import WordsUsage from "@report/components/cards/language/WordsUsage";
 import DomainsTree from "@report/components/cards/links/DomainsTree";
 import EditTime from "@report/components/cards/messages/EditTime";
 import EditedMessages from "@report/components/cards/messages/EditedMessages";
@@ -132,9 +132,9 @@ const ReportDashboard = () => {
                 value: "language",
                 cards: [
                     <Card
-                        num={1}
+                        num={2}
                         title={["Most used words", ["(as table)", "(as word cloud)"]]}
-                        children={MostUsedWords}
+                        children={WordsUsage}
                         tooltip={stopwordsTooltip}
                     />,
                     <Card

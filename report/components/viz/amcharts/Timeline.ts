@@ -63,7 +63,7 @@ export const createTimeline = (c: Container, timeUnit: TimeUnit, seriesChart: "s
         const settings: IXYSeriesSettings = {
             name: guild.name,
             valueXField: "ts",
-            valueYField: "value",
+            valueYField: "v",
             xAxis: xAxis,
             yAxis: yAxis,
             legendLabelText: "[{stroke}]{name}[/][bold #888]{categoryX}[/]",

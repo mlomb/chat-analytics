@@ -109,7 +109,6 @@ export const MessagesOverTime = ({ options }: { options: number[] }) => {
                         month: data.perMonth,
                     }[period]
                 );
-                return chart;
             };
 
             const cleanupAxisSync = syncAxisWithTimeFilter([series], xAxis, yAxis);

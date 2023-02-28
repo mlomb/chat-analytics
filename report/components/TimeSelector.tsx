@@ -80,8 +80,8 @@ const TimeSelector = () => {
             StepLineSeries.new(root, {
                 xAxis: xAxis,
                 yAxis: yAxis,
-                valueYField: "m",
-                valueXField: "d",
+                valueXField: "ts",
+                valueYField: "v",
                 noRisers: true,
             })
         );
