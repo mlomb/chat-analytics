@@ -24,11 +24,6 @@ const SentimentOverTime = ({ options }: { options: number[] }) => {
                 })
             );
 
-            chart.setAll({
-                paddingRight: 0,
-                marginRight: 0,
-            });
-
             const cursor = chart.set("cursor", XYCursor.new(c.root, {}));
             cursor.lineX.set("visible", false);
             cursor.lineY.set("visible", false);
