@@ -47,7 +47,7 @@ const createChart: CreateFn<ActiveAuthors> = (c: Container) => {
         })
     );
 
-    createYAxisLabel(yAxis, "Active authors in period");
+    createYAxisLabel(yAxis, "Active authors during month");
 
     const createSeries = (guild: Guild) => {
         const series = chart.series.push(
@@ -59,9 +59,9 @@ const createChart: CreateFn<ActiveAuthors> = (c: Container) => {
                 yAxis: yAxis,
                 legendLabelText: "[{stroke}]{name}[/][bold #888]{categoryX}[/]",
                 legendRangeLabelText: "[{stroke}]{name}[/]",
-                tooltip: Tooltip.new(c.root, {
-                    labelText: "{name}: {valueY} active authors",
-                }),
+                legendValueText: "{valueY}",
+                legendRangeValueText: "[bold #888]-[/]",
+                minBulletDistance: 8, // hide bullets if they are too close
             })
         );
         series.fills.template.setAll({

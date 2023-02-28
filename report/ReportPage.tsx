@@ -260,9 +260,9 @@ const ReportDashboard = () => {
                         : [
                               <Card
                                   num={3}
-                                  title="Active authors over time by month"
+                                  title="Active authors over time, by month"
                                   children={ActiveAuthorsOverTime}
-                                  tooltip="Authors that have sent at least one message in the month"
+                                  tooltip="An author is considered active if it has sent at least one message in the month"
                               />,
                               <Card
                                   num={3}
