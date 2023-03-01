@@ -59,7 +59,7 @@ const Item = (props: {
             style={{
                 width: props.percent + "%",
                 backgroundColor: props.selected
-                    ? `#06785e`
+                    ? `#2f8f79`
                     : props.colorHue === undefined
                     ? `rgba(255, 255, 255, 0.1)`
                     : `hsl(${props.colorHue}, 100%, 65%)`,

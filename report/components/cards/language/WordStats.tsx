@@ -68,7 +68,7 @@ const createChart: CreateFn<DateItem[]> = (c: Container) => {
         valueYField: "v",
         xAxis: xAxis,
         yAxis: yAxis,
-        fill: Color.fromHex(0x008cff),
+        fill: Color.fromHex(0x00ffc5),
         tooltip,
     });
     // rounded corners
