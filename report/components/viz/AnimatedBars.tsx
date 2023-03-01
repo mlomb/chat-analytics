@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import CountUp from "react-countup";
 
 import "@assets/styles/AnimatedBars.less";
@@ -16,6 +17,11 @@ export interface AnimatedBarEntry {
     pin?: boolean;
 }
 
+export interface SelectedBarEntry {
+    index: Index;
+    manual: boolean;
+}
+
 interface Props {
     /** It should have less thans `maxItems` items. The component DOES NOT slice the data. */
     data: AnimatedBarEntry[];
@@ -28,8 +34,8 @@ interface Props {
     formatNumber?: (n: number) => string;
 
     selectable?: boolean;
-    selectedIndex?: number;
-    onSelectChange?: (index: number) => void;
+    selected?: SelectedBarEntry;
+    onSelectChange?: (sel: SelectedBarEntry) => void;
 }
 
 const Item = (props: {
@@ -41,12 +47,12 @@ const Item = (props: {
     formatNumber?: (n: number) => string;
     selectable: boolean;
     selected: boolean;
-    onSelectChange?: (index: number) => void;
+    onSelectChange?: (sel: SelectedBarEntry) => void;
 }) => (
     <div
         className="AnimatedBars__item"
         style={{ top: props.rank * ITEM_STRIDE + "px", cursor: props.selectable ? "pointer" : "default" }}
-        onClick={() => props.onSelectChange && props.onSelectChange(props.entry.index)}
+        onClick={() => props.onSelectChange && props.onSelectChange({ index: props.entry.index, manual: true })}
     >
         <div
             className="AnimatedBars__bar"
@@ -83,6 +89,30 @@ const AnimatedBars = (props: Props) => {
             ? props.maxValue
             : sortedByValue.reduce((max, entry) => Math.max(max, entry.value), 0);
 
+    useEffect(() => {
+        if (!props.selectable) return;
+        if (props.onSelectChange === undefined) return;
+        if (sortedByValue.length === 0) return; // no item to select
+
+        const topEntry = sortedByValue[0];
+        const selected = sortedByValue.find((entry) => entry.index === props.selected?.index);
+
+        if (
+            // selection lost
+            // reset selection to the first item
+            selected === undefined ||
+            // change selection ONLY IF the current selection has not been set manually
+            (props.selected && props.selected.manual === false)
+        ) {
+            if (topEntry !== selected)
+                // and don't change if dont have to (avoid infinite loop)
+                props.onSelectChange({
+                    index: topEntry.index,
+                    manual: false,
+                });
+        }
+    }, [props.data, props.selected]);
+
     return (
         <div className="AnimatedBars" style={{ minHeight: ITEM_STRIDE * props.maxItems + HEADER_HEIGHT }}>
             <div className="AnimatedBars__header">
@@ -100,7 +130,7 @@ const AnimatedBars = (props: Props) => {
                         colorHue={props.colorHue}
                         formatNumber={props.formatNumber || defaultFormatting}
                         selectable={props.selectable === true}
-                        selected={props.selectedIndex === entry.index}
+                        selected={props.selected?.index === entry.index}
                         onSelectChange={props.onSelectChange}
                     ></Item>
                 ))}

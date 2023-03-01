@@ -3,7 +3,7 @@ import { memo, useMemo, useState } from "react";
 import { Index } from "@pipeline/Types";
 import { matchFormat } from "@pipeline/process/nlp/Text";
 import SearchInput from "@report/components/core/SearchInput";
-import AnimatedBars, { AnimatedBarEntry } from "@report/components/viz/AnimatedBars";
+import AnimatedBars, { AnimatedBarEntry, SelectedBarEntry } from "@report/components/viz/AnimatedBars";
 
 interface BaseProps {
     what: string;
@@ -15,8 +15,8 @@ interface BaseProps {
     colorHue?: number;
 
     selectable?: boolean;
-    selectedIndex?: number;
-    onSelectChange?: (index: number) => void;
+    selected?: SelectedBarEntry;
+    onSelectChange?: (sel: SelectedBarEntry) => void;
 }
 
 interface SimpleProps extends BaseProps {
@@ -94,7 +94,7 @@ const MostUsed = (props: Props) => {
                 maxItems={props.maxItems}
                 colorHue={props.colorHue}
                 selectable={props.selectable}
-                selectedIndex={props.selectedIndex}
+                selected={props.selected}
                 onSelectChange={props.onSelectChange}
             />
         </div>

@@ -6,6 +6,7 @@ import { LoadingGroup } from "@report/components/LoadingGroup";
 import WordCloud from "@report/components/cards/language/WordCloud";
 import WordStats from "@report/components/cards/language/WordStats";
 import { WordLabel } from "@report/components/core/labels/WordLabel";
+import { SelectedBarEntry } from "@report/components/viz/AnimatedBars";
 import MostUsed from "@report/components/viz/MostUsed";
 
 import "@assets/styles/WordsCard.less";
@@ -18,7 +19,10 @@ const WordsInFilter = (index: number, filter: string | RegExp) => {
 
 const WordsUsage = ({ options }: { options: number[] }) => {
     const languageStats = useBlockData("language/stats");
-    const [selectedWord, setSelectedWord] = useState<number>(0);
+    const [selectedWord, setSelectedWord] = useState<SelectedBarEntry>({
+        index: 0,
+        manual: false,
+    });
 
     if (options[0] === 1) return <WordCloud wordsCount={languageStats?.wordsCount} />;
 
@@ -36,14 +40,14 @@ const WordsUsage = ({ options }: { options: number[] }) => {
                 indexOf={WordsIndexOf}
                 inFilter={WordsInFilter}
                 selectable={true}
-                selectedIndex={selectedWord}
+                selected={selectedWord}
                 onSelectChange={setSelectedWord}
             />
 
             <LoadingGroup>
                 {(state) => (
                     <div className={"WordsCard__group " + (state !== "ready" ? "WordsCard__loading" : "")}>
-                        <WordStats wordIndex={selectedWord} />
+                        <WordStats wordIndex={selectedWord.index} />
                         <div className="WordsCard__overlay" />
                     </div>
                 )}
