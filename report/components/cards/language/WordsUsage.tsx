@@ -1,3 +1,5 @@
+import { useState } from "react";
+
 import { useBlockData } from "@report/BlockHook";
 import { getDatabase, getFormatCache } from "@report/WorkerWrapper";
 import WordCloud from "@report/components/cards/language/WordCloud";
@@ -15,6 +17,7 @@ const WordsInFilter = (index: number, filter: string | RegExp) => {
 
 const WordsUsage = ({ options }: { options: number[] }) => {
     const languageStats = useBlockData("language/stats");
+    const [selectedWord, setSelectedWord] = useState<number>(0);
 
     if (options[0] === 1) return <WordCloud wordsCount={languageStats?.wordsCount} />;
 
@@ -31,9 +34,12 @@ const WordsUsage = ({ options }: { options: number[] }) => {
                 searchPlaceholder="Filter words..."
                 indexOf={WordsIndexOf}
                 inFilter={WordsInFilter}
+                selectable={true}
+                selectedIndex={selectedWord}
+                onSelectChange={setSelectedWord}
             />
 
-            <WordStats wordIndex={0} />
+            <WordStats wordIndex={selectedWord} />
         </div>
     );
 };

@@ -26,6 +26,10 @@ interface Props {
     what: string;
     maxValue?: number;
     formatNumber?: (n: number) => string;
+
+    selectable?: boolean;
+    selectedIndex?: number;
+    onSelectChange?: (index: number) => void;
 }
 
 const Item = (props: {
@@ -35,14 +39,24 @@ const Item = (props: {
     percent: number;
     rank: number;
     formatNumber?: (n: number) => string;
+    selectable: boolean;
+    selected: boolean;
+    onSelectChange?: (index: number) => void;
 }) => (
-    <div className="AnimatedBars__item" style={{ top: props.rank * ITEM_STRIDE + "px" }}>
+    <div
+        className="AnimatedBars__item"
+        style={{ top: props.rank * ITEM_STRIDE + "px", cursor: props.selectable ? "pointer" : "default" }}
+        onClick={() => props.onSelectChange && props.onSelectChange(props.entry.index)}
+    >
         <div
             className="AnimatedBars__bar"
             style={{
                 width: props.percent + "%",
-                backgroundColor:
-                    props.colorHue === undefined ? `rgba(255, 255, 255, 0.1)` : `hsl(${props.colorHue}, 100%, 65%)`,
+                backgroundColor: props.selected
+                    ? `#06785e`
+                    : props.colorHue === undefined
+                    ? `rgba(255, 255, 255, 0.1)`
+                    : `hsl(${props.colorHue}, 100%, 65%)`,
             }}
         ></div>
         <div className="AnimatedBars__value">
@@ -85,6 +99,9 @@ const AnimatedBars = (props: Props) => {
                         itemComponent={props.itemComponent}
                         colorHue={props.colorHue}
                         formatNumber={props.formatNumber || defaultFormatting}
+                        selectable={props.selectable === true}
+                        selected={props.selectedIndex === entry.index}
+                        onSelectChange={props.onSelectChange}
                     ></Item>
                 ))}
             </div>

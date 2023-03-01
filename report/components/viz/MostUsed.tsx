@@ -13,6 +13,10 @@ interface BaseProps {
     itemComponent: (props: { index: Index }) => JSX.Element;
     maxItems: number;
     colorHue?: number;
+
+    selectable?: boolean;
+    selectedIndex?: number;
+    onSelectChange?: (index: number) => void;
 }
 
 interface SimpleProps extends BaseProps {
@@ -89,6 +93,9 @@ const MostUsed = (props: Props) => {
                 itemComponent={Item}
                 maxItems={props.maxItems}
                 colorHue={props.colorHue}
+                selectable={props.selectable}
+                selectedIndex={props.selectedIndex}
+                onSelectChange={props.onSelectChange}
             />
         </div>
     );
