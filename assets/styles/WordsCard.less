@@ -32,6 +32,33 @@
     }
 }
 
+.WordsCard__group {
+    position: relative;
+}
+
+.WordsCard__overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.3);
+    margin: 0px 5px;
+    border-radius: 5px;
+    opacity: 0;
+    pointer-events: none;
+    transition: 0.25s opacity;
+}
+
+.WordsCard__loading {
+    filter: grayscale(100%);
+
+    .WordsCard__overlay {
+        opacity: 1;
+        pointer-events: all;
+    }
+}
+
 @media (min-width: 630px) {
     .WordsCard {
         display: flex;

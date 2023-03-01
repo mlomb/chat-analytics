@@ -2,6 +2,7 @@ import { useState } from "react";
 
 import { useBlockData } from "@report/BlockHook";
 import { getDatabase, getFormatCache } from "@report/WorkerWrapper";
+import { LoadingGroup } from "@report/components/LoadingGroup";
 import WordCloud from "@report/components/cards/language/WordCloud";
 import WordStats from "@report/components/cards/language/WordStats";
 import { WordLabel } from "@report/components/core/labels/WordLabel";
@@ -39,7 +40,14 @@ const WordsUsage = ({ options }: { options: number[] }) => {
                 onSelectChange={setSelectedWord}
             />
 
-            <WordStats wordIndex={selectedWord} />
+            <LoadingGroup>
+                {(state) => (
+                    <div className={"WordsCard__group " + (state !== "ready" ? "WordsCard__loading" : "")}>
+                        <WordStats wordIndex={selectedWord} />
+                        <div className="WordsCard__overlay" />
+                    </div>
+                )}
+            </LoadingGroup>
         </div>
     );
 };

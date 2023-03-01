@@ -118,7 +118,7 @@ const WordStats = ({ wordIndex }: { wordIndex: number }) => {
     }
 
     return (
-        <div>
+        <>
             <h1 className="word-title">{word}</h1>
             <AmCharts5Chart
                 create={createChart}
@@ -146,7 +146,7 @@ const WordStats = ({ wordIndex }: { wordIndex: number }) => {
                 maxItems={maxItems}
                 colorHue={266}
             />
-        </div>
+        </>
     );
 };
 
