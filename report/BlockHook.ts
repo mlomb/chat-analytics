@@ -28,6 +28,10 @@ export const useBlockData = <K extends BlockKey>(blockKey: K, args?: BlockArgs<K
         store.subscribe(request, updateData);
         ctx.enable(request);
 
+        // set if already loaded
+        const status = store.getStoredStatus(request);
+        if (status?.data !== undefined) setData(status.data);
+
         return () => {
             store.unsubscribe(request, updateData);
             ctx.disable(request);
