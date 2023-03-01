@@ -20,7 +20,7 @@ const WordsInFilter = (index: number, filter: string | RegExp) => {
 const WordsUsage = ({ options }: { options: number[] }) => {
     const languageStats = useBlockData("language/stats");
     const [selectedWord, setSelectedWord] = useState<SelectedBarEntry>({
-        index: 0,
+        index: -1,
         manual: false,
     });
 

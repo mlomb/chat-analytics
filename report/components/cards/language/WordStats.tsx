@@ -1,3 +1,5 @@
+import { useMemo } from "react";
+
 import { Color, Container, Label, Tooltip, p50 } from "@amcharts/amcharts5";
 import {
     AxisRendererX,
@@ -90,32 +92,37 @@ const createChart: CreateFn<DateItem[]> = (c: Container) => {
 };
 
 const WordStats = ({ wordIndex }: { wordIndex: number }) => {
-    const word = getDatabase().words[wordIndex];
+    const word = wordIndex >= 0 ? getDatabase().words[wordIndex] : "";
     const wordStats = useBlockData("language/word-stats", { wordIndex });
     const maxItems = 4;
 
-    let authorEntries: AnimatedBarEntry[] = [];
-    let channelEntries: AnimatedBarEntry[] = [];
+    const computed = useMemo(() => {
+        if (wordStats === undefined) {
+            return {
+                authorEntries: [],
+                channelEntries: [],
+            };
+        }
 
-    if (wordStats) {
-        authorEntries = wordStats.counts.authors
-            .map((value, index) => ({
-                index,
-                value,
-            }))
-            .filter((a) => a.value > 0) // filter out 0
-            .sort((a, b) => b.value - a.value)
-            .slice(0, maxItems);
-
-        channelEntries = wordStats.counts.channels
-            .map((value, index) => ({
-                index,
-                value,
-            }))
-            .filter((a) => a.value > 0) // filter out 0
-            .sort((a, b) => b.value - a.value)
-            .slice(0, maxItems);
-    }
+        return {
+            authorEntries: wordStats.counts.authors
+                .map((value, index) => ({
+                    index,
+                    value,
+                }))
+                .filter((a) => a.value > 0) // filter out 0
+                .sort((a, b) => b.value - a.value)
+                .slice(0, maxItems),
+            channelEntries: wordStats.counts.channels
+                .map((value, index) => ({
+                    index,
+                    value,
+                }))
+                .filter((a) => a.value > 0) // filter out 0
+                .sort((a, b) => b.value - a.value)
+                .slice(0, maxItems),
+        };
+    }, [wordStats]);
 
     return (
         <>
@@ -133,7 +140,7 @@ const WordStats = ({ wordIndex }: { wordIndex: number }) => {
             <AnimatedBars
                 what="Author"
                 unit="# of times written"
-                data={authorEntries}
+                data={computed.authorEntries}
                 itemComponent={AuthorLabel}
                 maxItems={maxItems}
                 colorHue={240}
@@ -141,7 +148,7 @@ const WordStats = ({ wordIndex }: { wordIndex: number }) => {
             <AnimatedBars
                 what="Channel"
                 unit="# of times written"
-                data={channelEntries}
+                data={computed.channelEntries}
                 itemComponent={ChannelLabel}
                 maxItems={maxItems}
                 colorHue={266}

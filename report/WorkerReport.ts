@@ -130,10 +130,11 @@ const request = async (msg: BlockRequestMessage) => {
         // set triggers
         resultMsg.result.triggers = Blocks[request.blockKey].triggers;
 
-        console.time(request.blockKey);
+        const id = request.blockKey + (request.args ? "--" + JSON.stringify(request.args) : "");
+        console.time(id);
         // @ts-expect-error (BlockArgs<any>)
         const data = Blocks[request.blockKey].fn(database, filters, common, request.args);
-        console.timeEnd(request.blockKey);
+        console.timeEnd(id);
 
         resultMsg.result.success = true;
         resultMsg.result.data = data;
