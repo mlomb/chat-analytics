@@ -12,7 +12,7 @@ import {
 } from "@amcharts/amcharts5/xy";
 import { SentimentInDate, SentimentPerPeriod } from "@pipeline/aggregate/blocks/sentiment/SentimentPerPeriod";
 import { useBlockData } from "@report/BlockHook";
-import { syncAxisWithTimeFilter } from "@report/components/viz/amcharts/AmCharts5";
+import { createYAxisLabel, syncAxisWithTimeFilter } from "@report/components/viz/amcharts/AmCharts5";
 import { AmCharts5Chart, CreateFn } from "@report/components/viz/amcharts/AmCharts5Chart";
 
 const SentimentOverTime = ({ options }: { options: number[] }) => {
@@ -32,6 +32,7 @@ const SentimentOverTime = ({ options }: { options: number[] }) => {
                 DateAxis.new(c.root, {
                     baseInterval: { timeUnit: options[0] === 0 ? "week" : "month", count: 1 },
                     renderer: AxisRendererX.new(c.root, {}),
+                    tooltip: Tooltip.new(c.root, {}),
                 })
             );
             const yAxis = chart.yAxes.push(
@@ -79,16 +80,19 @@ const SentimentOverTime = ({ options }: { options: number[] }) => {
                 series[1].set("valueYField", "percN");
                 series[0].get("tooltip")!.set("labelText", "{valueY}% positive messages sent");
                 series[1].get("tooltip")!.set("labelText", "{valueY}% negative messages sent");
+                createYAxisLabel(yAxis, "Percentage of messages in period");
             } else if (options[1] === 1) {
                 series[0].set("valueYField", "p");
                 series[1].set("valueYField", "n");
                 series[0].get("tooltip")!.set("labelText", "{valueY} positive messages sent");
                 series[1].get("tooltip")!.set("labelText", "{valueY} negative messages sent");
+                createYAxisLabel(yAxis, "Number of messages");
             } else if (options[1] === 2) {
                 series[0].set("valueYField", "diffP");
                 series[1].set("valueYField", "diffN");
                 series[0].get("tooltip")!.set("labelText", "{valueY} more positive messages than negative sent");
                 series[1].get("tooltip")!.set("labelText", "{valueY} more negative messages than positive sent");
+                createYAxisLabel(yAxis, "Message difference (in number of messages)");
             }
 
             const cleanupAxisSync = syncAxisWithTimeFilter(series, xAxis, yAxis);

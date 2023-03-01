@@ -27,39 +27,35 @@ const createPieChart = (c: Container) => {
         })
     );
     series.slices.template.setAll({
-        templateField: "sliceSettings",
+        // disable pull-out
+        toggleKey: "none",
     });
     series.labels.template.setAll({
         textType: "circular",
         centerX: 0,
         centerY: 0,
     });
+    series
+        .get("colors")!
+        .set("colors", [
+            c.root.interfaceColors.get("positive")!,
+            c.root.interfaceColors.get("negative")!,
+            Color.fromHex(0x00bcd4),
+        ]);
 
     return (data: Props) => {
         series.data.setAll([
             {
                 tag: "Positive",
                 count: data.p,
-                sliceSettings: {
-                    fill: c.root.interfaceColors.get("positive")!,
-                    stroke: null,
-                },
             },
             {
                 tag: "Negative",
                 count: data.n,
-                sliceSettings: {
-                    fill: c.root.interfaceColors.get("negative")!,
-                    stroke: null,
-                },
             },
             {
                 tag: "Neutral",
                 count: data.z,
-                sliceSettings: {
-                    fill: Color.fromString("#00bcd4"),
-                    stroke: null,
-                },
             },
         ]);
     };
