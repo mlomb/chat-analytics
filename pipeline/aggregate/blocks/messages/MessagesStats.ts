@@ -86,7 +86,7 @@ const fn: BlockFn<MessagesStats> = (database, filters, common, args) => {
         monthlyCounts[dateToMonthIndex[msg.dayIndex]]++;
         yearlyCounts[dateToYearIndex[msg.dayIndex]]++;
 
-        const dayOfWeek = Day.fromKey(dateKeys[msg.dayIndex]).toDate().getDay();
+        const dayOfWeek = common.dayOfWeek[msg.dayIndex];
         weekdayHourCounts[dayOfWeek * 24 + Math.floor(msg.secondOfDay / 3600)]++;
 
         const attachments = msg.attachments;

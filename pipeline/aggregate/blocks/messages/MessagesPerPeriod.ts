@@ -21,24 +21,25 @@ const fn: BlockFn<MessagesPerPeriod> = (database, filters, common) => {
         perMonth: [],
     };
 
-    const { dateKeys, weekKeys, monthKeys, dateToWeekIndex, dateToMonthIndex } = common.timeKeys;
+    const { keyToTimestamp } = common;
+    const { dateToWeekIndex, dateToMonthIndex } = common.timeKeys;
 
     // fill empty
-    for (const dateKey of dateKeys) {
+    for (const ts of keyToTimestamp.date) {
         res.perDay.push({
-            ts: Day.fromKey(dateKey).toTimestamp(),
+            ts,
             v: 0,
         });
     }
-    for (const weekKey of weekKeys) {
+    for (const ts of keyToTimestamp.week) {
         res.perWeek.push({
-            ts: Day.fromKey(weekKey).toTimestamp(),
+            ts,
             v: 0,
         });
     }
-    for (const monthKey of monthKeys) {
+    for (const ts of keyToTimestamp.month) {
         res.perMonth.push({
-            ts: Day.fromKey(monthKey).toTimestamp(),
+            ts,
             v: 0,
         });
     }

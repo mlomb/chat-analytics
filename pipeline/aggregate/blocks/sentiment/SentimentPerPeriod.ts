@@ -37,12 +37,13 @@ const fn: BlockFn<SentimentPerPeriod> = (database, filters, common, args) => {
         perWeek: [],
     };
 
+    const { keyToTimestamp } = common;
     const { monthKeys, weekKeys, dateToMonthIndex, dateToWeekIndex } = common.timeKeys;
 
     // fill empty
-    for (const monthKey of monthKeys) {
+    for (const ts of keyToTimestamp.month) {
         res.perMonth.push({
-            t: Day.fromKey(monthKey).toTimestamp(),
+            t: ts,
             p: 0,
             n: 0,
             z: 0,
@@ -52,9 +53,9 @@ const fn: BlockFn<SentimentPerPeriod> = (database, filters, common, args) => {
             percN: 0,
         });
     }
-    for (const weekKey of weekKeys) {
+    for (const ts of keyToTimestamp.week) {
         res.perWeek.push({
-            t: Day.fromKey(weekKey).toTimestamp(),
+            t: ts,
             p: 0,
             n: 0,
             z: 0,

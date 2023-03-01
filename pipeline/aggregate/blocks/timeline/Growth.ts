@@ -10,6 +10,7 @@ export interface GrowthTimeline {
 }
 
 const fn: BlockFn<GrowthTimeline> = (database, filters, common, args) => {
+    const { keyToTimestamp } = common;
     const { dateKeys } = common.timeKeys;
 
     const computeForGuild = (guildIndex: Index) => {
@@ -43,14 +44,14 @@ const fn: BlockFn<GrowthTimeline> = (database, filters, common, args) => {
             for (let i = 0; i < database.time.numDays; i++) {
                 accum += newAuthorsInDay[i];
                 growth.push({
-                    ts: Day.fromKey(dateKeys[i]).toTimestamp(),
+                    ts: keyToTimestamp.date[i],
                     v: accum,
                 });
             }
 
             // last data point
             growth.push({
-                ts: Day.fromKey(dateKeys[dateKeys.length - 1]).toTimestamp(),
+                ts: keyToTimestamp.date[dateKeys.length - 1],
                 v: accum,
             });
         }

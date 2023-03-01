@@ -28,12 +28,13 @@ const fn: BlockFn<WordStats, WordStatsArgs> = (database, filters, common, args) 
         },
     };
 
-    const { monthKeys, dateToMonthIndex } = common.timeKeys;
+    const { keyToTimestamp } = common;
+    const { dateToMonthIndex } = common.timeKeys;
 
     // fill empty
-    for (const monthKey of monthKeys) {
+    for (const ts of keyToTimestamp.month) {
         res.perMonth.push({
-            ts: Day.fromKey(monthKey).toTimestamp(),
+            ts,
             v: 0,
         });
     }
@@ -55,7 +56,6 @@ const fn: BlockFn<WordStats, WordStatsArgs> = (database, filters, common, args) 
     filterMessages(processMessage, database, filters, {
         authors: true,
         channels: true,
-        // TODO: CHECK THIS
         time: true,
     });
 

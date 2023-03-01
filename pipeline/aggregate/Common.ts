@@ -5,13 +5,44 @@ import { Database } from "@pipeline/process/Types";
 /** This is data used by multiple blocks and can be computed only once */
 export interface CommonBlockData {
     timeKeys: TimeKeysResult;
+
+    /** Maps time keys to their corresponding timestamp */
+    keyToTimestamp: {
+        date: number[];
+        week: number[];
+        month: number[];
+    };
+
+    /** Day of the week for each dayIndex */
+    dayOfWeek: number[];
 }
 
 export const computeCommonBlockData = (database: Database): CommonBlockData => {
     const start = Day.fromKey(database.time.minDate);
     const end = Day.fromKey(database.time.maxDate);
+    const timeKeys = genTimeKeys(start, end);
 
-    return { timeKeys: genTimeKeys(start, end) };
+    const res: CommonBlockData = {
+        timeKeys,
+        dayOfWeek: [],
+        keyToTimestamp: {
+            date: [],
+            week: [],
+            month: [],
+        },
+    };
+
+    let i = 0;
+    for (const dateKey of timeKeys.dateKeys) {
+        const day = Day.fromKey(dateKey);
+        res.keyToTimestamp.date.push(day.toTimestamp());
+        res.dayOfWeek[i] = day.toDate().getDay();
+        i++;
+    }
+    for (const weekKey of timeKeys.weekKeys) res.keyToTimestamp.week.push(Day.fromKey(weekKey).toTimestamp());
+    for (const monthKey of timeKeys.monthKeys) res.keyToTimestamp.month.push(Day.fromKey(monthKey).toTimestamp());
+
+    return res;
 };
 
 export interface VariableDistribution {
