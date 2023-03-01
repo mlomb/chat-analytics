@@ -1,0 +1,52 @@
+@border: 2px dashed #596570;
+
+.WordsCard {
+    text-align: center;
+
+    > :last-child {
+        border-top: @border;
+        margin-top: 6px;
+        padding-top: 8px;
+    }
+
+    .word-title {
+        position: relative;
+        white-space: nowrap;
+        word-wrap: break-word;
+        overflow: hidden;
+        display: inline-block;
+        text-overflow: ellipsis;
+        max-width: 330px;
+        padding-right: 13px;
+
+        &:before {
+            content: '"';
+        }
+        &:after {
+            content: '"';
+            display: block;
+            position: absolute;
+            top: 0;
+            right: 0;
+        }
+    }
+}
+
+@media (min-width: 630px) {
+    .WordsCard {
+        display: flex;
+
+        > :first-child {
+            flex: 1;
+        }
+        > :last-child {
+            flex: 1.4;
+
+            border-top: none;
+            border-left: @border;
+            margin-bottom: 8px;
+            margin-top: 0;
+            padding-top: 0;
+        }
+    }
+}

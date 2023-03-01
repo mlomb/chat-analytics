@@ -1,6 +1,4 @@
-import { Container, DataItem } from "@amcharts/amcharts5";
-import { Color, Tooltip } from "@amcharts/amcharts5";
-import { XYChart } from "@amcharts/amcharts5/xy";
+import { Color, Container, Label, Tooltip, p50 } from "@amcharts/amcharts5";
 import {
     AxisRendererX,
     AxisRendererY,
@@ -8,23 +6,35 @@ import {
     DateAxis,
     StepLineSeries,
     ValueAxis,
+    XYChart,
     XYCursor,
 } from "@amcharts/amcharts5/xy";
 import { DateItem } from "@pipeline/aggregate/Common";
-import { MessagesPerPeriod } from "@pipeline/aggregate/blocks/messages/MessagesPerPeriod";
 import { useBlockData } from "@report/BlockHook";
 import { getDatabase } from "@report/WorkerWrapper";
 import { AuthorLabel } from "@report/components/core/labels/AuthorLabel";
 import { ChannelLabel } from "@report/components/core/labels/ChannelLabel";
 import AnimatedBars, { AnimatedBarEntry } from "@report/components/viz/AnimatedBars";
-import { createYAxisLabel } from "@report/components/viz/amcharts/AmCharts5";
-import { syncAxisWithTimeFilter } from "@report/components/viz/amcharts/AmCharts5";
+import { createYAxisLabel, syncAxisWithTimeFilter } from "@report/components/viz/amcharts/AmCharts5";
 import { AmCharts5Chart, CreateFn } from "@report/components/viz/amcharts/AmCharts5Chart";
 
 const createChart: CreateFn<DateItem[]> = (c: Container) => {
     const chart = c.children.push(
         XYChart.new(c.root, {
             layout: c.root.verticalLayout,
+        })
+    );
+
+    chart.children.unshift(
+        Label.new(c.root, {
+            text: "Usage over time",
+            fontSize: 20,
+            fontWeight: "500",
+            textAlign: "center",
+            x: p50,
+            centerX: p50,
+            paddingTop: 0,
+            paddingBottom: 10,
         })
     );
 
@@ -82,6 +92,7 @@ const createChart: CreateFn<DateItem[]> = (c: Container) => {
 const WordStats = ({ wordIndex }: { wordIndex: number }) => {
     const word = getDatabase().words[wordIndex];
     const wordStats = useBlockData("language/word-stats", { wordIndex });
+    const maxItems = 4;
 
     let authorEntries: AnimatedBarEntry[] = [];
     let channelEntries: AnimatedBarEntry[] = [];
@@ -94,7 +105,7 @@ const WordStats = ({ wordIndex }: { wordIndex: number }) => {
             }))
             .filter((a) => a.value > 0) // filter out 0
             .sort((a, b) => b.value - a.value)
-            .slice(0, 5);
+            .slice(0, maxItems);
 
         channelEntries = wordStats.counts.channels
             .map((value, index) => ({
@@ -103,18 +114,17 @@ const WordStats = ({ wordIndex }: { wordIndex: number }) => {
             }))
             .filter((a) => a.value > 0) // filter out 0
             .sort((a, b) => b.value - a.value)
-            .slice(0, 5);
+            .slice(0, maxItems);
     }
 
     return (
-        <>
-            <h1>"{word}"</h1>
-            <h2>word stats</h2>
+        <div>
+            <h1 className="word-title">{word}</h1>
             <AmCharts5Chart
                 create={createChart}
                 data={wordStats?.perMonth}
                 style={{
-                    minHeight: 500,
+                    minHeight: 250,
                     marginLeft: 5,
                     marginBottom: 8,
                 }}
@@ -125,7 +135,7 @@ const WordStats = ({ wordIndex }: { wordIndex: number }) => {
                 unit="# of times written"
                 data={authorEntries}
                 itemComponent={AuthorLabel}
-                maxItems={5}
+                maxItems={maxItems}
                 colorHue={240}
             />
             <AnimatedBars
@@ -133,10 +143,10 @@ const WordStats = ({ wordIndex }: { wordIndex: number }) => {
                 unit="# of times written"
                 data={channelEntries}
                 itemComponent={ChannelLabel}
-                maxItems={5}
+                maxItems={maxItems}
                 colorHue={266}
             />
-        </>
+        </div>
     );
 };
 
