@@ -241,6 +241,7 @@ const ReportDashboard = () => {
                 cards: [
                     <Card
                         num={2}
+                        defaultOptions={[1, 1]}
                         title={[
                             "Sentiment over time",
                             ["by week", "by month"],

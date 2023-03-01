@@ -30,7 +30,7 @@ export const MostMessagesAuthors = () => (
 export const MostRepliesAuthors = () => (
     <MostUsed
         what="Author"
-        unit="Number of messages replied"
+        unit="# of messages replied"
         counts={useBlockData("interaction/stats")?.authorsReplyCount}
         itemComponent={AuthorLabel}
         maxItems={Math.min(15, getDatabase().authors.length)}
@@ -60,7 +60,7 @@ export const MostConversations = ({ options }: { options: number[] }) => {
     return (
         <MostUsed
             what={options[0] === 0 ? "Author" : "Channel"}
-            unit="Number of conversations started"
+            unit="# of conversations started"
             counts={
                 conversationStats
                     ? conversationStats[options[0] === 0 ? "authorConversations" : "channelConversations"]
@@ -116,7 +116,7 @@ export const MostProducerEmojis = ({ options }: { options: number[] }) => {
     return (
         <MostUsed
             what={options[0] === 0 ? "Author" : "Channel"}
-            unit="Number of emojis used"
+            unit="# of emojis used"
             counts={emojiStats ? emojiStats.inText.counts[options[0] === 0 ? "authors" : "channels"] : undefined}
             maxItems={Math.min(15, Math.max(getDatabase().authors.length, getDatabase().channels.length))}
             itemComponent={options[0] === 0 ? AuthorLabel : ChannelLabel}
@@ -129,7 +129,7 @@ export const MostReactionReceiver = ({ options }: { options: number[] }) => {
     return (
         <MostUsed
             what={options[0] === 0 ? "Author" : "Channel"}
-            unit="Number of reactions received"
+            unit="# of reactions received"
             counts={emojiStats ? emojiStats.inReactions.counts[options[0] === 0 ? "authors" : "channels"] : undefined}
             maxItems={Math.min(15, Math.max(getDatabase().authors.length, getDatabase().channels.length))}
             itemComponent={options[0] === 0 ? AuthorLabel : ChannelLabel}
