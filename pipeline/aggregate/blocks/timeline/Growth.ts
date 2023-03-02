@@ -1,31 +1,30 @@
-import { Day } from "@pipeline/Time";
-import { Index } from "@pipeline/Types";
 import { BlockDescription, BlockFn } from "@pipeline/aggregate/Blocks";
 import { DateItem } from "@pipeline/aggregate/Common";
 import { filterMessages } from "@pipeline/aggregate/Helpers";
+import { TimelineSeriesDefinition, generateSeries } from "@pipeline/aggregate/blocks/timeline/Series";
 import { MessageView } from "@pipeline/serialization/MessageView";
 
 export interface GrowthTimeline {
-    perGuildPerDay: DateItem[][];
+    perSeriesPerMonth: DateItem[][];
 }
 
 const fn: BlockFn<GrowthTimeline> = (database, filters, common, args) => {
     const { keyToTimestamp } = common;
     const { dateKeys } = common.timeKeys;
 
-    const computeForGuild = (guildIndex: Index) => {
+    const computeForSeries = (def: TimelineSeriesDefinition) => {
         let foundAtLeastOneMessage = false;
 
         // the day each author posted their first message
         const firstMessageDay: number[] = new Array(database.authors.length).fill(-1);
 
         const processMessage = (msg: MessageView) => {
-            if (msg.guildIndex !== guildIndex) return;
+            if (msg.guildIndex === def.guildIndex || msg.channelIndex === def.channelIndex) {
+                if (firstMessageDay[msg.authorIndex] === -1 || msg.dayIndex < firstMessageDay[msg.authorIndex])
+                    firstMessageDay[msg.authorIndex] = msg.dayIndex;
 
-            if (firstMessageDay[msg.authorIndex] === -1 || msg.dayIndex < firstMessageDay[msg.authorIndex])
-                firstMessageDay[msg.authorIndex] = msg.dayIndex;
-
-            foundAtLeastOneMessage = true;
+                foundAtLeastOneMessage = true;
+            }
         };
 
         filterMessages(processMessage, database, filters, { channels: true, authors: true, time: false });
@@ -60,7 +59,7 @@ const fn: BlockFn<GrowthTimeline> = (database, filters, common, args) => {
     };
 
     const res: GrowthTimeline = {
-        perGuildPerDay: database.guilds.map((_, guildIndex) => computeForGuild(guildIndex)),
+        perSeriesPerMonth: generateSeries(database).map(computeForSeries),
     };
 
     return res;

@@ -16,7 +16,7 @@ const createChart: CreateFn<DateItem[][]> = (c: Container) => {
 const ActiveAuthorsOverTime = () => (
     <AmCharts5Chart
         create={createChart}
-        data={useBlockData("timeline/active-authors")?.perGuildPerMonth}
+        data={useBlockData("timeline/active-authors")?.perSeriesPerMonth}
         style={{
             minHeight: 500,
             marginLeft: 5,

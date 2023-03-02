@@ -3,16 +3,18 @@ import { Index } from "@pipeline/Types";
 import { BlockDescription, BlockFn } from "@pipeline/aggregate/Blocks";
 import { DateItem } from "@pipeline/aggregate/Common";
 import { filterMessages } from "@pipeline/aggregate/Helpers";
+import { TimelineSeriesDefinition, generateSeries } from "@pipeline/aggregate/blocks/timeline/Series";
 import { MessageView } from "@pipeline/serialization/MessageView";
 
 export interface ActiveAuthorsTimeline {
-    perGuildPerMonth: DateItem[][];
+    perSeriesPerMonth: DateItem[][];
 }
 
 const fn: BlockFn<ActiveAuthorsTimeline> = (database, filters, common, args) => {
+    const { keyToTimestamp } = common;
     const { monthKeys, dateToMonthIndex } = common.timeKeys;
 
-    const computeForGuild = (guildIndex: Index) => {
+    const computeForSeries = (def: TimelineSeriesDefinition) => {
         let foundAtLeastOneMessage = false;
 
         // TODO: optimize this with a bitset or something, using a Set may use too much memory if there are many authors
@@ -20,7 +22,7 @@ const fn: BlockFn<ActiveAuthorsTimeline> = (database, filters, common, args) => 
         for (const _ of monthKeys) authorsPresentInMonth.push(new Set());
 
         const processMessage = (msg: MessageView) => {
-            if (msg.guildIndex === guildIndex) {
+            if (msg.guildIndex === def.guildIndex || msg.channelIndex === def.channelIndex) {
                 authorsPresentInMonth[dateToMonthIndex[msg.dayIndex]].add(msg.authorIndex);
                 foundAtLeastOneMessage = true;
             }
@@ -33,7 +35,7 @@ const fn: BlockFn<ActiveAuthorsTimeline> = (database, filters, common, args) => 
         if (foundAtLeastOneMessage) {
             for (let i = 0; i < monthKeys.length; i++) {
                 items.push({
-                    ts: Day.fromKey(monthKeys[i]).toTimestamp(),
+                    ts: keyToTimestamp.month[i],
                     v: authorsPresentInMonth[i].size,
                 });
             }
@@ -43,7 +45,7 @@ const fn: BlockFn<ActiveAuthorsTimeline> = (database, filters, common, args) => 
     };
 
     const res: ActiveAuthorsTimeline = {
-        perGuildPerMonth: database.guilds.map((_, guildIndex) => computeForGuild(guildIndex)),
+        perSeriesPerMonth: generateSeries(database).map(computeForSeries),
     };
 
     return res;

@@ -11,10 +11,9 @@ import {
     ValueAxis,
     XYChart,
     XYCursor,
-    XYSeries,
 } from "@amcharts/amcharts5/xy";
 import { DateItem } from "@pipeline/aggregate/Common";
-import { Guild } from "@pipeline/process/Types";
+import { TimelineSeriesDefinition, generateSeries } from "@pipeline/aggregate/blocks/timeline/Series";
 import { getDatabase } from "@report/WorkerWrapper";
 import { syncAxisWithTimeFilter } from "@report/components/viz/amcharts/AmCharts5";
 
@@ -57,11 +56,11 @@ export const createTimeline = (c: Container, timeUnit: TimeUnit, seriesChart: "s
         })
     );
 
-    const createSeries = (guild: Guild) => {
+    const createSeries = (def: TimelineSeriesDefinition) => {
         let series: LineSeries;
 
         const settings: IXYSeriesSettings = {
-            name: guild.name,
+            name: def.title,
             valueXField: "ts",
             valueYField: "v",
             xAxis: xAxis,
@@ -109,7 +108,7 @@ export const createTimeline = (c: Container, timeUnit: TimeUnit, seriesChart: "s
         return series;
     };
 
-    const series = db.guilds.map(createSeries);
+    const series = generateSeries(db).map(createSeries);
 
     const legend = chart.children.unshift(
         Legend.new(root, {
