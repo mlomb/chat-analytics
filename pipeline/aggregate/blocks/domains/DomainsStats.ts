@@ -120,8 +120,8 @@ const buildDomainTree = (domains: string[], counts: number[]) => {
             entry.subdomains = newSubdomains;
         }
 
-        if (newSubdomains.length === 1) {
-            // collapse node
+        // collapse node but do NOT collapse the root node
+        if (newSubdomains.length === 1 && entry.domain !== "TLDs") {
             return cleanup(newSubdomains[0]);
         }
 
