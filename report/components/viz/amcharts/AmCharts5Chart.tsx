@@ -11,6 +11,7 @@ export type DisposeFn = () => void;
 export type CreateFn<Data> = (c: Container) => SetDataFn<Data> | [SetDataFn<Data>, DisposeFn];
 
 interface Props<Data extends any> {
+    className?: string;
     style?: React.CSSProperties;
     animated?: true;
     createTheme?: (root: Root) => Theme;
@@ -105,7 +106,7 @@ export const AmCharts5Chart = <Data extends any>(props: Props<Data>) => {
 
     return (
         <div ref={inViewRef}>
-            <div ref={chartDiv} style={props.style} />
+            <div ref={chartDiv} className={props.className} style={props.style} />
         </div>
     );
 };
