@@ -1,11 +1,11 @@
 import { memo } from "react";
 
-import { useDataProvider } from "@report/DataProvider";
+import { getDatabase } from "@report/WorkerWrapper";
 import { BaseLabel, LabelProps } from "@report/components/core/labels/BaseLabel";
 
 const _MentionLabel = ({ index }: LabelProps) => {
-    const dp = useDataProvider();
-    const mention = dp.database.mentions[index];
+    const db = getDatabase();
+    const mention = db.mentions[index];
 
     const name = (
         <>

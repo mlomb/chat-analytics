@@ -1,12 +1,12 @@
-import { useDataProvider } from "@report/DataProvider";
+import { getDatabase } from "@report/WorkerWrapper";
 import { LazyImage } from "@report/components/core/LazyImage";
 import { PlatformAvatar } from "@report/components/core/avatars/PlatformAvatar";
 import { TextAvatar } from "@report/components/core/avatars/TextAvatar";
 
 export const GuildAvatar = ({ index }: { index: number }) => {
-    const dp = useDataProvider();
-    const platform = dp.database.config.platform;
-    const guild = dp.database.guilds[index];
+    const db = getDatabase();
+    const platform = db.config.platform;
+    const guild = db.guilds[index];
 
     switch (platform) {
         case "discord":

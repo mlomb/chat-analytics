@@ -49,7 +49,7 @@
     "yargs": "^17.7.0"
   },
   "devDependencies": {
-    "@amcharts/amcharts5": "^5.3.3",
+    "@amcharts/amcharts5": "^5.3.6",
     "@tippyjs/react": "^4.2.6",
     "@trivago/prettier-plugin-sort-imports": "^4.0.0",
     "@types/glob": "^8.0.1",
@@ -88,7 +88,9 @@
     "webpack-dev-server": "^4.11.1"
   },
   "jest": {
-    "setupFilesAfterEnv": ["jest-extended/all"],
+    "setupFilesAfterEnv": [
+      "jest-extended/all"
+    ],
     "collectCoverageFrom": [
       "assets/Plausible.ts",
       "lib/**",

@@ -10,6 +10,8 @@ import { MessageBitConfig } from "@pipeline/serialization/MessageSerialization";
 /** All the information processed */
 export interface Database {
     config: Config;
+    generatedAt: string;
+
     title: string;
     langs: Language[];
 
@@ -54,7 +56,7 @@ export interface Channel {
     msgCount?: number;
 }
 
-// names are shortened to bytes during JSON serialization ReportWorker → UI (can add quickly with 300k members)
+// names are shortened to save bytes during JSON serialization ReportWorker → UI (can add quickly with 300k members)
 export interface Author {
     /** name */
     n: string;
@@ -68,6 +70,7 @@ export interface Message {
     // time
     dayIndex: number;
     secondOfDay: number;
+    editedAfter?: number; // seconds
 
     // author
     authorIndex: Index;

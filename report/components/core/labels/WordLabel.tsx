@@ -1,11 +1,11 @@
 import { memo } from "react";
 
-import { useDataProvider } from "@report/DataProvider";
+import { getDatabase } from "@report/WorkerWrapper";
 import { BaseLabel, LabelProps } from "@report/components/core/labels/BaseLabel";
 
 const _WordLabel = ({ index }: LabelProps) => {
-    const dp = useDataProvider();
-    const word = dp.database.words[index];
+    const db = getDatabase();
+    const word = db.words[index];
 
     return <BaseLabel title={word} name={word} />;
 };

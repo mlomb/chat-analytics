@@ -1,8 +1,9 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 
-import { initDataProvider } from "@report/DataProvider";
+import { initBlockStore } from "@report/BlockStore";
 import ReportPage from "@report/ReportPage";
+import { initWorker } from "@report/WorkerWrapper";
 
 import { plausible } from "@assets/Plausible";
 
@@ -14,7 +15,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         if (dataStr === "[[[DATA]]]") {
             // load from public/ folder
-            dataStr = await fetch("report_sample.data").then((res) => res.text());
+            const res = await fetch("report_sample.data");
+            if (res.status !== 200) {
+                alert("Could not load `report_sample.data` from `/public` for development, make sure to generate one.");
+                return;
+            }
+            dataStr = await res.text();
         }
 
         if (dataStr.length === 0 || dataStr === "[[[DATA]]]") {
@@ -23,7 +29,8 @@ document.addEventListener("DOMContentLoaded", async () => {
             return;
         }
 
-        initDataProvider(dataStr);
+        initWorker(dataStr);
+        initBlockStore();
     } catch (err) {
         // set basic error message
         document.querySelector(".basic")!.textContent = "Error occurred: " + (err as Error).message;

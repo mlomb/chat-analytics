@@ -49,7 +49,53 @@ When the report HTML is loaded (via blob or file://) we do the inverse process t
 
 ## 5. Aggregate / Blocks
 
-[TODO WRITE]
+The last mile is to aggregate the database into useful "blocks" that summarizes some particular information. This is done in the worker running in the report UI. Blocks must be defined inside `pipeline/aggregate/blocks` and imported in [`pipeline/aggregate/Blocks.ts`](/pipeline/aggregate/Blocks.ts).
+
+A typical block implementation looks like this:
+
+```ts
+export interface MyBlockResult {
+    totalMessages: number;
+}
+
+export interface MyBlockArgs {
+    channelIndex: number;
+}
+
+const fn: BlockFn<MyBlockResult, MyBlockArgs> = (database, filters, common, args) => {
+    let totalMessages = 0;
+
+    const processMessage = (msg: MessageView) => {
+        if (msg.channelIndex === args.channelIndex)
+            totalMessages++;
+    };
+
+    filterMessages(processMessage, database, filters, {
+        // wether to use current filters
+        authors: true,
+        channels: true,
+        time: true,
+    });
+
+    return { totalMessages };
+};
+
+export default {
+    key: "folder/my-block",
+    triggers: ["authors", "channels", "time"],
+    fn,
+} as BlockDescription<"folder/my-block", MyBlockResult, MyBlockArgs>;
+```
+
+It is implemented with a function that receives the `Database`, the current filters (in the UI), some common data (cached for performance) and the block arguments. It returns the block result.
+
+In the UI blocks can be requested using the hook `useBlockData`:
+
+```ts
+const data = useBlockData("folder/my-block", { channelIndex: 0 });
+```
+
+Very neat, right?
 
 ## About message serialization
 

@@ -1,60 +1,68 @@
-import { TimeKeysResult } from "@pipeline/Time";
-import { Index } from "@pipeline/Types";
+import { CommonBlockData } from "@pipeline/aggregate/Common";
 import { Filters } from "@pipeline/aggregate/Filters";
-// register blocks
-import ActiveAuthors from "@pipeline/aggregate/blocks/ActiveAuthors";
-import ConversationStats from "@pipeline/aggregate/blocks/ConversationStats";
-import EmojiStats from "@pipeline/aggregate/blocks/EmojiStats";
-import ExternalStats from "@pipeline/aggregate/blocks/ExternalStats";
-import Growth from "@pipeline/aggregate/blocks/Growth";
-import InteractionStats from "@pipeline/aggregate/blocks/InteractionStats";
-import LanguageStats from "@pipeline/aggregate/blocks/LanguageStats";
-import MessagesPerCycle from "@pipeline/aggregate/blocks/MessagesPerCycle";
-import MessagesStats from "@pipeline/aggregate/blocks/MessagesStats";
-import SentimentPerCycle from "@pipeline/aggregate/blocks/SentimentPerCycle";
-import SentimentStats from "@pipeline/aggregate/blocks/SentimentStats";
+import DomainsStats from "@pipeline/aggregate/blocks/domains/DomainsStats";
+import EmojiStats from "@pipeline/aggregate/blocks/emojis/EmojiStats";
+import ConversationStats from "@pipeline/aggregate/blocks/interaction/ConversationStats";
+import ConversationsDuration from "@pipeline/aggregate/blocks/interaction/ConversationsDuration";
+import InteractionStats from "@pipeline/aggregate/blocks/interaction/InteractionStats";
+import LanguageStats from "@pipeline/aggregate/blocks/language/LanguageStats";
+import WordStats from "@pipeline/aggregate/blocks/language/WordStats";
+import MessagesEdited from "@pipeline/aggregate/blocks/messages/MessagesEdited";
+import MessagesPerPeriod from "@pipeline/aggregate/blocks/messages/MessagesPerPeriod";
+import MessagesStats from "@pipeline/aggregate/blocks/messages/MessagesStats";
+import SentimentPerPeriod from "@pipeline/aggregate/blocks/sentiment/SentimentPerPeriod";
+import SentimentStats from "@pipeline/aggregate/blocks/sentiment/SentimentStats";
+import ActiveAuthors from "@pipeline/aggregate/blocks/timeline/ActiveAuthors";
+import Growth from "@pipeline/aggregate/blocks/timeline/Growth";
 import { Database } from "@pipeline/process/Types";
 
-// this is data used by multiple blocks and can be computed only once
-export interface CommonBlockData {
-    timeKeys: TimeKeysResult;
-}
+/* Function that computes a block */
+export type BlockFn<Data, Args = undefined> = (
+    database: Database,
+    filters: Filters,
+    common: CommonBlockData,
+    args: Args
+) => Data;
 
-export type BlockState = "loading" | "stale" | "ready" | "error";
-export type BlockTrigger = "authors" | "channels" | "time";
-export type BlockFn<T> = (database: Database, filters: Filters, common: CommonBlockData) => T;
-export type BlockDescription<K, T> = {
+/** Triggers that should make a block data stale (e.g. changes to this filters in the UI) */
+export type Filter = "authors" | "channels" | "time";
+
+/** A description of a block */
+export type BlockDescription<K, Data, Args = undefined> = {
     key: K;
-    triggers: BlockTrigger[];
-    fn: BlockFn<T>;
+    triggers: Filter[];
+    fn: BlockFn<Data, Args>;
 };
 
+/** All existing blocks must be defined here, so the UI can dynamically load them */
 export const Blocks = {
-    [MessagesPerCycle.key]: MessagesPerCycle,
-    [MessagesStats.key]: MessagesStats,
-    [LanguageStats.key]: LanguageStats,
-    [EmojiStats.key]: EmojiStats,
-    [InteractionStats.key]: InteractionStats,
-    [ExternalStats.key]: ExternalStats,
-    [SentimentPerCycle.key]: SentimentPerCycle,
-    [ConversationStats.key]: ConversationStats,
-    [SentimentStats.key]: SentimentStats,
-    [Growth.key]: Growth,
     [ActiveAuthors.key]: ActiveAuthors,
+    [ConversationsDuration.key]: ConversationsDuration,
+    [ConversationStats.key]: ConversationStats,
+    [DomainsStats.key]: DomainsStats,
+    [EmojiStats.key]: EmojiStats,
+    [Growth.key]: Growth,
+    [InteractionStats.key]: InteractionStats,
+    [LanguageStats.key]: LanguageStats,
+    [MessagesEdited.key]: MessagesEdited,
+    [MessagesPerPeriod.key]: MessagesPerPeriod,
+    [MessagesStats.key]: MessagesStats,
+    [SentimentPerPeriod.key]: SentimentPerPeriod,
+    [SentimentStats.key]: SentimentStats,
+    [WordStats.key]: WordStats,
 } as const;
 
+/** Block identifier */
 export type BlockKey = keyof typeof Blocks;
-export type BlockDataType<K extends BlockKey> = ReturnType<(typeof Blocks)[K]["fn"]>;
-export type BlockInfo<K extends BlockKey> = {
-    state: BlockState;
-    data: BlockDataType<K> | null;
-};
-export type BlockDescriptions = {
-    [K in BlockKey]: Omit<BlockDescription<K, BlockDataType<K>>, "fn">;
-};
 
-// common interfaces used by multiple blocks
-export interface IndexEntry {
-    index: Index;
-    value: number;
-}
+/** The input arguments required for a block */
+export type BlockArgs<K extends BlockKey> = Parameters<(typeof Blocks)[K]["fn"]>[3];
+
+/** The result of a block */
+export type BlockData<K extends BlockKey> = ReturnType<(typeof Blocks)[K]["fn"]>;
+
+console.warn(
+    "This message is here to prevent the inclusion of all blocks in the report UI. " +
+        "You should only see this message in the console once. If you see it twice, " +
+        "the report UI includes all blocks, which is not what we want."
+);

@@ -10,8 +10,8 @@ import { ExpectedPartialDatabaseResult } from "@tests/process/Process";
 export interface Sample {
     input: FileInput;
 
-    expectedParse: ExpectedPartialParseResult;
-    expectedDatabase: ExpectedPartialDatabaseResult;
+    expectedParse?: ExpectedPartialParseResult;
+    expectedDatabase?: ExpectedPartialDatabaseResult;
 }
 
 /**
@@ -19,17 +19,21 @@ export interface Sample {
  *
  * @param filepath it expects the path relative to `@tests/samples`, e.g. `discord/DM_2A_2M.json`
  */
-export const loadSample = async (filepath: string) => {
+export const loadSample = async (filepath: string): Promise<Sample> => {
     const samplePath = path.join(__dirname, filepath);
     const input = loadFile(samplePath);
-    const module = await import(samplePath + ".ts");
 
-    const sample: Sample = {
-        input,
-        expectedParse: module.expectedParse,
-        expectedDatabase: module.expectedDatabase,
-    };
-    return sample;
+    try {
+        const module = await import(samplePath + ".ts");
+
+        return {
+            input,
+            expectedParse: module.expectedParse,
+            expectedDatabase: module.expectedDatabase,
+        };
+    } catch (e) {
+        return { input };
+    }
 };
 
 export const loadSamples = (filepaths: string[]) => Promise.all(filepaths.map((fp) => loadSample(fp)));
