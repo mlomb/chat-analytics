@@ -146,12 +146,12 @@ const ReportDashboard = () => {
                 ],
             },
             {
-                name: "😃 Emojis",
-                value: "emojis",
+                name: "😃 Emoji",
+                value: "emoji",
                 cards: [
                     <Card
                         num={1}
-                        title={["Most used", ["emojis (all)", "regular emojis", "custom emojis"]].concat(
+                        title={["Most used", ["emoji (all)", "regular emoji", "custom emoji"]].concat(
                             platformInfo.support.reactions ? ["in", ["text", "reactions"]] : []
                         )}
                         children={MostUsedEmojis}
@@ -161,7 +161,7 @@ const ReportDashboard = () => {
                                 : undefined
                         }
                     />,
-                    <Card num={1} title={["Emojis sent", ["by author", "in channel"]]} children={MostProducerEmojis} />,
+                    <Card num={1} title={["Emoji sent", ["by author", "in channel"]]} children={MostProducerEmojis} />,
                     <Card num={1} title="Emoji statistics" children={EmojiStatsTable} />,
                 ],
             },

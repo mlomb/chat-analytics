@@ -17,27 +17,27 @@ const EmojiStatsTable = () => {
         {
             type: "number",
             formatter: "integer",
-            label: "Total emojis used in text",
+            label: "Total emoji used in text",
             value: emojiStats ? emojiStats.inText.regular + emojiStats.inText.custom : 0,
         },
         {
             type: "number",
             formatter: "integer",
             depth: 1,
-            label: "regular emojis (❤)",
+            label: "regular emoji (❤)",
             value: emojiStats?.inText.regular,
         },
         {
             type: "number",
             formatter: "integer",
             depth: 1,
-            label: "custom emojis (:pepe:)",
+            label: "custom emoji (:pepe:)",
             value: emojiStats?.inText.custom,
         },
         {
             type: "number",
             formatter: "integer",
-            label: "Unique emojis used in text",
+            label: "Unique emoji used in text",
             value: emojiStats?.inText.unique,
         },
         {
@@ -49,7 +49,7 @@ const EmojiStatsTable = () => {
         {
             type: "number",
             formatter: "integer",
-            label: "Total emojis used in reactions",
+            label: "Total emoji used in reactions",
             value: emojiStats ? emojiStats.inReactions.regular + emojiStats.inReactions.custom : 0,
             tooltip: reactionSupportTooltip,
         },
@@ -58,7 +58,7 @@ const EmojiStatsTable = () => {
             type: "number",
             formatter: "integer",
             depth: 1,
-            label: "regular emojis (❤)",
+            label: "regular emoji (❤)",
             value: data?.inReactions.regular,
             tooltip: reactionSupportTooltip
         },
@@ -66,7 +66,7 @@ const EmojiStatsTable = () => {
             type: "number",
             formatter: "integer",
             depth: 1,
-            label: "custom emojis (:pepe:)",
+            label: "custom emoji (:pepe:)",
             value: data?.inReactions.custom,
             tooltip: reactionSupportTooltip
         },
@@ -74,7 +74,7 @@ const EmojiStatsTable = () => {
         {
             type: "number",
             formatter: "integer",
-            label: "Unique emojis used in reactions",
+            label: "Unique emoji used in reactions",
             value: emojiStats?.inReactions.unique,
             tooltip: reactionSupportTooltip,
         },

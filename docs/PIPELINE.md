@@ -35,7 +35,7 @@ This part is about generating the [`Database` object](/pipeline/process/Types.ts
 During processing, incoming objects from the parser can be:
 * `PGuild`, `PChannel` and `PAuthor`: they are added to an [IndexedMap](/pipeline/process/IndexedMap.ts) and an index is assigned to them if their ID hasn't been seen before. Subsequent processing will query the index by ID to only store the index.
 * `PMessage`: each message is added to a processing queue in its corresponding [`ChannelMessages`](/pipeline/process/ChannelMessages.ts) (each channel has its own). This class handles duplicate messages and overlapping in input files. At some point, the queue will be split into groups of messages that were sent by the same author (PMessageGroup) and passed to the [`MessageProcessor`](/pipeline/process/MessageProcessor.ts) for processing that will have to return a [`Message`](/pipeline/process/Types.ts) array for each group.  
-The `MessageProcessor` class handles tokenization, language detection and sentiment computation. It inserts the data back into the data stores in the `DatabaseBuilder` instance (words, emojis, mentions, etc.).
+The `MessageProcessor` class handles tokenization, language detection and sentiment computation. It inserts the data back into the data stores in the `DatabaseBuilder` instance (words, emoji, mentions, etc.).
 
 After all input files have been processed, it sorts some data stores (IndexedMaps) based on the number of messages. Since this changes all indexes, we have to remap the old indexes to the new ones. Also, it filters out some data we don't want to keep. Unfortunately, it also means deserializing and serializing all messages again.
 
@@ -104,7 +104,7 @@ Instead of storing messages as JS Objects, they are serialized into a custom bin
 Overview of serialization files:
 
 - [MessageSerialization.ts](/pipeline/serialization/MessageSerialization.ts): contains `writeMessage` and `readMessage` to serialize and deserialize a single message. Make heavy use of `writeIndexCounts` and `readIndexCounts` to serialize and deserialize IndexCounts (see below).
-- [IndexCountsSerialization.ts](/pipeline/serialization/IndexCountsSerialization.ts): allows serialization of [IndexCounts](/pipeline/process/IndexCounts.ts) which are pairs of `[index, count]`. We use this format to point out which and how many of each object are used in a given context (e.g. emojis in a message)
+- [IndexCountsSerialization.ts](/pipeline/serialization/IndexCountsSerialization.ts): allows serialization of [IndexCounts](/pipeline/process/IndexCounts.ts) which are pairs of `[index, count]`. We use this format to point out which and how many of each object are used in a given context (e.g. emoji in a message)
 - [MessagesArray.ts](/pipeline/serialization/MessagesArray.ts): useful abstraction to work with serialized messages as if they were a regular Array (push and iteration)
 - [MessageView.ts](/pipeline/serialization/MessageView.ts): class implementing the `Message` interface that deserializes data on demand. Useful if you don't need all the data at once. Used in aggregation.
 

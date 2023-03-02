@@ -9,7 +9,7 @@ const TopReactedTitleFns = {
     "0": (msg: MessageComplete) =>
         `${msg.reactions!.reduce((acc, cur) => acc + cur[1], 0).toLocaleString()} reactions in total from ${
             msg.reactions!.length
-        } emojis`,
+        } emoji`,
     "1": (msg: MessageComplete) =>
         `${msg.reactions!.reduce((acc, cur) => Math.max(acc, cur[1]), 0).toLocaleString()} reactions in a single emoji`,
 };

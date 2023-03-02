@@ -82,9 +82,9 @@ const EmojiFilterFns = {
     "2": (index: number) => getDatabase().emojis[index].type === "custom", // custom emoji
 };
 const EmojiFilterPlaceholders = {
-    "0": 'Filter emojis... (e.g. "fire", "🔥" or ":pepe:")',
-    "1": 'Filter emojis... (e.g. "fire" or "🔥")',
-    "2": 'Filter emojis... (e.g. ":pepe:")',
+    "0": 'Filter emoji... (e.g. "fire", "🔥" or ":pepe:")',
+    "1": 'Filter emoji... (e.g. "fire" or "🔥")',
+    "2": 'Filter emoji... (e.g. ":pepe:")',
 };
 const EmojisTransformFilter = (filter: string) => filter.replace(/:/g, "");
 const EmojisIndexOf = (value: string) => {
@@ -116,7 +116,7 @@ export const MostProducerEmojis = ({ options }: { options: number[] }) => {
     return (
         <MostUsed
             what={options[0] === 0 ? "Author" : "Channel"}
-            unit="# of emojis used"
+            unit="# of emoji used"
             counts={emojiStats ? emojiStats.inText.counts[options[0] === 0 ? "authors" : "channels"] : undefined}
             maxItems={Math.min(15, Math.max(getDatabase().authors.length, getDatabase().channels.length))}
             itemComponent={options[0] === 0 ? AuthorLabel : ChannelLabel}
