@@ -43,7 +43,7 @@ export const AmCharts5Chart = <Data extends any>(props: Props<Data>) => {
         rootRef.current !== undefined;
 
     // this deps trigger a chart recreation
-    const chartDeps = [props.animated, props.createTheme, props.create] as any[];
+    const chartDeps = [shouldBeCreated, props.animated, props.createTheme, props.create] as any[];
 
     useLayoutEffect(() => {
         if (!shouldBeCreated) return;
@@ -87,7 +87,7 @@ export const AmCharts5Chart = <Data extends any>(props: Props<Data>) => {
             cleanupDebounce();
             root.dispose();
         };
-    }, chartDeps.concat([shouldBeCreated]));
+    }, chartDeps);
 
     useLayoutEffect(() => {
         if (props.data !== undefined) setDataRef.current(props.data);
