@@ -49,6 +49,8 @@ export class BlockStore {
 
     /** Requests computed and up to date (not invalidated) */
     private storedBlocks = new Map<BlockRequestID, BlockStatus<BlockKey>>();
+    /** Requests last broadcasted state (valid and invalidated) */
+    private lastBroadcastedState = new Map<BlockRequestID, BlockState>();
 
     /** Which requests must be marked as stale after a filter changes */
     private filterDependencies: { [filter in Filter]: Set<BlockRequestID> } = {
@@ -152,8 +154,12 @@ export class BlockStore {
     }
 
     private update(id: BlockRequestID, status: BlockStatus<BlockKey>) {
+        // check if the status changed (and its not ready since data may change)
+        if (status.state !== "ready" && this.lastBroadcastedState.get(id) === status.state) return;
+
         // store block result in case it is needed later
         this.storedBlocks.set(id, status);
+        this.lastBroadcastedState.set(id, status.state);
 
         // and notify the UI
         const listeners = this.blockListeners.get(id);
