@@ -143,6 +143,11 @@ const TelegramInstructions = () => (
 
 const WhatsAppInstructions = () => {
     const [device, setDevice] = useState<"ios" | "android">("ios");
+
+    // Do we want to add these links?
+    // https://faq.whatsapp.com/1180414079177245/?locale=en_US&cms_platform=android
+    // https://faq.whatsapp.com/902477924463699/?locale=en_US&cms_platform=iphone
+
     return (
         <>
             <div style={{ marginLeft: 10 }}>
