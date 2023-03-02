@@ -116,7 +116,8 @@ export const computeVariableDistribution = (values: Uint32Array, count: number):
     for (let i = 0; i < count; i++) {
         const time = values[i];
         if (time >= lower && time < upper) {
-            res.count[Math.floor(((time - lower) / (upper - lower)) * buckets)]++;
+            // Order of operations is critical to avoid rounding issues
+            res.count[Math.floor((buckets / (upper - lower)) * (time - lower))]++;
         } else {
             res.boxplot.outliers++;
         }

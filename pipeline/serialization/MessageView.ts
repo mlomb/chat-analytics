@@ -51,8 +51,8 @@ export class MessageView implements Message {
         this.authorIndex = stream.getBits(bitConfig.authorIdxBits);
         this.flags = stream.getBits(9);
 
-        if ((this.flags & MessageFlags.Edited) > 0) this.editedAfter = stream.readVarInt();
         if ((this.flags & MessageFlags.Reply) > 0) this.replyOffset = stream.readVarInt();
+        if ((this.flags & MessageFlags.Edited) > 0) this.editedAfter = stream.readVarInt();
         if ((this.flags & MessageFlags.Text) > 0) {
             this.langIndex = stream.getBits(8);
             this.sentiment = stream.getBits(8) - 128;

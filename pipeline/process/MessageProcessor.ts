@@ -133,7 +133,7 @@ export class MessageProcessor {
         let editedAfter: number | undefined = undefined;
         if (msg.timestampEdit !== undefined) {
             // time difference between sending the message and its last edit
-            editedAfter = (new Date(msg.timestampEdit).getTime() - date.getTime()) / 1000;
+            editedAfter = Math.ceil((new Date(msg.timestampEdit).getTime() - date.getTime()) / 1000);
         }
 
         return {
