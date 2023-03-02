@@ -94,7 +94,13 @@ export const AmCharts5Chart = <Data extends any>(props: Props<Data>) => {
 
     useLayoutEffect(() => {
         // enable ticking only if in view
-        if (rootRef.current) rootRef.current.updateTick = inView;
+        if (rootRef.current) {
+            rootRef.current.updateTick = inView;
+
+            // ⚠️ make sure to resize the chart when it becomes visible
+            // because we debounced the resize and since the chart was not visible, it was not resized
+            if (inView) rootRef.current.resize();
+        }
     }, chartDeps.concat([inView]));
 
     return (
