@@ -24,18 +24,29 @@ interface Props<Data extends any> {
  */
 export const AmCharts5Chart = <Data extends any>(props: Props<Data>) => {
     const chartDiv = useRef<HTMLDivElement>(null);
+    const rootRef = useRef<Root | undefined>(undefined);
     const setDataRef = useRef<(data: Data) => void>(() => {});
 
-    // defer chart creation until the component is in view
+    // track if the chart is in view
     const { inView, ref: inViewRef } = useInView({
         threshold: 0,
-        triggerOnce: true,
         initialInView: false,
         fallbackInView: true,
     });
 
+    // this should be set to true only once and then stay true
+    const shouldBeCreated =
+        // either the chart is in view
+        inView ||
+        // or the chart already exists (and we want to keep it that way)
+        rootRef.current !== undefined;
+
+    // this deps trigger a chart recreation
+    const chartDeps = [props.animated, props.createTheme, props.create] as any[];
+
     useLayoutEffect(() => {
-        if (!inView) return;
+        if (!shouldBeCreated) return;
+
         const root = Root.new(chartDiv.current!);
         root.setThemes(
             (
@@ -65,6 +76,7 @@ export const AmCharts5Chart = <Data extends any>(props: Props<Data>) => {
             setData = ret;
         }
 
+        rootRef.current = root;
         setDataRef.current = setData;
 
         const cleanupDebounce = enableDebouncedResize(root);
@@ -74,12 +86,16 @@ export const AmCharts5Chart = <Data extends any>(props: Props<Data>) => {
             cleanupDebounce();
             root.dispose();
         };
-    }, [inView, props.animated, props.createTheme, props.create]);
+    }, chartDeps.concat([shouldBeCreated]));
 
     useLayoutEffect(() => {
-        if (!inView) return;
         if (props.data !== undefined) setDataRef.current(props.data);
-    }, [inView, props.animated, props.createTheme, props.create, props.data]);
+    }, chartDeps.concat([props.data]));
+
+    useLayoutEffect(() => {
+        // enable ticking only if in view
+        if (rootRef.current) rootRef.current.updateTick = inView;
+    }, chartDeps.concat([inView]));
 
     return (
         <div ref={inViewRef}>
