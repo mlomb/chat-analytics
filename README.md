@@ -4,7 +4,7 @@
 ![Logo-Dark](assets/images/logos/app_dark.svg#gh-dark-mode-only)
 ![Logo-Light](assets/images/logos/app_light.svg#gh-light-mode-only)
 
-<h3>Generate insightful chat analysis reports</h3>
+<h3>Generate interactive, beautiful and insightful chat analysis reports</h3>
 
 [Open App](https://chatanalytics.app) • [View Demo](https://chatanalytics.app/demo) • [Use CLI](#cli)
 

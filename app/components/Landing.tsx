@@ -13,7 +13,7 @@ interface Props {
 export const Landing = ({ onStart }: Props) => {
     return (
         <div className="Landing">
-            <h1 className="Landing__title">Generate insightful chat analysis reports</h1>
+            <h1 className="Landing__title">Generate interactive, beautiful and insightful chat analysis reports</h1>
             <div className="Landing__desc">
                 <div className="Landing__sameline">
                     <p className="Landing__browser">Everything is processed in your browser.</p>
@@ -23,7 +23,9 @@ export const Landing = ({ onStart }: Props) => {
                     </span>
                 </div>
                 <br />
-                <p>Free and open source.</p>
+                <p>
+                    Can handle millions of messages and multiple chats. <b>Free and open source ❤️</b>
+                </p>
                 <br />
                 <div className="Landing__platforms-line">
                     <span>Supports</span>

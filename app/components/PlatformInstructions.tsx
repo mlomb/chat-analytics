@@ -39,7 +39,7 @@ const DiscordInstructions = () => {
                 <li>
                     You will have to obtain a bot token or use your account's token. Refer to{" "}
                     <a
-                        href="https://github.com/Tyrrrz/DiscordChatExporter/wiki/GUI%2C-CLI-and-Formats-explained#using-the-gui"
+                        href="https://github.com/Tyrrrz/DiscordChatExporter/blob/master/.docs/Getting-started.md#using-the-gui"
                         target="_blank"
                     >
                         this guide
