@@ -39,6 +39,9 @@ const fn: BlockFn<WordStats, WordStatsArgs> = (database, filters, common, args) 
         });
     }
 
+    // skip work if invalid
+    if (args.wordIndex < 0) return res;
+
     const processMessage = (msg: MessageView) => {
         if (!msg.hasWords) return;
 
