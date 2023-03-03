@@ -34,6 +34,7 @@ Things pending or ideas. Don't expect them soon. This is not a roadmap.
   * Sentiment per user?
   * bigrams, trigrams, n-grams?
   * oldest inactive user
+  * amount of words over time (with dashed number of messages as reference)
 * Data points at the end of the data should be marked as incomplete (with a distinct color, maybe dashed) [not trivial]
 * Maybe replace the reactions (which can be a lot) with a "XX reactions" and hover/click to see them all.
 * Make the filter menu fixed and being able to show and collapse it
