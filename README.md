@@ -18,7 +18,7 @@
 
 ---
 
-A web app that takes chat exports from supported platforms and generates a single HTML file containing information, statistics and interactive graphs about them. It has privacy as its main concern; no data ever leaves the device when generating reports.  
+A web app that takes chat exports from supported platforms and generates a single HTML file containing information, statistics and interactive graphs about them. Privacy is its main concern; no data ever leaves the device when generating reports.  
 
 |  💬 MESSAGES |  🅰️ LANGUAGE | 😃 EMOJI | 🔗 LINKS | 🌀 INTERACTION | 💙 SENTIMENT | 📅 TIMELINE |
 |--|--|--|--|--|--|--|
@@ -37,7 +37,7 @@ You can generate reports from the following platforms:
 | Telegram  | `json` from [Telegram Desktop](https://desktop.telegram.org/)                    | ✅            | ✅                | ✅                                                                                   | ❌ (not provided) | ❌                      | ✅ (as text) |
 | WhatsApp  | `txt` or `zip` exported from a phone                                             | ✅            | ❌ (not provided) | ✅<strong>*</strong> (if exported from iOS)<br>🟦 (generic if exported from Android) | ❌ (not provided) | ❌                      | ✅ (as text) |
 
-<strong>*</strong>: not all languages are supported, check [WhatsApp.ts](/pipeline/parse/parsers/WhatsApp.ts).
+<strong>*</strong> not all languages are supported, check [WhatsApp.ts](/pipeline/parse/parsers/WhatsApp.ts).
 
 You can't combine exports from different platforms.  
 The contribution of [new platform parsers](/docs/PIPELINE.md#writing-a-new-parser) is always welcomed 🙂
