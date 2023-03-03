@@ -18,7 +18,7 @@
 
 ---
 
-A web app that takes chat exports from supported platforms and generates a single HTML file containing information, statistics and interactive graphs about them. Privacy is its main concern; no data ever leaves the device when generating reports.  
+A web app that takes chat exports from supported platforms and generates a single HTML file containing information, statistics and interactive graphs about them. Privacy is its main concern; chat data never leaves the device when generating reports.  
 
 |  💬 MESSAGES |  🅰️ LANGUAGE | 😃 EMOJI | 🔗 LINKS | 🌀 INTERACTION | 💙 SENTIMENT | 📅 TIMELINE |
 |--|--|--|--|--|--|--|
