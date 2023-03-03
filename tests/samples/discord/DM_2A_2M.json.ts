@@ -18,6 +18,7 @@ export const expectedParse: ExpectedPartialParseResult = {
             channelId: "530805775262679064",
             textContent: "blah",
             timestamp: Date.parse("2019-01-04T17:52:39.762+00:00"),
+            reactions: [[{ text: "👆" }, 42]],
         },
         {
             id: "538148765782114306",

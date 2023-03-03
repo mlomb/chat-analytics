@@ -1,3 +1,7 @@
+# v1.0.1 [IN DEVELOPMENT]
+
+- Bugfix Discord: regular emoji were not being rendered correctly in MessageLabel because the ID was being set (due to DCE now including an empty ID)
+
 # v1.0.0
 
 After a lot of work in [#39](https://github.com/mlomb/chat-analytics/pull/39), [#53](https://github.com/mlomb/chat-analytics/pull/53), [#55](https://github.com/mlomb/chat-analytics/pull/55) and [#58](https://github.com/mlomb/chat-analytics/pull/58) (more than 200 commits of refactors and improvements) I can say I'm happy to call this the first release of Chat Analytics!
