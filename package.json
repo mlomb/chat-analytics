@@ -1,6 +1,6 @@
 {
   "name": "chat-analytics",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "author": "Martin Emiliano Lombardo <to@mlomb.me>",
   "license": "AGPLv3",
   "description": "Generate interactive, beautiful and insightful chat analysis reports",
