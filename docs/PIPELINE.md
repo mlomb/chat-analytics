@@ -1,6 +1,6 @@
 # Pipeline
 
-We call **the pipeline** all the steps that chat data goes through before reaching the report UI. This document describes each step so you can get a general idea of how it works.
+**The pipeline** refers to all the steps that chat data goes through before reaching the report user interface. This document provides a detailed description of each step to give you a general idea of how it works.
 
 The following diagram gives an overview of the pipeline:
 
@@ -17,7 +17,7 @@ Quick jump to sections:
 
 ## 1. Input files
 
-The input files are chat exports; each platform has its own format. Usually, they are provided by the user in the web app UI, using the CLI or by calling the npm package.
+The input files for the pipeline are chat exports from various platforms, each with its own format. Users can upload these files through the web application user interface, through the command-line interface, or by calling the npm package.
 
 For each file, a [`FileInput` interface](/pipeline/parse/File.ts) has to be created, which along with metadata, contains the `slice(start?: number, end?: number): ArrayBuffer` function that must return a slice of the file in the specified range. This function is environment dependent. Since files may be large (several GBs) we don't read the entire file content into memory, instead we allow parsers to stream them. 
 
@@ -43,7 +43,7 @@ I hope the code is clear enough to understand how it works.
 
 ## 4. Compression and Encoding
 
-After the `Database` object is ready, we store it in the standalone report HTML file. We want it to be as small as possible and can't be in binary since HTML is a text format. So we compress it with [`fflate`](https://www.npmjs.com/package/fflate) and then encode it with [`base91`](/pipeline/compression/Base91.ts) using HTML-friendly chars. The result is a string that is stored in the HTML file.
+After the `Database` object is ready, we store it in the standalone report HTML file. To minimize the file size, we use compression and encoding techniques. First, we compress it with [`fflate`](https://www.npmjs.com/package/fflate), then encode it with [`base91`](/pipeline/compression/Base91.ts) using HTML-friendly characters. The resulting string is stored in the HTML file.
 
 When the report HTML is loaded (via blob or file://) we do the inverse process to get the `Database` object: decode the string with `base91` and decompress it with `fflate`.
 
