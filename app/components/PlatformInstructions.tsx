@@ -34,7 +34,7 @@ const DiscordInstructions = () => {
                     <a href="https://github.com/Tyrrrz/DiscordChatExporter/releases/latest" target="_blank">
                         DiscordChatExporter
                     </a>
-                    . You will need a Windows PC or use the CLI.
+                    . You will need a Windows PC or use the CLI (Linux/Mac).
                 </li>
                 <li>
                     You will have to obtain a bot token or use your account's token. Refer to{" "}
