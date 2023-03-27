@@ -1,3 +1,4 @@
+const fs = require("fs");
 const path = require("path");
 const webpack = require("webpack");
 const CopyPlugin = require("copy-webpack-plugin");
@@ -16,6 +17,13 @@ try {
     commitHash = require("child_process").execSync("git rev-parse --short HEAD").toString().trim();
 } catch (e) {
     console.log("Can't run git");
+}
+
+let version = "?.?.?";
+try {
+    version = JSON.parse(fs.readFileSync(resolve("package.json"))).version;
+} catch (e) {
+    console.log("Can't read package.json");
 }
 
 module.exports = (env) => {
@@ -122,7 +130,8 @@ module.exports = (env) => {
                     isProd: JSON.stringify(isProd),
                     isDev: JSON.stringify(!isProd),
                     build: JSON.stringify({
-                        hash: commitHash,
+                        commitHash,
+                        version,
                         date: new Date().toISOString(),
                     }),
                 },

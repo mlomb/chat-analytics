@@ -14,7 +14,8 @@ declare const env: {
     isProd: boolean;
     isDev: boolean;
     build: {
-        hash: string;
+        commitHash: string;
+        version: string;
         date: string;
     };
 };

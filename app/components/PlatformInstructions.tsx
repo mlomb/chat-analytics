@@ -34,12 +34,12 @@ const DiscordInstructions = () => {
                     <a href="https://github.com/Tyrrrz/DiscordChatExporter/releases/latest" target="_blank">
                         DiscordChatExporter
                     </a>
-                    . You will need a Windows PC or use the CLI.
+                    . You will need a Windows PC or use the CLI (Linux/Mac).
                 </li>
                 <li>
                     You will have to obtain a bot token or use your account's token. Refer to{" "}
                     <a
-                        href="https://github.com/Tyrrrz/DiscordChatExporter/wiki/GUI%2C-CLI-and-Formats-explained#using-the-gui"
+                        href="https://github.com/Tyrrrz/DiscordChatExporter/blob/master/.docs/Getting-started.md#using-the-gui"
                         target="_blank"
                     >
                         this guide
@@ -143,6 +143,11 @@ const TelegramInstructions = () => (
 
 const WhatsAppInstructions = () => {
     const [device, setDevice] = useState<"ios" | "android">("ios");
+
+    // Do we want to add these links?
+    // https://faq.whatsapp.com/1180414079177245/?locale=en_US&cms_platform=android
+    // https://faq.whatsapp.com/902477924463699/?locale=en_US&cms_platform=iphone
+
     return (
         <>
             <div style={{ marginLeft: 10 }}>

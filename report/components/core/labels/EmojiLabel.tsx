@@ -1,6 +1,6 @@
 import { ReactElement, memo } from "react";
 
-import { useDataProvider } from "@report/DataProvider";
+import { getDatabase } from "@report/WorkerWrapper";
 import { BaseLabel, LabelProps } from "@report/components/core/labels/BaseLabel";
 
 interface EmojiLabelProps extends LabelProps {
@@ -8,8 +8,8 @@ interface EmojiLabelProps extends LabelProps {
 }
 
 const _EmojiLabel = ({ index, hideNameIfPossible }: EmojiLabelProps) => {
-    const dp = useDataProvider();
-    const emoji = dp.database.emojis[index];
+    const db = getDatabase();
+    const emoji = db.emojis[index];
 
     let name: string;
     let symbol: string | undefined;
@@ -30,7 +30,7 @@ const _EmojiLabel = ({ index, hideNameIfPossible }: EmojiLabelProps) => {
 
     const icon = image ? image : <span style={{ color: "#b9b9b9" }}>{symbol}</span>;
 
-    return <BaseLabel title={emoji.name} icon={icon} name={showName ? name : undefined} />;
+    return <BaseLabel title={emoji.name} leftIcon={icon} name={showName ? name : undefined} />;
 };
 
 export const EmojiLabel = memo(_EmojiLabel) as typeof _EmojiLabel;

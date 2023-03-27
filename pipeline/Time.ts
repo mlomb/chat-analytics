@@ -260,3 +260,16 @@ export const formatTime = (format: TimeFormat, day: Day, secondsOfDay: number = 
     d.setSeconds(secondsOfDay);
     return DateTimeFormatters[format].format(d);
 };
+
+/** Point in time */
+export interface Datetime {
+    key: DateKey | WeekKey | MonthKey | YearKey;
+    secondOfDay?: number;
+}
+
+/** Format a Datetime into a human readable string. @see formatTime */
+export const formatDatetime = (format: TimeFormat, datetime?: Datetime) => {
+    if (datetime === undefined) return "-";
+
+    return formatTime(format, Day.fromKey(datetime.key), datetime.secondOfDay);
+};

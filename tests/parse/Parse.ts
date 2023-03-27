@@ -68,9 +68,11 @@ export const checkSamplesAreParsedCorrectly = async (klass: new () => Parser, fi
     );
 
     for (const sample of samples) {
-        expect(parsed.guilds).toIncludeAllPartialMembers(sample.expectedParse.guilds);
-        expect(parsed.channels).toIncludeAllPartialMembers(sample.expectedParse.channels);
-        expect(parsed.authors).toIncludeAllPartialMembers(sample.expectedParse.authors);
-        expect(parsed.messages).toIncludeAllPartialMembers(sample.expectedParse.messages);
+        const expected = sample.expectedParse!;
+
+        expect(parsed.guilds).toIncludeAllPartialMembers(expected.guilds);
+        expect(parsed.channels).toIncludeAllPartialMembers(expected.channels);
+        expect(parsed.authors).toIncludeAllPartialMembers(expected.authors);
+        expect(parsed.messages).toIncludeAllPartialMembers(expected.messages);
     }
 };

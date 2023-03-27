@@ -125,13 +125,16 @@ export class DiscordParser extends Parser {
                 attachments: message.attachments
                     .map((a) => getAttachmentTypeFromFileName(a.fileName))
                     .concat(stickers.map((_) => AttachmentType.Sticker)),
-                reactions: message.reactions.map((r) => [
-                    {
-                        id: r.emoji.id === null ? undefined : r.emoji.id,
-                        text: r.emoji.name || r.emoji.id || "unknown",
-                    },
-                    r.count,
-                ]),
+                reactions: message.reactions.map((r) => {
+                    const emojiId = r.emoji.id === null || r.emoji.id === "" ? undefined : r.emoji.id;
+                    return [
+                        {
+                            id: emojiId,
+                            text: r.emoji.name || emojiId || "unknown",
+                        },
+                        r.count,
+                    ];
+                }),
             };
             this.emit("message", pmessage, this.lastMessageTimestampInFile);
         }

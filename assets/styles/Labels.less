@@ -23,7 +23,13 @@
 .Label__icon {
     display: flex;
     position: relative;
-    margin-right: 4px;
+
+    &--left {
+        margin-right: 4px;
+    }
+    &--right {
+        margin-left: 4px;
+    }
 }
 
 .Label__discriminator {
@@ -32,10 +38,6 @@
     font-family: monospace;
     margin: auto;
     margin-left: 3px;
-}
-
-.Label__linkout {
-    margin-left: 5px;
 }
 
 a.Label {

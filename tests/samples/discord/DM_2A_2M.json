@@ -36,7 +36,17 @@
             },
             "attachments": [],
             "embeds": [],
-            "reactions": [],
+            "reactions": [
+                {
+                    "emoji": {
+                        "id": "",
+                        "name": "\uD83D\uDC46",
+                        "isAnimated": false,
+                        "imageUrl": "https://cdn.jsdelivr.net/gh/twitter/twemoji@latest/assets/svg/1f446.svg"
+                    },
+                    "count": 42
+                }
+            ],
             "mentions": []
         },
         {

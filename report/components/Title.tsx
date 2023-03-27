@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 
-import { useDataProvider } from "@report/DataProvider";
+import { getDatabase } from "@report/WorkerWrapper";
 import { AuthorAvatar } from "@report/components/core/avatars/AuthorAvatar";
 import { AvatarStack } from "@report/components/core/avatars/AvatarStack";
 import { ChannelAvatar } from "@report/components/core/avatars/ChannelAvatar";
@@ -12,7 +12,7 @@ import { GuildLabel } from "@report/components/core/labels/GuildLabel";
 const topK = 3;
 
 export const Title = () => {
-    const db = useDataProvider().database;
+    const db = getDatabase();
 
     if (db.config.platform !== "discord") {
         /*

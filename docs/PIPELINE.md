@@ -1,6 +1,6 @@
 # Pipeline
 
-We call **the pipeline** all the steps that chat data goes through before reaching the report UI. This document describes each step so you can get a general idea of how it works.
+**The pipeline** refers to all the steps that chat data goes through before reaching the report user interface. This document provides a detailed description of each step to give you a general idea of how it works.
 
 The following diagram gives an overview of the pipeline:
 
@@ -17,7 +17,7 @@ Quick jump to sections:
 
 ## 1. Input files
 
-The input files are chat exports; each platform has its own format. Usually, they are provided by the user in the web app UI, using the CLI or by calling the npm package.
+The input files for the pipeline are chat exports from various platforms, each with its own format. Users can upload these files through the web application user interface, through the command-line interface, or by calling the npm package.
 
 For each file, a [`FileInput` interface](/pipeline/parse/File.ts) has to be created, which along with metadata, contains the `slice(start?: number, end?: number): ArrayBuffer` function that must return a slice of the file in the specified range. This function is environment dependent. Since files may be large (several GBs) we don't read the entire file content into memory, instead we allow parsers to stream them. 
 
@@ -35,7 +35,7 @@ This part is about generating the [`Database` object](/pipeline/process/Types.ts
 During processing, incoming objects from the parser can be:
 * `PGuild`, `PChannel` and `PAuthor`: they are added to an [IndexedMap](/pipeline/process/IndexedMap.ts) and an index is assigned to them if their ID hasn't been seen before. Subsequent processing will query the index by ID to only store the index.
 * `PMessage`: each message is added to a processing queue in its corresponding [`ChannelMessages`](/pipeline/process/ChannelMessages.ts) (each channel has its own). This class handles duplicate messages and overlapping in input files. At some point, the queue will be split into groups of messages that were sent by the same author (PMessageGroup) and passed to the [`MessageProcessor`](/pipeline/process/MessageProcessor.ts) for processing that will have to return a [`Message`](/pipeline/process/Types.ts) array for each group.  
-The `MessageProcessor` class handles tokenization, language detection and sentiment computation. It inserts the data back into the data stores in the `DatabaseBuilder` instance (words, emojis, mentions, etc.).
+The `MessageProcessor` class handles tokenization, language detection and sentiment computation. It inserts the data back into the data stores in the `DatabaseBuilder` instance (words, emoji, mentions, etc.).
 
 After all input files have been processed, it sorts some data stores (IndexedMaps) based on the number of messages. Since this changes all indexes, we have to remap the old indexes to the new ones. Also, it filters out some data we don't want to keep. Unfortunately, it also means deserializing and serializing all messages again.
 
@@ -43,13 +43,59 @@ I hope the code is clear enough to understand how it works.
 
 ## 4. Compression and Encoding
 
-After the `Database` object is ready, we store it in the standalone report HTML file. We want it to be as small as possible and can't be in binary since HTML is a text format. So we compress it with [`fflate`](https://www.npmjs.com/package/fflate) and then encode it with [`base91`](/pipeline/compression/Base91.ts) using HTML-friendly chars. The result is a string that is stored in the HTML file.
+After the `Database` object is ready, we store it in the standalone report HTML file. To minimize the file size, we use compression and encoding techniques. First, we compress it with [`fflate`](https://www.npmjs.com/package/fflate), then encode it with [`base91`](/pipeline/compression/Base91.ts) using HTML-friendly characters. The resulting string is stored in the HTML file.
 
 When the report HTML is loaded (via blob or file://) we do the inverse process to get the `Database` object: decode the string with `base91` and decompress it with `fflate`.
 
 ## 5. Aggregate / Blocks
 
-[TODO WRITE]
+The last mile is to aggregate the database into useful "blocks" that summarizes some particular information. This is done in the worker running in the report UI. Blocks must be defined inside `pipeline/aggregate/blocks` and imported in [`pipeline/aggregate/Blocks.ts`](/pipeline/aggregate/Blocks.ts).
+
+A typical block implementation looks like this:
+
+```ts
+export interface MyBlockResult {
+    totalMessages: number;
+}
+
+export interface MyBlockArgs {
+    channelIndex: number;
+}
+
+const fn: BlockFn<MyBlockResult, MyBlockArgs> = (database, filters, common, args) => {
+    let totalMessages = 0;
+
+    const processMessage = (msg: MessageView) => {
+        if (msg.channelIndex === args.channelIndex)
+            totalMessages++;
+    };
+
+    filterMessages(processMessage, database, filters, {
+        // wether to use current filters
+        authors: true,
+        channels: true,
+        time: true,
+    });
+
+    return { totalMessages };
+};
+
+export default {
+    key: "folder/my-block",
+    triggers: ["authors", "channels", "time"],
+    fn,
+} as BlockDescription<"folder/my-block", MyBlockResult, MyBlockArgs>;
+```
+
+It is implemented with a function that receives the `Database`, the current filters (in the UI), some common data (cached for performance) and the block arguments. It returns the block result.
+
+In the UI blocks can be requested using the hook `useBlockData`:
+
+```ts
+const data = useBlockData("folder/my-block", { channelIndex: 0 });
+```
+
+Very neat, right?
 
 ## About message serialization
 
@@ -58,7 +104,7 @@ Instead of storing messages as JS Objects, they are serialized into a custom bin
 Overview of serialization files:
 
 - [MessageSerialization.ts](/pipeline/serialization/MessageSerialization.ts): contains `writeMessage` and `readMessage` to serialize and deserialize a single message. Make heavy use of `writeIndexCounts` and `readIndexCounts` to serialize and deserialize IndexCounts (see below).
-- [IndexCountsSerialization.ts](/pipeline/serialization/IndexCountsSerialization.ts): allows serialization of [IndexCounts](/pipeline/process/IndexCounts.ts) which are pairs of `[index, count]`. We use this format to point out which and how many of each object are used in a given context (e.g. emojis in a message)
+- [IndexCountsSerialization.ts](/pipeline/serialization/IndexCountsSerialization.ts): allows serialization of [IndexCounts](/pipeline/process/IndexCounts.ts) which are pairs of `[index, count]`. We use this format to point out which and how many of each object are used in a given context (e.g. emoji in a message)
 - [MessagesArray.ts](/pipeline/serialization/MessagesArray.ts): useful abstraction to work with serialized messages as if they were a regular Array (push and iteration)
 - [MessageView.ts](/pipeline/serialization/MessageView.ts): class implementing the `Message` interface that deserializes data on demand. Useful if you don't need all the data at once. Used in aggregation.
 

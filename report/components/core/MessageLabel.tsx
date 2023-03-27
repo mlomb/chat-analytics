@@ -1,7 +1,7 @@
 import { AttachmentType } from "@pipeline/Attachments";
 import { Day, formatTime } from "@pipeline/Time";
 import { MessageComplete } from "@pipeline/process/Types";
-import { useDataProvider } from "@report/DataProvider";
+import { getDatabase } from "@report/WorkerWrapper";
 import { Tooltip } from "@report/components/core/Tooltip";
 import { AuthorLabel } from "@report/components/core/labels/AuthorLabel";
 import { ChannelLabel } from "@report/components/core/labels/ChannelLabel";
@@ -32,25 +32,25 @@ const sortFn = (a: ChipProps, b: ChipProps) => {
 };
 
 export const MessageLabel = (props: { message?: MessageComplete }) => {
-    const dp = useDataProvider();
+    const db = getDatabase();
     const msg = props.message;
 
     if (msg === undefined) {
         return <div className="MessageLabel"></div>;
     }
 
-    const day = Day.fromKey(dp.database.time.minDate).nextDays(msg.dayIndex);
+    const day = Day.fromKey(db.time.minDate).nextDays(msg.dayIndex);
     const date = formatTime("symd", day);
     const fullDateTime = formatTime("ymdhms", day, msg.secondOfDay);
 
     const chips: ChipProps[] = ([] as ChipProps[])
         .concat(
             msg.attachments?.map((x) => ({ type: "attachment", index: x[0], count: x[1] })) || [],
-            msg.words?.map((x) => ({ type: "word", index: x[0], count: x[1], text: dp.database.words[x[0]] })) || [],
+            msg.words?.map((x) => ({ type: "word", index: x[0], count: x[1], text: db.words[x[0]] })) || [],
             msg.emojis?.map((x) => ({ type: "emoji", index: x[0], count: x[1] })) || [],
             // prettier-ignore
-            msg.mentions?.map(x => ({ type: "mention", index: x[0], count: x[1], text: dp.database.mentions[x[0]] })) || [],
-            msg.domains?.map((x) => ({ type: "link", index: x[0], count: x[1], text: dp.database.domains[x[0]] })) || []
+            msg.mentions?.map(x => ({ type: "mention", index: x[0], count: x[1], text: db.mentions[x[0]] })) || [],
+            msg.domains?.map((x) => ({ type: "link", index: x[0], count: x[1], text: db.domains[x[0]] })) || []
         )
         .sort(sortFn);
 

@@ -1,35 +1,39 @@
 import { Fragment, ReactNode, useEffect, useMemo, useState } from "react";
 
 import { PlatformsInfo } from "@pipeline/Platforms";
-import { useDataProvider } from "@report/DataProvider";
+import { getDatabase, getWorker } from "@report/WorkerWrapper";
 import Card from "@report/components/Card";
 import Footer from "@report/components/Footer";
 import Header from "@report/components/Header";
 import LoadingOverlay from "@report/components/LoadingOverlay";
 import { TabContainer } from "@report/components/Tabs";
-import EmojiStatsTable from "@report/components/cards/EmojiStatsTable";
-import LanguageStatsTable from "@report/components/cards/LanguageStatsTable";
-import MessagesStatsTable from "@report/components/cards/MessagesStatsTable";
 import {
     MostConversations,
-    MostGetterEmojis,
     MostLinkedDomains,
+    MostLinks,
     MostMentioned,
     MostMessagesAuthors,
     MostMessagesChannels,
     MostProducerEmojis,
+    MostReactionReceiver,
     MostRepliesAuthors,
     MostUsedEmojis,
-    MostUsedWords,
 } from "@report/components/cards/MostCards";
-import SentimentStatsTable from "@report/components/cards/SentimentStatsTable";
 import { TopReacted } from "@report/components/cards/TopCards";
-import ActiveAuthorsOverTime from "@report/components/viz/ActiveAuthorsOverTime";
-import ConversationParticipation from "@report/components/viz/ConversationParticipation";
-import GrowthOverTime from "@report/components/viz/GrowthOverTime";
-import MessagesActivity from "@report/components/viz/MessagesActivity";
-import MessagesOverTime from "@report/components/viz/MessagesOverTime";
-import SentimentOverTime from "@report/components/viz/SentimentOverTime";
+import EmojiStatsTable from "@report/components/cards/emojis/EmojiStatsTable";
+import ConversationParticipation from "@report/components/cards/interaction/ConversationParticipation";
+import LanguageStatsTable from "@report/components/cards/language/LanguageStatsTable";
+import WordsUsage from "@report/components/cards/language/WordsUsage";
+import DomainsTree from "@report/components/cards/links/DomainsTree";
+import EditTime from "@report/components/cards/messages/EditTime";
+import EditedMessages from "@report/components/cards/messages/EditedMessages";
+import { MessagesOverTime } from "@report/components/cards/messages/MessagesOverTime";
+import MessagesStatsTable from "@report/components/cards/messages/MessagesStatsTable";
+import { WeekdayHourActivity } from "@report/components/cards/messages/WeekdayHourActivity";
+import SentimentOverTime from "@report/components/cards/sentiment/SentimentOverTime";
+import SentimentStatsTable from "@report/components/cards/sentiment/SentimentStatsTable";
+import ActiveAuthorsOverTime from "@report/components/cards/timeline/ActiveAuthorsOverTime";
+import GrowthOverTime from "@report/components/cards/timeline/GrowthOverTime";
 
 import "@assets/styles/ReportPage.less";
 
@@ -45,7 +49,7 @@ const ReportDashboard = () => {
     const [section, setSection] = useState("messages");
 
     const sections: Section[] = useMemo(() => {
-        const { database } = useDataProvider();
+        const database = getDatabase();
         const platformInfo = PlatformsInfo[database.config.platform];
 
         const conversationTooltip = (
@@ -71,13 +75,12 @@ const ReportDashboard = () => {
                     <Card
                         num={2}
                         title={["Messages sent over time", ["by day", "by week", "by month"]]}
-                        blockKey="messages-per-cycle"
+                        defaultOptions={database.time.numDays < 365 * 2 ? [0] : [2]}
                         children={MessagesOverTime}
                     />,
                     <Card
                         num={1}
                         title="Message statistics"
-                        blockKey="messages-stats"
                         children={MessagesStatsTable}
                         tooltip={
                             database.config.platform === "whatsapp" ? (
@@ -90,54 +93,67 @@ const ReportDashboard = () => {
                     />,
                     <Card
                         num={1}
-                        blockKey="messages-stats"
-                        title={["Activity by week day & hour", ["(split)", "(combined)"]]}
-                        children={MessagesActivity}
+                        title={["Activity by week day & hour", ["(split)", "(heatmap)"]]}
+                        children={WeekdayHourActivity}
                     />,
-                    <Card
-                        num={1}
-                        blockKey="messages-stats"
-                        title="Messages sent by author"
-                        children={MostMessagesAuthors}
-                    />,
-                    <Card
-                        num={1}
-                        blockKey="messages-stats"
-                        title="Messages sent by channel"
-                        children={MostMessagesChannels}
-                    />,
-                ],
+                    <Card num={1} title="Messages sent by author" children={MostMessagesAuthors} />,
+                    <Card num={1} title="Messages sent by channel" children={MostMessagesChannels} />,
+                ].concat(
+                    platformInfo.support.edits
+                        ? [
+                              <Card
+                                  num={1}
+                                  title={["Edited messages", ["by author", "in channel"]]}
+                                  children={EditedMessages}
+                                  tooltip={
+                                      <>
+                                          If a message has been edited multiple times, it will count as if it was edited
+                                          only once.
+                                          <br />
+                                          For the percentage, the author/channel <b>
+                                              must have at least 100 messages
+                                          </b>{" "}
+                                          with the current filters
+                                      </>
+                                  }
+                              />,
+                              <Card
+                                  num={1}
+                                  title={"Time between sending and editing"}
+                                  children={EditTime}
+                                  tooltip="If a message has been edited multiple times, we take the time of the last edit"
+                              />,
+                          ]
+                        : []
+                ),
             },
             {
                 name: "🅰️ Language",
                 value: "language",
                 cards: [
                     <Card
-                        num={1}
+                        num={2}
                         title={["Most used words", ["(as table)", "(as word cloud)"]]}
-                        blockKey="language-stats"
-                        children={MostUsedWords}
+                        children={WordsUsage}
                         tooltip={stopwordsTooltip}
                     />,
                     <Card
                         num={1}
                         title="Language statistics"
-                        blockKey="language-stats"
                         children={LanguageStatsTable}
                         tooltip={stopwordsTooltip}
                     />,
                 ],
             },
             {
-                name: "😃 Emojis",
-                value: "emojis",
+                name: "😃 Emoji",
+                value: "emoji",
                 cards: [
                     <Card
                         num={1}
-                        title={["Most used", ["emojis (all)", "regular emojis", "custom emojis"]].concat(
+                        title={["Most used", ["emoji (all)", "regular emoji", "custom emoji"]].concat(
                             platformInfo.support.reactions ? ["in", ["text", "reactions"]] : []
                         )}
-                        blockKey="emoji-stats"
                         children={MostUsedEmojis}
                         tooltip={
                             platformInfo.support.reactions
@@ -145,33 +161,35 @@ const ReportDashboard = () => {
                                 : undefined
                         }
                     />,
-                    <Card
-                        num={1}
-                        title={["Emojis sent", ["by author", "in channel"]]}
-                        blockKey="emoji-stats"
-                        children={MostProducerEmojis}
-                    />,
-                    <Card num={1} title="Emoji statistics" blockKey="emoji-stats" children={EmojiStatsTable} />,
+                    <Card num={1} title={["Emoji sent", ["by author", "in channel"]]} children={MostProducerEmojis} />,
+                    <Card num={1} title="Emoji statistics" children={EmojiStatsTable} />,
+                ],
+            },
+            {
+                name: "🔗 Links",
+                value: "links",
+                cards: [
+                    <Card num={1} title="Most linked domains" children={MostLinkedDomains} />,
+                    <Card num={2} title="Linked by domain hierarchy" children={DomainsTree} />,
+                    <Card num={1} title={["Most links sent", ["by author", "in channel"]]} children={MostLinks} />,
                 ],
             },
             {
                 name: "🌀 Interaction",
                 value: "interaction",
-                cards: [<Card num={1} title="Most mentioned" blockKey="interaction-stats" children={MostMentioned} />]
+                cards: [<Card num={1} title="Most mentioned" children={MostMentioned} />]
                     .concat(
                         platformInfo.support.reactions
                             ? [
                                   <Card
                                       num={1}
                                       title={["Top reacted messages", ["(total)", "(single)"]]}
-                                      blockKey="interaction-stats"
                                       children={TopReacted}
                                   />,
                                   <Card
                                       num={1}
                                       title={[["Authors", "Channels"], "that get the most reactions"]}
-                                      blockKey="emoji-stats"
-                                      children={MostGetterEmojis}
+                                      children={MostReactionReceiver}
                                   />,
                               ]
                             : []
@@ -182,7 +200,6 @@ const ReportDashboard = () => {
                                   <Card
                                       num={1}
                                       title="Authors that reply the most messages"
-                                      blockKey="interaction-stats"
                                       children={MostRepliesAuthors}
                                       tooltip={'This is clicking "Reply" in the app'}
                                   />,
@@ -195,7 +212,6 @@ const ReportDashboard = () => {
                                   <Card
                                       num={2}
                                       title="Participation in conversations between the top"
-                                      blockKey="conversation-stats"
                                       children={ConversationParticipation}
                                       tooltip={
                                           <>
@@ -214,7 +230,6 @@ const ReportDashboard = () => {
                         <Card
                             num={1}
                             title={["Conversations started", ["by author", "in channel"]]}
-                            blockKey="conversation-stats"
                             children={MostConversations}
                             tooltip={conversationTooltip}
                         />,
@@ -226,30 +241,17 @@ const ReportDashboard = () => {
                 cards: [
                     <Card
                         num={2}
+                        defaultOptions={[1, 1]}
                         title={[
                             "Sentiment over time",
                             ["by week", "by month"],
                             ["(% of total)", "(# messages)", "(# messages diff)"],
                         ]}
-                        blockKey="sentiment-per-cycle"
                         children={SentimentOverTime}
                     />,
-                    <Card
-                        num={1}
-                        title="Sentiment overview"
-                        blockKey="sentiment-stats"
-                        children={SentimentStatsTable}
-                    />,
+                    <Card num={1} title="Sentiment overview" children={SentimentStatsTable} />,
                 ],
             },
-            {
-                name: "🔗 External",
-                value: "external",
-                cards: [
-                    <Card num={1} title="Most linked domains" blockKey="external-stats" children={MostLinkedDomains} />,
-                ],
-            },
-
             {
                 name: "📅 Timeline",
                 value: "timeline",
@@ -259,15 +261,13 @@ const ReportDashboard = () => {
                         : [
                               <Card
                                   num={3}
-                                  title="Active authors over time by month"
-                                  blockKey="active-authors"
+                                  title="Active authors over time, by month"
                                   children={ActiveAuthorsOverTime}
-                                  tooltip="Authors that have sent at least one message in the month"
+                                  tooltip="An author is considered active if it has sent at least one message in the month"
                               />,
                               <Card
                                   num={3}
                                   title="Server/group growth"
-                                  blockKey="growth"
                                   children={GrowthOverTime}
                                   tooltip="Only authors that sent at least one message are considered"
                               />,
@@ -276,7 +276,7 @@ const ReportDashboard = () => {
         ].filter(({ cards }) => env.isDev || cards.length > 0);
     }, []);
 
-    const isDemo = useDataProvider().database.config.demo;
+    const isDemo = getDatabase().config.demo;
 
     return (
         <>
@@ -300,11 +300,10 @@ const ReportDashboard = () => {
 
 const ReportPage = () => {
     const [loading, setLoading] = useState(true);
-    const dataProvider = useDataProvider();
 
     useEffect(
         () =>
-            void dataProvider.once("ready", () =>
+            void getWorker().once("ready", () =>
                 setTimeout(() => setLoading(false), 1000 - Math.min(performance.now(), 1000))
             ),
         []

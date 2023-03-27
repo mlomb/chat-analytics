@@ -11,7 +11,7 @@ const FilenamePatterns = [
     "Conversa do WhatsApp com ",
     "WhatsApp Chat mit ",
     "Discussion WhatsApp avec ",
-    // TODO: ...
+    // TODO: find more patterns here https://cs.github.com/?scopeName=All+repos&scope=&q=email_conversation_subject
 ];
 // also include versions with _ instead of spaces
 FilenamePatterns.push(...FilenamePatterns.map((pattern) => pattern.replace(/ /g, "_")));

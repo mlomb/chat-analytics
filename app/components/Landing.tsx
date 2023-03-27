@@ -13,7 +13,7 @@ interface Props {
 export const Landing = ({ onStart }: Props) => {
     return (
         <div className="Landing">
-            <h1 className="Landing__title">Generate insightful chat analysis reports</h1>
+            <h1 className="Landing__title">Generate interactive, beautiful and insightful chat analysis reports</h1>
             <div className="Landing__desc">
                 <div className="Landing__sameline">
                     <p className="Landing__browser">Everything is processed in your browser.</p>
@@ -23,7 +23,9 @@ export const Landing = ({ onStart }: Props) => {
                     </span>
                 </div>
                 <br />
-                <p>Free and open source.</p>
+                <p>
+                    Can handle millions of messages and multiple chats. <b>Free and open source ❤️</b>
+                </p>
                 <br />
                 <div className="Landing__platforms-line">
                     <span>Supports</span>
@@ -44,7 +46,7 @@ export const Landing = ({ onStart }: Props) => {
                 <Button hueColor={[258, 90, 61]} className="Landing__cta" onClick={onStart}>
                     Generate a report
                 </Button>
-                <Button hueColor={[244, 90, 61]} href="/demo" target="_blank">
+                <Button hueColor={[244, 90, 61]} href={env.isDev ? "/report.html" : "/demo"} target="_blank">
                     View Demo
                 </Button>
                 <Button hueColor={[207, 23, 8]} href="https://github.com/mlomb/chat-analytics" target="_blank">

@@ -44,7 +44,6 @@ export class DatabaseBuilder {
     get numChannels() { return this.channels.size; } // prettier-ignore
     get numAuthors() { return this.authors.size; } // prettier-ignore
     get numMessages() { return [...this.messagesInChannel.values()].reduce((acc, mc) => acc + mc.numMessages, 0); } // prettier-ignore
-    get numBytesAllMessages() { return [...this.messagesInChannel.values()].reduce((acc, mc) => acc + mc.numBytes, 0); } // prettier-ignore
 
     constructor(private readonly config: Config, private readonly env: Env) {
         this.parser = createParser(config.platform);
@@ -345,7 +344,6 @@ export class DatabaseBuilder {
 
         const bitConfig: MessageBitConfig = {
             dayBits: numBitsFor(dateKeys.length),
-            replyBits: numBitsFor(1.2 * this.numBytesAllMessages),
             authorIdxBits: numBitsFor(this.authors.size),
             wordIdxBits: numBitsFor(this.words.size),
             emojiIdxBits: numBitsFor(this.emojis.size),
@@ -418,6 +416,8 @@ export class DatabaseBuilder {
 
         return {
             config: this.config,
+            generatedAt: new Date().toISOString(),
+
             title: this.buildTitle(guilds, channels),
             langs,
 

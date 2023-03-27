@@ -1,8 +1,10 @@
 import { ReactElement, useState } from "react";
 
-import { BlockDataType, BlockInfo, BlockKey } from "@pipeline/aggregate/Blocks";
-import Block from "@report/components/Block";
+import { BlockData, BlockKey } from "@pipeline/aggregate/Blocks";
+import { useBlockData } from "@report/BlockHook";
+import { BlockState } from "@report/BlockStore";
 import ErrorBoundary from "@report/components/ErrorBoundary";
+import { LoadingGroup } from "@report/components/LoadingGroup";
 import { Tooltip } from "@report/components/core/Tooltip";
 
 import InfoIcon from "@assets/images/icons/info.svg";
@@ -10,21 +12,25 @@ import "@assets/styles/Card.less";
 
 type Title = string | (string | string[])[];
 
-interface Props<K extends BlockKey> {
+interface Props {
     num: 1 | 2 | 3;
     title: Title;
-    blockKey: K;
-    children: (props: { data?: BlockDataType<K>; options: number[] }) => JSX.Element;
     tooltip?: ReactElement | string;
+    defaultOptions?: number[];
+    children: (props: { options: number[] }) => JSX.Element;
 }
 
-const Card = <K extends BlockKey>(props: Props<K>) => {
-    const Content = <K extends BlockKey>({ info }: { info: BlockInfo<K> }) => {
+const Card = (props: Props) => {
+    const Content = (pp: { state: BlockState }) => {
+        const { state } = pp;
+
         // normalize title, make sure it's an array
         const title = typeof props.title === "string" ? [props.title] : props.title;
 
         // by default all options are 0
-        const [options, setOptions] = useState<number[]>(title.filter((a) => typeof a !== "string").map((_) => 0));
+        const [options, setOptions] = useState<number[]>(
+            props.defaultOptions || title.filter((a) => typeof a !== "string").map((_) => 0)
+        );
 
         const elements: JSX.Element[] = [];
 
@@ -66,17 +72,17 @@ const Card = <K extends BlockKey>(props: Props<K>) => {
                     <div
                         className={
                             "Card__overlay" +
-                            (info.state === "ready"
+                            (state === "ready"
                                 ? " Card__overlay--hidden"
-                                : info.state === "error"
+                                : state === "error"
                                 ? " Card__overlay--error"
                                 : "")
                         }
                     ></div>
-                    {info.state === "error" && (
+                    {state === "error" && (
                         <div className="Card__error">Error occurred, please check the console for more details</div>
                     )}
-                    <div className={"Card__title Card__title--" + info.state}>
+                    <div className={"Card__title Card__title--" + state}>
                         {elements}
                         {props.tooltip ? (
                             <Tooltip
@@ -85,8 +91,8 @@ const Card = <K extends BlockKey>(props: Props<K>) => {
                             />
                         ) : null}
                     </div>
-                    <div className={info.state === "ready" ? "" : "Card__gray"}>
-                        <props.children data={info.data || undefined} options={options} />
+                    <div className={state === "ready" ? "" : "Card__gray"}>
+                        <props.children options={options} />
                     </div>
                 </ErrorBoundary>
             </>
@@ -95,7 +101,7 @@ const Card = <K extends BlockKey>(props: Props<K>) => {
 
     return (
         <div className={"Card Card--" + props.num}>
-            <Block blockKey={props.blockKey} children={Content} />
+            <LoadingGroup children={(state) => <Content state={state} />} />
         </div>
     );
 };

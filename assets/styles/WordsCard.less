@@ -1,0 +1,79 @@
+@border: 2px dashed #596570;
+
+.WordsCard {
+    text-align: center;
+
+    > :last-child {
+        border-top: @border;
+        margin-top: 6px;
+        padding-top: 8px;
+    }
+
+    .word-title {
+        position: relative;
+        white-space: nowrap;
+        word-wrap: break-word;
+        overflow: hidden;
+        display: inline-block;
+        text-overflow: ellipsis;
+        max-width: 330px;
+        padding-right: 13px;
+
+        &:before {
+            content: '"';
+        }
+        &:after {
+            content: '"';
+            display: block;
+            position: absolute;
+            top: 0;
+            right: 0;
+        }
+    }
+}
+
+.WordsCard__group {
+    position: relative;
+}
+
+.WordsCard__overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.3);
+    margin: 0px 5px;
+    border-radius: 5px;
+    opacity: 0;
+    pointer-events: none;
+    transition: 0.25s opacity;
+}
+
+.WordsCard__loading {
+    filter: grayscale(100%);
+
+    .WordsCard__overlay {
+        opacity: 1;
+        pointer-events: all;
+    }
+}
+
+@media (min-width: 630px) {
+    .WordsCard {
+        display: flex;
+
+        > :first-child {
+            flex: 1;
+        }
+        > :last-child {
+            flex: 1.4;
+
+            border-top: none;
+            border-left: @border;
+            margin-bottom: 8px;
+            margin-top: 0;
+            padding-top: 0;
+        }
+    }
+}

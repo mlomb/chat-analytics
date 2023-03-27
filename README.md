@@ -4,7 +4,7 @@
 ![Logo-Dark](assets/images/logos/app_dark.svg#gh-dark-mode-only)
 ![Logo-Light](assets/images/logos/app_light.svg#gh-light-mode-only)
 
-<h3>Generate insightful chat analysis reports</h3>
+<h3>Generate interactive, beautiful and insightful chat analysis reports</h3>
 
 [Open App](https://chatanalytics.app) • [View Demo](https://chatanalytics.app/demo) • [Use CLI](#cli)
 
@@ -18,8 +18,13 @@
 
 ---
 
-A web app that takes chat exports from supported platforms and generates a single HTML file containing information, statistics and graphs about them.  
+A web app that takes chat exports from supported platforms and generates a single HTML file containing information, statistics and interactive graphs about them. Privacy is its main concern; chat data never leaves the device when generating reports.  
 
+|  💬 MESSAGES |  🅰️ LANGUAGE | 😃 EMOJI | 🔗 LINKS | 🌀 INTERACTION | 💙 SENTIMENT | 📅 TIMELINE |
+|--|--|--|--|--|--|--|
+| <img src="https://user-images.githubusercontent.com/5845105/222576038-ebcff785-1d5a-4402-ac16-5f55fe7a1a8f.png" alt="chat analytics messages tab" width="200"> | <img src="https://user-images.githubusercontent.com/5845105/222576383-91ec15d7-0a3b-44eb-96bb-24de3886d23f.png" alt="chat analytics language tab" width="200"> | <img src="https://user-images.githubusercontent.com/5845105/222576596-dfeb7660-808f-4b1f-905c-340282f1ed8d.png" alt="chat analytics emoji tab" width="200"> | <img src="https://user-images.githubusercontent.com/5845105/222576676-9eac93b7-59d2-4ab6-95d4-d65bb0d32207.png" alt="chat analytics links tab" width="200"> | <img src="https://user-images.githubusercontent.com/5845105/222576804-0d884987-6394-4435-97cd-06bbca84e391.png" alt="chat analytics interaction tab" width="200"> | <img src="https://user-images.githubusercontent.com/5845105/222576869-f754d647-d915-4938-8acf-6c85f9315fee.png" alt="chat analytics sentiment tab" width="200"> | <img src="https://user-images.githubusercontent.com/5845105/222576879-30461d12-2a3b-4814-a16c-b23eab263b6b.png" alt="chat analytics timeline tab" width="200"> |
+
+You can interact with [the demo here](https://chatanalytics.app/demo)!
 
 ## Chat platform support
 
@@ -32,7 +37,7 @@ You can generate reports from the following platforms:
 | Telegram  | `json` from [Telegram Desktop](https://desktop.telegram.org/)                    | ✅            | ✅                | ✅                                                                                   | ❌ (not provided) | ❌                      | ✅ (as text) |
 | WhatsApp  | `txt` or `zip` exported from a phone                                             | ✅            | ❌ (not provided) | ✅<strong>*</strong> (if exported from iOS)<br>🟦 (generic if exported from Android) | ❌ (not provided) | ❌                      | ✅ (as text) |
 
-<strong>*</strong>: not all languages are supported, check [WhatsApp.ts](/pipeline/parse/parsers/WhatsApp.ts).
+<strong>*</strong> not all languages are supported, check [WhatsApp.ts](/pipeline/parse/parsers/WhatsApp.ts).
 
 You can't combine exports from different platforms.  
 The contribution of [new platform parsers](/docs/PIPELINE.md#writing-a-new-parser) is always welcomed 🙂

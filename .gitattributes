@@ -1,0 +1,2 @@
+# ignore sample JSONs in line count
+tests/samples/**/*.json linguist-vendored

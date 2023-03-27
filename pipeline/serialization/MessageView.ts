@@ -1,3 +1,4 @@
+import { AttachmentType } from "@pipeline/Attachments";
 import { Index } from "@pipeline/Types";
 import { IndexCounts } from "@pipeline/process/IndexCounts";
 import { Message, MessageComplete } from "@pipeline/process/Types";
@@ -17,6 +18,7 @@ export class MessageView implements Message {
 
     readonly dayIndex: Index;
     readonly secondOfDay: number;
+    readonly editedAfter?: number;
     readonly authorIndex: Index;
     readonly replyOffset?: number;
     readonly langIndex?: Index;
@@ -32,6 +34,7 @@ export class MessageView implements Message {
 
     get hasText(): boolean { return (this.flags & MessageFlags.Text) > 0; } // prettier-ignore
     get hasReply(): boolean { return (this.flags & MessageFlags.Reply) > 0; } // prettier-ignore
+    get hasEdits(): boolean { return (this.flags & MessageFlags.Edited) > 0; } // prettier-ignore
     get hasWords(): boolean { return (this.flags & MessageFlags.Words) > 0; } // prettier-ignore
     get hasEmojis(): boolean { return (this.flags & MessageFlags.Emojis) > 0; } // prettier-ignore
     get hasAttachments(): boolean { return (this.flags & MessageFlags.Attachments) > 0; } // prettier-ignore
@@ -40,37 +43,41 @@ export class MessageView implements Message {
     get hasDomains(): boolean { return (this.flags & MessageFlags.Domains) > 0; } // prettier-ignore
 
     constructor(private readonly stream: BitStream, private readonly bitConfig: MessageBitConfig) {
+        // PERFORMANCE NOTE: this is probably the most performance-critical part of report aggregation
+        // Instead of using `.hasXXX` we inline the checks to avoid the function call overhead, which REALLY adds up here
+
         this.dayIndex = stream.getBits(bitConfig.dayBits);
         this.secondOfDay = stream.getBits(17);
         this.authorIndex = stream.getBits(bitConfig.authorIdxBits);
         this.flags = stream.getBits(9);
 
-        if (this.hasReply) this.replyOffset = stream.getBits(bitConfig.replyBits);
-        if (this.hasText) {
+        if ((this.flags & MessageFlags.Reply) > 0) this.replyOffset = stream.readVarInt();
+        if ((this.flags & MessageFlags.Edited) > 0) this.editedAfter = stream.readVarInt();
+        if ((this.flags & MessageFlags.Text) > 0) {
             this.langIndex = stream.getBits(8);
             this.sentiment = stream.getBits(8) - 128;
         }
-        if (this.hasWords) {
+        if ((this.flags & MessageFlags.Words) > 0) {
             this.wordsOffset = stream.offset;
             skipIndexCounts(stream, bitConfig.wordIdxBits);
         }
-        if (this.hasEmojis) {
+        if ((this.flags & MessageFlags.Emojis) > 0) {
             this.emojisOffset = stream.offset;
             skipIndexCounts(stream, bitConfig.emojiIdxBits);
         }
-        if (this.hasAttachments) {
+        if ((this.flags & MessageFlags.Attachments) > 0) {
             this.attachmentsOffset = stream.offset;
             skipIndexCounts(stream, 3);
         }
-        if (this.hasReactions) {
+        if ((this.flags & MessageFlags.Reactions) > 0) {
             this.reactionsOffset = stream.offset;
             skipIndexCounts(stream, bitConfig.emojiIdxBits);
         }
-        if (this.hasMentions) {
+        if ((this.flags & MessageFlags.Mentions) > 0) {
             this.mentionsOffset = stream.offset;
             skipIndexCounts(stream, bitConfig.mentionsIdxBits);
         }
-        if (this.hasDomains) {
+        if ((this.flags & MessageFlags.Domains) > 0) {
             this.domainsOffset = stream.offset;
             skipIndexCounts(stream, bitConfig.domainsIdxBits);
         }
@@ -88,7 +95,7 @@ export class MessageView implements Message {
         return readIndexCounts(this.stream, this.bitConfig.emojiIdxBits);
     }
 
-    get attachments(): IndexCounts | undefined {
+    get attachments(): IndexCounts<AttachmentType> | undefined {
         if (this.attachmentsOffset === 0) return undefined;
         this.stream.offset = this.attachmentsOffset;
         return readIndexCounts(this.stream, 3);
@@ -124,6 +131,7 @@ export class MessageView implements Message {
         return {
             dayIndex: this.dayIndex,
             secondOfDay: this.secondOfDay,
+            editedAfter: this.editedAfter,
             authorIndex: this.authorIndex,
             replyOffset: this.replyOffset,
             langIndex: this.langIndex,

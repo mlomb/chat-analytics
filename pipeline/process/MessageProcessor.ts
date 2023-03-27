@@ -67,13 +67,14 @@ export class MessageProcessor {
 
         if (msg.reactions) {
             for (const [emoji, count] of msg.reactions) {
+                const symbol = normalizeText(emoji.text);
                 reactionsCount.incr(
                     this.processEmoji(
                         emoji.id === undefined
                             ? {
                                   type: "unicode",
-                                  symbol: emoji.text,
-                                  name: this.emojis!.getName(emoji.text),
+                                  symbol,
+                                  name: this.emojis!.getName(symbol),
                               }
                             : {
                                   type: "custom",
@@ -94,8 +95,9 @@ export class MessageProcessor {
                     if (wordIdx !== undefined) wordsCount.incr(wordIdx);
                     break;
                 case "emoji":
+                    const symbol = normalizeText(text); // to remove variants
                     emojisCount.incr(
-                        this.processEmoji({ type: "unicode", symbol: text, name: this.emojis!.getName(text) })
+                        this.processEmoji({ type: "unicode", symbol, name: this.emojis!.getName(symbol) })
                     );
                     break;
                 case "custom-emoji":
@@ -117,7 +119,7 @@ export class MessageProcessor {
             sentiment = this.sentiment?.calculate(tokens, langIndex) || 0;
         }
 
-        let replyOffset = undefined;
+        let replyOffset: number | undefined = undefined;
         if (msg.replyTo) {
             // store replyTo index
             replyOffset = this.builder.replyIds.length;
@@ -128,9 +130,16 @@ export class MessageProcessor {
         const date = new Date(msg.timestamp);
         const day = Day.fromDate(date);
 
+        let editedAfter: number | undefined = undefined;
+        if (msg.timestampEdit !== undefined) {
+            // time difference between sending the message and its last edit
+            editedAfter = Math.ceil((new Date(msg.timestampEdit).getTime() - date.getTime()) / 1000);
+        }
+
         return {
             dayIndex: day.toBinary(),
             secondOfDay: date.getSeconds() + 60 * (date.getMinutes() + 60 * date.getHours()),
+            editedAfter,
             authorIndex: this.builder.authors.getIndex(msg.authorId)!,
             replyOffset,
             langIndex,
