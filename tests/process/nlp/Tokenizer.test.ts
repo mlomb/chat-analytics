@@ -75,3 +75,40 @@ it("exclude outside ' matching words", () => {
     expect(tokens[1].tag).toBe("word");
     expect(tokens[2].text).toBe("'");
 });
+
+describe("URLs", () => {
+    const urlsToMatch = [
+        "http://example.com",
+        "https://withhttps.edu",
+        "http://withlongtld.somelongtld",
+        "http://withfragment.com#fragment",
+        "http://withgetparam.com?a=1",
+        "http://withtwogetparams.com?a=1&b=2",
+        "http://withport.com:8080",
+        "http://withportandpath.com:8080/path",
+        "http://withportandpathandgetparam.com:8080/path?a=1",
+        "http://withportandpathandgetparamandfragment.com:8080/path?a=1#fragment",
+        "http://a.b.c.d.e.withsubdomains.com",
+        "https://with-dashes.com/post-123456/happy-dog",
+        "http://withtrailingslash.com/",
+        "http://withfileextension.com/path/to/image.png",
+        "http://localhost/without/tld",
+        "http://www.example.com/page.html;sessionid=AAAAA&id=1234",
+    ];
+    const urlsNotToMatch = ["common text", "google.com", "http://", "https://", "https:// nospaces.com"];
+
+    test.each(urlsToMatch)("should match %p", (url) => {
+        const tokens = tokenize(url);
+        expect(tokens.length).toBe(1);
+        expect(tokens[0].text).toBe(url);
+        expect(tokens[0].tag).toBe("url");
+    });
+    test.each(urlsNotToMatch)("should not match %p", (url) => {
+        const tokens = tokenize(url);
+        expect(tokens).not.toContain(
+            expect.objectContaining({
+                tag: "url",
+            })
+        );
+    });
+});
