@@ -50,7 +50,7 @@ const Matchers: Readonly<TokenMatcher[]> = [
     },
     {
         // match URLs
-        regex: /https?:\/\/[^\s<]+[^<.,:;"')\]\s]/g,
+        regex: /https?:\/\/[^\s<]+[^<.,:;"')\]\s]/g, // Discord's regex to match URLs
         tag: "url",
     },
     // TODO: match emails, so they are not parsed as mentions (@gmail, @hotmail, etc)
