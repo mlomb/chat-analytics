@@ -1,8 +1,14 @@
-# v1.0.1 [IN DEVELOPMENT]
+# v1.0.2 (YYYY/MM/DD) [IN DEVELOPMENT]
 
-- Bugfix Discord: regular emoji were not being rendered correctly in MessageLabel because the ID was being set (due to DCE now including an empty ID)
+- [x]
 
-# v1.0.0
+# v1.0.1 (2023/04/03)
+
+- Bugfix Discord: regular emoji were not being rendered correctly in MessageLabel because the ID was being set (due to DCE now including an empty ID) [(87ab3f8)](https://github.com/mlomb/chat-analytics/commit/87ab3f8df20ea493056f0832d50b1b8661e67fa3)
+- Bugfix in URL parsing: some GET parameters were not being matched. Now using the same regex used by Discord. Added tests. [#72](https://github.com/mlomb/chat-analytics/pull/72)
+- Added platform clarification about CLI in DCE [(de8c517)](https://github.com/mlomb/chat-analytics/commit/de8c5177fdc1194497a3bdbafd5e476d7f97837e)
+
+# v1.0.0 (2023/03/02)
 
 After a lot of work in [#39](https://github.com/mlomb/chat-analytics/pull/39), [#53](https://github.com/mlomb/chat-analytics/pull/53), [#55](https://github.com/mlomb/chat-analytics/pull/55) and [#58](https://github.com/mlomb/chat-analytics/pull/58) (more than 200 commits of refactors and improvements) I can say I'm happy to call this the first release of Chat Analytics!
 
