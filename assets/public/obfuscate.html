@@ -508,7 +508,7 @@
         const obfuscater = new Obfuscater();
         readFileThen(contents => {
           result = obfuscater.obfuscate(contents);
-          previewElm.innerHTML = result.split("\n").slice(0, 50).join("<br>");
+          previewElm.innerHTML = result.slice(0, 10000).split("\n").slice(0, 50).join("<br>"); // These values are very arbitrary
           downloadButton.disabled = false;
         });
       };
