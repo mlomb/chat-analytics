@@ -351,7 +351,7 @@ export class DatabaseBuilder {
             domainsIdxBits: numBitsFor(this.domains.size),
         };
         const finalMessages = new MessagesArray(bitConfig);
-        const messageAddresses = new Map<RawID, BitAddress>();
+        const messageAddresses = new BigMap<RawID, BitAddress>();
 
         const totalMessages = this.numMessages;
         let alreadyCounted = 0;
