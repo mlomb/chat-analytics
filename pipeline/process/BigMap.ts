@@ -4,7 +4,7 @@ const MAX_MAP_SIZE = Math.pow(2, 24) - 1; // (-1 just in case)
 /**
  * A Map that can grow beyond the map size limit using multiple maps.
  */
-class BigMap<K, V> {
+export class BigMap<K, V> {
     private maps: Map<K, V>[] = [new Map()];
 
     private get lastMap() {

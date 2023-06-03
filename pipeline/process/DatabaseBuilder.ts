@@ -6,6 +6,7 @@ import { createParser } from "@pipeline/parse";
 import { FileInput } from "@pipeline/parse/File";
 import { Parser } from "@pipeline/parse/Parser";
 import { PAuthor, PChannel, PGuild, PMessage, RawID } from "@pipeline/parse/Types";
+import { BigMap } from "@pipeline/process/BigMap";
 import { ChannelMessages } from "@pipeline/process/ChannelMessages";
 import { IndexCountsBuilder } from "@pipeline/process/IndexCounts";
 import { IndexedMap } from "@pipeline/process/IndexedMap";
