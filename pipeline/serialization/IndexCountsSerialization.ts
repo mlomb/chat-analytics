@@ -54,6 +54,11 @@ export const writeIndexCounts = (counts: IndexCounts, stream: BitStream, bitsPer
         maxCount = Math.max(maxCount, c);
     }
 
+    // do we need to support this? I think not
+    if (len === 0) throw new Error("Cannot write empty IndexCounts");
+    if (total === 0) throw new Error("Cannot write IndexCounts with total 0");
+    if (maxCount === 0) throw new Error("Cannot write IndexCounts with maxCount 0");
+
     // check for single and double strategies
     if (total === 1) {
         stream.setBits(2, 0b00); // 0b00=single index
