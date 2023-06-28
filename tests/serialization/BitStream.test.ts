@@ -178,18 +178,35 @@ it("should get bits correctly after lots of sets", () => {
     }
 });
 
-test.each([7, 8, 9, 10, 11, 15, 16, 17, 20, 24, 31, 32])("varint %s bits should write and read correctly", (bits) => {
-    const cases: number[] = [0, 100, 200, 500, 1000, 5000, 10000, 100000, 2000000, 5000000, 1000000000].filter(
-        (v) => v < Math.pow(2, bits)
-    );
-    for (const value of cases) {
-        let s = new BitStream();
-        s.offset = 0;
-        s.writeVarInt(value, bits);
-        s.offset = 0;
-        expect(s.readVarInt(bits)).toBe(value);
+test.each([7, 8, 9, 10, 11, 15, 16, 17, 20, 24, 31, 32, 48])(
+    "varint %s bits should write and read correctly",
+    (bits) => {
+        const cases: number[] = [
+            0,
+            100,
+            200,
+            500,
+            1000,
+            5000,
+            10000,
+            100000,
+            2000000,
+            5000000,
+            1000000000,
+            2147483648 - 1,
+            2147483648 + 0,
+            2147483648 + 1,
+            2147483648 * 10,
+        ].filter((v) => v < Math.pow(2, bits) - 1);
+        for (const value of cases) {
+            let s = new BitStream();
+            s.offset = 0;
+            s.writeVarInt(value, bits);
+            s.offset = 0;
+            expect(s.readVarInt(bits)).toBe(value);
+        }
     }
-});
+);
 
 test("buffer8 returns a buffer aligned to 32bits", () => {
     const buf = new Uint32Array(1024);

@@ -380,6 +380,7 @@ export class DatabaseBuilder {
                     }
 
                     msg.words = newWords.toArray();
+                    if (msg.words.length === 0) delete msg.words;
                 }
 
                 // store the address of the message

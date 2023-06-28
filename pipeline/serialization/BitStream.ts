@@ -1,5 +1,5 @@
-/** Offset in bits in a BitStream */
-export type BitAddress = number;
+/** Offset in bits in a BitStream. May be over 2^32, so avoid bitwise operations. */
+export type BitAddress = number; // | bigint
 
 /**
  * A stream where you can read and write arbitrary amounts of bits.
@@ -73,6 +73,9 @@ export class BitStream {
         const offset = this.offset;
         this.offset += bits;
 
+        // if (bits > 32) throw new Error(`bits ${bits} is greater than 32`);
+        // if (value > Math.pow(2, bits)) throw new Error(`value ${value} does not fit in ${bits} bits`);
+
         // check if we must grow the buffer
         if ((offset + bits) / 8 > this.buffer.byteLength - 4) this.grow();
         // buffer may have grown
@@ -82,8 +85,8 @@ export class BitStream {
         const mask = bits === 32 ? 0b11111111111111111111111111111111 : (1 << bits) - 1;
         const valueMasked = value & mask;
 
-        const aligned32 = offset >>> 5;
-        const delta = offset - (aligned32 << 5);
+        const aligned32 = Math.floor(offset / 32); // can't use >>> 5 because offset may be over 2^32
+        const delta = offset - aligned32 * 32;
 
         // TODO: try to do it branch-less
         if (delta + bits > 32) {
@@ -102,8 +105,8 @@ export class BitStream {
         const offset = this.offset;
         this.offset += bits;
 
-        const aligned32 = offset >>> 5;
-        const delta = offset - (aligned32 << 5);
+        const aligned32 = Math.floor(offset / 32);
+        const delta = offset - aligned32 * 32;
         const value1 = buffer[aligned32];
         const value2 = buffer[aligned32 + 1];
 
@@ -128,25 +131,59 @@ export class BitStream {
             return;
         }
 
-        while (value > 127) {
-            this.setBits(8, (value & 127) | 128);
-            value = value >>> 7;
+        // if (value >= Math.pow(2, maxBits)) throw new Error(`value ${value} does not fit in ${maxBits} bits`);
+
+        // NOTE: Bitwise operations are performed using 32 bits,
+        //       so to read and write a number bigger than 2^32,
+        //       we need to use BigInts.
+
+        if (maxBits > 30) {
+            // big int
+            let valueBig = BigInt(value);
+
+            while (valueBig > 127n) {
+                this.setBits(8, Number((valueBig & 127n) | 128n));
+                valueBig = valueBig >> 7n;
+            }
+            this.setBits(8, Number(valueBig));
+        } else {
+            // normal number
+            while (value > 127) {
+                this.setBits(8, (value & 127) | 128);
+                value = value >>> 7;
+            }
+            this.setBits(8, value);
         }
-        this.setBits(8, value);
     }
 
     /** Reads a variable length integer, up to the specified number of bits */
     readVarInt(maxBits: number = 32): number {
         if (maxBits < 10) return this.getBits(maxBits);
 
-        let value = 0;
-        let byte = 0;
-        let shift = 0;
-        do {
-            byte = this.getBits(8);
-            value |= (byte & 127) << shift;
-            shift += 7;
-        } while (byte & 128);
-        return value;
+        if (maxBits > 30) {
+            // big int
+            let value = 0n;
+            let byte = 0n;
+            let shift = 0n;
+            do {
+                byte = BigInt(this.getBits(8));
+                value |= (byte & 127n) << shift;
+                shift += 7n;
+            } while (byte & 128n);
+
+            return Number(value);
+        } else {
+            // normal number
+            let value = 0;
+            let byte = 0;
+            let shift = 0;
+            do {
+                byte = this.getBits(8);
+                value |= (byte & 127) << shift;
+                shift += 7;
+            } while (byte & 128);
+
+            return value;
+        }
     }
 }
