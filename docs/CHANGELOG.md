@@ -1,6 +1,10 @@
-# v1.0.2 (YYYY/MM/DD) [IN DEVELOPMENT]
+# v1.0.3 (YYYY/MM/DD) [IN DEVELOPMENT]
 
 - [x]
+
+# v1.0.2 (2023/06/29)
+
+- Bugfix in big exports: when the message buffer reaches 2^32 bits serialization breaks because bitwise operations are done in 32 bits. Now we use BigInts where necessary and avoid some bitwise operations. [#83](https://github.com/mlomb/chat-analytics/issues/83)
 
 # v1.0.1 (2023/04/03)
 
