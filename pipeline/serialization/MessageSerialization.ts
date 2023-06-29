@@ -50,7 +50,7 @@ export const writeMessage = (message: Message, stream: BitStream, bitConfig: Mes
     stream.setBits(bitConfig.authorIdxBits, message.authorIndex);
 
     let flags = MessageFlags.None;
-    if (message.replyOffset) flags |= MessageFlags.Reply;
+    if (message.replyOffset !== undefined) flags |= MessageFlags.Reply;
     if (message.editedAfter !== undefined) flags |= MessageFlags.Edited;
     if (message.langIndex !== undefined) flags |= MessageFlags.Text;
     if (message.words?.length) flags |= MessageFlags.Words;
@@ -61,11 +61,11 @@ export const writeMessage = (message: Message, stream: BitStream, bitConfig: Mes
     if (message.domains?.length) flags |= MessageFlags.Domains;
     stream.setBits(9, flags);
 
-    if (flags & MessageFlags.Reply) stream.writeVarInt(message.replyOffset!);
+    if (flags & MessageFlags.Reply) stream.writeVarInt(message.replyOffset!, 48);
     if (flags & MessageFlags.Edited) stream.writeVarInt(message.editedAfter!);
     if (flags & MessageFlags.Text) {
         stream.setBits(8, message.langIndex!); // 0-255
-        stream.setBits(8, message.sentiment! + 128); // 0-255
+        stream.setBits(8, Math.max(-128, Math.min(127, message.sentiment!)) + 128); // 0-255
     }
     if (flags & MessageFlags.Words) writeIndexCounts(message.words!, stream, bitConfig.wordIdxBits);
     if (flags & MessageFlags.Emojis) writeIndexCounts(message.emojis!, stream, bitConfig.emojiIdxBits);

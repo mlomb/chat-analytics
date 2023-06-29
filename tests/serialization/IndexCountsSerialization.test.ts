@@ -1,4 +1,3 @@
-import { Index } from "@pipeline/Types";
 import { IndexCounts } from "@pipeline/process/IndexCounts";
 import { BitStream } from "@pipeline/serialization/BitStream";
 import { readIndexCounts, skipIndexCounts, writeIndexCounts } from "@pipeline/serialization/IndexCountsSerialization";
@@ -13,6 +12,7 @@ describe("index serialization", () => {
         { name: "serial big",         counts: [[0,1],[1,1],[2,1],[3,1],[4,1],[5,1],[6,1],[7,1],[8,1],[9,1],[10,1],[11,1],[12,1],[13,1],[14,1],[15,1]] },
         { name: "serial consecutive", counts: [[0,1],[1,1],[1,1],[2,1]] },
         { name: "rle",                counts: [[0, 100],[1, 100],[2, 100],[3, 100]] },
+        { name: "big values",                counts: [[65001, 1456123456],[65003, 1321456987]] },
     ];
 
     function writeThenRead(counts: IndexCounts) {
@@ -44,6 +44,17 @@ describe("index serialization", () => {
         stream.offset = 0;
         skipIndexCounts(stream, 16);
         expect(stream.offset).toStrictEqual(length);
+    });
+
+    // prettier-ignore
+    const crashCases: { name: string; counts: IndexCounts }[] = [
+        { name: "empty", counts: [] },
+        { name: "single total zero", counts: [[0, 0]] },
+        { name: "multiple total zero", counts: [[1, 0],[2, 0]] },
+    ];
+
+    it.each(crashCases)("should crash: $name", ({ counts }) => {
+        expect(() => writeThenRead(counts)).toThrow();
     });
 
     it("should overflow total with serial encoding", () => {

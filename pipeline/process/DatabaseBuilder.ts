@@ -6,6 +6,7 @@ import { createParser } from "@pipeline/parse";
 import { FileInput } from "@pipeline/parse/File";
 import { Parser } from "@pipeline/parse/Parser";
 import { PAuthor, PChannel, PGuild, PMessage, RawID } from "@pipeline/parse/Types";
+import { BigMap } from "@pipeline/process/BigMap";
 import { ChannelMessages } from "@pipeline/process/ChannelMessages";
 import { IndexCountsBuilder } from "@pipeline/process/IndexCounts";
 import { IndexedMap } from "@pipeline/process/IndexedMap";
@@ -351,7 +352,7 @@ export class DatabaseBuilder {
             domainsIdxBits: numBitsFor(this.domains.size),
         };
         const finalMessages = new MessagesArray(bitConfig);
-        const messageAddresses = new Map<RawID, BitAddress>();
+        const messageAddresses = new BigMap<RawID, BitAddress>();
 
         const totalMessages = this.numMessages;
         let alreadyCounted = 0;
@@ -379,6 +380,7 @@ export class DatabaseBuilder {
                     }
 
                     msg.words = newWords.toArray();
+                    if (msg.words.length === 0) delete msg.words;
                 }
 
                 // store the address of the message
