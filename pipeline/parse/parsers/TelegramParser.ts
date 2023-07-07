@@ -11,6 +11,8 @@ export class TelegramParser extends Parser {
     private lastChannelType?: TelegramChannelType;
     private lastChannelID?: RawID;
     private lastMessageTimestampInFile?: Timestamp;
+    /** Used to detect DST */
+    private lastEmittedMessageTimestamp?: Timestamp;
 
     /**
      * Regex to find the timestamp of the last message in a Telegram export file.
@@ -31,6 +33,7 @@ export class TelegramParser extends Parser {
 
         this.lastChannelName = undefined;
         this.lastChannelID = undefined;
+        this.lastEmittedMessageTimestamp = undefined;
     }
 
     private onChannelName(channelName: string) {
@@ -116,7 +119,15 @@ export class TelegramParser extends Parser {
                 // NOTE: as of now, Telegram doesn't export reactions :(
                 // reactions: [],
             };
+
+            // before emitting, check if it's out of order
+            if (this.lastEmittedMessageTimestamp !== undefined && timestamp < this.lastEmittedMessageTimestamp) {
+                // we assume DST
+                this.emit("out-of-order");
+            }
+
             this.emit("message", pmessage, this.lastMessageTimestampInFile);
+            this.lastEmittedMessageTimestamp = timestamp;
         }
     }
 

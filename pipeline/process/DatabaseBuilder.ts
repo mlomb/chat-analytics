@@ -60,6 +60,7 @@ export class DatabaseBuilder {
             }
             channelMessages.addMessage(message);
         });
+        this.parser.on("out-of-order", () => this.markEOF());
     }
 
     // static data
