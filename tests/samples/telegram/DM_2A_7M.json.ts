@@ -16,14 +16,14 @@ export const expectedParse: ExpectedPartialParseResult = {
             authorId: "user700000000",
             channelId: 700000000,
             textContent: " https://google.com  👀",
-            timestamp: 1646842052 * 1000,
+            timestamp: Date.parse("2019-07-12T16:55:32"),
         },
         {
             id: "3645",
             authorId: "user300000000",
             channelId: 700000000,
             textContent: "hello world",
-            timestamp: Date.parse("2022-03-09T13:07:42"),
+            timestamp: Date.parse("2022-03-08T13:07:42"),
         },
         {
             id: "3662",
