@@ -16,7 +16,7 @@ export class TelegramParser extends Parser {
      * Regex to find the timestamp of the last message in a Telegram export file.
      * We use the timestamp of the last message as the `at` value (see @Parser)
      */
-    static readonly TS_MSG_REGEX = /"date_unixtime": ?"([0-9]+)"/gi;
+    static readonly TS_MSG_REGEX = /"date(?:_unixtime)?": ?"(.+?)"/gi;
 
     async *parse(file: FileInput, progress?: Progress) {
         this.lastMessageTimestampInFile = await tryToFindTimestampAtEnd(TelegramParser.TS_MSG_REGEX, file);
