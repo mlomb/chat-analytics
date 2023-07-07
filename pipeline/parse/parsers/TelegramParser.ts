@@ -67,6 +67,14 @@ export class TelegramParser extends Parser {
         const rawReplyToId: RawID | undefined =
             message.reply_to_message_id === null ? undefined : message.reply_to_message_id + "";
 
+        // read from unix timestamp or full datetime
+        const timestamp = message.date_unixtime ? parseInt(message.date_unixtime) * 1000 : Date.parse(message.date!);
+        const timestampEdit = message.edited_unixtime
+            ? parseInt(message.edited_unixtime) * 1000
+            : message.edited
+            ? Date.parse(message.edited)
+            : undefined;
+
         if (message.type === "message") {
             const pauthor: PAuthor = {
                 id: rawAuthorId,
@@ -101,8 +109,8 @@ export class TelegramParser extends Parser {
                 replyTo: rawReplyToId,
                 authorId: rawAuthorId,
                 channelId: this.lastChannelID,
-                timestamp: message.date_unixtime,
-                timestampEdit: message.edited_unixtime,
+                timestamp,
+                timestampEdit,
                 textContent,
                 attachments: attachment === undefined ? [] : [attachment],
                 // NOTE: as of now, Telegram doesn't export reactions :(

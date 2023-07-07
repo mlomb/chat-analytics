@@ -11,8 +11,12 @@ type TelegramChannelType =
 
 // some available keys: id, type, date, actor, actor_id, action, title, text, from, from_id, reply_to_message_id, file, thumbnail, media_type, sticker_emoji, width, height, photo, via_bot, mime_type, duration_seconds, edited, inviter, forwarded_from, message_id, members, performer, game_title, game_description, game_link, game_message_id, score, place_name, address, location_information, poll, saved_from, author, duration
 interface TelegramMessage {
-    date_unixtime: number;
-    edited_unixtime: number | undefined;
+    // Note about date, date_unixtime, edited and edited_unixtime
+    // In some cases, the information is present in unix format and sometimes as a full datetime
+    date?: string;
+    date_unixtime?: string;
+    edited?: string;
+    edited_unixtime?: string;
     from_id: number;
     from: string | null; // sometimes from is null, I don't know why
     id: number;
