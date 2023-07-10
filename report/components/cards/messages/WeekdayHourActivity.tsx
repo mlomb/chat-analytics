@@ -13,11 +13,19 @@ const MIN_COLOR = Color.fromHex(0xfefa76);
 const MAX_COLOR = Color.fromHex(0xfe3527);
 
 const createActivitySplit = (c: Container) => {
-    const { series: weekdaySeries, xAxis: weekdayXAxis } = createBarChart(c.root, "weekday", "value");
-    const { series: hourSeries, xAxis: hourXAxis } = createBarChart(c.root, "hour", "value");
+    const {
+        series: weekdaySeries,
+        xAxis: weekdayXAxis,
+        yAxis: weekdayYAxis,
+    } = createBarChart(c.root, "weekday", "value");
+    const { series: hourSeries, xAxis: hourXAxis, yAxis: hourYAxis } = createBarChart(c.root, "hour", "value");
 
     // set height to 50%
     weekdaySeries.chart!.set("height", percent(50));
+
+    // start Y axis at 0
+    weekdayYAxis.set("min", 0);
+    hourYAxis.set("min", 0);
 
     [weekdaySeries, hourSeries].forEach((s, i) => {
         // rounded corners
