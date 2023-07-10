@@ -22,6 +22,11 @@ export declare interface Parser {
     on(event: "channel", listener: (channel: PChannel, at?: Timestamp) => void): this;
     on(event: "author",  listener: (author:  PAuthor,  at?: Timestamp) => void): this;
     on(event: "message", listener: (message: PMessage, at?: Timestamp) => void): this;
+
+    // Allows the parser to notify if messages become out of order.
+    // This can happen if the export has daylight savings time.
+    emit(event: "out-of-order"): boolean;
+    on(event: "out-of-order", listener: () => void): this;
 }
 
 export abstract class Parser extends EventEmitter {

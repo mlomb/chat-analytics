@@ -11,12 +11,14 @@ export class TelegramParser extends Parser {
     private lastChannelType?: TelegramChannelType;
     private lastChannelID?: RawID;
     private lastMessageTimestampInFile?: Timestamp;
+    /** Used to detect DST */
+    private lastEmittedMessageTimestamp?: Timestamp;
 
     /**
      * Regex to find the timestamp of the last message in a Telegram export file.
      * We use the timestamp of the last message as the `at` value (see @Parser)
      */
-    static readonly TS_MSG_REGEX = /"date_unixtime": ?"([0-9]+)"/gi;
+    static readonly TS_MSG_REGEX = /"date(?:_unixtime)?": ?"(.+?)"/gi;
 
     async *parse(file: FileInput, progress?: Progress) {
         this.lastMessageTimestampInFile = await tryToFindTimestampAtEnd(TelegramParser.TS_MSG_REGEX, file);
@@ -31,6 +33,7 @@ export class TelegramParser extends Parser {
 
         this.lastChannelName = undefined;
         this.lastChannelID = undefined;
+        this.lastEmittedMessageTimestamp = undefined;
     }
 
     private onChannelName(channelName: string) {
@@ -67,8 +70,13 @@ export class TelegramParser extends Parser {
         const rawReplyToId: RawID | undefined =
             message.reply_to_message_id === null ? undefined : message.reply_to_message_id + "";
 
-        const timestamp = Date.parse(message.date);
-        const timestampEdit = message.edited ? Date.parse(message.edited) : undefined;
+        // read from unix timestamp or full datetime
+        const timestamp = message.date_unixtime ? parseInt(message.date_unixtime) * 1000 : Date.parse(message.date!);
+        const timestampEdit = message.edited_unixtime
+            ? parseInt(message.edited_unixtime) * 1000
+            : message.edited
+            ? Date.parse(message.edited)
+            : undefined;
 
         if (message.type === "message") {
             const pauthor: PAuthor = {
@@ -111,7 +119,15 @@ export class TelegramParser extends Parser {
                 // NOTE: as of now, Telegram doesn't export reactions :(
                 // reactions: [],
             };
+
+            // before emitting, check if it's out of order
+            if (this.lastEmittedMessageTimestamp !== undefined && timestamp < this.lastEmittedMessageTimestamp) {
+                // we assume DST
+                this.emit("out-of-order");
+            }
+
             this.emit("message", pmessage, this.lastMessageTimestampInFile);
+            this.lastEmittedMessageTimestamp = timestamp;
         }
     }
 
