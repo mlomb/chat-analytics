@@ -1,6 +1,11 @@
-# v1.0.3 (YYYY/MM/DD) [IN DEVELOPMENT]
+# v1.0.4 (YYYY/MM/DD) [IN DEVELOPMENT]
 
-- [x]
+
+# v1.0.3 (2023/07/10)
+
+- Telegram now supports both `date` and `date_unixtime` in exports. [#80](https://github.com/mlomb/chat-analytics/issues/80)
+- Telegram exports now do not break when there are DST changes in the middle of a file. [#79](https://github.com/mlomb/chat-analytics/issues/79) [#80](https://github.com/mlomb/chat-analytics/issues/80)
+- Activity by hour/weekday Y-axis now starts at 0. [(4cb8ae4)](https://github.com/mlomb/chat-analytics/commit/4cb8ae4904901e4238c5b5f59e02c6c5040d1d03)
 
 # v1.0.2 (2023/06/29)
 
