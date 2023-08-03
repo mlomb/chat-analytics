@@ -370,6 +370,17 @@ export class DatabaseBuilder {
                 msg.dayIndex = dateKeys.indexOf(Day.fromBinary(msg.dayIndex).dateKey);
                 msg.authorIndex = this.authorsRank[msg.authorIndex];
 
+                if (msg.dayIndex === -1) {
+                    console.log(
+                        "dateKeys.length:",
+                        dateKeys.length,
+                        "msg.dayIndex:",
+                        msg.dayIndex,
+                        "Day.fromBinary(msg.dayIndex).dateKey:",
+                        Day.fromBinary(msg.dayIndex).dateKey
+                    );
+                }
+
                 // reindex and skip words
                 if (msg.words) {
                     const newWords = new IndexCountsBuilder();
