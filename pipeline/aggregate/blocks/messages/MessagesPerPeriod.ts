@@ -45,6 +45,10 @@ const fn: BlockFn<MessagesPerPeriod> = (database, filters, common) => {
     }
 
     const processMessage = (msg: MessageView) => {
+        if (typeof msg.dayIndex !== "number" || msg.dayIndex > 850) {
+            console.log("msg.dayIndex:", msg.dayIndex, "perDay.length:", res.perDay.length);
+        }
+
         res.perDay[msg.dayIndex].v++;
         res.perWeek[dateToWeekIndex[msg.dayIndex]].v++;
         res.perMonth[dateToMonthIndex[msg.dayIndex]].v++;
