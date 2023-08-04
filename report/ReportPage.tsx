@@ -20,6 +20,7 @@ import {
     MostUsedEmojis,
 } from "@report/components/cards/MostCards";
 import { TopReacted } from "@report/components/cards/TopCards";
+import CallsOverTime from "@report/components/cards/calls/CallsPerPeriod";
 import EmojiStatsTable from "@report/components/cards/emojis/EmojiStatsTable";
 import ConversationParticipation from "@report/components/cards/interaction/ConversationParticipation";
 import LanguageStatsTable from "@report/components/cards/language/LanguageStatsTable";
@@ -172,6 +173,18 @@ const ReportDashboard = () => {
                     <Card num={1} title="Most linked domains" children={MostLinkedDomains} />,
                     <Card num={2} title="Linked by domain hierarchy" children={DomainsTree} />,
                     <Card num={1} title={["Most links sent", ["by author", "in channel"]]} children={MostLinks} />,
+                ],
+            },
+            {
+                name: "📞 Calls",
+                value: "calls",
+                cards: [
+                    <Card
+                        num={2}
+                        defaultOptions={[0, 2]}
+                        title={[["Time spent on", "Number of"], "calls over time", ["by day", "by week", "by month"]]}
+                        children={CallsOverTime}
+                    />,
                 ],
             },
             {
