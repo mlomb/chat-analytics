@@ -46,6 +46,15 @@ export interface PMessage {
     reactions?: [PEmoji, number][];
 }
 
+/** Call interface produced by parsers */
+export interface PCall {
+    id: RawID;
+    authorId: RawID; // the user who started the call
+    channelId: RawID;
+    timestampStart: Timestamp;
+    timestampEnd: Timestamp;
+}
+
 /** Emoji interface produced by parsers */
 export interface PEmoji {
     id?: RawID; // if available

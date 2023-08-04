@@ -5,13 +5,13 @@ import { Config, Index } from "@pipeline/Types";
 import { createParser } from "@pipeline/parse";
 import { FileInput } from "@pipeline/parse/File";
 import { Parser } from "@pipeline/parse/Parser";
-import { PAuthor, PChannel, PGuild, PMessage, RawID } from "@pipeline/parse/Types";
+import { PAuthor, PCall, PChannel, PGuild, PMessage, RawID } from "@pipeline/parse/Types";
 import { BigMap } from "@pipeline/process/BigMap";
 import { ChannelMessages } from "@pipeline/process/ChannelMessages";
 import { IndexCountsBuilder } from "@pipeline/process/IndexCounts";
 import { IndexedMap } from "@pipeline/process/IndexedMap";
 import { MessageProcessor } from "@pipeline/process/MessageProcessor";
-import { Author, Channel, Database, Emoji, Guild, Message } from "@pipeline/process/Types";
+import { Author, Call, Channel, Database, Emoji, Guild, Message } from "@pipeline/process/Types";
 import { rank, remap } from "@pipeline/process/Util";
 import { Stopwords } from "@pipeline/process/nlp/Stopwords";
 import { BitAddress } from "@pipeline/serialization/BitStream";
@@ -30,6 +30,7 @@ export class DatabaseBuilder {
     guilds = new IndexedMap<RawID, PGuild>();
     channels = new IndexedMap<RawID, PChannel>();
     authors = new IndexedMap<RawID, PAuthor>();
+    calls = new IndexedMap<RawID, PCall>();
     words = new IndexedMap<string, string>();
     emojis = new IndexedMap<string, Emoji>();
     mentions = new IndexedMap<string, string>();
@@ -61,6 +62,7 @@ export class DatabaseBuilder {
             }
             channelMessages.addMessage(message);
         });
+        this.parser.on("call", (call, at) => this.calls.set(call.id, call, at));
         this.parser.on("out-of-order", () => this.markEOF());
     }
 
@@ -406,6 +408,39 @@ export class DatabaseBuilder {
         return { finalMessages };
     }
 
+    private processCalls(dateKeys: string[]) {
+        const finalCalls: Call[] = [];
+
+        for (const call of this.calls.values) {
+            const authorIndex = this.authorsRank[this.authors.getIndex(call.authorId)!];
+            const channelIndex = this.channelsRank[this.channels.getIndex(call.channelId)!];
+
+            const startDate = new Date(call.timestampStart);
+            const endDate = new Date(call.timestampEnd);
+
+            const startDay = Day.fromDate(startDate);
+            const endDay = Day.fromDate(endDate);
+
+            const duration = Math.ceil((endDate.getTime() - startDate.getTime()) / 1000);
+
+            finalCalls.push({
+                authorIndex,
+                channelIndex,
+                start: {
+                    dayIndex: dateKeys.indexOf(startDay.dateKey),
+                    secondOfDay: startDate.getSeconds() + 60 * (startDate.getMinutes() + 60 * startDate.getHours()),
+                },
+                end: {
+                    dayIndex: dateKeys.indexOf(endDay.dateKey),
+                    secondOfDay: endDate.getSeconds() + 60 * (endDate.getMinutes() + 60 * endDate.getHours()),
+                },
+                duration,
+            });
+        }
+
+        return { finalCalls };
+    }
+
     build(): Database {
         if (this.numMessages === 0)
             throw new Error("No messages found. Are you sure you are using the right platform?");
@@ -416,6 +451,7 @@ export class DatabaseBuilder {
         const { guilds, channels, authors, words } = this.makeFinalObjects();
         const { dateKeys, monthKeys, yearKeys } = genTimeKeys(this.minDate, this.maxDate);
         const { finalMessages } = this.compactMessagesData(channels, dateKeys);
+        const { finalCalls } = this.processCalls(dateKeys);
 
         return {
             config: this.config,
@@ -435,6 +471,7 @@ export class DatabaseBuilder {
             guilds,
             channels,
             authors,
+            calls: finalCalls,
             words,
             emojis: this.emojis.values,
             mentions: this.mentions.values,

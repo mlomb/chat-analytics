@@ -28,6 +28,7 @@ export interface Database {
     guilds: Guild[];
     channels: Channel[];
     authors: Author[];
+    calls: Call[];
     emojis: Emoji[];
     words: string[];
     mentions: string[];
@@ -114,3 +115,18 @@ export interface UnicodeEmoji {
 }
 
 export type Emoji = CustomEmoji | UnicodeEmoji;
+
+export interface Call {
+    authorIndex: Index;
+    channelIndex: Index;
+    start: {
+        dayIndex: number;
+        secondOfDay: number;
+    };
+    end: {
+        dayIndex: number;
+        secondOfDay: number;
+    };
+    /** Call duration in seconds */
+    duration: number;
+}
