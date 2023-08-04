@@ -136,6 +136,22 @@ export class MessageProcessor {
             editedAfter = Math.ceil((new Date(msg.timestampEdit).getTime() - date.getTime()) / 1000);
         }
 
+        if (
+            day.day < 1 ||
+            day.day > 31 ||
+            day.month < 1 ||
+            day.month > 12 ||
+            ![2019, 2020, 2021, 2022, 2023].includes(day.year) ||
+            day.toBinary() < 0 ||
+            day.toBinary() >= 2 ** 21
+        ) {
+            throw new Error(
+                `DAY OUT OF RANGE! day.day: ${day.day}, day.month: ${day.month}, day.year: ${
+                    day.year
+                } day.toBinary(): ${day.toBinary()} msg.timestamp: ${msg.timestamp}`
+            );
+        }
+
         return {
             dayIndex: day.toBinary(),
             secondOfDay: date.getSeconds() + 60 * (date.getMinutes() + 60 * date.getHours()),
