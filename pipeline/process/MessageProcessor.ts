@@ -141,7 +141,8 @@ export class MessageProcessor {
             day.day > 31 ||
             day.month < 1 ||
             day.month > 12 ||
-            ![2019, 2020, 2021, 2022, 2023].includes(day.year) ||
+            day.year < 2000 ||
+            day.year > 2100 ||
             day.toBinary() < 0 ||
             day.toBinary() >= 2 ** 21
         ) {
