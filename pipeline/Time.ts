@@ -273,3 +273,16 @@ export const formatDatetime = (format: TimeFormat, datetime?: Datetime) => {
 
     return formatTime(format, Day.fromKey(datetime.key), datetime.secondOfDay);
 };
+
+/** Finds the time difference in seconds between two Datetimes */
+export const diffDatetime = (a: Datetime, b: Datetime): number => {
+    // Probably this can be done more efficient and be reused (also see formatTime)
+
+    const aDate = Day.fromKey(a.key).toDate();
+    if (a.secondOfDay !== undefined) aDate.setSeconds(a.secondOfDay);
+
+    const bDate = Day.fromKey(b.key).toDate();
+    if (b.secondOfDay !== undefined) bDate.setSeconds(b.secondOfDay);
+
+    return (bDate.getTime() - aDate.getTime()) / 1000;
+};

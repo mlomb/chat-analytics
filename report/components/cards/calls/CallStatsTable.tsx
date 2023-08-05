@@ -24,6 +24,32 @@ const CallsStatsTable = () => {
             label: "Time spent on calls",
             value: stats?.secondsInCall,
         },
+        {
+            type: "number",
+            formatter: "time",
+            label: "Average call duration",
+            value: stats?.averageDuration,
+        },
+        {
+            type: "number",
+            formatter: "time",
+            label: "Median call duration",
+            value: stats?.medianDuration,
+        },
+        {
+            type: "separator",
+        },
+        {
+            type: "number",
+            formatter: "time",
+            label: "Longest call",
+            value: stats?.longestCall?.duration,
+            tooltip: (
+                <>
+                    The call was initiated on <b>{formatDatetime("ymdhm", stats?.longestCall?.start)}</b>
+                </>
+            ),
+        },
     ];
 
     return <DottedTable lines={lines} />;
