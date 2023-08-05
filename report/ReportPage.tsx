@@ -20,6 +20,7 @@ import {
     MostUsedEmojis,
 } from "@report/components/cards/MostCards";
 import { TopReacted } from "@report/components/cards/TopCards";
+import CallsStatsTable from "@report/components/cards/calls/CallStatsTable";
 import CallsOverTime from "@report/components/cards/calls/CallsPerPeriod";
 import EmojiStatsTable from "@report/components/cards/emojis/EmojiStatsTable";
 import ConversationParticipation from "@report/components/cards/interaction/ConversationParticipation";
@@ -47,7 +48,6 @@ export interface Section {
 }
 
 const ReportDashboard = () => {
-    const [section, setSection] = useState("messages");
 
     const sections: Section[] = useMemo(() => {
         const database = getDatabase();
@@ -185,6 +185,7 @@ const ReportDashboard = () => {
                         title={[["Time spent on", "Number of"], "calls over time", ["by day", "by week", "by month"]]}
                         children={CallsOverTime}
                     />,
+                    <Card num={1} title="Call statistics" children={CallsStatsTable} />,
                 ],
             },
             {
