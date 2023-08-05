@@ -48,6 +48,7 @@ export interface Section {
 }
 
 const ReportDashboard = () => {
+    const [section, setSection] = useState("messages");
 
     const sections: Section[] = useMemo(() => {
         const database = getDatabase();
