@@ -8,6 +8,7 @@ import Header from "@report/components/Header";
 import LoadingOverlay from "@report/components/LoadingOverlay";
 import { TabContainer } from "@report/components/Tabs";
 import {
+    MostCallsInitiated,
     MostConversations,
     MostLinkedDomains,
     MostLinks,
@@ -21,7 +22,6 @@ import {
 } from "@report/components/cards/MostCards";
 import { TopReacted } from "@report/components/cards/TopCards";
 import CallsStatsTable from "@report/components/cards/calls/CallStatsTable";
-import CallTimes from "@report/components/cards/calls/CallTimes";
 import { CallsActivity } from "@report/components/cards/calls/CallsActivity";
 import CallsOverTime from "@report/components/cards/calls/CallsPerPeriod";
 import EmojiStatsTable from "@report/components/cards/emojis/EmojiStatsTable";
@@ -200,7 +200,7 @@ const ReportDashboard = () => {
                               tooltip="If a call extends across multiple hours or days, it will make a partial contribution to each of them."
                               children={CallsActivity}
                           />,
-                          <Card num={1} title={"Call times distributions"} children={CallTimes} />,
+                          <Card num={1} title="Most calls initiated" children={MostCallsInitiated} />,
                       ]
                     : [],
             },

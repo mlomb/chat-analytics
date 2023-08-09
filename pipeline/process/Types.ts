@@ -127,6 +127,5 @@ export interface Call {
         dayIndex: number;
         secondOfDay: number;
     };
-    /** Call duration in seconds */
-    duration: number;
+    duration: number; // seconds
 }

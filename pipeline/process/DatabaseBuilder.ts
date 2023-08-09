@@ -411,7 +411,11 @@ export class DatabaseBuilder {
     private processCalls(dateKeys: string[]) {
         const finalCalls: Call[] = [];
 
-        for (const call of this.calls.values) {
+        // copy to sort
+        const sourceCalls = [...this.calls.values];
+        sourceCalls.sort((a, b) => a.timestampStart - b.timestampStart);
+
+        for (const call of sourceCalls) {
             const authorIndex = this.authorsRank[this.authors.getIndex(call.authorId)!];
             const channelIndex = this.channelsRank[this.channels.getIndex(call.channelId)!];
 
@@ -431,6 +435,7 @@ export class DatabaseBuilder {
                 throw new Error("see console!");
             }
 
+            if (startDate > endDate) throw new Error("Call start date is after end date");
             if (duration < 1) continue; // skip call
 
             finalCalls.push({

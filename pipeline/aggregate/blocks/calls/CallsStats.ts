@@ -19,9 +19,11 @@ export interface CallsStats {
 
     /** Call duration distribution in seconds */
     durationDistribution: VariableDistribution;
-
     /** Time between calls distribution in seconds */
     timesBetweenDistribution: VariableDistribution;
+
+    /** Number of calls made by each author */
+    authorsCount: number[];
 }
 
 const fn: BlockFn<CallsStats> = (database, filters, common, args) => {
@@ -31,6 +33,8 @@ const fn: BlockFn<CallsStats> = (database, filters, common, args) => {
     let secondsInCall = 0;
     let longestCall: CallDuration | undefined = undefined;
     let lastCall: Datetime | undefined = undefined;
+
+    const authorsCount = new Array(database.authors.length).fill(0);
 
     const durations = new Uint32Array(database.calls.length).fill(0xfffffff0);
     const timesBetween = new Uint32Array(database.calls.length).fill(0xfffffff0);
@@ -50,6 +54,7 @@ const fn: BlockFn<CallsStats> = (database, filters, common, args) => {
         };
 
         durations[total] = call.duration;
+        authorsCount[call.authorIndex]++;
 
         if (longestCall === undefined || call.duration > longestCall.duration) {
             longestCall = {
@@ -62,7 +67,7 @@ const fn: BlockFn<CallsStats> = (database, filters, common, args) => {
             // compute time difference between calls
             const diff = diffDatetime(lastCall, startDatetime);
             if (diff < 0) throw new Error("Time difference between calls is negative, diff=" + diff);
-            timesBetween[total] = diff;
+            timesBetween[total - 1] = diff;
         }
         lastCall = endDatetime;
 
@@ -75,9 +80,11 @@ const fn: BlockFn<CallsStats> = (database, filters, common, args) => {
         secondsInCall,
         averageDuration: secondsInCall / total,
         longestCall,
-        // timesBetween
+
         durationDistribution: computeVariableDistribution(durations, total),
-        timesBetweenDistribution: computeVariableDistribution(timesBetween, total),
+        timesBetweenDistribution: computeVariableDistribution(timesBetween, total - 1),
+
+        authorsCount,
     };
 };
 

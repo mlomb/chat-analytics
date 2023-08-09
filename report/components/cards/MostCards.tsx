@@ -185,3 +185,17 @@ export const MostMentioned = () => (
         inFilter={MentionsInFilter}
     />
 );
+
+///////////////////////////
+/// CALLS
+///////////////////////////
+export const MostCallsInitiated = ({ options }: { options: number[] }) => (
+    <MostUsed
+        what={"Author"}
+        unit="# of calls initiated"
+        counts={useBlockData("calls/stats")?.authorsCount}
+        itemComponent={AuthorLabel}
+        maxItems={Math.min(15, getDatabase().authors.length)}
+        colorHue={240}
+    />
+);
