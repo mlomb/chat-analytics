@@ -52,9 +52,9 @@ const fn: BlockFn<CallsPerPeriod> = (database, filters, common) => {
 
     for (const call of database.calls) {
         // check filters
+        // if (!filters.inTime(call.start.dayIndex)) continue; // don't filter by time, UI scrolls the time natively
         if (!filters.hasChannel(call.channelIndex)) continue;
         if (!filters.hasAuthor(call.authorIndex)) continue;
-        // if (!filters.inTime(call.start.dayIndex)) continue; // don't filter by time, UI scrolls the time natively
 
         res.perDay[call.start.dayIndex].n += 1;
         res.perDay[call.start.dayIndex].t += call.duration;
@@ -63,8 +63,6 @@ const fn: BlockFn<CallsPerPeriod> = (database, filters, common) => {
         res.perMonth[dateToMonthIndex[call.start.dayIndex]].n += 1;
         res.perMonth[dateToMonthIndex[call.start.dayIndex]].t += call.duration;
     }
-
-    console.log(res);
 
     return res;
 };

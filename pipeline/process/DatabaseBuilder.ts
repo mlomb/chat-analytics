@@ -431,6 +431,8 @@ export class DatabaseBuilder {
                 throw new Error("see console!");
             }
 
+            if (duration < 1) continue; // skip call
+
             finalCalls.push({
                 authorIndex,
                 channelIndex,

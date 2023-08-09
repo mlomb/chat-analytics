@@ -1,5 +1,6 @@
 import { CommonBlockData } from "@pipeline/aggregate/Common";
 import { Filters } from "@pipeline/aggregate/Filters";
+import CallsActivity from "@pipeline/aggregate/blocks/calls/CallsActivity";
 import CallsPerPeriod from "@pipeline/aggregate/blocks/calls/CallsPerPeriod";
 import CallsStats from "@pipeline/aggregate/blocks/calls/CallsStats";
 import DomainsStats from "@pipeline/aggregate/blocks/domains/DomainsStats";
@@ -39,6 +40,7 @@ export type BlockDescription<K, Data, Args = undefined> = {
 /** All existing blocks must be defined here, so the UI can dynamically load them */
 export const Blocks = {
     [ActiveAuthors.key]: ActiveAuthors,
+    [CallsActivity.key]: CallsActivity,
     [CallsPerPeriod.key]: CallsPerPeriod,
     [CallsStats.key]: CallsStats,
     [ConversationsDuration.key]: ConversationsDuration,

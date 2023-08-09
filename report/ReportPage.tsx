@@ -21,6 +21,8 @@ import {
 } from "@report/components/cards/MostCards";
 import { TopReacted } from "@report/components/cards/TopCards";
 import CallsStatsTable from "@report/components/cards/calls/CallStatsTable";
+import CallTimes from "@report/components/cards/calls/CallTimes";
+import { CallsActivity } from "@report/components/cards/calls/CallsActivity";
 import CallsOverTime from "@report/components/cards/calls/CallsPerPeriod";
 import EmojiStatsTable from "@report/components/cards/emojis/EmojiStatsTable";
 import ConversationParticipation from "@report/components/cards/interaction/ConversationParticipation";
@@ -179,15 +181,28 @@ const ReportDashboard = () => {
             {
                 name: "📞 Calls",
                 value: "calls",
-                cards: [
-                    <Card
-                        num={2}
-                        defaultOptions={[0, 2]}
-                        title={[["Time spent on", "Number of"], "calls over time", ["by day", "by week", "by month"]]}
-                        children={CallsOverTime}
-                    />,
-                    <Card num={1} title="Call statistics" children={CallsStatsTable} />,
-                ],
+                cards: platformInfo.support.calls
+                    ? [
+                          <Card
+                              num={2}
+                              defaultOptions={[0, 2]}
+                              title={[
+                                  ["Time spent on", "Number of"],
+                                  "calls over time",
+                                  ["by day", "by week", "by month"],
+                              ]}
+                              children={CallsOverTime}
+                          />,
+                          <Card num={1} title="Call statistics" children={CallsStatsTable} />,
+                          <Card
+                              num={1}
+                              title="Time spent on calls by week day/hour"
+                              tooltip="If a call extends across multiple hours or days, it will make a partial contribution to each of them."
+                              children={CallsActivity}
+                          />,
+                          <Card num={1} title={"Call times distributions"} children={CallTimes} />,
+                      ]
+                    : [],
             },
             {
                 name: "🌀 Interaction",

@@ -1,5 +1,6 @@
 import { Datetime, diffDatetime } from "@pipeline/Time";
 import { BlockDescription, BlockFn } from "@pipeline/aggregate/Blocks";
+import { VariableDistribution, computeVariableDistribution } from "@pipeline/aggregate/Common";
 import { filterMessages } from "@pipeline/aggregate/Helpers";
 import { MessageView } from "@pipeline/serialization/MessageView";
 
@@ -13,10 +14,14 @@ export interface CallsStats {
     total: number;
     /** Total number of seconds spent in calls */
     secondsInCall: number;
-    medianDuration: number;
-    averageDuration: number;
 
     longestCall?: CallDuration;
+
+    /** Call duration distribution in seconds */
+    durationDistribution: VariableDistribution;
+
+    /** Time between calls distribution in seconds */
+    timesBetweenDistribution: VariableDistribution;
 }
 
 const fn: BlockFn<CallsStats> = (database, filters, common, args) => {
@@ -27,8 +32,8 @@ const fn: BlockFn<CallsStats> = (database, filters, common, args) => {
     let longestCall: CallDuration | undefined = undefined;
     let lastCall: Datetime | undefined = undefined;
 
-    const durations: number[] = [];
-    const timesBetween: number[] = [];
+    const durations = new Uint32Array(database.calls.length).fill(0xfffffff0);
+    const timesBetween = new Uint32Array(database.calls.length).fill(0xfffffff0);
 
     for (const call of database.calls) {
         if (!filters.inTime(call.start.dayIndex)) continue;
@@ -44,8 +49,7 @@ const fn: BlockFn<CallsStats> = (database, filters, common, args) => {
             secondOfDay: call.end.secondOfDay,
         };
 
-        total++;
-        secondsInCall += call.duration;
+        durations[total] = call.duration;
 
         if (longestCall === undefined || call.duration > longestCall.duration) {
             longestCall = {
@@ -54,30 +58,26 @@ const fn: BlockFn<CallsStats> = (database, filters, common, args) => {
             };
         }
 
-        durations.push(call.duration);
-
         if (lastCall !== undefined) {
             // compute time difference between calls
             const diff = diffDatetime(lastCall, startDatetime);
             if (diff < 0) throw new Error("Time difference between calls is negative, diff=" + diff);
-            timesBetween.push(diff);
+            timesBetween[total] = diff;
         }
         lastCall = endDatetime;
+
+        secondsInCall += call.duration;
+        total++;
     }
-
-    durations.sort((a, b) => b - a);
-    const medianIndex = Math.floor(durations.length / 2);
-    const medianDuration = durations[medianIndex];
-
-    console.log(timesBetween);
 
     return {
         total,
         secondsInCall,
-        medianDuration,
         averageDuration: secondsInCall / total,
         longestCall,
         // timesBetween
+        durationDistribution: computeVariableDistribution(durations, total),
+        timesBetweenDistribution: computeVariableDistribution(timesBetween, total),
     };
 };
 
