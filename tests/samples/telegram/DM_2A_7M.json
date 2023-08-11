@@ -102,6 +102,19 @@
             "height": 1280,
             "text": "",
             "text_entities": []
+        },
+        {
+            "id": 3674,
+            "type": "service",
+            "date": "2023-08-10T23:11:02",
+            "date_unixtime": "1691719862",
+            "actor": "Alice",
+            "actor_id": "user300000000",
+            "action": "phone_call",
+            "duration_seconds": 56,
+            "discard_reason": "hangup",
+            "text": "",
+            "text_entities": []
         }
     ]
 }

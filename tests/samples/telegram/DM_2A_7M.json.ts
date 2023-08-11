@@ -54,4 +54,13 @@ export const expectedParse: ExpectedPartialParseResult = {
             timestamp: 1654898799 * 1000,
         },
     ],
+    calls: [
+        {
+            id: "3674",
+            authorId: "user300000000",
+            channelId: 700000000,
+            timestampStart: 1691719862 * 1000,
+            timestampEnd: (1691719862 + 56) * 1000,
+        },
+    ],
 };
