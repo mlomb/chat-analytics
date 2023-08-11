@@ -126,6 +126,10 @@ export class MessageProcessor {
             this.builder.replyIds.push(msg.replyTo);
         }
 
+        if (isNaN(msg.timestamp) || msg.timestamp < 1) {
+            throw new Error(`Invalid timestamp: '${msg.timestamp}' in message ${msg.id}`);
+        }
+
         // TODO: timezones
         const date = new Date(msg.timestamp);
         const day = Day.fromDate(date);
