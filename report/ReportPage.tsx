@@ -181,28 +181,29 @@ const ReportDashboard = () => {
             {
                 name: "📞 Calls",
                 value: "calls",
-                cards: platformInfo.support.calls
-                    ? [
-                          <Card
-                              num={2}
-                              defaultOptions={[0, 2]}
-                              title={[
-                                  ["Time spent on", "Number of"],
-                                  "calls over time",
-                                  ["by day", "by week", "by month"],
-                              ]}
-                              children={CallsOverTime}
-                          />,
-                          <Card num={1} title="Call statistics" children={CallsStatsTable} />,
-                          <Card
-                              num={1}
-                              title="Time spent on calls by week day/hour"
-                              tooltip="If a call extends across multiple hours or days, it will make a partial contribution to each of them."
-                              children={CallsActivity}
-                          />,
-                          <Card num={1} title="Most calls initiated" children={MostCallsInitiated} />,
-                      ]
-                    : [],
+                cards:
+                    platformInfo.support.calls && database.calls.length > 0
+                        ? [
+                              <Card
+                                  num={2}
+                                  defaultOptions={[0, 2]}
+                                  title={[
+                                      ["Time spent on", "Number of"],
+                                      "calls over time",
+                                      ["by day", "by week", "by month"],
+                                  ]}
+                                  children={CallsOverTime}
+                              />,
+                              <Card num={1} title="Call statistics" children={CallsStatsTable} />,
+                              <Card
+                                  num={1}
+                                  title="Time spent on calls by week day/hour"
+                                  tooltip="If a call extends across multiple hours or days, it will make a partial contribution to each of them."
+                                  children={CallsActivity}
+                              />,
+                              <Card num={1} title="Most calls initiated" children={MostCallsInitiated} />,
+                          ]
+                        : [],
             },
             {
                 name: "🌀 Interaction",
