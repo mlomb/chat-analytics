@@ -2,7 +2,7 @@ import { AttachmentType } from "@pipeline/Attachments";
 import { Platform } from "@pipeline/Platforms";
 import { DateKey, Day, genTimeKeys } from "@pipeline/Time";
 import { generateDatabase } from "@pipeline/index";
-import { Author, Channel, Guild, Message } from "@pipeline/process/Types";
+import { Author, Call, Channel, Guild, Message } from "@pipeline/process/Types";
 import { matchFormat } from "@pipeline/process/nlp/Text";
 import { BitStream } from "@pipeline/serialization/BitStream";
 import { MessagesArray } from "@pipeline/serialization/MessagesArray";
@@ -29,6 +29,10 @@ export interface ExpectedPartialDatabaseResult {
         mentions?: [string, number][];
         domains?: [string, number][];
     }[];
+    calls: Partial<{
+        authorName: string;
+        duration: number;
+    }>[];
 }
 
 /** Checks if a group of samples matches the set of expected parse results */
@@ -110,6 +114,15 @@ export const checkDatabaseIsGeneratedCorrectly = async (platform: Platform, file
             // TODO: there is a lot more to test...
 
             expect(messages).toIncludeAllPartialMembers([toCheck]);
+        }
+
+        for (const expectedCall of expected.calls) {
+            const toCheck: Partial<Call> = {
+                authorIndex: db.authors.findIndex((a) => a.n === expectedCall.authorName),
+                duration: expectedCall.duration,
+            };
+
+            expect(db.calls).toIncludeAllPartialMembers([toCheck]);
         }
     }
 };
