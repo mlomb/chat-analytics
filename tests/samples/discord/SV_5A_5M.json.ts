@@ -58,6 +58,7 @@ export const expectedParse: ExpectedPartialParseResult = {
             ]),
         },
     ],
+    calls: [],
 };
 
 export const expectedDatabase: ExpectedPartialDatabaseResult = {

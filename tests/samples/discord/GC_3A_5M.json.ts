@@ -48,6 +48,7 @@ export const expectedParse: ExpectedPartialParseResult = {
             replyTo: "1064990824305274930",
         },
     ],
+    calls: [],
 };
 
 export const expectedDatabase: ExpectedPartialDatabaseResult = {

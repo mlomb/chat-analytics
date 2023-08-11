@@ -58,4 +58,5 @@ export const expectedParse: ExpectedPartialParseResult = {
             timestamp: 1415147732056,
         },
     ],
+    calls: [],
 };

@@ -27,4 +27,5 @@ export const expectedParse: ExpectedPartialParseResult = {
             timestamp: new Date(2020, 8, 12, 23, 55, 0).getTime(),
         },
     ],
+    calls: [],
 };
