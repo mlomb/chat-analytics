@@ -50,7 +50,7 @@ export const PlatformsInfo: {
             reactions: false,
             replies: true,
             edits: true,
-            calls: false,
+            calls: true,
         },
     },
     whatsapp: {

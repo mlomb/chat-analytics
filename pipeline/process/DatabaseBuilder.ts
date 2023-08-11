@@ -62,7 +62,14 @@ export class DatabaseBuilder {
             }
             channelMessages.addMessage(message);
         });
-        this.parser.on("call", (call, at) => this.calls.set(call.id, call, at));
+        this.parser.on("call", (call, at) => {
+            this.calls.set(call.id, call, at);
+
+            // update min/max date
+            const day = Day.fromDate(new Date(call.timestampEnd));
+            if (Day.lt(day, this.minDate)) this.minDate = day;
+            if (Day.gt(day, this.maxDate)) this.maxDate = day;
+        });
         this.parser.on("out-of-order", () => this.markEOF());
     }
 
