@@ -1,6 +1,8 @@
 import { BlockDescription, BlockFn } from "@pipeline/aggregate/Blocks";
 import { WeekdayHourEntry } from "@pipeline/aggregate/Common";
 
+import { iterateHoursInCall } from "./CallsUtils";
+
 export interface CallsActivity {
     /** Each entry contains the total amount of seconds spent in calls for that hour of the week */
     weekdayHourActivity: WeekdayHourEntry[];
@@ -14,32 +16,11 @@ const fn: BlockFn<CallsActivity> = (database, filters, common) => {
         if (!filters.hasChannel(call.channelIndex)) continue;
         if (!filters.hasAuthor(call.authorIndex)) continue;
 
-        const startT = call.start.dayIndex * 3600 * 24 + call.start.secondOfDay;
-        const endT = startT + call.duration;
-
-        let T = startT;
-        let durationSum = 0;
-
-        while (T < endT) {
-            const nextHourT = T - (T % 3600) + 3600;
-            const callDurationThisHour = Math.min(nextHourT, endT) - T;
-
-            //////////////////
-            const dayIndex = Math.floor(T / (3600 * 24));
-            const dayOfWeek = common.dayOfWeek[dayIndex];
-            const secondOfDay = T % (3600 * 24);
-
+        iterateHoursInCall(call, (dayIndex, hourInDay, secondsInCall) => {
             if (filters.inTime(dayIndex)) {
-                weekdayHourDurations[dayOfWeek * 24 + Math.floor(secondOfDay / 3600)] += callDurationThisHour;
+                weekdayHourDurations[common.dayOfWeek[dayIndex] * 24 + hourInDay] += secondsInCall;
             }
-            //////////////////
-
-            durationSum += callDurationThisHour;
-            T = nextHourT;
-        }
-
-        // Make sure we didn't miss any seconds or add any extra seconds
-        console.assert(durationSum === call.duration);
+        });
     }
 
     const weekdayHourActivity: WeekdayHourEntry[] = weekdayHourDurations.map((count, i) => {
