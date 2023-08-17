@@ -329,7 +329,10 @@ export class DatabaseBuilder {
             type: channel.type,
             avatar: channel.avatar,
             guildIndex: this.guildsRank[this.guilds.getIndex(channel.guildId)!],
-            participants: participants.length > 0 ? participants : undefined,
+            participants:
+                participants.length > 0
+                    ? participants.map((oldAuthorIndex) => this.authorsRank[oldAuthorIndex])
+                    : undefined,
 
             // the following are set making the final messages
             msgAddr: undefined,
