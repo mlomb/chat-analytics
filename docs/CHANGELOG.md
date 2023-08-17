@@ -1,4 +1,7 @@
-# v1.0.4 (YYYY/MM/DD) [IN DEVELOPMENT]
+# v1.1.1 (YYYY/MM/DD) [IN DEVELOPMENT]
+
+
+# v1.1.0 (2023/08/17)
 
 - Bugfix: DM/Group channel labels (Alice & Bob) were showing an invalid picture.
 - Added calls support for Discord and Telegram: [#76](https://github.com/mlomb/chat-analytics/issues/76) [#88](https://github.com/mlomb/chat-analytics/pull/88)
