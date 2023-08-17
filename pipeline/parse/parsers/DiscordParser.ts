@@ -26,6 +26,8 @@ export class DiscordParser extends Parser {
      */
     async *parse(file: FileInput, progress?: Progress) {
         this.lastMessageTimestampInFile = await tryToFindTimestampAtEnd(DiscordParser.TS_MSG_REGEX, file);
+        this.lastChannelId = undefined;
+        this.lastGuildId = undefined;
 
         const stream = new JSONStream()
             .onObject<DiscordGuild>("guild", this.parseGuild.bind(this))
