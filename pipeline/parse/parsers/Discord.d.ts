@@ -46,8 +46,8 @@ interface DiscordMessage {
     id: Snowflake;
     type: DiscordMessageType;
     timestamp: string;
-    timestampEdited: string;
-    callEndedTimestamp: string;
+    timestampEdited: string | null;
+    callEndedTimestamp: string | null;
     isPinned: boolean;
     content: string;
     author: DiscordAuthor;

@@ -1,4 +1,4 @@
-import { DateKey, Day, MonthKey, WeekKey, YearKey, formatTime, genTimeKeys } from "@pipeline/Time";
+import { DateKey, Datetime, Day, MonthKey, WeekKey, YearKey, diffDatetime, genTimeKeys } from "@pipeline/Time";
 
 it("should convert from and to Date", () => {
     const date = new Date(2020, 5, 7);
@@ -138,4 +138,27 @@ test("genTimeKeys should generate keys correctly", () => {
 
 test("genTimeKeys should throw if start > end", () => {
     expect(() => genTimeKeys(Day.fromKey("2021-1-5"), Day.fromKey("2020-12-25"))).toThrow();
+});
+
+describe("diffDatetime", () => {
+    // prettier-ignore
+    const cases: {
+        from: Datetime;
+        to: Datetime;
+        secondsDiff: number;
+    }[] = [
+        { from: { key: "2022-12-30", secondOfDay: 15009}, to: { key: "2023-1-3", secondOfDay: 70419 }, secondsDiff: 401010 },
+        { from: { key: "2022-4-6", secondOfDay: 61684}, to: { key: "2022-4-6", secondOfDay: 62066 }, secondsDiff: 382 },
+        { from: { key: "2022-5-4", secondOfDay: 46255}, to: { key: "2022-5-4", secondOfDay: 56459 }, secondsDiff: 10204 },
+        { from: { key: "2022-7-6", secondOfDay: 50413}, to: { key: "2022-7-6", secondOfDay: 64511 }, secondsDiff: 14098 },
+        { from: { key: "2022-7-16", secondOfDay: 5657}, to: { key: "2022-7-16", secondOfDay: 70906 }, secondsDiff: 65249 },
+        { from: { key: "2022-7-21", secondOfDay: 59553}, to: { key: "2022-7-21", secondOfDay: 59554 }, secondsDiff: 1 },
+    ];
+
+    test.each(cases)(
+        "$from.key ($from.secondOfDay) to $to.key ($to.secondOfDay) should diff by $secondsDiff seconds",
+        ({ from, to, secondsDiff }) => {
+            expect(diffDatetime(from, to)).toBe(secondsDiff);
+        }
+    );
 });

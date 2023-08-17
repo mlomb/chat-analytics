@@ -3,7 +3,7 @@ import { EventEmitter } from "events";
 import { Progress } from "@pipeline/Progress";
 import { Timestamp } from "@pipeline/Types";
 import { FileInput } from "@pipeline/parse/File";
-import { PAuthor, PChannel, PGuild, PMessage } from "@pipeline/parse/Types";
+import { PAuthor, PCall, PChannel, PGuild, PMessage } from "@pipeline/parse/Types";
 
 // prettier-ignore
 export declare interface Parser {
@@ -17,11 +17,13 @@ export declare interface Parser {
     emit(event: "channel", channel: PChannel, at?: Timestamp): boolean;
     emit(event: "author",  author:  PAuthor,  at?: Timestamp): boolean;
     emit(event: "message", message: PMessage, at?: Timestamp): boolean;
+    emit(event: "call",    call:    PCall,    at?: Timestamp): boolean;
 
     on(event: "guild",   listener: (guild:   PGuild,   at?: Timestamp) => void): this;
     on(event: "channel", listener: (channel: PChannel, at?: Timestamp) => void): this;
     on(event: "author",  listener: (author:  PAuthor,  at?: Timestamp) => void): this;
     on(event: "message", listener: (message: PMessage, at?: Timestamp) => void): this;
+    on(event: "call",    listener: (call:    PCall,    at?: Timestamp) => void): this;
 
     // Allows the parser to notify if messages become out of order.
     // This can happen if the export has daylight savings time.

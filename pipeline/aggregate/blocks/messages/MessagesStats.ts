@@ -1,14 +1,9 @@
 import { AttachmentType } from "@pipeline/Attachments";
-import { Datetime, Day } from "@pipeline/Time";
+import { Datetime } from "@pipeline/Time";
 import { BlockDescription, BlockFn } from "@pipeline/aggregate/Blocks";
+import { WeekdayHourEntry } from "@pipeline/aggregate/Common";
 import { filterMessages } from "@pipeline/aggregate/Helpers";
 import { MessageView } from "@pipeline/serialization/MessageView";
-
-export interface WeekdayHourEntry {
-    value: number;
-    hour: `${number}hs`;
-    weekday: "Sun" | "Mon" | "Tue" | "Wed" | "Thu" | "Fri" | "Sat";
-}
 
 interface MostActiveEntry {
     messages: number;

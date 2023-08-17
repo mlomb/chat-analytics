@@ -4,7 +4,7 @@ import { Timestamp } from "@pipeline/Types";
 import { FileInput, streamJSONFromFile, tryToFindTimestampAtEnd } from "@pipeline/parse/File";
 import { JSONStream } from "@pipeline/parse/JSONStream";
 import { Parser } from "@pipeline/parse/Parser";
-import { PAuthor, PChannel, PGuild, PMessage, RawID } from "@pipeline/parse/Types";
+import { PAuthor, PCall, PChannel, PGuild, PMessage, RawID } from "@pipeline/parse/Types";
 
 export class TelegramParser extends Parser {
     private lastChannelName?: string;
@@ -66,7 +66,7 @@ export class TelegramParser extends Parser {
         if (this.lastChannelID === undefined) throw new Error("Missing channel ID");
 
         const rawId: RawID = message.id + "";
-        const rawAuthorId: RawID = message.from_id + "";
+        const rawAuthorId: RawID = (message.from_id || message.actor_id) + "";
         const rawReplyToId: RawID | undefined =
             message.reply_to_message_id === null ? undefined : message.reply_to_message_id + "";
 
@@ -128,6 +128,16 @@ export class TelegramParser extends Parser {
 
             this.emit("message", pmessage, this.lastMessageTimestampInFile);
             this.lastEmittedMessageTimestamp = timestamp;
+        } else if (message.type === "service" && message.action === "phone_call") {
+            const pcall: PCall = {
+                id: rawId,
+                authorId: rawAuthorId,
+                channelId: this.lastChannelID,
+                timestampStart: timestamp,
+                timestampEnd: timestamp + (message.duration_seconds || 0) * 1000,
+            };
+
+            this.emit("call", pcall);
         }
     }
 

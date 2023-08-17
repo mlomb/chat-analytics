@@ -70,7 +70,30 @@
             "embeds": [],
             "reactions": [],
             "mentions": []
+        },
+        {
+            "id": "100",
+            "type": "Call",
+            "timestamp": "2020-07-17T17:03:14.366+00:00",
+            "timestampEdited": null,
+            "callEndedTimestamp": "2020-07-17T21:14:52.787+00:00",
+            "isPinned": false,
+            "content": "Started a call that lasted 251 minutes.",
+            "author": {
+                "id": "444444444444444444",
+                "name": "Someones name",
+                "discriminator": "1234",
+                "nickname": "Someones nickname",
+                "color": null,
+                "isBot": true,
+                "avatarUrl": "https://cdn.discordapp.com/embed/avatars/4.png"
+            },
+            "attachments": [],
+            "embeds": [],
+            "stickers": [],
+            "reactions": [],
+            "mentions": []
         }
     ],
-    "messageCount": 2
+    "messageCount": 3
 }

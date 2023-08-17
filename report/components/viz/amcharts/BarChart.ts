@@ -4,12 +4,14 @@ import {
     AxisRendererY,
     CategoryAxis,
     ColumnSeries,
+    DurationAxis,
     ValueAxis,
     XYChart,
     XYCursor,
 } from "@amcharts/amcharts5/xy";
+import { AxisType } from "@report/components/viz/amcharts/AmCharts5";
 
-export const createBarChart = (root: Root, xField: string, yField: string) => {
+export const createBarChart = (root: Root, xField: string, yField: string, yAxisType: AxisType = "value") => {
     const chart = XYChart.new(root, {
         panX: false,
         panY: false,
@@ -30,7 +32,7 @@ export const createBarChart = (root: Root, xField: string, yField: string) => {
     );
 
     const yAxis = chart.yAxes.push(
-        ValueAxis.new(root, {
+        (yAxisType === "duration" ? DurationAxis : ValueAxis).new(root, {
             renderer: AxisRendererY.new(root, {}),
         })
     );

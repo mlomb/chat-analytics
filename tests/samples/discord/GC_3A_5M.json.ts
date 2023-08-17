@@ -48,6 +48,15 @@ export const expectedParse: ExpectedPartialParseResult = {
             replyTo: "1064990824305274930",
         },
     ],
+    calls: [
+        {
+            id: "100",
+            authorId: PAUTHOR_MLOMB.id,
+            channelId: "1064990764406419508",
+            timestampStart: Date.parse("2023-03-03T14:47:59.187+00:00"),
+            timestampEnd: Date.parse("2023-03-03T16:40:59.313+00:00"),
+        },
+    ],
 };
 
 export const expectedDatabase: ExpectedPartialDatabaseResult = {
@@ -90,6 +99,12 @@ export const expectedDatabase: ExpectedPartialDatabaseResult = {
                 ["nice", 1],
             ],
             // TODO: test custom_emoji
+        },
+    ],
+    calls: [
+        {
+            authorName: AUTHOR_MLOMB.n,
+            duration: 6781,
         },
     ],
 };

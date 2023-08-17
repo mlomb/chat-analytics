@@ -135,6 +135,29 @@
                 "channelId": "1064990764406419508",
                 "guildId": null
             }
+        },
+        {
+            "id": "100",
+            "type": "Call",
+            "timestamp": "2023-03-03T14:47:59.187+00:00",
+            "timestampEdited": null,
+            "callEndedTimestamp": "2023-03-03T16:40:59.313+00:00",
+            "isPinned": false,
+            "content": "Started a call that lasted 113 minutes.",
+            "author": {
+                "id": "111111111111111111",
+                "name": "mlomb",
+                "discriminator": "5506",
+                "nickname": "mlomb",
+                "color": null,
+                "isBot": false,
+                "avatarUrl": "https://cdn.discordapp.com/avatars/111111111111111111/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.png?size=128"
+            },
+            "attachments": [],
+            "embeds": [],
+            "stickers": [],
+            "reactions": [],
+            "mentions": []
         }
     ],
     "messageCount": 5

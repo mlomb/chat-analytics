@@ -47,9 +47,10 @@ export const computeCommonBlockData = (database: Database): CommonBlockData => {
 
 export interface VariableDistribution {
     total: number;
+    sum: number;
+    average: number;
     /** Aggregation in `count.length` buckets of `(whiskerMax-whiskerMin)/count.length` */
     count: number[];
-    /** Boxplot */
     boxplot: {
         min: number;
         whiskerMin: number;
@@ -65,6 +66,8 @@ export interface VariableDistribution {
 export const computeVariableDistribution = (values: Uint32Array, count: number): VariableDistribution => {
     const res: VariableDistribution = {
         total: count,
+        sum: 0,
+        average: 0,
         count: [],
         boxplot: {
             min: 0,
@@ -114,14 +117,17 @@ export const computeVariableDistribution = (values: Uint32Array, count: number):
     };
 
     for (let i = 0; i < count; i++) {
-        const time = values[i];
-        if (time >= lower && time < upper) {
+        const value = values[i];
+        if (value >= lower && value < upper) {
             // Order of operations is critical to avoid rounding issues
-            res.count[Math.floor((buckets / (upper - lower)) * (time - lower))]++;
+            res.count[Math.floor((buckets / (upper - lower)) * (value - lower))]++;
         } else {
             res.boxplot.outliers++;
         }
+        res.sum += value;
     }
+
+    res.average = res.sum / count;
 
     return res;
 };
@@ -136,4 +142,11 @@ export interface IndexEntry {
 export interface DateItem {
     ts: number; // timestamp
     v: number; // value
+}
+
+/** Activity entry for one hour of a weekday */
+export interface WeekdayHourEntry {
+    value: number;
+    hour: `${number}hs`;
+    weekday: "Sun" | "Mon" | "Tue" | "Wed" | "Thu" | "Fri" | "Sat";
 }

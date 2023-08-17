@@ -10,6 +10,7 @@ interface PlatformInformation {
         reactions: boolean;
         replies: boolean;
         edits: boolean;
+        calls: boolean;
     };
 }
 
@@ -25,6 +26,7 @@ export const PlatformsInfo: {
             reactions: true,
             replies: true,
             edits: true,
+            calls: true,
         },
     },
     messenger: {
@@ -36,6 +38,7 @@ export const PlatformsInfo: {
             reactions: false,
             replies: false,
             edits: false,
+            calls: false,
         },
     },
     telegram: {
@@ -47,6 +50,7 @@ export const PlatformsInfo: {
             reactions: false,
             replies: true,
             edits: true,
+            calls: true,
         },
     },
     whatsapp: {
@@ -58,6 +62,7 @@ export const PlatformsInfo: {
             reactions: false,
             replies: false,
             edits: false,
+            calls: false,
         },
     },
 };

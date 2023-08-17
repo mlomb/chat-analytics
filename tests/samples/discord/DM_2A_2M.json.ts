@@ -28,4 +28,13 @@ export const expectedParse: ExpectedPartialParseResult = {
             timestamp: Date.parse("2019-01-25T00:11:04.083+00:00"),
         },
     ],
+    calls: [
+        {
+            id: "100",
+            authorId: PAUTHOR_SOMEONE.id,
+            channelId: "530805775262679064",
+            timestampStart: Date.parse("2020-07-17T17:03:14.366+00:00"),
+            timestampEnd: Date.parse("2020-07-17T21:14:52.787+00:00"),
+        },
+    ],
 };

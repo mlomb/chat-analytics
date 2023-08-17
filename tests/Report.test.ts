@@ -23,6 +23,7 @@ test("report should contain data and title", async () => {
         channels: [],
         authors: [],
         emojis: [],
+        calls: [],
         words: [],
         mentions: [],
         domains: [],

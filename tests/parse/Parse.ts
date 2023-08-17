@@ -2,7 +2,7 @@ import "jest-extended";
 
 import { FileInput, wrapStringAsFile } from "@pipeline/parse/File";
 import { Parser } from "@pipeline/parse/Parser";
-import { PAuthor, PChannel, PGuild, PMessage } from "@pipeline/parse/Types";
+import { PAuthor, PCall, PChannel, PGuild, PMessage } from "@pipeline/parse/Types";
 
 import { loadSample } from "@tests/samples";
 
@@ -12,6 +12,7 @@ export interface ParseResult {
     channels: PChannel[];
     authors: PAuthor[];
     messages: PMessage[];
+    calls: PCall[];
 }
 
 /** The structure we expect after running the Parser with the inputs */
@@ -20,6 +21,7 @@ export interface ExpectedPartialParseResult {
     channels: Partial<PChannel>[];
     authors: Partial<PAuthor>[];
     messages: Partial<PMessage>[];
+    calls: Partial<PCall>[];
 }
 
 /** Convenient function to inspect the objects emitted by a parser for specific inputs */
@@ -29,6 +31,7 @@ export const runParser = async (klass: new () => Parser, inputs: FileInput[]): P
         channels: [],
         authors: [],
         messages: [],
+        calls: [],
     };
     let lastMsgTimestamp: number | undefined;
 
@@ -44,6 +47,7 @@ export const runParser = async (klass: new () => Parser, inputs: FileInput[]): P
         if (lastMsgTimestamp === undefined) lastMsgTimestamp = message.timestamp;
         else expect(message.timestamp).toBeGreaterThanOrEqual(lastMsgTimestamp);
     });
+    parser.on("call", (call) => parsed.calls.push(call));
 
     for (const input of inputs) {
         // new file, reset
@@ -74,5 +78,6 @@ export const checkSamplesAreParsedCorrectly = async (klass: new () => Parser, fi
         expect(parsed.channels).toIncludeAllPartialMembers(expected.channels);
         expect(parsed.authors).toIncludeAllPartialMembers(expected.authors);
         expect(parsed.messages).toIncludeAllPartialMembers(expected.messages);
+        expect(parsed.calls).toIncludeAllPartialMembers(expected.calls);
     }
 };

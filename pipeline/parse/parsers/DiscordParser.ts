@@ -4,7 +4,7 @@ import { ChannelType } from "@pipeline/Types";
 import { FileInput, streamJSONFromFile, tryToFindTimestampAtEnd } from "@pipeline/parse/File";
 import { JSONStream } from "@pipeline/parse/JSONStream";
 import { Parser } from "@pipeline/parse/Parser";
-import { PAuthor, PChannel, PMessage, RawID } from "@pipeline/parse/Types";
+import { PAuthor, PCall, PChannel, PMessage, RawID } from "@pipeline/parse/Types";
 
 export class DiscordParser extends Parser {
     private lastGuildId?: RawID;
@@ -26,6 +26,8 @@ export class DiscordParser extends Parser {
      */
     async *parse(file: FileInput, progress?: Progress) {
         this.lastMessageTimestampInFile = await tryToFindTimestampAtEnd(DiscordParser.TS_MSG_REGEX, file);
+        this.lastChannelId = undefined;
+        this.lastGuildId = undefined;
 
         const stream = new JSONStream()
             .onObject<DiscordGuild>("guild", this.parseGuild.bind(this))
@@ -78,6 +80,7 @@ export class DiscordParser extends Parser {
         // "YYYY-MM-DDTHH:MM:SS.mmm+00:00"
         const timestamp = Date.parse(message.timestamp);
         const timestampEdit = message.timestampEdited ? Date.parse(message.timestampEdited) : undefined;
+        const callEndedTimestamp = message.callEndedTimestamp ? Date.parse(message.callEndedTimestamp) : undefined;
 
         // Discord allows users to have different nicknames depending the chat. We honor the nickname first
         const name = message.author.nickname || message.author.name;
@@ -137,6 +140,23 @@ export class DiscordParser extends Parser {
                 }),
             };
             this.emit("message", pmessage, this.lastMessageTimestampInFile);
+        } else if (message.type === "Call") {
+            if (callEndedTimestamp === undefined) {
+                console.warn("Call message without callEndedTimestamp");
+                // we dont want to throw here
+                // discord may have gone crazy or the export was done while in call
+                return;
+            }
+
+            const pcall: PCall = {
+                id: message.id,
+                authorId: message.author.id,
+                channelId: this.lastChannelId,
+                timestampStart: timestamp,
+                timestampEnd: callEndedTimestamp,
+            };
+
+            this.emit("call", pcall, this.lastMessageTimestampInFile);
         }
     }
 

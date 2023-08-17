@@ -92,3 +92,6 @@ export const createYAxisLabel = (axis: Axis<any>, text: string) => {
         })
     );
 };
+
+/** Wether to use ValueAxis or DurationAxis */
+export type AxisType = "value" | "duration";

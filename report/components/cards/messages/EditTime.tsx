@@ -1,43 +1,14 @@
-import { Container, Tooltip } from "@amcharts/amcharts5";
-import { XYCursor } from "@amcharts/amcharts5/xy";
 import { useBlockData } from "@report/BlockHook";
 import DottedTable, { Line } from "@report/components/viz/DottedTable";
-import { createXAxisLabel, createYAxisLabel } from "@report/components/viz/amcharts/AmCharts5";
 import { AmCharts5Chart } from "@report/components/viz/amcharts/AmCharts5Chart";
-import { createHistogramWithBoxplot } from "@report/components/viz/amcharts/Distribution";
+import { createDistributionChart } from "@report/components/viz/amcharts/Distribution";
 
-const createChart = (c: Container) => {
-    const { chart, setData, histogramSeries, xAxis, yAxis } = createHistogramWithBoxplot(c.root);
-
-    histogramSeries.setAll({
-        tooltip: Tooltip.new(c.root, {
-            labelText:
-                "[bold]{valueY} messages [/] were edited\n between [bold]{from}-{to} seconds[/] after being sent",
-        }),
-    });
-
-    xAxis.setAll({
-        min: 0,
-        maxPrecision: 0, // integer in axis labels
-        numberFormat: "#.#", // 1 decimal in tooltip ↓
-        extraTooltipPrecision: 1,
-    });
-    yAxis.setAll({
-        tooltipText: "{value} messages sent",
-        min: 0,
-        maxPrecision: 0, // integer
-    });
-
-    createXAxisLabel(xAxis, "Seconds between sending and editing");
-    createYAxisLabel(yAxis, "Messages edited");
-
-    const cursor = chart.set("cursor", XYCursor.new(c.root, {}));
-    cursor.lineY.set("visible", false);
-
-    c.children.push(chart);
-
-    return setData;
-};
+const createDistributionChartFn = createDistributionChart({
+    tooltipLabel: "[bold]{valueY} messages [/] were edited\n between [bold]{from}-{to} seconds[/] after being sent",
+    xAxisType: "value", // better to show seconds than minutes
+    xAxisLabel: "Seconds between sending and editing",
+    yAxisLabel: "Messages edited",
+});
 
 const EditTime = () => {
     const data = useBlockData("messages/edited");
@@ -78,7 +49,7 @@ const EditTime = () => {
     return (
         <>
             <AmCharts5Chart
-                create={createChart}
+                create={createDistributionChartFn}
                 data={data?.editTimeDistribution}
                 style={{
                     minHeight: 250,

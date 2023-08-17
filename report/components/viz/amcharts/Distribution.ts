@@ -1,4 +1,4 @@
-import { Color, Root, percent } from "@amcharts/amcharts5";
+import { Color, Container, Root, Tooltip, percent } from "@amcharts/amcharts5";
 import {
     Axis,
     AxisRendererX,
@@ -6,13 +6,16 @@ import {
     CandlestickSeries,
     CategoryAxis,
     ColumnSeries,
+    DurationAxis,
     StepLineSeries,
     ValueAxis,
     XYChart,
+    XYCursor,
 } from "@amcharts/amcharts5/xy";
 import { VariableDistribution } from "@pipeline/aggregate/Common";
+import { AxisType, createXAxisLabel, createYAxisLabel } from "@report/components/viz/amcharts/AmCharts5";
 
-export const createHistogramWithBoxplot = (root: Root) => {
+export const createHistogramWithBoxplot = (root: Root, xAxisType: AxisType) => {
     // Chart where we will put the boxplot and the histogram
     const chart = XYChart.new(root, {
         // stack vertically
@@ -25,7 +28,7 @@ export const createHistogramWithBoxplot = (root: Root) => {
 
     // X-axis, shared by all series
     const xAxis = chart.xAxes.push(
-        ValueAxis.new(root, {
+        (xAxisType === "value" ? ValueAxis : DurationAxis).new(root, {
             renderer: AxisRendererX.new(root, {}),
         })
     );
@@ -151,4 +154,46 @@ const createHistogram = (root: Root, chart: XYChart, xAxis: Axis<any>) => {
     series.columns.template.set("strokeOpacity", 0);
 
     return series;
+};
+
+interface DistributionChartConfig {
+    tooltipLabel: string;
+    xAxisType: AxisType;
+    xAxisLabel: string;
+    yAxisLabel: string;
+}
+
+export const createDistributionChart = (config: DistributionChartConfig) => (c: Container) => {
+    const { chart, setData, histogramSeries, xAxis, yAxis } = createHistogramWithBoxplot(c.root, config.xAxisType);
+
+    histogramSeries.setAll({
+        tooltip: Tooltip.new(c.root, {
+            labelText: config.tooltipLabel,
+        }),
+    });
+
+    c.root.numberFormatter.setAll({
+        numberFormat: "##.#", // 1 decimal in tooltip
+        numericFields: ["valueY"],
+    });
+
+    xAxis.setAll({
+        min: 0,
+        maxPrecision: 0, // integer in axis labels
+        extraTooltipPrecision: 1,
+    });
+    yAxis.setAll({
+        min: 0,
+        maxPrecision: 0, // integer
+    });
+
+    createXAxisLabel(xAxis, config.xAxisLabel);
+    createYAxisLabel(yAxis, config.yAxisLabel);
+
+    const cursor = chart.set("cursor", XYCursor.new(c.root, {}));
+    cursor.lineY.set("visible", false);
+
+    c.children.push(chart);
+
+    return setData;
 };
