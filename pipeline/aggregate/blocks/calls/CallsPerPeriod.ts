@@ -1,5 +1,7 @@
 import { BlockDescription, BlockFn } from "@pipeline/aggregate/Blocks";
 
+import { iterateHoursInCall } from "./CallsUtils";
+
 export type CallsInDate = {
     ts: number; // timestamp
 
@@ -56,12 +58,15 @@ const fn: BlockFn<CallsPerPeriod> = (database, filters, common) => {
         if (!filters.hasChannel(call.channelIndex)) continue;
         if (!filters.hasAuthor(call.authorIndex)) continue;
 
+        iterateHoursInCall(call, (dayIndex, _, secondsInCall) => {
+            res.perDay[dayIndex].t += secondsInCall;
+            res.perWeek[dateToWeekIndex[dayIndex]].t += secondsInCall;
+            res.perMonth[dateToMonthIndex[dayIndex]].t += secondsInCall;
+        });
+
         res.perDay[call.start.dayIndex].n += 1;
-        res.perDay[call.start.dayIndex].t += call.duration;
         res.perWeek[dateToWeekIndex[call.start.dayIndex]].n += 1;
-        res.perWeek[dateToWeekIndex[call.start.dayIndex]].t += call.duration;
         res.perMonth[dateToMonthIndex[call.start.dayIndex]].n += 1;
-        res.perMonth[dateToMonthIndex[call.start.dayIndex]].t += call.duration;
     }
 
     return res;
