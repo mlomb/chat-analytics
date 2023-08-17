@@ -1,5 +1,15 @@
 # v1.0.4 (YYYY/MM/DD) [IN DEVELOPMENT]
 
+- Added calls support for Discord and Telegram: [#76](https://github.com/mlomb/chat-analytics/issues/76) [#88](https://github.com/mlomb/chat-analytics/pull/88)
+    - Time spent on calls over time
+    - Number of calls initiated over time
+    - Total calls, total time spent on calls, average/median call duration
+    - Call duration distribution
+    - Average/median time between calls
+    - Time spent on calls by week day / hour
+    - Most calls initiated
+
+<img src="https://github.com/mlomb/chat-analytics/assets/5845105/bbf21f1c-4202-4c9a-ab9d-ff3b3c6c199b" width="300" title="New calls section" />
 
 # v1.0.3 (2023/07/10)
 
