@@ -43,16 +43,58 @@ const createParticipationChart = (c: Container) => {
 const ConversationParticipation = () => {
     const data = useBlockData("interaction/conversation-stats");
 
+    const downloadCSV = () => {
+        if (!data) return;
+        const db = getDatabase();
+
+        const maxN = data.nodes.reduce((acc, node) => {
+            return Math.max(acc, Math.max(node.f, node.t));
+        }, 0);
+
+        let csv = "author1,author2,count\n";
+
+        const escapeName = (name: string) => {
+            return name.replace(/,/g, "");
+        };
+
+        for (const node of data.nodes) {
+            csv += `${escapeName(db.authors[node.f].n)},${escapeName(db.authors[node.t].n)},${node.c}\n`;
+        }
+
+        const csvData = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+        const csvURL = window.URL.createObjectURL(csvData);
+
+        console.log(csvURL);
+
+        const link = document.createElement("a");
+        link.setAttribute("href", csvURL);
+        link.setAttribute("download", "datos.csv");
+        document.body.appendChild(link);
+        link.click();
+    };
+
     return (
-        <AmCharts5Chart
-            data={data}
-            create={createParticipationChart}
-            style={{
-                minHeight: 619,
-                marginLeft: 5,
-                marginBottom: 8,
-            }}
-        />
+        <>
+            <AmCharts5Chart
+                data={data}
+                create={createParticipationChart}
+                style={{
+                    minHeight: 619,
+                    marginLeft: 5,
+                    marginBottom: 8,
+                }}
+            />
+            <button
+                onClick={downloadCSV}
+                style={{
+                    padding: 10,
+                    margin: 10,
+                    cursor: "pointer",
+                }}
+            >
+                DESCARGAR CSV
+            </button>
+        </>
     );
 };
 
