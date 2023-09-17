@@ -1,525 +1,557 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="robots" content="noindex, nofollow">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat Analytics - Export obfuscator</title>
-    <link rel="canonical" href="https://chatanalytics.app/obfuscator.html" />
-    <link rel="icon" type="image/png" href="https://chatanalytics.app/favicon.png">
-  </head>
-  <body>
-    <h3>Export obfuscator</h3>
-    <p>
-      If you're needing to share an export as a sample for testing or debugging, you will want to obfuscate it to
-      protect any personal information such as message contents, IDs, author information and URLs. This tool will do
-      that for you.
-    </p>
-    <form>
-      <label for="file">Upload export:</label>
-      <input type="file" id="file" name="file" accept=".json,.txt">
-      <br>
-      <label for="file" id="detectedPlatform"></label>
-      <br>
-      <br>
-      <input type="checkbox" id="obMessages" name="obMessages" checked disabled>
-      <label for="obMessages">Obfuscate message content</label>
-      <br>
-      <input type="checkbox" id="obNames" name="obNames" checked>
-      <label for="obNames">Obfuscate names (of channels, authors, guilds...)</label>
-      <br>
-      <input type="checkbox" id="obIDs" name="obIDs" checked>
-      <label for="obIDs">Obfuscate IDs (of messages, channels, authors, guilds...). Keep in mind these can sometimes be reverse-engineered to find more information</label>
-      <br>
-      <input type="checkbox" id="obMedia" name="obMedia" checked>
-      <label for="obMedia">Obfuscate media (profile pictures, attachments...)</label>
-      <br>
-      <label for="obTimestamps">Obfuscate timestamps by...</label>
-      <select id="obTimestamps" name="obTimestamps">
-        <option value="dont">Don't obfuscate timestamps</option>
-        <option value="unix0">Set all timestamps to unix 0</option>
-        <option value="currentTimestamp">Set all timestamps to current timestamp</option>
-        <option value="roundSecs">Round timestamps down to second</option>
-        <option value="roundMins">Round timestamps down to minute</option>
-        <option value="roundHrs">Round timestamps down to hour</option>
-        <option value="roundDays">Round timestamps down to day</option>
-      </select>
-      <br>
-      <input type="button" id="obfuscateButton" value="Obfuscate" disabled>
-      <input type="button" id="downloadButton" value="Download" disabled>
-      <fieldset>
-        <legend>Preview:</legend>
-        <output id="preview"></output>
-      </fieldset>
-    </form>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="robots" content="noindex, nofollow" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Chat Analytics - Export obfuscator</title>
+        <link rel="canonical" href="https://chatanalytics.app/obfuscator.html" />
+        <link rel="icon" type="image/png" href="https://chatanalytics.app/favicon.png" />
+    </head>
+    <body>
+        <h3>Export obfuscator</h3>
+        <p>
+            If you're needing to share an export as a sample for testing or debugging, you will want to obfuscate it to
+            protect any personal information such as message contents, IDs, author information and URLs. This tool will
+            do that for you.
+        </p>
+        <form>
+            <label for="file">Upload export:</label>
+            <input type="file" id="file" name="file" accept=".json,.txt" />
+            <br />
+            <label for="file" id="detectedPlatform"></label>
+            <br />
+            <br />
+            <input type="checkbox" id="obMessages" name="obMessages" checked disabled />
+            <label for="obMessages">Obfuscate message content</label>
+            <br />
+            <input type="checkbox" id="obNames" name="obNames" checked />
+            <label for="obNames">Obfuscate names (of channels, authors, guilds...)</label>
+            <br />
+            <input type="checkbox" id="obIDs" name="obIDs" checked />
+            <label for="obIDs"
+                >Obfuscate IDs (of messages, channels, authors, guilds...). Keep in mind these can sometimes be
+                reverse-engineered to find more information</label
+            >
+            <br />
+            <input type="checkbox" id="obMedia" name="obMedia" checked />
+            <label for="obMedia">Obfuscate media (profile pictures, attachments...)</label>
+            <br />
+            <label for="obTimestamps">Obfuscate timestamps by...</label>
+            <select id="obTimestamps" name="obTimestamps">
+                <option value="dont">Don't obfuscate timestamps</option>
+                <option value="unix0">Set all timestamps to unix 0</option>
+                <option value="currentTimestamp">Set all timestamps to current timestamp</option>
+                <option value="roundSecs">Round timestamps down to second</option>
+                <option value="roundMins">Round timestamps down to minute</option>
+                <option value="roundHrs">Round timestamps down to hour</option>
+                <option value="roundDays">Round timestamps down to day</option>
+            </select>
+            <br />
+            <input type="button" id="obfuscateButton" value="Obfuscate" disabled />
+            <input type="button" id="downloadButton" value="Download" disabled />
+            <fieldset>
+                <legend>Preview:</legend>
+                <output id="preview"></output>
+            </fieldset>
+        </form>
 
-    <script>
-      const fileUpload = document.getElementById('file'),
-        detectedPlatform = document.getElementById('detectedPlatform'),
-        obfuscateButton = document.getElementById('obfuscateButton'),
-        downloadButton = document.getElementById('downloadButton'),
-        previewElm = document.getElementById('preview'),
-        PLATFORM_KEYS = {
-          'Discord': ['guild','channel','dateRange','messages','messageCount'],
-          'Messenger': ['participants','messages','title','is_still_participant','thread_type','thread_path','magic_words'],
-          'Telegram': ['name','type','id','messages']
-        },
-        MESSAGE_CONTENT_REDACTION = 'Lorem ipsum';
+        <script>
+            const fileUpload = document.getElementById("file"),
+                detectedPlatform = document.getElementById("detectedPlatform"),
+                obfuscateButton = document.getElementById("obfuscateButton"),
+                downloadButton = document.getElementById("downloadButton"),
+                previewElm = document.getElementById("preview"),
+                PLATFORM_KEYS = {
+                    Discord: ["guild", "channel", "dateRange", "messages", "messageCount"],
+                    Messenger: [
+                        "participants",
+                        "messages",
+                        "title",
+                        "is_still_participant",
+                        "thread_type",
+                        "thread_path",
+                        "magic_words",
+                    ],
+                    Telegram: ["name", "type", "id", "messages"],
+                },
+                MESSAGE_CONTENT_REDACTION = "Lorem ipsum";
 
-      const WHATSAPP_LINE_START_REGEX = /^(\d\d)\/(\d\d)\/(\d{4}), (\d\d):(\d\d) - (.+)$/;
-      const WHATSAPP_MESSAGE_CONTENT_REGEX = /^(.+?): (.+)/;
-      const WHATSAPP_WHITELISTED_CONTENTS = [
-        '<Media omitted>',
-        'This message was deleted'
-      ];
+            const WHATSAPP_LINE_START_REGEX = /^(\d\d)\/(\d\d)\/(\d{4}), (\d\d):(\d\d) - (.+)$/;
+            const WHATSAPP_MESSAGE_CONTENT_REGEX = /^(.+?): (.+)/;
+            const WHATSAPP_WHITELISTED_CONTENTS = ["<Media omitted>", "This message was deleted"];
 
-      // While obfuscated usernames are consistent, obfuscated user IDs and other user information will be the same
-      const JSON_PLATFORMS_PATHS = {
-        'Discord': {
-          'Messages': [
-            {
-              'path': 'messages$content',
-              'obfuscation': MESSAGE_CONTENT_REDACTION
-            },
-            { // Could be obfuscated individually to maintain null values
-              'path': 'messages$embeds$',
-              'obfuscation': {
-                "title": "Example embed", // Can also be null
-                "url": null,
-                "timestamp": null,
-                "description": null,
-                "color": null,
-                "author": null,
-                "thumbnail": null,
-                "images": [],
-                "fields": []
-              }
-            }
-          ],
-          'Names': [
-            {
-              'path': 'guild.name',
-              'obfuscation': 'Example guild',
-              'whitelist': ['Direct Messages']
-            },
-            {
-              'path': 'channel.category',
-              'obfuscation': 'Example category',
-              'whitelist': ['Private']
-            },
-            {
-              'path': 'channel.name',
-              'obfuscation': 'Example channel'
-            },
-            {
-              'path': 'channel.topic',
-              'obfuscation': 'Topic for example channel',
-              'whitelist': [null]
-            },
-            {
-              'path': 'messages$author.name',
-              'is_user_name': true
-            },
-            {
-              'path': 'messages$author.nickname',
-              'is_user_name': true
-            },
-            {
-              'path': 'messages$mentions.name',
-              'is_user_name': true
-            },
-            {
-              'path': 'messages$mentions.nickname',
-              'is_user_name': true
-            }
-          ],
-          'IDs': [
-            {
-              'path': 'guild.id',
-              'obfuscation': 123456789123456789,
-              'whitelist': [0]
-            },
-            {
-              'path': 'channel.id',
-              'obfuscation': 123456789123456789,
-              'whitelist': [0]
-            },
-            {
-              'path': 'channel.category.id',
-              'obfuscation': 123456789123456789,
-              'whitelist': [0]
-            },
-            {
-              'path': 'messages$id',
-              'obfuscation': 123456789123456789
-            },
-            {
-              'path': 'messages$author.id',
-              'obfuscation': 123456789123456789
-            },
-            {
-              'path': 'messages$author.discriminator', // While not unique to individual users, people who know the user could make an educated guess
-              'obfuscation': 1234
-            },
-            {
-              'path': 'messages$attachments.id',
-              'obfuscation': 123456789123456789
-            },
-            {
-              'path': 'messages$mentions.id',
-              'obfuscation': 123456789123456789
-            },
-            {
-              'path': 'messages$mentions.discriminator', // While not unique to individual users, people who know the user could make an educated guess
-              'obfuscation': 1234
-            },
-            {
-              'path': 'messages$reference.messageId',
-              'obfuscation': 123456789123456789
-            },
-            {
-              'path': 'messages$reference.channelId',
-              'obfuscation': 123456789123456789
-            },
-            {
-              'path': 'messages$reference.guildId',
-              'obfuscation': 123456789123456789
-            }
-            // Could also include stickers and reactions, which can be specific to guilds, but most aren't and each should be differentiated in some way
-          ],
-          'Media': [
-            {
-              'path': 'guild.icon_url',
-              'obfuscation': 'https://cdn.discordapp.com/embed/avatars/0.png'
-            },
-            {
-              'path': 'messages$author.avatarUrl',
-              'obfuscation': 'https://cdn.discordapp.com/embed/avatars/0.png'
-            },
-            {
-              'path': 'messages$attachments.url',
-              'obfuscation': 'https://cdn.discordapp.com/attachments/123456789123456789/123456789123456789/example.png'
-            },
-            {
-              'path': 'messages$attachments.filename',
-              'obfuscation': 'example.png'
-            }
-            // Could obfuscate messages$attachments.fileSizeBytes but not sure if this is necessary
-          ],
-          'Timestamps': [
-            {
-              'path': 'dateRange.after',
-              'whitelist': [null],
-              'toDate': value => new Date(value)
-            },
-            {
-              'path': 'dateRange.before',
-              'whitelist': [null],
-              'toDate': value => new Date(value)
-            },
-            {
-              'path': 'messages$timestamp',
-              'toDate': value => new Date(value)
-            },
-            {
-              'path': 'messages$timestampEdited',
-              'whitelist': [null],
-              'toDate': value => new Date(value)
-            },
-            {
-              'path': 'messages$callEndedTimestamp',
-              'whitelist': [null],
-              'toDate': value => new Date(value)
-            }
-          ]
-        },
-        'Messenger': {
-          // Supposedly there is a messages$ip property,
-          // but I can't find it in any of my own exports and not sure what it was for
-          'Messages': [
-            {
-              'path': 'messages$content',
-              'obfuscation': MESSAGE_CONTENT_REDACTION
-            }
-          ],
-          'Names': [
-            {
-              'path': 'participants$name',
-              'is_user_name': true
-            },
-            {
-              'path': 'title',
-              'obfuscation': 'Example group chat title' // Doesn't take into account DMs
-            },
-            {
-              'path': 'thread_path',
-              'obfuscation': 'index/example_aaaaaaaaaa'
-            },
-            {
-              'path': 'messages$sender_name',
-              'is_user_name': true
-            }
-          ],
-          'IDs': [
-            { // I can't actually find this property in my own exports, both old and new,
-              // but it appears in /tests/samples/messenger/2A_7M.json, so I've included it
-              'path': 'messages$sender_id_INTERNAL',
-              'obfuscation': 0
-            }
-            // Some IDs are also included in media URIs
-          ],
-          'Media': [
-            // Supposedly there are messages$files$media_path_INTERNAL and messages$files$type_INTERNAL properties,
-            // but I can't find either of these in any of my own exports and not sure what they're for
-            {
-              'path': 'messages$files$uri',
-              'obfuscation': 'messages/inbox/example_1234567812345678/files/example.txt'
-            },
-            {
-              'path': 'messages$photos$uri',
-              'obfuscation': 'messages/inbox/example_1234567812345678/photos/12345678_123456781234567_1234567890123456789_n_123456781234567.jpg'
-            },
-            {
-              'path': 'messages$videos$uri',
-              'obfuscation': 'messages/inbox/example_1234567812345678/videos/12345678_123456781234567_1234567890123456789_n_123456781234567.mp4'
-            },
-            {
-              'path': 'messages$gifs$uri',
-              'obfuscation': 'messages/inbox/example_1234567812345678/gifs/12345678_123456781234567_1234567890123456789_n_123456781234567.gif'
-            }
-          ],
-          'Timestamps': [
-            {
-              'path': 'messages$timestamp_ms',
-              'toDate': value => new Date(value)
-            },
-            {
-              'path': 'messages$files$creation_timestamp',
-              'toDate': value => new Date(value*1000)
-            },
-            {
-              'path': 'messages$photos$creation_timestamp',
-              'toDate': value => new Date(value*1000)
-            },
-            {
-              'path': 'messages$videos$creation_timestamp',
-              'toDate': value => new Date(value*1000)
-            }
-          ]
-        },
-        'Telegram': {
-          'Messages': [
-            {
-              'path': 'messages$text',
-              'obfuscation': [MESSAGE_CONTENT_REDACTION]
-            },
-            {
-              'path': 'messages$text_entities',
-              'obfuscation': [MESSAGE_CONTENT_REDACTION]
-            }
-          ],
-          'Names': [
-            {
-              'path': 'name',
-              'obfuscation': 'Example name'
-            },
-            {
-              'path': 'from',
-              'is_user_name': true
-            }
-          ],
-          'IDs': [
-            {
-              'path': 'id',
-              'obfuscation': 1111111111
-            },
-            {
-              'path': 'messages$id',
-              'obfuscation': 1234
-            },
-            {
-              'path': 'messages$from_id',
-              'obfuscation': 1111111111
-            }
-          ],
-          'Timestamps': [
-            {
-              'path': 'messages$date',
-              'toDate': value => new Date(value)
-            },
-            {
-              'path': 'messages$date_unixtime',
-              'toDate': value => new Date(value)
-            }
-          ]
-        }
-      };
+            // While obfuscated usernames are consistent, obfuscated user IDs and other user information will be the same
+            const JSON_PLATFORMS_PATHS = {
+                Discord: {
+                    Messages: [
+                        {
+                            path: "messages$content",
+                            obfuscation: MESSAGE_CONTENT_REDACTION,
+                        },
+                        {
+                            // Could be obfuscated individually to maintain null values
+                            path: "messages$embeds$",
+                            obfuscation: {
+                                title: "Example embed", // Can also be null
+                                url: null,
+                                timestamp: null,
+                                description: null,
+                                color: null,
+                                author: null,
+                                thumbnail: null,
+                                images: [],
+                                fields: [],
+                            },
+                        },
+                    ],
+                    Names: [
+                        {
+                            path: "guild.name",
+                            obfuscation: "Example guild",
+                            whitelist: ["Direct Messages"],
+                        },
+                        {
+                            path: "channel.category",
+                            obfuscation: "Example category",
+                            whitelist: ["Private"],
+                        },
+                        {
+                            path: "channel.name",
+                            obfuscation: "Example channel",
+                        },
+                        {
+                            path: "channel.topic",
+                            obfuscation: "Topic for example channel",
+                            whitelist: [null],
+                        },
+                        {
+                            path: "messages$author.name",
+                            is_user_name: true,
+                        },
+                        {
+                            path: "messages$author.nickname",
+                            is_user_name: true,
+                        },
+                        {
+                            path: "messages$mentions.name",
+                            is_user_name: true,
+                        },
+                        {
+                            path: "messages$mentions.nickname",
+                            is_user_name: true,
+                        },
+                    ],
+                    IDs: [
+                        {
+                            path: "guild.id",
+                            obfuscation: 123456789123456789,
+                            whitelist: [0],
+                        },
+                        {
+                            path: "channel.id",
+                            obfuscation: 123456789123456789,
+                            whitelist: [0],
+                        },
+                        {
+                            path: "channel.category.id",
+                            obfuscation: 123456789123456789,
+                            whitelist: [0],
+                        },
+                        {
+                            path: "messages$id",
+                            obfuscation: 123456789123456789,
+                        },
+                        {
+                            path: "messages$author.id",
+                            obfuscation: 123456789123456789,
+                        },
+                        {
+                            path: "messages$author.discriminator", // While not unique to individual users, people who know the user could make an educated guess
+                            obfuscation: 1234,
+                        },
+                        {
+                            path: "messages$attachments.id",
+                            obfuscation: 123456789123456789,
+                        },
+                        {
+                            path: "messages$mentions.id",
+                            obfuscation: 123456789123456789,
+                        },
+                        {
+                            path: "messages$mentions.discriminator", // While not unique to individual users, people who know the user could make an educated guess
+                            obfuscation: 1234,
+                        },
+                        {
+                            path: "messages$reference.messageId",
+                            obfuscation: 123456789123456789,
+                        },
+                        {
+                            path: "messages$reference.channelId",
+                            obfuscation: 123456789123456789,
+                        },
+                        {
+                            path: "messages$reference.guildId",
+                            obfuscation: 123456789123456789,
+                        },
+                        // Could also include stickers and reactions, which can be specific to guilds, but most aren't and each should be differentiated in some way
+                    ],
+                    Media: [
+                        {
+                            path: "guild.icon_url",
+                            obfuscation: "https://cdn.discordapp.com/embed/avatars/0.png",
+                        },
+                        {
+                            path: "messages$author.avatarUrl",
+                            obfuscation: "https://cdn.discordapp.com/embed/avatars/0.png",
+                        },
+                        {
+                            path: "messages$attachments.url",
+                            obfuscation:
+                                "https://cdn.discordapp.com/attachments/123456789123456789/123456789123456789/example.png",
+                        },
+                        {
+                            path: "messages$attachments.filename",
+                            obfuscation: "example.png",
+                        },
+                        // Could obfuscate messages$attachments.fileSizeBytes but not sure if this is necessary
+                    ],
+                    Timestamps: [
+                        {
+                            path: "dateRange.after",
+                            whitelist: [null],
+                            toDate: (value) => new Date(value),
+                        },
+                        {
+                            path: "dateRange.before",
+                            whitelist: [null],
+                            toDate: (value) => new Date(value),
+                        },
+                        {
+                            path: "messages$timestamp",
+                            toDate: (value) => new Date(value),
+                        },
+                        {
+                            path: "messages$timestampEdited",
+                            whitelist: [null],
+                            toDate: (value) => new Date(value),
+                        },
+                        {
+                            path: "messages$callEndedTimestamp",
+                            whitelist: [null],
+                            toDate: (value) => new Date(value),
+                        },
+                    ],
+                },
+                Messenger: {
+                    // Supposedly there is a messages$ip property,
+                    // but I can't find it in any of my own exports and not sure what it was for
+                    Messages: [
+                        {
+                            path: "messages$content",
+                            obfuscation: MESSAGE_CONTENT_REDACTION,
+                        },
+                    ],
+                    Names: [
+                        {
+                            path: "participants$name",
+                            is_user_name: true,
+                        },
+                        {
+                            path: "title",
+                            obfuscation: "Example group chat title", // Doesn't take into account DMs
+                        },
+                        {
+                            path: "thread_path",
+                            obfuscation: "index/example_aaaaaaaaaa",
+                        },
+                        {
+                            path: "messages$sender_name",
+                            is_user_name: true,
+                        },
+                    ],
+                    IDs: [
+                        {
+                            // I can't actually find this property in my own exports, both old and new,
+                            // but it appears in /tests/samples/messenger/2A_7M.json, so I've included it
+                            path: "messages$sender_id_INTERNAL",
+                            obfuscation: 0,
+                        },
+                        // Some IDs are also included in media URIs
+                    ],
+                    Media: [
+                        // Supposedly there are messages$files$media_path_INTERNAL and messages$files$type_INTERNAL properties,
+                        // but I can't find either of these in any of my own exports and not sure what they're for
+                        {
+                            path: "messages$files$uri",
+                            obfuscation: "messages/inbox/example_1234567812345678/files/example.txt",
+                        },
+                        {
+                            path: "messages$photos$uri",
+                            obfuscation:
+                                "messages/inbox/example_1234567812345678/photos/12345678_123456781234567_1234567890123456789_n_123456781234567.jpg",
+                        },
+                        {
+                            path: "messages$videos$uri",
+                            obfuscation:
+                                "messages/inbox/example_1234567812345678/videos/12345678_123456781234567_1234567890123456789_n_123456781234567.mp4",
+                        },
+                        {
+                            path: "messages$gifs$uri",
+                            obfuscation:
+                                "messages/inbox/example_1234567812345678/gifs/12345678_123456781234567_1234567890123456789_n_123456781234567.gif",
+                        },
+                    ],
+                    Timestamps: [
+                        {
+                            path: "messages$timestamp_ms",
+                            toDate: (value) => new Date(value),
+                        },
+                        {
+                            path: "messages$files$creation_timestamp",
+                            toDate: (value) => new Date(value * 1000),
+                        },
+                        {
+                            path: "messages$photos$creation_timestamp",
+                            toDate: (value) => new Date(value * 1000),
+                        },
+                        {
+                            path: "messages$videos$creation_timestamp",
+                            toDate: (value) => new Date(value * 1000),
+                        },
+                    ],
+                },
+                Telegram: {
+                    Messages: [
+                        {
+                            path: "messages$text",
+                            obfuscation: [MESSAGE_CONTENT_REDACTION],
+                        },
+                        {
+                            path: "messages$text_entities",
+                            obfuscation: [MESSAGE_CONTENT_REDACTION],
+                        },
+                    ],
+                    Names: [
+                        {
+                            path: "name",
+                            obfuscation: "Example name",
+                        },
+                        {
+                            path: "from",
+                            is_user_name: true,
+                        },
+                    ],
+                    IDs: [
+                        {
+                            path: "id",
+                            obfuscation: 1111111111,
+                        },
+                        {
+                            path: "messages$id",
+                            obfuscation: 1234,
+                        },
+                        {
+                            path: "messages$from_id",
+                            obfuscation: 1111111111,
+                        },
+                    ],
+                    Timestamps: [
+                        {
+                            path: "messages$date",
+                            toDate: (value) => new Date(value),
+                        },
+                        {
+                            path: "messages$date_unixtime",
+                            toDate: (value) => new Date(value),
+                        },
+                    ],
+                },
+            };
 
-      function readFileThen(then) {
-        const reader = new FileReader();
-        reader.onload = e => then(e.target.result);
-        reader.readAsText(fileUpload.files[0]);
-      }
-
-      function sameMembers(arr1, arr2) {
-        const set1 = new Set(arr1);
-        const set2 = new Set(arr2);
-        return arr1.every(item => set2.has(item)) && arr2.every(item => set1.has(item));
-      }
-
-      let platform;
-      function setDetectedPlatform(platformName) {
-        platform = platformName;
-        detectedPlatform.textContent = 'Detected platform '+platformName;
-        obfuscateButton.disabled = false;
-      }
-      function failDetectingPlatform(reason) {
-        platform = null;
-        detectedPlatform.textContent = 'Could not detect platform; '+reason;
-        obfuscateButton.disabled = true;
-      }
-      fileUpload.onchange = e => {
-        const ext = e.target.files[0].name.split('.').pop();
-        if (ext === 'txt') setDetectedPlatform('WhatsApp');
-        else if (ext === 'json') {
-          readFileThen(contents => {
-            const keys = Object.keys(JSON.parse(contents));
-            for (const [platformName,expectedKeys] of Object.entries(PLATFORM_KEYS)) {
-              if (sameMembers(expectedKeys, keys)) {
-                setDetectedPlatform(platformName);
-                break;
-              }
+            function readFileThen(then) {
+                const reader = new FileReader();
+                reader.onload = (e) => then(e.target.result);
+                reader.readAsText(fileUpload.files[0]);
             }
-            if (!platform) failDetectingPlatform('JSON keys do not match any expected keys');
-          });
-        } else failDetectingPlatform('file should be .txt or .json');
-      };
 
-      function shouldObfuscate(feature) {
-        return document.getElementById('ob'+feature).checked;
-      }
-
-      // Replaces all values in obj (based on paths) with the return value of func given the current value
-      // paths is a list of strings, each listing period-delimited properties to traverse in obj,
-      // where each item in the property value is iterated through before continuing (until last path)
-      function traverseObject(obj, func, paths) {
-        const props = paths[0].split('.');
-        const lastIndex = props.length-1;
-        props.reduce((curr, prop, i) => {
-          if (curr === undefined) return undefined;
-          if (i === lastIndex) {
-            if (paths.length === 1) {
-              curr[prop] = func(curr[prop]);
-            } else {
-              paths.shift();
-              for (const item of curr[prop]) {
-                traverseObject(item, func, paths);
-              }
+            function sameMembers(arr1, arr2) {
+                const set1 = new Set(arr1);
+                const set2 = new Set(arr2);
+                return arr1.every((item) => set2.has(item)) && arr2.every((item) => set1.has(item));
             }
-          }
-          return curr[prop];
-        }, obj);
-      }
 
-      class Obfuscator {
-        authors = [];
-
-        constructor() {
-          this.platform = platform;
-          this.obNames = shouldObfuscate('Names');
-          this.timestampObLevel = document.getElementById('obTimestamps').value;
-        }
-
-        obfuscate(fileContents) {
-          return this.platform === 'WhatsApp' ? this.obfuscateWhatsApp(fileContents) : this.obfuscateJSONFile(fileContents)
-        }
-
-        // Would be better to use whatsapp-chat-parser, but the obfuscator is intended to be stand-alone
-        // In case we switch to whatsapp-chat-parser, I've chosen to not make this function to extensive
-        // But I've ensured to leave plenty room for future improvement
-        obfuscateWhatsApp(fileContents) {
-          return fileContents.split('\n')
-            .map(line => {
-              const lineMatch = WHATSAPP_LINE_START_REGEX.exec(line);
-              if (!lineMatch) return null;
-              const d = lineMatch.slice(1,6).map(Number);
-              const newTimestamp = this.obfuscateTimestamp(new Date(d[2], d[1]-1, d[0], d[3], d[4]))
-                .toLocaleString('en-GB', {day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute:'2-digit'});
-              const messageMatch = WHATSAPP_MESSAGE_CONTENT_REGEX.exec(lineMatch[6]);
-              if (!messageMatch) return `${newTimestamp} - ${lineMatch[6]}`;
-              const newAuthor = this.obfuscateUserName(messageMatch[1]);
-              const newContent = WHATSAPP_WHITELISTED_CONTENTS.includes(messageMatch[2]) ? messageMatch[2] : MESSAGE_CONTENT_REDACTION;
-              return `${newTimestamp} - ${newAuthor}: ${newContent}`;
-            }).filter(line => line).join('\n');
-        }
-
-        obfuscateJSONFile(fileContents) {
-          let data = JSON.parse(fileContents); // Modified inside obfuscateOccurrence / setValueAtLocation
-          for (const [feature, occurrences] of Object.entries(JSON_PLATFORMS_PATHS[this.platform])) {
-            if (shouldObfuscate(feature)) {
-              for (const occurrence of occurrences) {
-                traverseObject(data, currentValue => {
-                  if ('whitelist' in occurrence && occurrence.whitelist.includes(currentValue))
-                    return currentValue;
-                  if ('is_user_name' in occurrence && occurrence.is_user_name)
-                    return this.obfuscateUserName(currentValue);
-                  if ('toDate' in occurrence)
-                    this.obfuscateTimestamp(occurrence.toDate(currentValue));
-                  return occurrence.obfuscation;
-                }, occurrence.path.split("$"))
-              }
+            let platform;
+            function setDetectedPlatform(platformName) {
+                platform = platformName;
+                detectedPlatform.textContent = "Detected platform " + platformName;
+                obfuscateButton.disabled = false;
             }
-          }
-          return JSON.stringify(data);
-        }
-
-        obfuscateTimestamp(timestamp) {
-          switch (this.timestampObLevel) {
-            case 'unix0':
-              return new Date(0);
-            case 'currentTimestamp':
-              return new Date();
-            case 'roundDays':
-              timestamp.setHours(0);
-            case 'roundHrs':
-              timestamp.setMinutes(0);
-            case 'roundMins':
-              timestamp.setSeconds(0);
-            case 'roundSecs':
-              timestamp.setMilliseconds(0);
-          }
-          return timestamp
-        }
-
-        obfuscateUserName(username) {
-          if (this.obNames) {
-            if (!this.authors.includes(username)) {
-              this.authors.push(username);
+            function failDetectingPlatform(reason) {
+                platform = null;
+                detectedPlatform.textContent = "Could not detect platform; " + reason;
+                obfuscateButton.disabled = true;
             }
-            return 'User '+(this.authors.indexOf(username)+1);
-          }
-          return username;
-        }
-      }
+            fileUpload.onchange = (e) => {
+                const ext = e.target.files[0].name.split(".").pop();
+                if (ext === "txt") setDetectedPlatform("WhatsApp");
+                else if (ext === "json") {
+                    readFileThen((contents) => {
+                        const keys = Object.keys(JSON.parse(contents));
+                        for (const [platformName, expectedKeys] of Object.entries(PLATFORM_KEYS)) {
+                            if (sameMembers(expectedKeys, keys)) {
+                                setDetectedPlatform(platformName);
+                                break;
+                            }
+                        }
+                        if (!platform) failDetectingPlatform("JSON keys do not match any expected keys");
+                    });
+                } else failDetectingPlatform("file should be .txt or .json");
+            };
 
-      let result;
-      obfuscateButton.onclick = () => {
-        if (!platform) return;
-        const obfuscator = new Obfuscator();
-        readFileThen(contents => {
-          result = obfuscator.obfuscate(contents);
-          previewElm.innerHTML = result.slice(0, 10000).split("\n").slice(0, 50).join("<br>"); // These values are very arbitrary
-          downloadButton.disabled = false;
-        });
-      };
-      downloadButton.onclick = () => {
-        const a = document.createElement('a');
-        a.href = 'data:text/plain;charset=utf-8,'+encodeURIComponent(result);
-        a.download = fileUpload.files[0].name;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-      };
-    </script>
-  </body>
+            function shouldObfuscate(feature) {
+                return document.getElementById("ob" + feature).checked;
+            }
+
+            // Replaces all values in obj (based on paths) with the return value of func given the current value
+            // paths is a list of strings, each listing period-delimited properties to traverse in obj,
+            // where each item in the property value is iterated through before continuing (until last path)
+            function traverseObject(obj, func, paths) {
+                const props = paths[0].split(".");
+                const lastIndex = props.length - 1;
+                props.reduce((curr, prop, i) => {
+                    if (curr === undefined) return undefined;
+                    if (i === lastIndex) {
+                        if (paths.length === 1) {
+                            curr[prop] = func(curr[prop]);
+                        } else {
+                            paths.shift();
+                            for (const item of curr[prop]) {
+                                traverseObject(item, func, paths);
+                            }
+                        }
+                    }
+                    return curr[prop];
+                }, obj);
+            }
+
+            class Obfuscator {
+                authors = [];
+
+                constructor() {
+                    this.platform = platform;
+                    this.obNames = shouldObfuscate("Names");
+                    this.timestampObLevel = document.getElementById("obTimestamps").value;
+                }
+
+                obfuscate(fileContents) {
+                    return this.platform === "WhatsApp"
+                        ? this.obfuscateWhatsApp(fileContents)
+                        : this.obfuscateJSONFile(fileContents);
+                }
+
+                // Would be better to use whatsapp-chat-parser, but the obfuscator is intended to be stand-alone
+                // In case we switch to whatsapp-chat-parser, I've chosen to not make this function to extensive
+                // But I've ensured to leave plenty room for future improvement
+                obfuscateWhatsApp(fileContents) {
+                    return fileContents
+                        .split("\n")
+                        .map((line) => {
+                            const lineMatch = WHATSAPP_LINE_START_REGEX.exec(line);
+                            if (!lineMatch) return null;
+                            const d = lineMatch.slice(1, 6).map(Number);
+                            const newTimestamp = this.obfuscateTimestamp(
+                                new Date(d[2], d[1] - 1, d[0], d[3], d[4])
+                            ).toLocaleString("en-GB", {
+                                day: "2-digit",
+                                month: "2-digit",
+                                year: "numeric",
+                                hour: "2-digit",
+                                minute: "2-digit",
+                            });
+                            const messageMatch = WHATSAPP_MESSAGE_CONTENT_REGEX.exec(lineMatch[6]);
+                            if (!messageMatch) return `${newTimestamp} - ${lineMatch[6]}`;
+                            const newAuthor = this.obfuscateUserName(messageMatch[1]);
+                            const newContent = WHATSAPP_WHITELISTED_CONTENTS.includes(messageMatch[2])
+                                ? messageMatch[2]
+                                : MESSAGE_CONTENT_REDACTION;
+                            return `${newTimestamp} - ${newAuthor}: ${newContent}`;
+                        })
+                        .filter((line) => line)
+                        .join("\n");
+                }
+
+                obfuscateJSONFile(fileContents) {
+                    let data = JSON.parse(fileContents); // Modified inside obfuscateOccurrence / setValueAtLocation
+                    for (const [feature, occurrences] of Object.entries(JSON_PLATFORMS_PATHS[this.platform])) {
+                        if (shouldObfuscate(feature)) {
+                            for (const occurrence of occurrences) {
+                                traverseObject(
+                                    data,
+                                    (currentValue) => {
+                                        if ("whitelist" in occurrence && occurrence.whitelist.includes(currentValue))
+                                            return currentValue;
+                                        if ("is_user_name" in occurrence && occurrence.is_user_name)
+                                            return this.obfuscateUserName(currentValue);
+                                        if ("toDate" in occurrence)
+                                            this.obfuscateTimestamp(occurrence.toDate(currentValue));
+                                        return occurrence.obfuscation;
+                                    },
+                                    occurrence.path.split("$")
+                                );
+                            }
+                        }
+                    }
+                    return JSON.stringify(data);
+                }
+
+                obfuscateTimestamp(timestamp) {
+                    switch (this.timestampObLevel) {
+                        case "unix0":
+                            return new Date(0);
+                        case "currentTimestamp":
+                            return new Date();
+                        case "roundDays":
+                            timestamp.setHours(0);
+                        case "roundHrs":
+                            timestamp.setMinutes(0);
+                        case "roundMins":
+                            timestamp.setSeconds(0);
+                        case "roundSecs":
+                            timestamp.setMilliseconds(0);
+                    }
+                    return timestamp;
+                }
+
+                obfuscateUserName(username) {
+                    if (this.obNames) {
+                        if (!this.authors.includes(username)) {
+                            this.authors.push(username);
+                        }
+                        return "User " + (this.authors.indexOf(username) + 1);
+                    }
+                    return username;
+                }
+            }
+
+            let result;
+            obfuscateButton.onclick = () => {
+                if (!platform) return;
+                const obfuscator = new Obfuscator();
+                readFileThen((contents) => {
+                    result = obfuscator.obfuscate(contents);
+                    previewElm.innerHTML = result.slice(0, 10000).split("\n").slice(0, 50).join("<br>"); // These values are very arbitrary
+                    downloadButton.disabled = false;
+                });
+            };
+            downloadButton.onclick = () => {
+                const a = document.createElement("a");
+                a.href = "data:text/plain;charset=utf-8," + encodeURIComponent(result);
+                a.download = fileUpload.files[0].name;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+            };
+        </script>
+    </body>
 </html>
