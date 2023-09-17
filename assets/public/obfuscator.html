@@ -4,12 +4,12 @@
     <meta charset="UTF-8" />
     <meta name="robots" content="noindex, nofollow">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat Analytics - Export obfuscater</title>
-    <link rel="canonical" href="https://chatanalytics.app/obfuscate.html" />
+    <title>Chat Analytics - Export obfuscator</title>
+    <link rel="canonical" href="https://chatanalytics.app/obfuscator.html" />
     <link rel="icon" type="image/png" href="https://chatanalytics.app/favicon.png">
   </head>
   <body>
-    <h3>Export obfuscater</h3>
+    <h3>Export obfuscator</h3>
     <p>
       If you're needing to share an export as a sample for testing or debugging, you will want to obfuscate it to
       protect any personal information such as message contents, IDs, author information and URLs. This tool will do
@@ -421,7 +421,7 @@
         }, obj);
       }
 
-      class Obfuscater {
+      class Obfuscator {
         authors = [];
 
         constructor() {
@@ -434,7 +434,7 @@
           return this.platform === 'WhatsApp' ? this.obfuscateWhatsApp(fileContents) : this.obfuscateJSONFile(fileContents)
         }
 
-        // Would be better to use whatsapp-chat-parser, but the obfuscater is intended to be stand-alone
+        // Would be better to use whatsapp-chat-parser, but the obfuscator is intended to be stand-alone
         // In case we switch to whatsapp-chat-parser, I've chosen to not make this function to extensive
         // But I've ensured to leave plenty room for future improvement
         obfuscateWhatsApp(fileContents) {
@@ -505,9 +505,9 @@
       let result;
       obfuscateButton.onclick = () => {
         if (!platform) return;
-        const obfuscater = new Obfuscater();
+        const obfuscator = new Obfuscator();
         readFileThen(contents => {
-          result = obfuscater.obfuscate(contents);
+          result = obfuscator.obfuscate(contents);
           previewElm.innerHTML = result.slice(0, 10000).split("\n").slice(0, 50).join("<br>"); // These values are very arbitrary
           downloadButton.disabled = false;
         });
