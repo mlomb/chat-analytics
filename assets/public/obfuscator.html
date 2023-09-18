@@ -198,10 +198,75 @@
             }
 
             class TelegramObfuscator extends Obfuscator {
+                constructor() {
+                    super();
+
+                    this.authors = new ObjectGroup((author, id) => ({
+                        id: faker.string.numeric(10),
+                        name: faker.person.fullName(),
+                    }));
+                }
+
                 obfuscate(content) {
-                    return {
-                        a: "b",
+                    const data = JSON.parse(content);
+                    const file = {
+                        name: faker.internet.domainWord(),
+                        type: data.type,
+                        id: parseInt(faker.string.numeric(10)),
+                        messages: data.messages
+                            .map((message) => this.obfuscateMessage(message))
+                            .filter((m) => m !== null),
                     };
+                    return JSON.stringify(file, null, 2);
+                }
+
+                obfuscateMessage(message) {
+                    const fni = "(File not included. Change data exporting settings to download.)";
+
+                    const result = {
+                        id: message.id, // Telegram exports have increasing IDs, starting from 1
+                        type: message.type,
+                        date: message.date,
+                    };
+
+                    if (message.edited) result.edited = message.edited;
+
+                    switch (message.type) {
+                        case "message":
+                            const author = this.authors.get(message.from_id);
+                            result.from = author.name;
+                            result.from_id = author.id;
+                            result.text = this.obfuscateMessageContent(this.parseTextArray(message.text));
+                            if (message.reply_to_message_id) result.reply_to_message_id = message.reply_to_message_id;
+                            if (message.media_type) result.media_type = message.media_type;
+                            if (message.mime_type) result.mime_type = message.mime_type;
+                            if (message.location_information)
+                                result.location_information = {
+                                    latitude: 0,
+                                    longitude: 0,
+                                };
+                            if (message.file) result.file = fni;
+                            if (message.thumbnail) result.thumbnail = fni;
+                            if (message.sticker_emoji) result.sticker_emoji = message.sticker_emoji;
+                            if (message.photo) result.photo = fni;
+                            break;
+                        case "service":
+                            // intentionally skipped
+                            // console.log(message);
+                            break;
+                        default:
+                            console.log("Skipping message type", message.type);
+                            return null;
+                    }
+
+                    return result;
+                }
+
+                parseTextArray(input) {
+                    if (typeof input === "string") return input;
+                    if (Array.isArray(input)) return input.map(this.parseTextArray.bind(this)).join("");
+
+                    return input.text;
                 }
             }
 
@@ -223,6 +288,8 @@
                 outputElement.textContent = "Working... (browser may freeze)";
 
                 try {
+                    faker.seed(42);
+
                     const ObfuscatorClass = {
                         discord: DiscordObfuscator,
                         telegram: TelegramObfuscator,
