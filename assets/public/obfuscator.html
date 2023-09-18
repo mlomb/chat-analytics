@@ -92,12 +92,12 @@
                     this.generator = generator;
                 }
 
-                get(object) {
-                    const str = JSON.stringify(object);
-                    if (!this.objects.has(str)) {
-                        this.objects.set(str, this.generator(object, this.nextId++));
+                get(object, customId) {
+                    const trueId = customId || JSON.stringify(object); // use object as id
+                    if (!this.objects.has(trueId)) {
+                        this.objects.set(trueId, this.generator(object, this.nextId++));
                     }
-                    return this.objects.get(str);
+                    return this.objects.get(trueId);
                 }
             }
 
@@ -156,14 +156,29 @@
                             callEndedTimestamp: message.callEndedTimestamp,
                             isPinned: message.isPinned,
                             content: this.obfuscateMessageContent(message.content),
-                            author: this.authors.get(message.author),
-                            // TODO:
-                            attachments: [],
+                            author: this.authors.get(message.author, message.author.id),
+                            attachments: message.attachments.map((attachment) => ({
+                                id: faker.string.numeric(18),
+                                url: faker.internet.url() + "/file",
+                                filename: faker.system.fileName(),
+                                fileSizeBytes: faker.number.int({ min: 500, max: 100000000 }),
+                            })),
+                            reactions: message.reactions.map((reaction) => ({
+                                emoji: this.emojis.get(reaction.emoji),
+                                count: faker.number.int({ min: 0, max: 100 }),
+                            })),
+                            mentions: message.mentions.map((mention) => this.authors.get(mention, mention.id)),
+
+                            // TODO? we dont use them
                             embeds: [],
-                            reactions: [],
-                            mentions: [],
                         };
                     });
+                    this.emojis = new ObjectGroup((emoji, id) => ({
+                        id: emoji.id === null ? null : `${id}`,
+                        name: faker.internet.emoji(),
+                        isAnimated: emoji.isAnimated,
+                        url: faker.internet.url() + "/emoji.svg",
+                    }));
                 }
 
                 obfuscate(content) {
@@ -205,7 +220,7 @@
             };
 
             obfuscateButton.onclick = async () => {
-                outputElement.textContent = "Working...";
+                outputElement.textContent = "Working... (browser may freeze)";
 
                 try {
                     const ObfuscatorClass = {
