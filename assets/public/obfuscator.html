@@ -16,45 +16,241 @@
             do that for you.
         </p>
         <form>
-            <label for="file">Upload export:</label>
-            <input type="file" id="file" name="file" accept=".json,.txt" />
-            <br />
-            <label for="file" id="detectedPlatform"></label>
-            <br />
-            <br />
-            <input type="checkbox" id="obMessages" name="obMessages" checked disabled />
-            <label for="obMessages">Obfuscate message content</label>
-            <br />
-            <input type="checkbox" id="obNames" name="obNames" checked />
-            <label for="obNames">Obfuscate names (of channels, authors, guilds...)</label>
-            <br />
-            <input type="checkbox" id="obIDs" name="obIDs" checked />
-            <label for="obIDs"
-                >Obfuscate IDs (of messages, channels, authors, guilds...). Keep in mind these can sometimes be
-                reverse-engineered to find more information</label
-            >
-            <br />
-            <input type="checkbox" id="obMedia" name="obMedia" checked />
-            <label for="obMedia">Obfuscate media (profile pictures, attachments...)</label>
-            <br />
-            <label for="obTimestamps">Obfuscate timestamps by...</label>
-            <select id="obTimestamps" name="obTimestamps">
-                <option value="dont">Don't obfuscate timestamps</option>
-                <option value="unix0">Set all timestamps to unix 0</option>
-                <option value="currentTimestamp">Set all timestamps to current timestamp</option>
-                <option value="roundSecs">Round timestamps down to second</option>
-                <option value="roundMins">Round timestamps down to minute</option>
-                <option value="roundHrs">Round timestamps down to hour</option>
-                <option value="roundDays">Round timestamps down to day</option>
-            </select>
-            <br />
-            <input type="button" id="obfuscateButton" value="Obfuscate" disabled />
-            <input type="button" id="downloadButton" value="Download" disabled />
             <fieldset>
-                <legend>Preview:</legend>
-                <output id="preview"></output>
+                <legend>Platform</legend>
+                <input type="radio" id="discord" name="platform" value="discord" checked />
+                <label for="discord">Discord</label>
+
+                <input type="radio" id="telegram" name="platform" value="telegram" />
+                <label for="telegram">Telegram</label>
+            </fieldset>
+
+            <br />
+
+            <fieldset>
+                <legend>Export files</legend>
+                <input type="file" id="files" name="files" accept=".json" multiple />
+            </fieldset>
+
+            <p>What will be obfuscated:</p>
+
+            <ul>
+                <li>asd</li>
+                <li>asd</li>
+                <li>asd</li>
+
+                <li>
+                    <input type="checkbox" id="obMessages" name="obMessages" checked disabled />
+                    <label for="obMessages">Obfuscate message content</label>
+                </li>
+                <li>
+                    <input type="checkbox" id="obNames" name="obNames" checked />
+                    <label for="obNames">Obfuscate names (of channels, authors, guilds...)</label>
+                </li>
+                <li>
+                    <input type="checkbox" id="obIDs" name="obIDs" checked />
+                    <label for="obIDs"
+                        >Obfuscate IDs (of messages, channels, authors, guilds...). Keep in mind these can sometimes be
+                        reverse-engineered to find more information</label
+                    >
+                </li>
+                <li>
+                    <input type="checkbox" id="obMedia" name="obMedia" checked />
+                    <label for="obMedia">Obfuscate media (profile pictures, attachments...)</label>
+                </li>
+                <li>
+                    <label for="obTimestamps">Obfuscate timestamps by...</label>
+                    <select id="obTimestamps" name="obTimestamps">
+                        <option value="dont">Don't obfuscate timestamps</option>
+                        <option value="unix0">Set all timestamps to unix 0</option>
+                        <option value="currentTimestamp">Set all timestamps to current timestamp</option>
+                        <option value="roundSecs">Round timestamps down to second</option>
+                        <option value="roundMins">Round timestamps down to minute</option>
+                        <option value="roundHrs">Round timestamps down to hour</option>
+                        <option value="roundDays">Round timestamps down to day</option>
+                    </select>
+                </li>
+            </ul>
+            <input type="button" id="obfuscate" value="Obfuscate" disabled />
+
+            <br />
+            <br />
+
+            <fieldset>
+                <legend>Output</legend>
+                <div id="output">Nothing</div>
             </fieldset>
         </form>
+        <script type="module">
+            import { faker } from "https://cdn.skypack.dev/@faker-js/faker";
+
+            class ObjectGroup {
+                objects = new Map();
+                nextId = 1;
+
+                constructor(generator) {
+                    this.generator = generator;
+                }
+
+                get(object) {
+                    const str = JSON.stringify(object);
+                    if (!this.objects.has(str)) {
+                        this.objects.set(str, this.generator(object, this.nextId++));
+                    }
+                    return this.objects.get(str);
+                }
+            }
+
+            class Obfuscator {
+                obfuscate(content) {
+                    throw new Error("Not implemented");
+                }
+
+                // Obfuscate timestamp, result must be after `after`, if provided
+                obfuscateTimestamp(timestamp, after) {
+                    if (after) {
+                        // ...
+                    }
+                    // TODO: use...
+                    return -1;
+                }
+
+                obfuscateMessageContent(content) {
+                    const wordsInContent = content.split(" ");
+                    return faker.lorem.sentence(wordsInContent.length);
+                }
+            }
+
+            class DiscordObfuscator extends Obfuscator {
+                constructor() {
+                    super();
+
+                    // note: ids must be strings
+                    this.guilds = new ObjectGroup((guild, id) => ({
+                        id: `${id}`,
+                        name: faker.internet.domainWord(),
+                        iconUrl: "https://cdn.discordapp.com/embed/avatars/0.png", // default
+                    }));
+                    this.channels = new ObjectGroup((channel, id) => ({
+                        id: `${id}`,
+                        type: channel.type,
+                        name: faker.internet.domainWord(),
+                    }));
+                    this.authors = new ObjectGroup((author, id) => ({
+                        id: `${id}`,
+                        name: faker.internet.userName(),
+                        discriminator: author.discriminator, // not identifiable
+                        nickname: faker.internet.displayName(),
+                        color: faker.color.rgb(),
+                        isBot: author.isBot,
+                        avatarUrl: "https://cdn.discordapp.com/embed/avatars/0.png", // default
+                    }));
+                    this.messages = new ObjectGroup((message, id) => {
+                        // const ts = this.obfuscateTimestamp(new Date(message.timestamp));
+
+                        return {
+                            id: `${id}`,
+                            type: message.type,
+                            timestamp: message.timestamp,
+                            timestampEdited: message.timestampEdited,
+                            callEndedTimestamp: message.callEndedTimestamp,
+                            isPinned: message.isPinned,
+                            content: this.obfuscateMessageContent(message.content),
+                            author: this.authors.get(message.author),
+                            // TODO:
+                            attachments: [],
+                            embeds: [],
+                            reactions: [],
+                            mentions: [],
+                        };
+                    });
+                }
+
+                obfuscate(content) {
+                    const data = JSON.parse(content);
+                    const file = {
+                        guild: this.guilds.get(data.guild),
+                        channel: this.channels.get(data.channel),
+                        dateRange: {
+                            after: null,
+                            before: null,
+                        },
+                        messages: data.messages.map((message) => this.messages.get(message)),
+                        messageCount: data.messageCount,
+                    };
+                    return JSON.stringify(file, null, 2);
+                }
+            }
+
+            class TelegramObfuscator extends Obfuscator {
+                obfuscate(content) {
+                    return {
+                        a: "b",
+                    };
+                }
+            }
+
+            ////////////////////////////////////////
+            ////////////////////////////////////////
+            ////////////////////////////////////////
+
+            const filesElement = document.querySelector('input[name="files"]'),
+                obfuscateButton = document.getElementById("obfuscate"),
+                outputElement = document.getElementById("output");
+
+            const getFiles = () => filesElement.files;
+
+            filesElement.onchange = () => {
+                obfuscateButton.disabled = getFiles().length === 0;
+            };
+
+            obfuscateButton.onclick = async () => {
+                outputElement.textContent = "Working...";
+
+                try {
+                    const ObfuscatorClass = {
+                        discord: DiscordObfuscator,
+                        telegram: TelegramObfuscator,
+                    }[document.querySelector('input[name="platform"]:checked').value];
+                    const obfuscator = new ObfuscatorClass();
+
+                    const ul = document.createElement("ul");
+
+                    for (const file of getFiles()) {
+                        const name = (await digestText(file.name)) + ".json";
+                        const text = await file.text();
+                        const output = obfuscator.obfuscate(text);
+
+                        const blob = new Blob([output], { type: "application/json" });
+                        const url = URL.createObjectURL(blob);
+
+                        const li = document.createElement("li");
+                        const a = document.createElement("a");
+                        a.href = url;
+                        a.download = name;
+                        a.textContent = name;
+                        li.appendChild(a);
+                        li.appendChild(document.createTextNode(" (" + file.name + ")"));
+                        ul.appendChild(li);
+                    }
+
+                    outputElement.textContent = "";
+                    outputElement.appendChild(ul);
+                } catch (e) {
+                    outputElement.textContent = "Error: " + e.message;
+                    throw e;
+                }
+            };
+
+            // taken from https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/digest
+            async function digestText(message) {
+                const msgUint8 = new TextEncoder().encode(message); // encode as (utf-8) Uint8Array
+                const hashBuffer = await crypto.subtle.digest("SHA-1", msgUint8); // hash the message
+                const hashArray = Array.from(new Uint8Array(hashBuffer)); // convert buffer to byte array
+                const hashHex = hashArray.map((b) => b.toString(16).padStart(2, "0")).join(""); // convert bytes to hex string
+                return hashHex;
+            }
+        </script>
 
         <script>
             const fileUpload = document.getElementById("file"),
