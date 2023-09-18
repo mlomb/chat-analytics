@@ -11,7 +11,7 @@
     <body>
         <h3>Export obfuscator</h3>
         <p>
-            If you need to share a chat export as a sample for testing or debugging, you will want to obfuscate it to
+            If you need to share a chat export as a sample for testing or debugging, you may want to obfuscate it to
             protect any personal information such as message contents, IDs, author information and URLs. This tool will
             do that for you.
         </p>
@@ -80,9 +80,14 @@
                 <legend>Output</legend>
                 <div id="output">Nothing</div>
             </fieldset>
+
+            <p style="color: red">
+                <b>**DO NOT FORGET TO CHECK GENERATED FILES FOR SENSITIVE DATA**</b>
+            </p>
         </form>
         <script type="module">
             import { faker } from "https://cdn.skypack.dev/@faker-js/faker";
+            import JSZip from "https://cdn.skypack.dev/jszip";
 
             class ObjectGroup {
                 objects = new Map();
@@ -177,7 +182,7 @@
                         id: emoji.id === null ? null : `${id}`,
                         name: faker.internet.emoji(),
                         isAnimated: emoji.isAnimated,
-                        url: faker.internet.url() + "/emoji.svg",
+                        url: faker.internet.url() + "emoji.svg",
                     }));
                 }
 
@@ -296,12 +301,15 @@
                     }[document.querySelector('input[name="platform"]:checked').value];
                     const obfuscator = new ObfuscatorClass();
 
+                    const zipFile = new JSZip();
                     const ul = document.createElement("ul");
 
                     for (const file of getFiles()) {
                         const name = (await digestText(file.name)) + ".json";
                         const text = await file.text();
                         const output = obfuscator.obfuscate(text);
+
+                        zipFile.file(name, output);
 
                         const blob = new Blob([output], { type: "application/json" });
                         const url = URL.createObjectURL(blob);
@@ -313,6 +321,20 @@
                         a.textContent = name;
                         li.appendChild(a);
                         li.appendChild(document.createTextNode(" (" + file.name + ")"));
+                        ul.appendChild(li);
+                    }
+
+                    // build zip
+                    {
+                        const blob = await zipFile.generateAsync({ type: "blob", compression: "DEFLATE" });
+                        const url = URL.createObjectURL(blob);
+
+                        const li = document.createElement("li");
+                        const a = document.createElement("a");
+                        a.href = url;
+                        a.download = "obfuscated.zip";
+                        a.textContent = "Download all as ZIP";
+                        li.appendChild(a);
                         ul.appendChild(li);
                     }
 
