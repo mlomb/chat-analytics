@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="robots" content="noindex, nofollow" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Chat Analytics - Export obfuscator</title>
+        <meta name="description" content="Obfuscate your chat exports to protect personal information" />
+        <link rel="canonical" href="https://chatanalytics.app/obfuscator.html" />
+        <link rel="icon" type="image/png" href="https://chatanalytics.app/favicon.png" />
+    </head>
+    <body>
+        <h3>Export obfuscator</h3>
+        <p>
+            If you need to share a chat export as a sample for testing or debugging, you may want to obfuscate it to
+            protect any personal information such as message contents, IDs, author information and URLs. This tool will
+            do that for you.
+        </p>
+        <form>
+            <fieldset>
+                <legend>Platform</legend>
+                <input type="radio" id="discord" name="platform" value="discord" checked />
+                <label for="discord">Discord</label>
+
+                <input type="radio" id="telegram" name="platform" value="telegram" />
+                <label for="telegram">Telegram</label>
+            </fieldset>
+
+            <br />
+
+            <fieldset>
+                <legend>Export files</legend>
+                <input type="file" id="files" name="files" accept=".json" multiple />
+            </fieldset>
+
+            <p>
+                The process will build a new export from scratch, instead of modifying the existing file; this is to
+                avoid leaking new fields we are not aware of.
+                <br />
+                All the obfuscator code is contained in this HTML file, feel free to audit it.
+            </p>
+
+            <p>What will happen with your data:</p>
+            <ul>
+                <li>
+                    <b>Message content will obfuscated.</b> The tool will generate Lorem Ipsum sentences the same length
+                    as the original message.
+                </li>
+                <li>
+                    <b>All names will be obfuscated.</b> The tool will generate random names for guilds and channels, as
+                    well as nicknames/names for authors.
+                </li>
+                <li>(as of now) Timestamps are preserved as is.</li>
+                <li>
+                    <b>Guilds, Channels, Authors, and all other forms of IDs are obfuscated.</b> For each kind of
+                    entity, we create a new sequential id.
+                </li>
+                <li>
+                    <b>References between guilds, channels and authors is preserved.</b> This means that messages sent
+                    by the same author, or in the same channel or guild, will reference to the same obfuscated
+                    author/channel/guild.
+                </li>
+                <li>
+                    <b>Media, stickers, reactions, and attachments will be preserved but obfuscated.</b> The tool will
+                    generate the same kind of media in the same quantity, but with random content (different emojis for
+                    reactions, or random URLs for attachments)
+                </li>
+                <li>
+                    A lot of data is being lost that could be preserved obfuscated. We will add them here when we have
+                    the need to debug those things.
+                </li>
+            </ul>
+            <p>If you are not satified with some of the points, feel free to let us know.</p>
+
+            <input type="button" id="obfuscate" value="Obfuscate" disabled />
+
+            <br />
+            <br />
+
+            <fieldset>
+                <legend>Output</legend>
+                <div id="output">Nothing</div>
+            </fieldset>
+
+            <p style="color: red">
+                <b>**DO NOT FORGET TO CHECK GENERATED FILES FOR SENSITIVE DATA**</b>
+            </p>
+        </form>
+        <script type="module">
+            import { faker } from "https://cdn.skypack.dev/@faker-js/faker";
+            import JSZip from "https://cdn.skypack.dev/jszip";
+
+            class ObjectGroup {
+                objects = new Map();
+                nextId = 1;
+
+                constructor(generator) {
+                    this.generator = generator;
+                }
+
+                get(object, customId) {
+                    const trueId = customId || JSON.stringify(object); // use object as id
+                    if (!this.objects.has(trueId)) {
+                        this.objects.set(trueId, this.generator(object, this.nextId++));
+                    }
+                    return this.objects.get(trueId);
+                }
+            }
+
+            class Obfuscator {
+                obfuscate(content) {
+                    throw new Error("Not implemented");
+                }
+
+                // Obfuscate timestamp, result must be after `after`, if provided
+                obfuscateTimestamp(timestamp, after) {
+                    if (after) {
+                        // ...
+                    }
+                    // TODO: use...
+                    return -1;
+                }
+
+                obfuscateMessageContent(content) {
+                    const wordsInContent = content.split(" ");
+                    return faker.lorem.sentence(wordsInContent.length);
+                }
+            }
+
+            class DiscordObfuscator extends Obfuscator {
+                constructor() {
+                    super();
+
+                    // note: ids must be strings
+                    this.guilds = new ObjectGroup((guild, id) => ({
+                        id: `${id}`,
+                        name: faker.internet.domainWord(),
+                        iconUrl: "https://cdn.discordapp.com/embed/avatars/0.png", // default
+                    }));
+                    this.channels = new ObjectGroup((channel, id) => ({
+                        id: `${id}`,
+                        type: channel.type,
+                        name: faker.internet.domainWord(),
+                    }));
+                    this.authors = new ObjectGroup((author, id) => ({
+                        id: `${id}`,
+                        name: faker.internet.userName(),
+                        discriminator: author.discriminator, // not identifiable
+                        nickname: faker.internet.displayName(),
+                        color: faker.color.rgb(),
+                        isBot: author.isBot,
+                        avatarUrl: "https://cdn.discordapp.com/embed/avatars/0.png", // default
+                    }));
+                    this.messages = new ObjectGroup((message, id) => {
+                        // const ts = this.obfuscateTimestamp(new Date(message.timestamp));
+
+                        return {
+                            id: `${id}`,
+                            type: message.type,
+                            timestamp: message.timestamp,
+                            timestampEdited: message.timestampEdited,
+                            callEndedTimestamp: message.callEndedTimestamp,
+                            isPinned: message.isPinned,
+                            content: this.obfuscateMessageContent(message.content),
+                            author: this.authors.get(message.author, message.author.id),
+                            attachments: message.attachments.map((attachment) => ({
+                                id: faker.string.numeric(18),
+                                url: faker.internet.url() + "/file",
+                                filename: faker.system.fileName(),
+                                fileSizeBytes: faker.number.int({ min: 500, max: 100000000 }),
+                            })),
+                            reactions: message.reactions.map((reaction) => ({
+                                emoji: this.emojis.get(reaction.emoji),
+                                count: faker.number.int({ min: 0, max: 100 }),
+                            })),
+                            mentions: message.mentions.map((mention) => this.authors.get(mention, mention.id)),
+
+                            // TODO? we dont use them
+                            embeds: [],
+                        };
+                    });
+                    this.emojis = new ObjectGroup((emoji, id) => ({
+                        id: emoji.id === null ? null : `${id}`,
+                        name: faker.internet.emoji(),
+                        isAnimated: emoji.isAnimated,
+                        url: faker.internet.url() + "emoji.svg",
+                    }));
+                }
+
+                obfuscate(content) {
+                    const data = JSON.parse(content);
+                    const file = {
+                        guild: this.guilds.get(data.guild),
+                        channel: this.channels.get(data.channel),
+                        dateRange: {
+                            after: null,
+                            before: null,
+                        },
+                        messages: data.messages.map((message) => this.messages.get(message)),
+                        messageCount: data.messageCount,
+                    };
+                    return JSON.stringify(file, null, 2);
+                }
+            }
+
+            class TelegramObfuscator extends Obfuscator {
+                constructor() {
+                    super();
+
+                    this.authors = new ObjectGroup((author, id) => ({
+                        id: faker.string.numeric(10),
+                        name: faker.person.fullName(),
+                    }));
+                }
+
+                obfuscate(content) {
+                    const data = JSON.parse(content);
+                    const file = {
+                        name: faker.internet.domainWord(),
+                        type: data.type,
+                        id: parseInt(faker.string.numeric(10)),
+                        messages: data.messages
+                            .map((message) => this.obfuscateMessage(message))
+                            .filter((m) => m !== null),
+                    };
+                    return JSON.stringify(file, null, 2);
+                }
+
+                obfuscateMessage(message) {
+                    const fni = "(File not included. Change data exporting settings to download.)";
+
+                    const result = {
+                        id: message.id, // Telegram exports have increasing IDs, starting from 1
+                        type: message.type,
+                        date: message.date,
+                    };
+
+                    if (message.edited) result.edited = message.edited;
+
+                    switch (message.type) {
+                        case "message":
+                            const author = this.authors.get(message.from_id);
+                            result.from = author.name;
+                            result.from_id = author.id;
+                            result.text = this.obfuscateMessageContent(this.parseTextArray(message.text));
+                            if (message.reply_to_message_id) result.reply_to_message_id = message.reply_to_message_id;
+                            if (message.media_type) result.media_type = message.media_type;
+                            if (message.mime_type) result.mime_type = message.mime_type;
+                            if (message.location_information)
+                                result.location_information = {
+                                    latitude: 0,
+                                    longitude: 0,
+                                };
+                            if (message.file) result.file = fni;
+                            if (message.thumbnail) result.thumbnail = fni;
+                            if (message.sticker_emoji) result.sticker_emoji = message.sticker_emoji;
+                            if (message.photo) result.photo = fni;
+                            break;
+                        case "service":
+                            // intentionally skipped
+                            // console.log(message);
+                            break;
+                        default:
+                            console.log("Skipping message type", message.type);
+                            return null;
+                    }
+
+                    return result;
+                }
+
+                parseTextArray(input) {
+                    if (typeof input === "string") return input;
+                    if (Array.isArray(input)) return input.map(this.parseTextArray.bind(this)).join("");
+
+                    return input.text;
+                }
+            }
+
+            ////////////////////////////////////////
+            ////////////////////////////////////////
+            ////////////////////////////////////////
+
+            const filesElement = document.querySelector('input[name="files"]'),
+                obfuscateButton = document.getElementById("obfuscate"),
+                outputElement = document.getElementById("output");
+
+            const getFiles = () => filesElement.files;
+
+            filesElement.onchange = () => {
+                obfuscateButton.disabled = getFiles().length === 0;
+            };
+
+            obfuscateButton.onclick = async () => {
+                outputElement.textContent = "Working... (browser may freeze)";
+
+                try {
+                    faker.seed(42);
+
+                    const ObfuscatorClass = {
+                        discord: DiscordObfuscator,
+                        telegram: TelegramObfuscator,
+                    }[document.querySelector('input[name="platform"]:checked').value];
+                    const obfuscator = new ObfuscatorClass();
+
+                    const zipFile = new JSZip();
+                    const ul = document.createElement("ul");
+
+                    for (const file of getFiles()) {
+                        const name = (await digestText(file.name)) + ".json";
+                        const text = await file.text();
+                        const output = obfuscator.obfuscate(text);
+
+                        zipFile.file(name, output);
+
+                        const blob = new Blob([output], { type: "application/json" });
+                        const url = URL.createObjectURL(blob);
+
+                        const li = document.createElement("li");
+                        const a = document.createElement("a");
+                        a.href = url;
+                        a.download = name;
+                        a.textContent = name;
+                        li.appendChild(a);
+                        li.appendChild(document.createTextNode(" (" + file.name + ")"));
+                        ul.appendChild(li);
+                    }
+
+                    // build zip
+                    {
+                        const blob = await zipFile.generateAsync({ type: "blob", compression: "DEFLATE" });
+                        const url = URL.createObjectURL(blob);
+
+                        const li = document.createElement("li");
+                        const a = document.createElement("a");
+                        a.href = url;
+                        a.download = "obfuscated.zip";
+                        a.textContent = "Download all as ZIP";
+                        li.appendChild(a);
+                        ul.appendChild(li);
+                    }
+
+                    outputElement.textContent = "";
+                    outputElement.appendChild(ul);
+                } catch (e) {
+                    outputElement.textContent = "Error: " + e.message;
+                    throw e;
+                }
+            };
+
+            // taken from https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/digest
+            async function digestText(message) {
+                const msgUint8 = new TextEncoder().encode(message); // encode as (utf-8) Uint8Array
+                const hashBuffer = await crypto.subtle.digest("SHA-1", msgUint8); // hash the message
+                const hashArray = Array.from(new Uint8Array(hashBuffer)); // convert buffer to byte array
+                const hashHex = hashArray.map((b) => b.toString(16).padStart(2, "0")).join(""); // convert bytes to hex string
+                return hashHex;
+            }
+        </script>
+    </body>
+</html>

@@ -1,6 +1,7 @@
 .github/*
 .vscode/*
 *.html
+!assets/public/obfuscator.html
 *.md
 *.json
 !tests/**/*.json
