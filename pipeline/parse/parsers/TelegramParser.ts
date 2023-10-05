@@ -67,8 +67,9 @@ export class TelegramParser extends Parser {
 
         const rawId: RawID = message.id + "";
         const rawAuthorId: RawID = (message.from_id || message.actor_id) + "";
-        const rawReplyToId: RawID | undefined =
-            message.reply_to_message_id === null ? undefined : message.reply_to_message_id + "";
+        const rawReplyToId: RawID | undefined = message.reply_to_message_id
+            ? message.reply_to_message_id + ""
+            : undefined;
 
         // read from unix timestamp or full datetime
         const timestamp = message.date_unixtime ? parseInt(message.date_unixtime) * 1000 : Date.parse(message.date!);
