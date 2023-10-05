@@ -126,6 +126,8 @@ export class BitStream {
      * Knowing the maximum number of bits lets us decide if we need to use a variable length encoding or if its worse.
      */
     writeVarInt(value: number, maxBits: number = 32): void {
+        value = Math.max(0, value); // negative numbers are not supported
+
         if (maxBits < 10) {
             this.setBits(maxBits, value);
             return;
