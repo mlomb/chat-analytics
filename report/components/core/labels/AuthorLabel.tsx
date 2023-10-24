@@ -25,14 +25,13 @@ const _AuthorLabel = ({ index }: LabelProps) => {
         if (discr && discr.length === 4) {
             discr = parseInt(discr).toString();
             n = n.slice(0, -5);
-        } else discr = undefined;
-
-        name = (
-            <>
-                {n}
-                {discr && <span className="Label__discriminator">#{`${isDemo ? 0 : discr}`.padStart(4, "0")}</span>}
-            </>
-        );
+            name = (
+                <>
+                    {n}
+                    {discr && <span className="Label__discriminator">#{`${isDemo ? 0 : discr}`.padStart(4, "0")}</span>}
+                </>
+            );
+        }
     }
 
     if (author.b) {
