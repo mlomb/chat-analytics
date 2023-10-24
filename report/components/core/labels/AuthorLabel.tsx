@@ -18,17 +18,14 @@ const _AuthorLabel = ({ index }: LabelProps) => {
 
     // add discriminator in Discord
     if (db.config.platform === "discord") {
-        let n = author.n;
-        let discr = n.split("#").pop();
+        const discr = author.n.split("#").pop();
 
         // only keep if it's 4 chars (and not a deleted ID)
         if (discr && discr.length === 4) {
-            discr = parseInt(discr).toString();
-            n = n.slice(0, -5);
             name = (
                 <>
-                    {n}
-                    {discr && <span className="Label__discriminator">#{`${isDemo ? 0 : discr}`.padStart(4, "0")}</span>}
+                    {author.n.slice(0, -5)}
+                    <span className="Label__discriminator">#{`${isDemo ? "0000" : discr}`}</span>
                 </>
             );
         }
