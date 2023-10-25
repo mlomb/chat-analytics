@@ -195,7 +195,7 @@ export const genTimeKeys = (start: Day, end: Day): TimeKeysResult => {
 };
 
 /**
- * Available human readable formats
+ * Available human-readable formats
  *
  * Examples for day="2020-12-25", seconds=12345:
  * - y: 2020
@@ -254,7 +254,7 @@ const DateTimeFormatters: {
 // we cant test this since it depends on the browser locale
 // setting it as a parameter will force us to create a new Intl.DateTimeFormat each call
 // istanbul ignore next
-/** Format a Day (+seconds) into a human readable string */
+/** Format a Day (+seconds) into a human-readable string */
 export const formatTime = (format: TimeFormat, day: Day, secondsOfDay: number = 0): string => {
     const d = day.toDate();
     d.setSeconds(secondsOfDay);
@@ -267,7 +267,7 @@ export interface Datetime {
     secondOfDay?: number;
 }
 
-/** Format a Datetime into a human readable string. @see formatTime */
+/** Format a Datetime into a human-readable string. @see formatTime */
 export const formatDatetime = (format: TimeFormat, datetime?: Datetime) => {
     if (datetime === undefined) return "-";
 

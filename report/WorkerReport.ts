@@ -92,7 +92,7 @@ const init = (msg: InitMessage) => {
         database: {
             ...database,
             // since we don't need serialized messages in the UI
-            // and they are huge, let's remove them
+            // and since they are huge, let's remove them
             // @ts-expect-error
             messages: undefined,
         },

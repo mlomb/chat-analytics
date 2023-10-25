@@ -18,7 +18,7 @@ const createTreeTheme = (root: Root) => {
 };
 
 const createTreeChart = (c: Container) => {
-    let series = c.children.push(
+    const series = c.children.push(
         Treemap.new(c.root, {
             sort: "descending",
             singleBranchOnly: true,
@@ -51,13 +51,13 @@ const createTreeChart = (c: Container) => {
             let domain = (c.dataContext as DomainTreeEntry).domain;
 
             // skip "Other" nodes
-            if (domain.includes("Other")) return undefined;
+            if (domain.includes("Other")) return;
 
             // if TLD, try to load icon from nic site (nic.us, nic.io, etc.)
             if (domain.startsWith(".") && domain.split(".").length === 2) domain = "nic" + domain;
 
             // remove front dot
-            if (domain.startsWith(".")) domain = domain.substr(1);
+            if (domain.startsWith(".")) domain = domain.substring(1);
 
             const imageSrc = "https://icons.duckduckgo.com/ip3/" + domain + ".ico";
 
@@ -65,7 +65,7 @@ const createTreeChart = (c: Container) => {
         });
     });
 
-    series.bullets.push(function (root, series, dataItem) {
+    series.bullets.push((root, series, dataItem) => {
         const picture = Picture.new(root, {
             centerX: p50,
             centerY: p50,

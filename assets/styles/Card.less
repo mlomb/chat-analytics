@@ -5,8 +5,7 @@
     display: grid;
     grid-template-columns: repeat(1, 1fr);
     grid-gap: @cards-gap;
-    padding: @cards-gap;
-    padding-bottom: 0;
+    padding: @cards-gap @cards-gap 0;
     margin: 0 auto;
     width: 100%;
     box-sizing: border-box;
@@ -33,14 +32,12 @@
     select {
         display: inline-grid;
         appearance: none;
-        background: none;
         color: white;
         font-family: inherit;
         font-size: inherit;
         border-bottom: 2px dotted #dddddd96;
         padding-right: 26px;
-        background-image: ~"url(@assets/images/icons/chevron-down.svg)";
-        background-repeat: no-repeat;
+        background: ~"url(@assets/images/icons/chevron-down.svg)" no-repeat;
         background-position-x: 95%;
         background-position-y: 60%;
         transition: border-color 0.2s;
@@ -158,8 +155,7 @@
 }
 @media (min-width: 1280px) {
     .CardContainer {
-        padding: 20px;
-        padding-bottom: 0;
+        padding: 20px 20px 0;
         max-width: 1500px;
     }
 }

@@ -48,7 +48,7 @@ The contribution of [new platform parsers](/docs/PIPELINE.md#writing-a-new-parse
 
 Since all chat data always stays in the browser, there is zero risk of someone reading your chats. Note that **the report HTML file contains sensitive information** (one may reconstruct message contents for every message), so share your reports with people you trust.
 
-The site does not use cookies either and uses a self-hosted version of [Plausible](https://plausible.io). All events do not contain PII and the information is segmented (e.g. 1MB-10MB, etc). Since I want full transparency, you can check the [site analytics here](https://p.chatanalytics.app/chatanalytics.app).
+The site does not use cookies either and uses a self-hosted version of [Plausible](https://plausible.io). All events do not contain PII and the information is segmented (e.g. 1MB-10MB, etc.). Since I want full transparency, you can check the [site analytics here](https://p.chatanalytics.app/chatanalytics.app).
 
 ## CLI
 

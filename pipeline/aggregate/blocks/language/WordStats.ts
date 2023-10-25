@@ -1,4 +1,3 @@
-import { Day } from "@pipeline/Time";
 import { Index } from "@pipeline/Types";
 import { BlockDescription, BlockFn } from "@pipeline/aggregate/Blocks";
 import { DateItem } from "@pipeline/aggregate/Common";

@@ -17,7 +17,7 @@ import User from "@assets/images/icons/user.svg";
 const prettyBytesAligned = (n: number) => prettyBytes(n, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
 interface Props {
-    /** Wether the generation is currently running (still processing) */
+    /** Whether the generation is currently running (still processing) */
     working: boolean;
 
     tasks: ProgressTask[];

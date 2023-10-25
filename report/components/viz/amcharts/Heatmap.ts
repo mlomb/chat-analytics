@@ -1,4 +1,4 @@
-import { Color, HeatLegend, Root, p100 } from "@amcharts/amcharts5";
+import { Color, HeatLegend, Root } from "@amcharts/amcharts5";
 import { AxisRendererX, AxisRendererY, CategoryAxis, ColumnSeries, XYChart } from "@amcharts/amcharts5/xy";
 
 export const createHeatmap = (

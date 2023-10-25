@@ -28,7 +28,7 @@ export const loadFile = (filepath: string): FileInput => {
     };
 };
 
-/** Loads assets when running in a NodeJS process */
+/** Loads assets when running in a Node.js process */
 export const loadNodeAsset: LoadAssetFn = async (filepath: string, type: "json" | "text" | "arraybuffer") => {
     let rootDir: string;
 

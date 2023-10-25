@@ -20,6 +20,6 @@ export interface Config {
     /** Target platform */
     platform: Platform;
 
-    /** Wether this report should be marked as a demo */
+    /** Whether this report should be marked as a demo */
     demo?: boolean;
 }

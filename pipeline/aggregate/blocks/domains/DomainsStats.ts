@@ -106,7 +106,7 @@ const buildDomainTree = (domains: string[], counts: number[]) => {
 
         if (
             otherCount > 0 &&
-            // fiter others aswell
+            // filter others as well
             otherCount / total >= 0.01 &&
             // only add other if we are combining more than one domain
             combined > 1

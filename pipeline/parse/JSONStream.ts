@@ -147,7 +147,7 @@ export class JSONStream {
                     if (
                         this.brackets === 0 &&
                         this.braces === 0 &&
-                        this.quotes === false &&
+                        !this.quotes &&
                         this.primitive &&
                         isPrimitiveTerminator(c)
                     ) {

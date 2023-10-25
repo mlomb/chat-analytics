@@ -1,4 +1,3 @@
-import { InteractionStats } from "@pipeline/aggregate/blocks/interaction/InteractionStats";
 import { MessageComplete } from "@pipeline/process/Types";
 import { useBlockData } from "@report/BlockHook";
 import { TopMessages } from "@report/components/viz/TopMessages";

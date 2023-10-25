@@ -45,7 +45,7 @@ This is the first entry in the changelog, so I'll just list **some** changes tha
 - Now input files that have overlapped messages are merged (duplicate messages are ignored)
 - Now we keep the latest information about authors and channels and guilds, like the name and avatar
 - 4x speedup in base91 decoding
-- I'm sure there is a lot more to put here but I can't remember
+- I'm sure there is a lot more to put here, but I can't remember
 
 ## App
 
@@ -68,9 +68,9 @@ This is the first entry in the changelog, so I'll just list **some** changes tha
 - Created boxplot with histogram chart
 - Now bot authors have an icon alongside their name
 - All charts now have proper tooltips and hover information
-- The timeline tab now shows the number of messages per guild or per group if appropiate
+- The timeline tab now shows the number of messages per guild or per group if appropriate
 - Added a link to report issues in ErrorBoundary
-- Most charts have been modified to look prettier (colors, margins, kind of series, etc)
+- Most charts have been modified to look prettier (colors, margins, kind of series, etc.)
 - Words have its own stats now: usage over time, who write them the most, which channels they are used the most.
 - Added a few statistics in Message statistics
 - Renamed "combined" to "heatmap" in activity by hour/weekday
@@ -82,7 +82,7 @@ This is the first entry in the changelog, so I'll just list **some** changes tha
 - Renamed "non-bot" to "human"
 - Added a card: "Linked by domain hierarchy"
 - Added a card: "Most links sent [by author/in channel]"
-- A lot other performance and bug fixes
+- A lot of other performance and bug fixes
 
 # Documentation
 

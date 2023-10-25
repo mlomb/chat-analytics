@@ -14,7 +14,7 @@ import emojiRegex from "emoji-regex";
     > (source: https://fasttext.cc/docs/en/crawl-vectors.html)
     Migrating these is a lot of work.
     I didn't find a good library for this, so we would have to implement it ourselves.
-    Also I only know well Spanish and English, so I need help here.
+    Also, I only know well Spanish and English, so I need help here.
 
     But we also have another problem, we don't know beforehand what language the
     messages are in. Asking the user may only work sometimes since people can be
@@ -74,8 +74,8 @@ const Matchers: Readonly<TokenMatcher[]> = [
     // TODO: match words on languages that words are one character (help wanted)
     // See: https://github.com/facebookresearch/fastText/blob/master/docs/crawl-vectors.md#tokenization
     {
-        // match words
-        // words can have numbers (k8s, i18n, etc) (is this a mistake?)
+        // match words;
+        // words can have numbers (k8s, i18n, etc.) (is this a mistake?)
         regex: /(?:\p{L}[\p{L}'0-9-]*[\p{L}0-9])|\p{L}/giu,
         tag: "word",
     },

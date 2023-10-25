@@ -15,7 +15,7 @@ export class Stopwords {
         }
     }
 
-    /** Checks wether a word is a stopword in any of the given languages */
+    /** Checks whether a word is a stopword in any of the given languages */
     public isStopword(word: string, langs: (typeof LanguageCodes)[number][]): boolean {
         const wordFormatted = matchFormat(word);
         for (const lang of langs) {

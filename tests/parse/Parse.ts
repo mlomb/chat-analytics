@@ -26,7 +26,7 @@ export interface ExpectedPartialParseResult {
 
 /** Convenient function to inspect the objects emitted by a parser for specific inputs */
 export const runParser = async (klass: new () => Parser, inputs: FileInput[]): Promise<ParseResult> => {
-    let parsed: ParseResult = {
+    const parsed: ParseResult = {
         guilds: [],
         channels: [],
         authors: [],
@@ -42,8 +42,8 @@ export const runParser = async (klass: new () => Parser, inputs: FileInput[]): P
     parser.on("message", (message) => {
         parsed.messages.push(message);
 
-        // bonus check
-        // check that messages are emitted in chronological order, WHITHIN EACH FILE
+        // bonus check:
+        // check that messages are emitted in chronological order, WITHIN EACH FILE
         if (lastMsgTimestamp === undefined) lastMsgTimestamp = message.timestamp;
         else expect(message.timestamp).toBeGreaterThanOrEqual(lastMsgTimestamp);
     });

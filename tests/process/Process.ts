@@ -1,6 +1,6 @@
 import { AttachmentType } from "@pipeline/Attachments";
 import { Platform } from "@pipeline/Platforms";
-import { DateKey, Day, genTimeKeys } from "@pipeline/Time";
+import { DateKey, Day } from "@pipeline/Time";
 import { generateDatabase } from "@pipeline/index";
 import { Author, Call, Channel, Guild, Message } from "@pipeline/process/Types";
 import { matchFormat } from "@pipeline/process/nlp/Text";

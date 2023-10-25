@@ -68,7 +68,7 @@ const MostUsed = (props: Props) => {
             .slice(0, props.maxItems);
 
         return entries;
-    }, [props.counts, props.maxItems, props.filter, filter]); // we use other props in this memo but I WILL assume they don't change
+    }, [props.counts, props.maxItems, props.filter, filter]); // we use other props in this memo, but I'll assume they don't change
 
     // memo component
     const Item = useMemo(

@@ -39,7 +39,7 @@ const fn: BlockFn<CallsActivity> = (database, filters, common) => {
 };
 
 export default {
-    key: "calls/activty",
+    key: "calls/activity",
     triggers: ["time", "authors", "channels"],
     fn,
-} as BlockDescription<"calls/activty", CallsActivity>;
+} as BlockDescription<"calls/activity", CallsActivity>;

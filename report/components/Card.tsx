@@ -1,7 +1,5 @@
 import { ReactElement, useState } from "react";
 
-import { BlockData, BlockKey } from "@pipeline/aggregate/Blocks";
-import { useBlockData } from "@report/BlockHook";
 import { BlockState } from "@report/BlockStore";
 import ErrorBoundary from "@report/components/ErrorBoundary";
 import { LoadingGroup } from "@report/components/LoadingGroup";

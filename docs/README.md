@@ -6,7 +6,7 @@ We are building chat-analytics using [TypeScript](https://www.typescriptlang.org
 
 The project is split into 3 main parts:
 
-* `pipeline/`: the pipeline, which handles all the data from the input files to the final aggregated data. **This is the core of the project** and it is described in detail in [PIPELINE.md](./PIPELINE.md).
+* `pipeline/`: the pipeline, which handles all the data from the input files to the final aggregated data. **This is the core of the project**; it is described in detail in [PIPELINE.md](./PIPELINE.md).
 * `app/`: the main UI for generating reports, which is hosted in [chatanalytics.app](https://chatanalytics.app). It uses a WebWorker to run the pipeline.
 * `report/`: the report UI, which is exported as a single, static HTML file, acting like a placeholder. Then it is filled with the processed data from the pipeline to display the graphs and stats. Also uses its own WebWorker to aggregate the data.
 
@@ -30,4 +30,4 @@ Zipping and then replacing the file in Google Drive (~280MB uncompressed, 23MB c
 
 ## Performance
 
-We aim to handle millions of messages in a single report (at least 10M). This is a lot of data and we have to be careful with the amount of memory used when generating the report (since browser tabs like to crash when asking for too much memory). And make sure report don't get extremely big to be impractical.
+We aim to handle millions of messages in a single report (at least 10M). This is a lot of data, we have to be careful with the amount of memory used when generating the report (since browser tabs like to crash when asking for too much memory) and we have to make sure reports don't get impractically big.

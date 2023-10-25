@@ -92,7 +92,7 @@ export class WhatsAppParser extends Parser {
 
     /**
      * Tries to extract a .txt file from a .zip file buffer.
-     * It searches the default "_chat.txt" file. Otherwise tries to match some text files with a pattern.
+     * It searches the default "_chat.txt" file. Otherwise, it tries to match some text files with a pattern.
      *
      * @throws if it can't find a .txt file
      * @returns the .txt file buffer

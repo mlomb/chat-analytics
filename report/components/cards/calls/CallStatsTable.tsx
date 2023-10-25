@@ -1,6 +1,5 @@
 import { formatDatetime } from "@pipeline/Time";
 import { useBlockData } from "@report/BlockHook";
-import { getDatabase } from "@report/WorkerWrapper";
 import DottedTable, { Line } from "@report/components/viz/DottedTable";
 import { AmCharts5Chart } from "@report/components/viz/amcharts/AmCharts5Chart";
 import { createDistributionChart } from "@report/components/viz/amcharts/Distribution";

@@ -15,7 +15,7 @@ export const CallsActivity = () => (
             marginLeft: 5,
             marginBottom: 8,
         }}
-        data={useBlockData("calls/activty")?.weekdayHourActivity}
+        data={useBlockData("calls/activity")?.weekdayHourActivity}
         create={createChart}
     />
 );

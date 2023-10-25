@@ -111,14 +111,14 @@ export class BitStream {
         const value2 = buffer[aligned32 + 1];
 
         // TODO: try to do it branch-less
-        let value = 0;
+        let value;
         if (delta + bits > 32) {
             const aligned = (value1 << delta) | (value2 >>> (32 - delta));
             value = aligned >>> (32 - bits);
         } else {
             value = (value1 << delta) >>> (32 - bits);
         }
-        return value >>> 0;
+        return value;
     }
 
     /**
@@ -145,14 +145,14 @@ export class BitStream {
 
             while (valueBig > 127n) {
                 this.setBits(8, Number((valueBig & 127n) | 128n));
-                valueBig = valueBig >> 7n;
+                valueBig >>= 7n;
             }
             this.setBits(8, Number(valueBig));
         } else {
             // normal number
             while (value > 127) {
                 this.setBits(8, (value & 127) | 128);
-                value = value >>> 7;
+                value >>>= 7;
             }
             this.setBits(8, value);
         }

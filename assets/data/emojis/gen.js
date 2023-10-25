@@ -8,10 +8,10 @@ const emojiSentimentMap = {};
 
 for (const line of emojiSentiment) {
     const [emoji, _1, occurrences, _2, negative, neutral, positive] = line.split(",");
-    const sentiment = (positive / occurrences - negative / occurrences).toFixed(3);
     if (occurrences <= 2) continue; // ignore entries with less than 3 occurrences
+    const sentiment = positive / occurrences - negative / occurrences;
     if (!isNaN(sentiment)) {
-        emojiSentimentMap[emoji] = sentiment;
+        emojiSentimentMap[emoji] = sentiment.toFixed(3);
     }
 }
 

@@ -1,7 +1,7 @@
 import { Env } from "@pipeline/Env";
 import { Day } from "@pipeline/Time";
 import { Index } from "@pipeline/Types";
-import { PEmoji, PMessage } from "@pipeline/parse/Types";
+import { PMessage } from "@pipeline/parse/Types";
 import { PMessageGroup } from "@pipeline/process/ChannelMessages";
 import { DatabaseBuilder } from "@pipeline/process/DatabaseBuilder";
 import { IndexCountsBuilder } from "@pipeline/process/IndexCounts";
