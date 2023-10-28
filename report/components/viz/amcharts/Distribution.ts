@@ -49,7 +49,7 @@ export const createHistogramWithBoxplot = (root: Root, xAxisType: AxisType) => {
 
         for (const value of data.count) {
             values.push({
-                value: value,
+                value,
                 from: accum,
                 to: accum + step,
             });
