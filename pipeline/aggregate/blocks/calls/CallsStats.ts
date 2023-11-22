@@ -65,7 +65,7 @@ const fn: BlockFn<CallsStats> = (database, filters, common, args) => {
             // compute time difference between calls
             let diff = diffDatetime(lastCall, startDatetime);
             if (diff < 0) {
-                secondsInCall -= diff; // remove overlap
+                secondsInCall += diff; // remove overlap
                 diff = 0;
             }
             timesBetween[total - 1] = diff;
