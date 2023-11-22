@@ -102,7 +102,7 @@ export class DiscordParser extends Parser {
         const pauthor: PAuthor = {
             id: message.author.id,
             bot: message.author.isBot,
-            name: name,
+            name,
             avatar: avatar ? (" " + avatar).substring(1) : undefined, // avoid leak
         };
         this.emit("author", pauthor, this.lastMessageTimestampInFile);
