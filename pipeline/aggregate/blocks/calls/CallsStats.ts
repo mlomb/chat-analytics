@@ -1,8 +1,6 @@
 import { Datetime, diffDatetime } from "@pipeline/Time";
 import { BlockDescription, BlockFn } from "@pipeline/aggregate/Blocks";
 import { VariableDistribution, computeVariableDistribution } from "@pipeline/aggregate/Common";
-import { filterMessages } from "@pipeline/aggregate/Helpers";
-import { MessageView } from "@pipeline/serialization/MessageView";
 
 interface CallDuration {
     duration: number;
@@ -65,8 +63,11 @@ const fn: BlockFn<CallsStats> = (database, filters, common, args) => {
 
         if (lastCall !== undefined) {
             // compute time difference between calls
-            const diff = diffDatetime(lastCall, startDatetime);
-            if (diff < 0) throw new Error("Time difference between calls is negative, diff=" + diff);
+            let diff = diffDatetime(lastCall, startDatetime);
+            if (diff < 0) {
+                secondsInCall -= diff; // remove overlap
+                diff = 0;
+            }
             timesBetween[total - 1] = diff;
         }
         lastCall = endDatetime;
