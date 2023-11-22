@@ -82,9 +82,13 @@ export class DiscordParser extends Parser {
         const timestampEdit = message.timestampEdited ? Date.parse(message.timestampEdited) : undefined;
         const callEndedTimestamp = message.callEndedTimestamp ? Date.parse(message.callEndedTimestamp) : undefined;
 
-        // Discord allows users to have different nicknames depending the chat. We honor the nickname first
-        const name = message.author.nickname || message.author.name;
-        const isDeletedUser = name === "Deleted User";
+        // Discord allows users to have different nicknames depending on the chat. We honor the nickname first
+        let name = message.author.nickname || message.author.name;
+        if (name === "Deleted User") {
+            name = name.concat(" #" + message.author.id);
+        } else if (message.author.discriminator !== "0000") {
+            name = name.concat("#" + message.author.discriminator);
+        }
 
         // About the avatar:
         // See: https://discord.com/developers/docs/reference#image-formatting-cdn-endpoints
@@ -98,7 +102,7 @@ export class DiscordParser extends Parser {
         const pauthor: PAuthor = {
             id: message.author.id,
             bot: message.author.isBot,
-            name: name + (isDeletedUser ? " #" + message.author.id : "#" + message.author.discriminator),
+            name,
             avatar: avatar ? (" " + avatar).substring(1) : undefined, // avoid leak
         };
         this.emit("author", pauthor, this.lastMessageTimestampInFile);
