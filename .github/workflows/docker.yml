@@ -4,7 +4,8 @@ on:
   push:
     branches:
       - main
-      - docker
+    tags:
+      - 'v*'
 
 jobs:
   publish:
@@ -19,6 +20,11 @@ jobs:
         id: meta
         with:
           images: mlomb/chat-analytics
+          tags: |
+            # set latest tag for default branch
+            type=raw,value=latest,enable={{is_default_branch}}
+            # release tag
+            type=semver,pattern={{version}},prefix=v
       - uses: docker/build-push-action@v5
         with:
           context: .
