@@ -1,5 +1,15 @@
-# v1.1.1 (YYYY/MM/DD) [IN DEVELOPMENT]
+# v1.1.2 (YYYY/MM/DD) [IN DEVELOPMENT]
 
+
+# v1.1.1 (2023/12/14)
+
+- Added Docker images!
+- Added [the obfuscator](https://chatanalytics.app/obfuscator) to simplify sharing exports [#81](https://github.com/mlomb/chat-analytics/issues/81) [#82](https://github.com/mlomb/chat-analytics/pull/82)
+- Fixed bug in `writeVarInt`: Negative editedAfter value causing serialization to break [#85](https://github.com/mlomb/chat-analytics/pull/85)
+- Hide Discord discriminators if they are #0000 [#93](https://github.com/mlomb/chat-analytics/pull/93)
+- Fix a bug with multiple calls at the same time [#94](https://github.com/mlomb/chat-analytics/pull/94)
+
+Thanks to @HopperElec for cleaning and refactoring code!
 
 # v1.1.0 (2023/08/17)
 
