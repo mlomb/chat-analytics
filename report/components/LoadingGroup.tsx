@@ -1,4 +1,4 @@
-import { ReactNode, createContext, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { ReactNode, createContext, useCallback, useEffect, useMemo, useState } from "react";
 import { useInView } from "react-intersection-observer";
 
 import { BlockKey } from "@pipeline/aggregate/Blocks";
@@ -55,7 +55,7 @@ export const LoadingGroup = (props: { children: (state: BlockState) => ReactNode
     const ctxValue: LoadingContextValue = useMemo(() => ({ enable, disable }), [enable, disable]);
 
     useEffect(() => {
-        if (inView === false) return;
+        if (!inView) return;
 
         // enable in store
         requests.forEach((req) => store.enable(req));

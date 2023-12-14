@@ -42,7 +42,7 @@ export const AmCharts5Chart = <Data extends any>(props: Props<Data>) => {
         // or the chart already exists (and we want to keep it that way)
         rootRef.current !== undefined;
 
-    // this deps trigger a chart recreation
+    // these deps trigger a chart recreation
     const chartDeps = [shouldBeCreated, props.animated, props.createTheme, props.create] as any[];
 
     useLayoutEffect(() => {

@@ -92,7 +92,7 @@ export interface Message {
     attachments?: IndexCounts<AttachmentType>;
 }
 
-/** Esentially a Message but with extra information needed in the UI */
+/** Essentially a Message but with extra information needed in the UI */
 export interface MessageComplete extends Message {
     guildIndex: Index;
     channelIndex: Index;

@@ -47,7 +47,7 @@ export declare interface Progress {
  * - `progress()` (optional)
  * - `success()` or `error()`
  *
- * Note: there is a undocumented and untested `waiting` state, which allows multiple `new` calls (unused)
+ * Note: there is an undocumented and untested `waiting` state, which allows multiple `new` calls (unused)
  */
 export class Progress extends EventEmitter {
     /** All the tasks */
@@ -59,7 +59,7 @@ export class Progress extends EventEmitter {
     /** Stats (global) */
     private keys: ProgressStats = {};
 
-    /** Wether a task errored */
+    /** Whether a task errored */
     private errored: boolean = false;
 
     /** Adds a new task */
@@ -143,7 +143,7 @@ export class Progress extends EventEmitter {
     /**
      * Emits a "progress" event if progress advanced at least 1% or 15ms has passed since the last update.
      *
-     * @param force wether to force the update
+     * @param force whether to force the update
      */
     private update(force: boolean) {
         let emit = force;

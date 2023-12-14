@@ -10,7 +10,7 @@ import { Database } from "@pipeline/process/Types";
  */
 export const compressDatabase = (database: Database): string => {
     // variables must be declared with let and not const
-    // so we can release the memory when we are done with them
+    // so that we can release the memory when we are done with them
 
     let messages = database.messages;
 

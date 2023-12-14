@@ -13,13 +13,12 @@ const _ChannelLabel = ({ index }: LabelProps) => {
     const guild = db.guilds[channel.guildIndex];
 
     let title = channel.name;
-    let name: ReactNode = channel.name;
     let avatar: ReactNode;
     let icon: ReactNode;
 
     if (platform === "discord") {
         // prepend the guild name to the channel name
-        title = guild.name + " > " + name;
+        title = guild.name + " > " + channel.name;
 
         if (channel.type === "text") {
             // show a # before channel names because Discord does it
@@ -38,7 +37,7 @@ const _ChannelLabel = ({ index }: LabelProps) => {
         avatar = <ChannelAvatar index={index} />;
     }
 
-    return <BaseLabel title={title} name={name} leftIcon={icon} avatar={avatar} />;
+    return <BaseLabel title={title} name={channel.name} leftIcon={icon} avatar={avatar} />;
 };
 
 export const ChannelLabel = memo(_ChannelLabel) as typeof _ChannelLabel;

@@ -33,7 +33,7 @@ const fn: BlockFn<ConversationDuration> = (database, filters, common, args) => {
     let prevMessage = -1, // used for time without messages
         startMessage = -1; // used for active conversations
     for (let i = 0; i < numFiveMinBlocks; i++) {
-        // found a 5 minute block with messages
+        // found a 5-minute block with messages
         if (fiveMinMessagesCount[i] > 0) {
             // [longestTimeWithoutMessages]
             // did we find one before?

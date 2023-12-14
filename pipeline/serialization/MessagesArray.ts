@@ -21,7 +21,7 @@ export class MessagesArray implements Iterable<Message> {
      * The offset where the messages start in the stream.
      * This is the offset that was initially in the stream when the array was created.
      */
-    private startOffset: number;
+    private readonly startOffset: number;
 
     /**
      * Creates an array. You can provide an existing stream.

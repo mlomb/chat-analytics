@@ -27,7 +27,7 @@ export type BlockFn<Data, Args = undefined> = (
     args: Args
 ) => Data;
 
-/** Triggers that should make a block data stale (e.g. changes to this filters in the UI) */
+/** Triggers that should make a block data stale (e.g. changes to these filters in the UI) */
 export type Filter = "authors" | "channels" | "time";
 
 /** A description of a block */

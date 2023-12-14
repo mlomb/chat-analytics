@@ -112,7 +112,7 @@ export class DiscordParser extends Parser {
             for (const mention of message.mentions) {
                 // replace names by nicknames in mentions (to honor nicknames)
                 // and just to make sure, replace spaces by underscores in the nickname and
-                // add spaces in the sides so it can be picked correctly up by the Tokenizer
+                // add spaces in the sides so that it can be picked correctly up by the Tokenizer
                 content = content.split(`@${mention.name}`).join(` @${mention.nickname.replace(/\s/g, "_")} `);
             }
 
@@ -147,7 +147,7 @@ export class DiscordParser extends Parser {
         } else if (message.type === "Call") {
             if (callEndedTimestamp === undefined) {
                 console.warn("Call message without callEndedTimestamp");
-                // we dont want to throw here
+                // we don't want to throw here
                 // discord may have gone crazy or the export was done while in call
                 return;
             }

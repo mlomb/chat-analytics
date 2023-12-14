@@ -204,16 +204,16 @@ export class DatabaseBuilder {
         // we determine which languages we have to correctly filter stopwords
 
         const totalWithLang = this.langCounts.reduce((a, b) => a + b, 0);
-        const langs = this.langCounts
-            .map((count, index) => ({ code: LanguageCodes[index], ratio: count / totalWithLang }))
-            // we need AT LEAST 3% to consider reliable
-            .filter((l) => l.ratio >= 0.03)
-            // sort most used
-            .sort((a, b) => b.ratio - a.ratio)
-            // only keep the code
-            .map((l) => l.code);
-
-        return langs;
+        return (
+            this.langCounts
+                .map((count, index) => ({ code: LanguageCodes[index], ratio: count / totalWithLang }))
+                // we need AT LEAST 3% to consider reliable
+                .filter((l) => l.ratio >= 0.03)
+                // sort most used
+                .sort((a, b) => b.ratio - a.ratio)
+                // only keep the code
+                .map((l) => l.code)
+        );
     }
 
     /** Filter words. Skip unfrequent words and stopwords. */
@@ -224,12 +224,12 @@ export class DatabaseBuilder {
 
         for (let oldIndex = 0; oldIndex < numWords; oldIndex++) {
             let skip = false;
-            // only keep words if the have been used more than once, IF there are too many (more than 100k words)
+            // only keep words if they've been used more than once, IF there are too many (more than 100k words)
             if (this.wordsCounts[oldIndex] <= 1 && numWords > 100000) skip = true;
             // only keep words if they are not stopwords
             if (this.stopwords!.isStopword(this.words.getByIndex(oldIndex)!, langs)) skip = true;
 
-            // set the count to -1 so it gets filtered out
+            // set the count to -1 so that it gets filtered out
             if (skip) this.wordsCounts[oldIndex] = -1;
 
             this.env.progress?.progress("number", oldIndex, numWords);
@@ -344,7 +344,7 @@ export class DatabaseBuilder {
     private makeFinalAuthor(author: PAuthor, oldIndex: number): Author {
         return {
             n: author.name,
-            b: author.bot === true ? true : undefined,
+            b: author.bot ? true : undefined,
             // only keep avatars if the author is in the top 1000 authors
             a: this.authorsRank[oldIndex] < 1000 ? author.avatar : undefined,
         };

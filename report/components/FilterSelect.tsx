@@ -290,7 +290,7 @@ export default class FilterSelect extends PureComponent<Props, State> {
 
     onToggle = (index: Index) => {
         const { selected, onChange } = this.props;
-        // this is fast enoguh for now
+        // this is fast enough for now
         if (selected.includes(index)) {
             onChange(selected.filter((i) => i !== index));
         } else {

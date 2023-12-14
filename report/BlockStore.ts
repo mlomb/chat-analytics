@@ -1,5 +1,5 @@
 import { BlockData, BlockKey, Filter } from "@pipeline/aggregate/Blocks";
-import { BlockRequest, BlockRequestMessage, BlockResult } from "@report/WorkerReport";
+import { BlockRequest, BlockResult } from "@report/WorkerReport";
 import { WorkerWrapper, getWorker } from "@report/WorkerWrapper";
 
 /**
@@ -36,7 +36,7 @@ export const idRequest = (request: BlockRequest<BlockKey> | undefined): BlockReq
  * Block storage and management.
  * It tracks computed blocks and dispatches work to the worker.
  *
- * The way it works is a two step process:
+ * The way it works is a two-step process:
  * 1. You have to subscribe (with `subscribe`) to a block to get notified of status changes
  * 2. You have to enable (with `enable`) a block to make it be computed
  */
@@ -125,7 +125,7 @@ export class BlockStore {
     }
 
     private tryToDispatchWork() {
-        if (this.worker.areFiltersSet === false) {
+        if (!this.worker.areFiltersSet) {
             // we need to wait for the UI to set the filters
             return;
         }
@@ -154,7 +154,7 @@ export class BlockStore {
     }
 
     private update(id: BlockRequestID, status: BlockStatus<BlockKey>) {
-        // check if the status changed (and its not ready since data may change)
+        // check if the status changed (and it's not ready since data may change)
         if (status.state !== "ready" && this.lastBroadcastedState.get(id) === status.state) return;
 
         // store block result in case it is needed later

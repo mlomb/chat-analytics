@@ -14,7 +14,7 @@ tests/
 tsconfig*.json
 webpack.config.js
 
-# exlude web output
+# exclude web output
 # in package.json files, we whitelist the report HTML
 dist_web/
 

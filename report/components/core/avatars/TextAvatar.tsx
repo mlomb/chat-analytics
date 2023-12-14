@@ -15,7 +15,7 @@ export const TextAvatar = ({ text, color, background, useInitials }: Props) => {
         for (const part of keepParts) {
             // iterate UTF-8 codepoints
             for (const symbol of part) {
-                // store frist
+                // store first
                 initials += symbol;
                 break;
             }

@@ -47,9 +47,9 @@ export const createHistogramWithBoxplot = (root: Root, xAxisType: AxisType) => {
         const step = (data.boxplot.whiskerMax - data.boxplot.whiskerMin) / data.count.length;
         let accum = data.boxplot.whiskerMin;
 
-        for (let i = 0; i < data.count.length; i++) {
+        for (const value of data.count) {
             values.push({
-                value: data.count[i],
+                value,
                 from: accum,
                 to: accum + step,
             });

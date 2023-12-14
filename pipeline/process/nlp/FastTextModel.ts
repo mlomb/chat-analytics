@@ -48,7 +48,7 @@ export class FastTextModel {
 
         // write the input model to the fake filesystem as "model.bin"
         // NOTE: writeFile is not available since the closure compiler optimized it out (but we still have open, write and close)
-        // we could configure CC to keep it but it's not worth it, this works
+        // we could configure CC to keep it, but it's not worth it; this works
         const { FS } = fastTextModule;
         const stream = FS.open("model.bin", "w+");
         FS.write(stream, model, 0, model.length, 0);

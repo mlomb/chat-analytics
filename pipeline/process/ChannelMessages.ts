@@ -1,4 +1,4 @@
-import { Index, Timestamp } from "@pipeline/Types";
+import { Timestamp } from "@pipeline/Types";
 import { PMessage, RawID } from "@pipeline/parse/Types";
 import { Message } from "@pipeline/process/Types";
 import { DefaultMessageBitConfig } from "@pipeline/serialization/MessageSerialization";
@@ -69,7 +69,7 @@ export class ChannelMessages {
     }
 
     /**
-     * Mark the end of an input file. This allow the next message added (from another file)
+     * Mark the end of an input file. This allows the next message added (from another file)
      * to have a different starting timestamp.
      *
      * It will close the current open interval, if any. Make sure to call `process` to process leftover messages.
@@ -102,7 +102,7 @@ export class ChannelMessages {
  * Messages stored here can be either pending to be processed or already processed. (PMessage → Message)
  * Unprocessed messages (PMessage) are added via `addAndExtend(message)`. Eventually you
  * should call `process(fn, isClosed)` to process all pending messages (into Message).
- * The processing is not done by this class and instead you are expected to provide a function to process
+ * The processing is not done by this class; instead you are expected to provide a function to process
  * groups of messages into Message's.
  * These groups of messages are PMessageGroup and are guaranteed to be from the same author, in chronological order.
  * The `isClosed` parameter is used to indicate that the interval is closed and no more messages will be added, to
@@ -133,7 +133,7 @@ export class MessagesInterval {
     /** Adds the PMessage to the queue and extends the end of the interval to contain it */
     addMessageAndExtend(message: PMessage) {
         if (message.timestamp < this.end) throw new Error("MessagesInterval can only be extended to the future");
-        // NOTE: we should check here that the id is not in this.ids, but its too expensive
+        // NOTE: we should check here that the id is not in this.ids, but it's too expensive
 
         this.messageQueue.push(message);
         this.ids.push(message.id);

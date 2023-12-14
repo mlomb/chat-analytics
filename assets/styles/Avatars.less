@@ -25,7 +25,9 @@
             // we can't use circle because it only supports <length>
             // ellipse supports <length-percentage>
             mask: radial-gradient(
-                ellipse 100% 100% at calc(-50% + @overlap) 50%; transparent @threshold; #fff (@threshold+1)
+                ellipse 100% 100% at calc(-50% + @overlap) 50%,
+                transparent @threshold,
+                #fff (@threshold+1)
             );
         }
     }

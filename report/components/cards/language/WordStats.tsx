@@ -16,7 +16,7 @@ import { useBlockData } from "@report/BlockHook";
 import { getDatabase } from "@report/WorkerWrapper";
 import { AuthorLabel } from "@report/components/core/labels/AuthorLabel";
 import { ChannelLabel } from "@report/components/core/labels/ChannelLabel";
-import AnimatedBars, { AnimatedBarEntry } from "@report/components/viz/AnimatedBars";
+import AnimatedBars from "@report/components/viz/AnimatedBars";
 import { createYAxisLabel, syncAxisWithTimeFilter } from "@report/components/viz/amcharts/AmCharts5";
 import { AmCharts5Chart, CreateFn } from "@report/components/viz/amcharts/AmCharts5Chart";
 

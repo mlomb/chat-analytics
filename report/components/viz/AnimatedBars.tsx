@@ -23,7 +23,7 @@ export interface SelectedBarEntry {
 }
 
 interface Props {
-    /** It should have less thans `maxItems` items. The component DOES NOT slice the data. */
+    /** It should have less than `maxItems` items. The component DOES NOT slice the data. */
     data: AnimatedBarEntry[];
     colorHue?: number;
     itemComponent: ItemComponent;
@@ -102,10 +102,10 @@ const AnimatedBars = (props: Props) => {
             // reset selection to the first item
             selected === undefined ||
             // change selection ONLY IF the current selection has not been set manually
-            (props.selected && props.selected.manual === false)
+            (props.selected && !props.selected.manual)
         ) {
             if (topEntry !== selected)
-                // and don't change if dont have to (avoid infinite loop)
+                // and don't change if don't have to (avoid infinite loop)
                 props.onSelectChange({
                     index: topEntry.index,
                     manual: false,

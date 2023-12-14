@@ -111,7 +111,7 @@ export class BitStream {
         const value2 = buffer[aligned32 + 1];
 
         // TODO: try to do it branch-less
-        let value = 0;
+        let value;
         if (delta + bits > 32) {
             const aligned = (value1 << delta) | (value2 >>> (32 - delta));
             value = aligned >>> (32 - bits);

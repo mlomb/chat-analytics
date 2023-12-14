@@ -10,7 +10,7 @@ export declare interface Parser {
     // The `at` parameter represents how up-to-date the information is.
     // For example, the timestamp when the export file was generated.
     // For clarification, in messages it is NOT the timestamp of when the message was *sent*!
-    // This allows us to keep the most up to date information (last nickname, avatar, etc)
+    // This allows us to keep the most up-to-date information (last nickname, avatar, etc.)
     // If you don't have this information, just omit the parameter.
 
     emit(event: "guild",   guild:   PGuild,   at?: Timestamp): boolean;

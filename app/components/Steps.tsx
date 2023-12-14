@@ -28,7 +28,7 @@ const StepMaxHeights = [360, 1300, 400, 420, 420];
 const BackColor: [number, number, number] = [216, 10, 10];
 const NextColor: [number, number, number] = [258, 90, 61];
 
-// we hardcode this task first since the worker doesn't emit it
+// we hard-code this task first since the worker doesn't emit it
 const StartWorkerTask: ProgressTask = {
     status: "success",
     title: "Start WebWorker",
@@ -147,7 +147,7 @@ export const Steps = () => {
             worker,
         }));
 
-        // show usaved progress alert before leaving
+        // show unsaved progress alert before leaving
         if (env.isProd) {
             window.addEventListener("beforeunload", (event) => {
                 // this message is never shown really.

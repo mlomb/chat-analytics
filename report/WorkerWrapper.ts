@@ -61,7 +61,7 @@ export class WorkerWrapper extends EventEmitter {
     /** Updated filters since last request */
     private staleFilters: Set<Filter> = new Set(["authors", "channels", "time"]);
 
-    /** Wether the worker is currently processing a request */
+    /** Whether the worker is currently processing a request */
     private workerBusy: boolean = false;
 
     constructor(dataStr: string) {
@@ -116,7 +116,7 @@ export class WorkerWrapper extends EventEmitter {
             this.emit("ready");
         } else if (res.type === "result") {
             this.workerBusy = false;
-            // a result will be invialid if one of its triggers has been updated since the request was made
+            // a result will be invalid if one of its triggers has been updated since the request was made
             const invalid = res.result.triggers.some((f) => this.staleFilters.has(f));
             this.emit("result", res.request, res.result, invalid);
         }
@@ -188,7 +188,7 @@ export class WorkerWrapper extends EventEmitter {
     }
 
     get available() {
-        return this.workerBusy === false;
+        return !this.workerBusy;
     }
 }
 
