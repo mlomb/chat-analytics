@@ -11,6 +11,7 @@
 ![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/mlomb/chat-analytics/cicd.yml)
 [![codecov](https://codecov.io/gh/mlomb/chat-analytics/branch/main/graph/badge.svg)](https://codecov.io/gh/mlomb/chat-analytics)
 [![npm](https://img.shields.io/npm/v/chat-analytics)](https://www.npmjs.com/package/chat-analytics)
+[![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?logo=docker&logoColor=white)](https://hub.docker.com/r/mlomb/chat-analytics)
 
 [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/donate/?hosted_button_id=NKHZJPKFJ34WJ)
 
@@ -18,7 +19,7 @@
 
 ---
 
-A web app that takes chat exports from supported platforms and generates a single HTML file containing information, statistics and interactive graphs about them. Privacy is its main concern; chat data never leaves the device when generating reports.  
+A web app that takes chat exports from supported platforms and generates a single HTML file containing information, statistics and interactive graphs about them. Privacy is its main concern; chat data never leaves the device when generating reports. Selfhost with Docker!  
 
 |  💬 MESSAGES |  🅰️ LANGUAGE | 😃 EMOJI | 🔗 LINKS | 📞 CALLS | 🌀 INTERACTION | 💙 SENTIMENT | 📅 TIMELINE |
 |--|--|--|--|--|--|--|--|
