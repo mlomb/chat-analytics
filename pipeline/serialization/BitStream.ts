@@ -118,7 +118,7 @@ export class BitStream {
         } else {
             value = (value1 << delta) >>> (32 - bits);
         }
-        return value;
+        return value >>> 0;
     }
 
     /**
@@ -145,14 +145,14 @@ export class BitStream {
 
             while (valueBig > 127n) {
                 this.setBits(8, Number((valueBig & 127n) | 128n));
-                valueBig >>= 7n;
+                valueBig = valueBig >> 7n;
             }
             this.setBits(8, Number(valueBig));
         } else {
             // normal number
             while (value > 127) {
                 this.setBits(8, (value & 127) | 128);
-                value >>>= 7;
+                value = value >>> 7;
             }
             this.setBits(8, value);
         }
