@@ -13,6 +13,7 @@ declare module "*.gif" {
 declare const env: {
     isProd: boolean;
     isDev: boolean;
+    isSelfHosted: boolean;
     build: {
         commitHash: string;
         version: string;

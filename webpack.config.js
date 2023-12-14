@@ -28,7 +28,9 @@ try {
 
 module.exports = (env) => {
     const isProd = env.production == true;
+    const isSelfhosted = process.env.SELF_HOSTED == "1";
     if (!isProd) console.log("DEV BUILD");
+    if (isSelfhosted) console.log("SELF HOSTED BUILD");
 
     return {
         target: "web",
@@ -129,6 +131,7 @@ module.exports = (env) => {
                 env: {
                     isProd: JSON.stringify(isProd),
                     isDev: JSON.stringify(!isProd),
+                    isSelfHosted: JSON.stringify(isSelfhosted),
                     build: JSON.stringify({
                         commitHash,
                         version,
