@@ -76,8 +76,8 @@ const EmojiFilterFns = {
     "2": (index: number) => getDatabase().emojis[index].type === "custom", // custom emoji
 };
 const EmojiFilterPlaceholders = {
-    "0": 'Filter emoji... (e.g. "fire", "🔥" or ":pepe:")',
-    "1": 'Filter emoji... (e.g. "fire" or "🔥")',
+    "0": 'Filter emoji... (e.g. "heart", "❤️" or ":pepe:")',
+    "1": 'Filter emoji... (e.g. "heart" or "❤️")',
     "2": 'Filter emoji... (e.g. ":pepe:")',
 };
 const EmojisTransformFilter = (filter: string) => filter.replace(/:/g, "");
