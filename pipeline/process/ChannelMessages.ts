@@ -80,7 +80,7 @@ export class ChannelMessages {
 
     /**
      * Process as much pending messages as possible. Not all are processed since the current open interval
-     * may receive more messages from the same author in the future (remember we are groping them by author).
+     * may receive more messages from the same author in the future (remember we are grouping them by author).
      */
     process(fn: ProcessGroupFn) {
         for (const interval of this.intervals) interval.process(fn, interval !== this.openInterval);
