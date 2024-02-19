@@ -83,7 +83,7 @@ jobs:
       - run: npm link
       - name: Download demo input files
         run: |
-          curl -s -L "https://drive.google.com/uc?export=download&confirm=yes&id=1SqHZqKstFem9qf1kgusuhiGUcE3xY8KQ" -o export.zip
+          curl -s -L "https://drive.usercontent.google.com/download?id=1SqHZqKstFem9qf1kgusuhiGUcE3xY8KQ&confirm=t" -o export.zip
           unzip -qq -O utf8 export.zip -d export
       - name: Generate demo report
         run: |
