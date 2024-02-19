@@ -95,9 +95,20 @@ export class DiscordParser extends Parser {
         // Can be:
         // - https://cdn.discordapp.com/avatars/user_id/user_avatar.png (custom avatar, we only care about `user_id/user_avatar`)
         // - https://cdn.discordapp.com/embed/avatars/discriminator.png (default color avatar)
+        // - <path>.png/gif (custom avatar but stored using `--media=true` in DCE)
         let avatar: string | undefined;
-        if (message.author.avatarUrl && message.author.avatarUrl.includes("discordapp.com/avatars"))
-            avatar = message.author.avatarUrl.slice(35).split(".")[0];
+        if (message.author.avatarUrl) {
+            if (message.author.avatarUrl.includes("discordapp.com/avatars")) {
+                // custom avatar as URL, extract "user_id/user_avatar"
+                avatar = message.author.avatarUrl.slice(35).split(".")[0];
+            } else if (!message.author.avatarUrl.startsWith("http")) {
+                // assume it's a custom avatar stored as media
+                // store the full path to the avatar
+                // note that this will not work unless the user puts the report.html in the correct
+                // folder, but since we don't have the online URL, we do this as best-effort
+                avatar = message.author.avatarUrl;
+            }
+        }
 
         const pauthor: PAuthor = {
             id: message.author.id,

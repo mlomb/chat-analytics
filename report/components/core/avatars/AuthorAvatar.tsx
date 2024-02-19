@@ -45,7 +45,16 @@ export const AuthorAvatar = ({ index }: { index: number }) => {
             const num = author.n.split("#").pop();
             if (num && num.length === 4) discriminator = parseInt(num);
 
-            url = author.a ? `https://cdn.discordapp.com/avatars/${author.a}.png?size=64` : undefined;
+            if (author.a) {
+                if (!author.a.includes(".")) {
+                    // author.a is the "user_id/user_avatar" of the avatar URL
+                    // for example "840286670888370206/7a0ce959e13e749f4f4d93ea4b314b9c"
+                    url = `https://cdn.discordapp.com/avatars/${author.a}.png?size=64`;
+                } else {
+                    // author.a is the full path to the avatar (probably locally stored)
+                    url = author.a;
+                }
+            }
             placeholder = RawImg(DiscordDefaultDMAvatars[discriminator % 5]);
             break;
         case "telegram":
