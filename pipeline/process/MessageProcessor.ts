@@ -49,9 +49,16 @@ export class MessageProcessor {
 
         // detect language in the whole group text
         // this yields better accuracy
-        let langIndex: number | undefined;
-        if (allText.length > 0) {
-            langIndex = this.langPredictModel!.identifyLanguage(allText).iso639index;
+        let langIndex: number = 0;
+        let result;
+        const accuracy_threshold = 0.7; // language model accuracy must be at least this high (0-1)
+        const word_count_threshold = 6; // must have at least this many words for language detection
+        let word_count: number = allText.split(" ").length - 1;
+        if (word_count >= word_count_threshold) {
+            result = this.langPredictModel!.identifyLanguage(allText);
+            if (result.accuracy >= accuracy_threshold) {
+                langIndex = result.iso639index;
+            }
         }
 
         return group.map((message, index) => this.processMessage(message, tokenizations[index], langIndex));

@@ -204,11 +204,13 @@ export class DatabaseBuilder {
         // we determine which languages we have to correctly filter stopwords
 
         const totalWithLang = this.langCounts.reduce((a, b) => a + b, 0);
+        console.log(totalWithLang)
+        console.log(this.langCounts)
         return (
             this.langCounts
                 .map((count, index) => ({ code: LanguageCodes[index], ratio: count / totalWithLang }))
-                // we need AT LEAST 3% to consider reliable
-                .filter((l) => l.ratio >= 0.03)
+                // we need AT LEAST 0.1% to consider reliable
+                .filter((l) => l.ratio >= 0.001)
                 // sort most used
                 .sort((a, b) => b.ratio - a.ratio)
                 // only keep the code
@@ -470,6 +472,7 @@ export class DatabaseBuilder {
         const { finalMessages } = this.compactMessagesData(channels, dateKeys);
         const { finalCalls } = this.processCalls(dateKeys);
 
+        console.log(langs)
         return {
             config: this.config,
             generatedAt: new Date().toISOString(),
