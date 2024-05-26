@@ -45,8 +45,7 @@ const fn: BlockFn<LanguageStats> = (database, filters, common, args) => {
     const languageList = allLanguages.filter((lang) => lang.value >= langThreshold);
     try {
         languageList[0].value += totalUnreliable; // append cutoff languages to unreliable languages count
-    }
-    catch {
+    } catch {
         // if the index didn't exist, push the value instead
         languageList.push({ index: 0, value: totalUnreliable });
     }
