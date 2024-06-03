@@ -1,3 +1,5 @@
+import { isUndefined } from "util";
+
 import { BlockDescription, BlockFn } from "@pipeline/aggregate/Blocks";
 import { IndexEntry } from "@pipeline/aggregate/Common";
 import { filterMessages } from "@pipeline/aggregate/Helpers";
@@ -43,11 +45,11 @@ const fn: BlockFn<LanguageStats> = (database, filters, common, args) => {
         .filter((lang) => lang.value < langThreshold)
         .reduce((sum, lang) => sum + lang.value, 0);
     const languageList = allLanguages.filter((lang) => lang.value >= langThreshold);
-    try {
-        languageList[0].value += totalUnreliable; // append cutoff languages to unreliable languages count
-    } catch {
-        // if the index didn't exist, push the value instead
-        languageList.push({ index: 0, value: totalUnreliable });
+    const UnreliableToDetectIndex = languageList.findIndex((item) => item.index == 0);
+    if (UnreliableToDetectIndex < 0) {
+        languageList.push({ index: 0, value: totalUnreliable }); // if the index didn't exist, push the value
+    } else {
+        languageList[UnreliableToDetectIndex].value += totalUnreliable; // append cutoff languages to unreliable languages count
     }
     languageList.sort((a, b) => b.value - a.value);
 
