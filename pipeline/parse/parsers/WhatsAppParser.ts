@@ -27,7 +27,7 @@ export class WhatsAppParser extends Parser {
         parsed.sort((a, b) => a.date.getTime() - b.date.getTime());
 
         // compute the number of authors, excluding the "System" author
-        const numAuthors = new Set(parsed.filter((m) => m.author !== "System").map((m) => m.author)).size;
+        const numAuthors = new Set(parsed.filter((m) => m.author !== null).map((m) => m.author)).size;
 
         // try to extract the chat name from the filename
         let name: string | undefined = extractChatName(file.name);
