@@ -1,5 +1,15 @@
-# v1.1.2 (YYYY/MM/DD) [IN DEVELOPMENT]
+# v1.1.3 (YYYY/MM/DD) [IN DEVELOPMENT]
 
+# v1.1.2 (2024/08/14)
+
+- Fixed WhatsApp channel type. [Comment](https://github.com/mlomb/chat-analytics/commit/9e25f8bfe3323fc62ce6d7474c3f38d45390358c#r145396724).
+- Updated `whatsapp-chat-parser` to `4.0.1` due [this issue](https://github.com/Pustur/whatsapp-chat-parser/issues/256). [#117](https://github.com/mlomb/chat-analytics/issues/117)
+- Changed emojis in placeholder to be more consistent. [#91](https://github.com/mlomb/chat-analytics/issues/91) [#96](https://github.com/mlomb/chat-analytics/pull/96)
+- Load avatars from local directories if exports have media files enabled (Discord). [#106](https://github.com/mlomb/chat-analytics/issues/106) [#107](https://github.com/mlomb/chat-analytics/pull/107)
+- Added light mode favicon. [#111](https://github.com/mlomb/chat-analytics/pull/111)
+- Emoji sentiment is now being saved as a float instead of a string. [#116](https://github.com/mlomb/chat-analytics/issues/116)
+- Updated demo export files to Feb 2024.
+- Fixed typos [#98](https://github.com/mlomb/chat-analytics/pull/98)
 
 # v1.1.1 (2023/12/14)
 
