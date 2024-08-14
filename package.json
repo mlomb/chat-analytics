@@ -45,7 +45,7 @@
     "fast-glob": "^3.2.12",
     "fflate": "^0.7.4",
     "pretty-bytes": "<6.0.0",
-    "whatsapp-chat-parser": "^4.0.0",
+    "whatsapp-chat-parser": "^4.0.1",
     "yargs": "^17.7.0"
   },
   "devDependencies": {
