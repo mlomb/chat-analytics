@@ -74,6 +74,56 @@ For example:
 npx chat-analytics -p discord -i "exported/*.json" -o report.html
 ```
 
+## Docker Compose
+
+You can utilize the official docker image provided at https://hub.docker.com/r/mlomb/chat-analytics for selfhosting purposes.
+
+For example:
+```
+version: '3.8'
+
+services:
+  chat-analytics:
+    image: mlomb/chat-analytics:latest
+    ports:
+      - "80:80"
+```
+You can map the web interface port as required by changing the port mapping, internal port must be kept to 80.
+
+## Docker build
+
+The image can be built from stratch by downloading the source repository, utilizing the following dockerfile:
+
+```
+FROM node:alpine AS builder
+
+WORKDIR /chat-analytics
+
+COPY package.json .
+COPY package-lock.json .
+
+RUN npm ci
+
+COPY app app
+COPY assets assets
+COPY pipeline pipeline
+COPY report report
+COPY tsconfig.json .
+COPY tsconfig.web.json .
+COPY webpack.config.js .
+
+ENV SELF_HOSTED=1
+RUN npm run build:web
+
+FROM nginx:alpine
+
+COPY --from=builder /chat-analytics/dist_web /usr/share/nginx/html
+
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]
+```
+
 ## Docs & Development
 
 You can read [docs/README.md](/docs/README.md) for technical details, and [docs/DEV.md](/docs/DEV.md) for development instructions.  
