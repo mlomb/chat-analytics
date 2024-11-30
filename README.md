@@ -87,6 +87,7 @@ services:
     image: mlomb/chat-analytics:latest
     ports:
       - "80:80"
+    restart: unless-stopped
 ```
 You can map the web interface port as required by changing the port mapping, internal port must be kept to 80.
 
