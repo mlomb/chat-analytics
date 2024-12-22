@@ -1,0 +1,9 @@
+version: '3.8'
+
+services:
+  chat-analytics:
+    image: mlomb/chat-analytics:latest
+    ports:
+    # Change internal port (external:internal) as required, internal port must be kept to 80
+      - "80:80"
+    restart: unless-stopped
