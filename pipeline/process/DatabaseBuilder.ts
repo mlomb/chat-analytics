@@ -437,7 +437,11 @@ export class DatabaseBuilder {
 
             const duration = Math.ceil((endDate.getTime() - startDate.getTime()) / 1000);
 
-            if (startDate > endDate) throw new Error("Call start date is after end date");
+            if (startDate > endDate) {
+                // TODO: check why this happens
+                console.error("Call start date is after end date");
+                continue;
+            }
             if (duration < 1) continue; // skip call
 
             finalCalls.push({

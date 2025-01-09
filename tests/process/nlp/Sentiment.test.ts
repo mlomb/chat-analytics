@@ -16,4 +16,9 @@ describe("Sentiment", () => {
         expect(sentiment.calculate(tokenize("i love you"), LanguageCodes.indexOf("en"))).toBePositive();
         expect(sentiment.calculate(tokenize("i hate you"), LanguageCodes.indexOf("en"))).toBeNegative();
     });
+
+    it("should detect sentiment in emojis", () => {
+        expect(sentiment.calculate(tokenize("💓"), LanguageCodes.indexOf("en"))).toBePositive();
+        expect(sentiment.calculate(tokenize("😠"), LanguageCodes.indexOf("en"))).toBeNegative();
+    });
 });
