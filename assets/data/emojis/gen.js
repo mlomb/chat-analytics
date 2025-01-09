@@ -11,7 +11,7 @@ for (const line of emojiSentiment) {
     if (occurrences <= 2) continue; // ignore entries with less than 3 occurrences
     const sentiment = positive / occurrences - negative / occurrences;
     if (!isNaN(sentiment)) {
-        emojiSentimentMap[emoji] = sentiment.toFixed(3);
+        emojiSentimentMap[emoji] = parseFloat(sentiment.toFixed(3));
     }
 }
 

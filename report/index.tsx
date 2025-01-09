@@ -5,6 +5,7 @@ import { initBlockStore } from "@report/BlockStore";
 import ReportPage from "@report/ReportPage";
 import { initWorker } from "@report/WorkerWrapper";
 
+import "@assets/Favicon";
 import { plausible } from "@assets/Plausible";
 
 document.addEventListener("DOMContentLoaded", async () => {
