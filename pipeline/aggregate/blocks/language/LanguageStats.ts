@@ -1,5 +1,3 @@
-import { isUndefined } from "util";
-
 import { BlockDescription, BlockFn } from "@pipeline/aggregate/Blocks";
 import { IndexEntry } from "@pipeline/aggregate/Common";
 import { filterMessages } from "@pipeline/aggregate/Helpers";
