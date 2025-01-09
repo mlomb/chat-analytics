@@ -51,7 +51,7 @@ export class MessageProcessor {
         // this yields better accuracy
         let langIndex: number = 0;
         let result;
-        const accuracy_threshold = 0.7; // language model accuracy must be at least this high (0-1)
+        const accuracy_threshold = 0; // language model accuracy must be at least this high (0-1)
         const word_count_threshold = 1; // must have at least this many words for language detection
         let word_count: number = tokenizations
             .map((msg) => msg.reduce((sum, token) => (token.tag == "word" ? sum + 1 : sum), 0)) // sum the number of words per message
