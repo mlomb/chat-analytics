@@ -207,8 +207,8 @@ export class DatabaseBuilder {
         return (
             this.langCounts
                 .map((count, index) => ({ code: LanguageCodes[index], ratio: count / totalWithLang }))
-                // we need AT LEAST 1% to consider reliable
-                .filter((l) => l.ratio >= 0.01)
+                // we need AT LEAST 3% to consider reliable
+                .filter((l) => l.ratio >= 0.03)
                 // sort most used
                 .sort((a, b) => b.ratio - a.ratio)
                 // only keep the code

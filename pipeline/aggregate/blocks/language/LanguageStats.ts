@@ -39,7 +39,7 @@ const fn: BlockFn<LanguageStats> = (database, filters, common, args) => {
     filterMessages(processMessage, database, filters);
 
     // lang
-    const langThreshold = Math.max(1, totalWithLang * 0.01); // at least 1% to be reliable
+    const langThreshold = Math.max(1, totalWithLang * 0.03); // at least 3% to be reliable
     const allLanguages = languagesCount.map((count, index) => ({ index, value: count }));
     const totalUnreliable = allLanguages
         .filter((lang) => lang.value < langThreshold)
