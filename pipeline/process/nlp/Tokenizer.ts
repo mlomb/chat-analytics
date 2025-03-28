@@ -24,7 +24,7 @@ import emojiRegex from "emoji-regex";
     https://i.imgflip.com/4hkogk.jpg
 */
 
-export type Tag = "code" | "url" | "mention" | "emoji" | "custom-emoji" | "word" | "unknown";
+export type Tag = "code" | "url" | "email" | "mention" | "emoji" | "custom-emoji" | "word" | "unknown";
 
 export interface Token {
     text: string;
@@ -53,12 +53,17 @@ const Matchers: Readonly<TokenMatcher[]> = [
         regex: /https?:\/\/[^\s<]+[^<.,:;"')\]\s]/g, // Discord's regex to match URLs
         tag: "url",
     },
-    // TODO: match emails, so they are not parsed as mentions (@gmail, @hotmail, etc)
+    // Emails matcher must be before @mentions matcher to avoid false positives
+    {
+        // Match emails
+        regex: /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/g,
+        tag: "email",
+    },
     {
         // match @mentions
-        regex: /@[\p{L}_0-9]+/giu,
+        regex: /(^|\s)@[\p{L}_0-9]+/giu,
         tag: "mention",
-        transform: (match) => match.slice(1), // remove @
+        transform: (match) => match.trim().slice(1), // remove @
     },
     {
         // match emojis 🔥
