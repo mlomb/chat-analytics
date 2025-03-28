@@ -49,15 +49,18 @@ export class MessageProcessor {
 
         // detect language in the whole group text
         // this yields better accuracy
-        let langIndex: number = 0;
-        let result;
+        let langIndex: number = 0; // 0 = "Unreliable to detect"
+
+        // See https://github.com/mlomb/chat-analytics/pull/110
         const accuracy_threshold = 0; // language model accuracy must be at least this high (0-1)
         const word_count_threshold = 1; // must have at least this many words for language detection
-        let word_count: number = tokenizations
+        const word_count: number = tokenizations
             .map((msg) => msg.reduce((sum, token) => (token.tag == "word" ? sum + 1 : sum), 0)) // sum the number of words per message
             .reduce((sum, len) => sum + len, 0); // sum the number of words in all messages in the group
+
         if (word_count >= word_count_threshold) {
-            result = this.langPredictModel!.identifyLanguage(allText);
+            const result = this.langPredictModel!.identifyLanguage(allText);
+
             if (result.accuracy >= accuracy_threshold) {
                 langIndex = result.iso639index;
             }
@@ -67,7 +70,7 @@ export class MessageProcessor {
     }
 
     /** Process the given message. Also takes the tokens for the message, and other information. */
-    private processMessage(msg: PMessage, tokens: Token[], langIndex: number | undefined): Message {
+    private processMessage(msg: PMessage, tokens: Token[], langIndex: number): Message {
         const wordsCount = new IndexCountsBuilder();
         const emojisCount = new IndexCountsBuilder();
         const mentionsCount = new IndexCountsBuilder();
@@ -123,10 +126,8 @@ export class MessageProcessor {
         }
 
         // sentiment analysis
-        let sentiment = 0;
-        if (langIndex) {
-            sentiment = this.sentiment?.calculate(tokens, langIndex) || 0;
-        }
+        // note that if langIndex is 0 (no language), the following line will return undefined (as expected)
+        const sentiment = this.sentiment?.calculate(tokens, langIndex);
 
         let replyOffset: number | undefined = undefined;
         if (msg.replyTo) {
@@ -156,7 +157,7 @@ export class MessageProcessor {
             authorIndex: this.builder.authors.getIndex(msg.authorId)!,
             replyOffset,
             langIndex,
-            sentiment: langIndex !== undefined ? sentiment : undefined,
+            sentiment,
             words: wordsCount.toArray(),
             emojis: emojisCount.toArray(),
             mentions: mentionsCount.toArray(),
