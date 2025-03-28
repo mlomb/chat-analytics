@@ -66,6 +66,7 @@ export class Sentiment {
         let score = 0;
         let nearNegator = false;
         let nearNegatorDist = 0;
+        let tokenHits = 0;
 
         for (let i = 0, len = tokens.length; i < len; i++) {
             const token = tokens[i];
@@ -76,7 +77,11 @@ export class Sentiment {
             nearNegatorDist++;
 
             if (token.tag === "emoji") {
-                score += this.emojiData.getSentiment(token.text);
+                const emojiValue = this.emojiData.getSentiment(token.text);
+                if (emojiValue !== undefined) {
+                    tokenHits++;
+                    score += emojiValue;
+                }
                 continue;
             }
 
@@ -93,12 +98,14 @@ export class Sentiment {
 
                 const afinnMatch = langDb.afinn.match(slice);
                 if (afinnMatch) {
+                    tokenHits++;
                     score += afinnMatch.value * (nearNegator ? -1 : 1);
                 }
             }
         }
 
-        return score;
+        // only return score if we found at least one token with sentiment
+        return tokenHits > 0 ? score : undefined;
     }
 
     static async load(env: Env, emojis: Emojis) {

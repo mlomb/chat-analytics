@@ -17,6 +17,6 @@ describe("Emojis", () => {
     it("should return correct sentiment for common emojis", async () => {
         expect(emojis.getSentiment("😡")).toBeNegative();
         expect(emojis.getSentiment("❤")).toBePositive();
-        expect(emojis.getSentiment("🟪")).toBe(0); // rare emoji
+        expect(emojis.getSentiment("🟪")).toBe(undefined); // rare emoji
     });
 });

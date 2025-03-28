@@ -18,9 +18,9 @@ export class Emojis {
         return this.data[emoji] ? this.data[emoji].n : emoji;
     }
 
-    /** Returns the sentiment of an emoji. e.g. 😡 → negative, ❤ → positive, 🟪 → 0. Always [-1, 1] */
-    public getSentiment(emoji: string): number {
-        return this.data[emoji]?.s || 0;
+    /** Returns the sentiment of an emoji. e.g. 😡 → negative, ❤ → positive, 🟪 → undefined. Always [-1, 1] */
+    public getSentiment(emoji: string): number | undefined {
+        return this.data[emoji]?.s;
     }
 
     static async load(env: Env) {
