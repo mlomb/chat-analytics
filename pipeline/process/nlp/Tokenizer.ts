@@ -61,9 +61,9 @@ const Matchers: Readonly<TokenMatcher[]> = [
     },
     {
         // match @mentions
-        regex: /@[\p{L}_0-9]+/giu,
+        regex: /(^|\s)@[\p{L}_0-9]+/giu,
         tag: "mention",
-        transform: (match) => match.slice(1), // remove @
+        transform: (match) => match.trim().slice(1), // remove @
     },
     {
         // match emojis 🔥

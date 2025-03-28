@@ -45,7 +45,9 @@ describe("should match the correct tag", () => {
         // urls
         ["http://example.com", "http://example.com", "url"],
         // mentions
+        ["email@gmail.com", "email@gmail.com", "email"],
         ["@mention", "mention", "mention"],
+        ["  @mention", "mention", "mention"], // with whitespace
         ["@123123123", "123123123", "mention"],
         // emojis
         ["🔥", "🔥", "emoji"],
@@ -61,10 +63,17 @@ describe("should match the correct tag", () => {
 
     test.each(cases)("%p → %p (tag=%p)", async (input, expectedText, expectedTag) => {
         const tokens = tokenize(input);
-        expect(tokens.length).toBe(1);
-        expect(tokens[0].text).toBe(expectedText);
-        expect(tokens[0].tag).toBe(expectedTag);
+        expect(tokens).toStrictEqual([{ text: expectedText, tag: expectedTag }]);
     });
+});
+
+it("should not classify 'abc@xyz' as an email or mention", () => {
+    const tokens = tokenize("abc@xyz");
+    expect(tokens).toStrictEqual([
+        { text: "abc", tag: "word" },
+        { text: "@", tag: "unknown" },
+        { text: "xyz", tag: "word" },
+    ]);
 });
 
 it("exclude outside ' matching words", () => {
