@@ -74,6 +74,23 @@ For example:
 npx chat-analytics -p discord -i "exported/*.json" -o report.html
 ```
 
+## Docker Compose
+
+You can self-host the app using the official docker image provided at https://hub.docker.com/r/mlomb/chat-analytics. Check out the [Dockerfile](/Dockerfile).
+
+Example `docker-compose.yaml`:
+
+```yaml
+services:
+  chat-analytics:
+    image: mlomb/chat-analytics:latest
+    ports:
+      - 1234:80
+    restart: unless-stopped
+```
+
+You can map the web interface port as required by changing the port mapping, internal port must be kept to 80.
+
 ## Docs & Development
 
 You can read [docs/README.md](/docs/README.md) for technical details, and [docs/DEV.md](/docs/DEV.md) for development instructions.  
