@@ -26,7 +26,7 @@ jobs:
           node-version: 16.x
       - run: npm ci
       - run: npm run build:web
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: build-web
           path: dist_web
@@ -41,7 +41,7 @@ jobs:
           node-version: 16.x
       - run: npm ci
       - run: npm run build:node
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: build-node
           path: dist
@@ -56,7 +56,7 @@ jobs:
         with:
           node-version: 16.x
       - run: npm ci
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: build-web
           path: dist_web
@@ -72,11 +72,11 @@ jobs:
         with:
           node-version: 16.x
       - run: npm ci
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: build-web
           path: dist_web
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: build-node
           path: dist
@@ -88,7 +88,7 @@ jobs:
       - name: Generate demo report
         run: |
           chat-analytics -p discord -i export/*.json -o demo.html --demo
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: demo
           path: demo.html
@@ -100,7 +100,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run: echo ${{ github.event.number }} > pr.txt
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: pr
           path: pr.txt
@@ -110,11 +110,11 @@ jobs:
     needs: [build-web, gen-demo]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: build-web
           path: dist_web
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: demo
           path: dist_web
