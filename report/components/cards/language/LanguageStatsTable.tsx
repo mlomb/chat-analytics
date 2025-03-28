@@ -40,7 +40,7 @@ const LanguageStatsTable = () => {
                     depth: 1,
                     tooltip:
                         language.index === 0
-                            ? "Messages that did not have enough text to reliable detect the language"
+                            ? "Messages that did not have enough text to reliably detect the language"
                             : undefined,
                 } as Line)
         ) ?? []),

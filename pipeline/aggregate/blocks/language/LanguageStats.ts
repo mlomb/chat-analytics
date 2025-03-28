@@ -43,7 +43,13 @@ const fn: BlockFn<LanguageStats> = (database, filters, common, args) => {
         .filter((lang) => lang.value < langThreshold)
         .reduce((sum, lang) => sum + lang.value, 0);
     const languageList = allLanguages.filter((lang) => lang.value >= langThreshold);
-    languageList.push({ index: 0, value: totalUnreliable });
+
+    // since langIndex can be 0 now, it can appear in languagesCount
+    // so we sum to the existing value or push it to the list if it doesn't exist
+    const utdIndex = languageList.findIndex((item) => item.index == 0);
+    if (utdIndex < 0) languageList.push({ index: 0, value: totalUnreliable });
+    else languageList[utdIndex].value += totalUnreliable;
+
     languageList.sort((a, b) => b.value - a.value);
 
     return {
