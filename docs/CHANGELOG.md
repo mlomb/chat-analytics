@@ -1,5 +1,7 @@
 # v1.1.3 (YYYY/MM/DD) [IN DEVELOPMENT]
 
+- Added support for Telegram data exports (all chats) in addition to single-chat exports. Both formats are automatically detected and supported with full backwards compatibility.
+
 # v1.1.2 (2024/08/14)
 
 - Fixed WhatsApp channel type. [Comment](https://github.com/mlomb/chat-analytics/commit/9e25f8bfe3323fc62ce6d7474c3f38d45390358c#r145396724).

@@ -24,6 +24,7 @@ describe("should parse correctly", () => {
         { parser: WhatsAppParser, inputs: ["whatsapp/4A_11M.zip"] },
 
         { parser: TelegramParser, inputs: ["telegram/DM_2A_7M.json"] },
+        { parser: TelegramParser, inputs: ["telegram/MultiChat_2C_6M.json"] },
 
         { parser: MessengerParser, inputs: ["messenger/2A_7M.json"] },
 
@@ -53,6 +54,7 @@ describe("timestamp of the last message at the end of the file", () => {
         { file: "discord/SV_5A_5M.json", regex: DiscordParser.TS_MSG_REGEX, lastMessageTimestamp: new Date("2018-05-20T16:09:51.118+00:00").getTime() },
 
         { file: "telegram/DM_2A_7M.json", regex: TelegramParser.TS_MSG_REGEX, lastMessageTimestamp: 1691719862 },
+        { file: "telegram/MultiChat_2C_6M.json", regex: TelegramParser.TS_MSG_REGEX, lastMessageTimestamp: 1672747200 },
     ];
 
     test.each(cases)("$file", async ({ file, regex, lastMessageTimestamp }) => {

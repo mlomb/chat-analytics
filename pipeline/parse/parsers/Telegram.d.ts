@@ -50,3 +50,26 @@ interface TextArray {
         | unknown;
     text: string;
 }
+
+// Single chat export format: { name, type, id, messages: [...] }
+interface TelegramChat {
+    name?: string;
+    type: TelegramChannelType;
+    id: number;
+    messages: TelegramMessage[];
+}
+
+// Multi-chat export format: { chats: { about, list: [TelegramChat, ...] } }
+interface TelegramChatsContainer {
+    about: string;
+    list: TelegramChat[];
+}
+
+interface TelegramDataExport {
+    about?: string;
+    personal_information?: any;
+    profile_pictures?: any[];
+    stories?: any[];
+    contacts?: any;
+    chats: TelegramChatsContainer;
+}

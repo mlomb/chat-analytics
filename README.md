@@ -37,7 +37,7 @@ You can generate reports from the following platforms:
 |-----------|----------------------------------------------------------------------------------|--------------|------------------|-------------------------------------------------------------------------------------|------------------|------------------------|-------------|-------|
 | Discord   | `json` from [DiscordChatExporter](https://github.com/Tyrrrz/DiscordChatExporter) | ✅            | ✅                | ✅                                                                                   | ✅                | ✅ (until link expires) | ✅ (as text) | ✅ |
 | Messenger | `json` from [Facebook DYI export](https://www.facebook.com/dyi)                  | ✅            | ❌                | ✅                                                                                   | ❌                | ❌                      | ✅ (as text) | ❌ |
-| Telegram  | `json` from [Telegram Desktop](https://desktop.telegram.org/)                    | ✅            | ✅                | ✅                                                                                   | ❌ (not provided) | ❌                      | ✅ (as text) | ✅ |
+|| Telegram  | `json` from [Telegram Desktop](https://desktop.telegram.org/)<br>Supports both single-chat exports and full data exports (all chats) | ✅            | ✅                | ✅                                                                                   | ❌ (not provided) | ❌                      | ✅ (as text) | ✅ |
 | WhatsApp  | `txt` or `zip` exported from a phone                                             | ✅            | ❌ (not provided) | ✅<strong>*</strong> (if exported from iOS)<br>🟦 (generic if exported from Android) | ❌ (not provided) | ❌                      | ✅ (as text) | ❌ |
 
 <strong>*</strong> not all languages are supported, check [WhatsApp.ts](/pipeline/parse/parsers/WhatsApp.ts).
@@ -73,6 +73,14 @@ For example:
 ```sh
 npx chat-analytics -p discord -i "exported/*.json" -o report.html
 ```
+
+### Telegram exports
+
+Telegram Desktop supports two types of exports:
+- **Single chat export**: Export messages from one specific chat (use "Export chat history" on a chat)
+- **Data export**: Export all your Telegram data including all chats (use "Settings → Privacy & Security → Export Telegram data")
+
+Both formats are supported and will be automatically detected.
 
 ## Docker Compose
 
