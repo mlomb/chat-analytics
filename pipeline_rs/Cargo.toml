@@ -1,0 +1,16 @@
+[package]
+name = "pipeline_rs"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+clap = { version = "4.5.48", features = ["derive"] }
+serde = { version = "1.0.226", features = ["serde_derive"] }
+struson = { version = "0.6.0", features = ["serde"] }
+
+[[bin]]
+name = "chat-analytics"
+path = "src/bin/cli.rs"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
