@@ -44,20 +44,19 @@ pub fn try_to_find_timestamp_at_end<R: Read + Seek>(
     let buffer = String::from_utf8_lossy(&buffer);
 
     // try to match
-    Ok(if let Some(captures) = regex.captures_at(&buffer, 0) {
+    if let Some(captures) = regex.captures_at(&buffer, 0) {
         let timestamp = captures.get(1).expect("the capture group").as_str();
 
-        if timestamp.contains("T") {
+        return Ok(if timestamp.contains("T") {
             // try to parse as ISO 8601 date
             DateTime::parse_from_str(timestamp, "%Y-%m-%dT%H:%M:%S%.3f%z")
                 .ok()
                 .map(|dt| dt.timestamp() as UnixTimestamp)
         } else {
-            println!("timestamp: {timestamp}");
             // try to parse as unix timestamp
             timestamp.parse::<UnixTimestamp>().ok()
-        }
-    } else {
-        None
-    })
+        });
+    }
+
+    Ok(None)
 }
