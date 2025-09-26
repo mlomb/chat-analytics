@@ -1,6 +1,6 @@
 use crate::parse::{ChatParser, json::JSONStreamHelper};
 use ::serde::Deserialize;
-use std::io::Read;
+use std::io::{Read, Seek, SeekFrom};
 
 #[derive(Default, Debug)]
 pub struct DiscordParser {}
@@ -24,7 +24,7 @@ struct DiscordMessage {
 }
 
 impl ChatParser for DiscordParser {
-    fn parse<R: Read>(&self, reader: R) -> Result<(), Box<dyn std::error::Error>> {
+    fn parse<R: Read + Seek>(&self, mut reader: R) -> Result<(), Box<dyn std::error::Error>> {
         let mut count = 0;
         JSONStreamHelper::default()
             .on_object::<DiscordGuild>("guild", |guild| Ok(println!("guild: {guild:?}")))
