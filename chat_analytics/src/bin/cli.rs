@@ -32,12 +32,15 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let file = File::open(args.files[0].clone())?;
 
-    let parser = DiscordParser::default();
-    parser.parse(file).expect("Failed to parse file");
+    let parser = DiscordParser::new(file)?;
 
-    //for result in parser {
-    //    println!("result: {result:?}");
-    //}
+    let mut count = 0;
+
+    for result in parser {
+        count += 1;
+    }
+
+    println!("count: {count}");
 
     Ok(())
 }

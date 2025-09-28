@@ -25,15 +25,26 @@ struct PMessage {
 }
 
 #[derive(Debug)]
-pub enum ParsedEntity {
-    Guild(PGuild),
-    Channel(PChannel),
-    Author(PAuthor),
-    Message(PMessage),
+struct PCall {
+    id: String,
+    authorId: String,
+    channelId: String,
+    timestampStart: String,
+    timestampEnd: String,
 }
 
-pub trait ChatParser {
-    fn parse<R: Read + Seek>(&self, reader: R) -> Result<(), Box<dyn std::error::Error>>;
+#[derive(Debug)]
+pub enum ParsedEntity {
+    A,
+    Message(PMessage),
+    Call(PCall),
+}
+
+pub trait ChatParser<R: Read + Seek>
+where
+    Self: Sized,
+{
+    fn new(reader: R) -> Result<Self, Box<dyn std::error::Error>>;
 }
 
 pub mod discord;
