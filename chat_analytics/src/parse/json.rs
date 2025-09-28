@@ -29,7 +29,7 @@ impl<'a, R: Read> JSONStreamHelper<'a, R> {
     /// ```rust
     /// use serde::Deserialize;
     /// use std::io::Cursor;
-    /// use pipeline_rs::parse::json::JSONStreamHelper;
+    /// use chat_analytics::parse::json::JSONStreamHelper;
     ///
     /// #[derive(Deserialize)]
     /// struct Message {

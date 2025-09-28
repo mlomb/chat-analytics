@@ -77,7 +77,7 @@ export const Steps = () => {
                     progressTasks: tasks,
                 };
             });
-            if (env.isDev) throw e;
+            if (import.meta.env.isDev) throw e;
         };
         worker.onmessage = (e: MessageEvent<ProgressMessage | ResultMessage>) => {
             const data = e.data;
@@ -126,7 +126,7 @@ export const Steps = () => {
                 terminate = true;
             }
 
-            if (terminate && env.isProd) {
+            if (terminate && import.meta.env.isProd) {
                 worker.terminate();
             }
         };
@@ -148,7 +148,7 @@ export const Steps = () => {
         }));
 
         // show unsaved progress alert before leaving
-        if (env.isProd) {
+        if (import.meta.env.isProd) {
             window.addEventListener("beforeunload", (event) => {
                 // this message is never shown really.
                 event.returnValue = `Are you sure you want to leave?`;

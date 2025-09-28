@@ -12,6 +12,14 @@ createRoot(document.getElementById("app") as HTMLElement).render(
     </StrictMode>
 );
 
-console.log(env);
+console.log(import.meta.env);
 
 plausible("pageview");
+
+async function test() {
+    // @ts-ignore
+    const worker = new Worker(new URL("@app/GlueWorker.ts", import.meta.url), { type: "module" });
+    console.log(worker);
+}
+
+test();

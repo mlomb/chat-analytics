@@ -15,12 +15,12 @@ pub type UnixTimestamp = i64;
 ///
 /// let regex = Regex::new(r#""ts": (\d+)"#).unwrap();
 /// let reader = Cursor::new(r#"{ "ts": 1111111111 }"#);
-/// let timestamp = pipeline_rs::parse::util::try_to_find_timestamp_at_end(reader, regex).unwrap();
+/// let timestamp = chat_analytics::parse::util::try_to_find_timestamp_at_end(reader, regex).unwrap();
 /// assert_eq!(timestamp, Some(1111111111));
 ///
 /// let regex = Regex::new(r#""timestamp": ?"([0-9-:.+T]+)""#).unwrap();
 /// let reader = Cursor::new(r#"{ "timestamp": "2020-07-17T17:03:14.366+00:00" }"#);
-/// let timestamp = pipeline_rs::parse::util::try_to_find_timestamp_at_end(reader, regex).unwrap();
+/// let timestamp = chat_analytics::parse::util::try_to_find_timestamp_at_end(reader, regex).unwrap();
 /// assert_eq!(timestamp, Some(1595005394));
 /// ```
 pub fn try_to_find_timestamp_at_end<R: Read + Seek>(

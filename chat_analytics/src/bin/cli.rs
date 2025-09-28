@@ -1,9 +1,9 @@
+use chat_analytics::parse::ChatParser;
 use clap::Parser;
 use clap::ValueEnum;
-use pipeline_rs::parse::ChatParser;
 use std::fs::File;
 
-use pipeline_rs::parse::discord::DiscordParser;
+use chat_analytics::parse::discord::DiscordParser;
 
 #[derive(ValueEnum, Debug, Clone)]
 #[value(rename_all = "lower")]
@@ -34,6 +34,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let parser = DiscordParser::default();
     parser.parse(file).expect("Failed to parse file");
+
+    //for result in parser {
+    //    println!("result: {result:?}");
+    //}
 
     Ok(())
 }

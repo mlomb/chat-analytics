@@ -1,0 +1,12 @@
+{
+  "name": "app",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "vite --host"
+  },
+  "dependencies": {
+    "app_worker": "file:worker/pkg",
+    "vite": "^7.1.7",
+    "vite-plugin-wasm": "^3.5.0"
+  }
+}

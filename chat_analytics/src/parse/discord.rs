@@ -1,4 +1,4 @@
-use crate::parse::{ChatParser, json::JSONStreamHelper};
+use crate::parse::{ChatParser, ParsedEntity, json::JSONStreamHelper};
 use ::serde::Deserialize;
 use std::io::{Read, Seek, SeekFrom};
 
@@ -42,5 +42,13 @@ impl ChatParser for DiscordParser {
         println!("count: {count}");
 
         Ok(())
+    }
+}
+
+impl Iterator for DiscordParser {
+    type Item = Result<Option<ParsedEntity>, Box<dyn std::error::Error>>;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        todo!()
     }
 }

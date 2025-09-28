@@ -115,7 +115,7 @@ export const ViewDownloadReport = ({ result }: Props) => {
                     <img src={LinkOut} alt="Link out" height={16} />
                     View Locally
                 </Button>
-                {env.isDev && (
+                {import.meta.env.isDev && (
                     <Button hueColor={[115, 70, 50]} href={files.dataURL} download="report_sample.data">
                         🛠️ Download DATA (dev, {prettyBytes(files.dataBlob?.size || 0)})
                     </Button>
