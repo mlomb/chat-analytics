@@ -3,7 +3,7 @@ use clap::Parser;
 use clap::ValueEnum;
 use std::fs::File;
 
-use chat_analytics::parse::discord::DiscordParser;
+use chat_analytics::parse::discord::DiscordChatExporterParser;
 
 #[derive(ValueEnum, Debug, Clone)]
 #[value(rename_all = "lower")]
@@ -32,11 +32,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let file = File::open(args.files[0].clone())?;
 
-    let parser = DiscordParser::new(file)?;
+    let parser = DiscordChatExporterParser::new(file)?;
 
     let mut count = 0;
 
     for result in parser {
+        println!("result: {result:?}");
         count += 1;
     }
 

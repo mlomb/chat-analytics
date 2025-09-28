@@ -133,9 +133,7 @@ pub fn read_top_level_key<'a, T: Deserialize<'a>, R: Read + Seek>(
 
     // iterate over top level keys forwards
     while stream.has_next()? {
-        let name = stream.next_name_owned()?;
-
-        if name == key {
+        if key == stream.next_name_owned()? {
             // match!
             return Ok(stream.deserialize_next::<T>()?);
         }

@@ -2,7 +2,7 @@ use chrono::DateTime;
 use regex::Regex;
 use std::io::{Read, Seek, SeekFrom};
 
-pub type UnixTimestamp = i64;
+use crate::parse::UnixTimestamp;
 
 /// Tries to find a timestamp at the end of a file, using the provided regex. The regex must have a capture group.
 /// It can detect ISO 8601 dates and unix timestamps.
@@ -37,7 +37,7 @@ pub fn try_to_find_timestamp_at_end<R: Read + Seek>(
 
     // read at most the last 4KB
     let len = reader.seek(SeekFrom::End(0))? as i64;
-    reader.seek(SeekFrom::End(-4096.min(len)))?;
+    reader.seek(SeekFrom::End(4096))?; // -4096.min(len)
     reader.read_to_end(&mut buffer)?;
 
     // parse as UTF-8 lossy, since we might start reading from an incomplete UTF-8 sequence
