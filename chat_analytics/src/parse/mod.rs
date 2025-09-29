@@ -8,9 +8,9 @@ pub type UnixTimestamp = i64;
 /// Guild interface produced by parsers
 #[derive(Debug, Clone)]
 pub struct PGuild {
-    id: String,
-    name: String,
-    avatar: Option<String>,
+    pub id: String,
+    pub name: String,
+    pub avatar: Option<String>,
 }
 
 #[derive(Debug, Clone)]
@@ -24,7 +24,7 @@ pub enum ChannelType {
 }
 
 /// Types of attachments
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum AttachmentType {
     Image,
     ImageAnimated, // (GIFs)
@@ -38,58 +38,58 @@ pub enum AttachmentType {
 /// Channel interface produced by parsers
 #[derive(Debug, Clone)]
 pub struct PChannel {
-    id: RawID,
-    guild: PGuild,
-    r#type: ChannelType,
-    name: String,
-    avatar: Option<String>,
+    pub id: RawID,
+    pub guild: PGuild,
+    pub r#type: ChannelType,
+    pub name: String,
+    pub avatar: Option<String>,
 }
 
 /// Author interface produced by parsers
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct PAuthor {
-    id: RawID,
-    name: String,
-    bot: bool,
-    avatar: Option<String>,
+    pub id: RawID,
+    pub name: String,
+    pub bot: bool,
+    pub avatar: Option<String>,
 }
 
 /// Message interface produced by parsers
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct PMessage {
-    id: RawID,
-    channel: PChannel,
-    author: PAuthor,
-    timestamp: UnixTimestamp,
-    timestamp_edit: Option<UnixTimestamp>,
-    reply_to: Option<RawID>,
+    pub id: RawID,
+    pub channel: PChannel,
+    pub author: PAuthor,
+    pub timestamp: UnixTimestamp,
+    pub timestamp_edit: Option<UnixTimestamp>,
+    pub reply_to: Option<RawID>,
 
-    text_content: Option<String>,
-    attachments: Vec<AttachmentType>,
-    reactions: Vec<(PEmoji, u32)>,
+    pub text_content: Option<String>,
+    pub attachments: Vec<AttachmentType>,
+    pub reactions: Vec<(PEmoji, u32)>,
 }
 
 #[derive(Debug)]
 pub struct PCall {
-    id: RawID,
+    pub id: RawID,
     /// The user who started the call
-    author_id: RawID,
-    channel_id: RawID,
-    timestamp_start: UnixTimestamp,
-    timestamp_end: UnixTimestamp,
+    pub author_id: RawID,
+    pub channel_id: RawID,
+    pub timestamp_start: UnixTimestamp,
+    pub timestamp_end: UnixTimestamp,
 }
 
 /// Emoji interface produced by parsers
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct PEmoji {
-    id: Option<RawID>,
+    pub id: Option<RawID>,
     /// e.g. "🔥", "pepe", "pepe_sad"
-    text: String,
+    pub text: String,
 }
 
 #[derive(Debug)]
+#[allow(clippy::large_enum_variant)]
 pub enum ParsedEntity {
-    A,
     Message(PMessage),
     Call(PCall),
 }
