@@ -1,7 +1,7 @@
 use crate::parse::json::read_top_level_key;
 use crate::parse::{ChannelType, ChatParser, PAuthor, PChannel, PGuild, PMessage, ParsedEntity};
 use ::serde::Deserialize;
-use chrono::{Date, DateTime, FixedOffset};
+use chrono::{DateTime, FixedOffset};
 use serde::Serialize;
 use std::io::{Read, Seek, SeekFrom};
 use struson::json_path;
