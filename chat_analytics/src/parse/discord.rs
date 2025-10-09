@@ -47,7 +47,9 @@ enum DiscordMessageType {
     RecipientAdd,
     RecipientRemove,
     Reply,
+    ThreadCreated,
 
+    #[serde(other)]
     Unknown,
 }
 
@@ -135,7 +137,7 @@ struct DiscordMention {
 struct DiscordMessageReference {
     channelId: Option<Snowflake>,
     guildId: Option<Snowflake>,
-    messageId: Snowflake,
+    messageId: Option<Snowflake>,
 }
 
 /// Discord Chat Exporter message representation
@@ -304,24 +306,12 @@ impl<R: Read + Seek> ChatParser<R> for DiscordChatExporterParser<R> {
             author: convert_author(message.author),
             timestamp: timestamp.timestamp(),
             timestamp_edit: timestamp_edit.map(|t| t.timestamp()),
-            reply_to: message.reference.map(|r| r.messageId),
+            reply_to: message.reference.and_then(|r| r.messageId),
             text_content: Some(message.content),
             attachments: vec![],
             reactions: vec![],
         };
 
         Ok(Some(ParsedEntity::Message(msg)))
-    }
-}
-
-impl<R: Read + Seek> Iterator for DiscordChatExporterParser<R> {
-    type Item = Result<ParsedEntity, Box<dyn std::error::Error>>;
-
-    fn next(&mut self) -> Option<Self::Item> {
-        match self.parse_next() {
-            Ok(Some(entity)) => Some(Ok(entity)),
-            Ok(None) => None,
-            Err(e) => Some(Err(e)),
-        }
     }
 }

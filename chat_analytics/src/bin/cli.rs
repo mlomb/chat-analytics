@@ -1,10 +1,14 @@
+use chat_analytics::aggregate::Block;
 use clap::Parser;
 use clap::ValueEnum;
+use indicatif::{ProgressBar, ProgressStyle};
 use std::fs::File;
 
+use chat_analytics::aggregate::stats::MessagesStats;
 use chat_analytics::parse::ChatParser;
 use chat_analytics::parse::discord::DiscordChatExporterParser;
-use chat_analytics::process::db::Database;
+use chat_analytics::process::db::DatabaseBuilder;
+use chat_analytics::progress_reader::ProgressReader;
 
 #[derive(ValueEnum, Debug, Clone)]
 #[value(rename_all = "lower")]
@@ -32,18 +36,32 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("args: {args:?}");
 
     let file = File::open(args.files[0].clone())?;
+    let file_size = file.metadata()?.len();
+    let (file_wrapper, bytes_read) = ProgressReader::new(file);
 
-    let parser = DiscordChatExporterParser::new(file)?;
-    let mut database = Database::new();
+    let mut parser = DiscordChatExporterParser::new(file_wrapper)?;
+    let mut database = DatabaseBuilder::new();
 
     let mut count = 0;
 
-    for result in parser {
-        database.push(result?);
+    let bar = ProgressBar::new(file_size);
+    bar.set_style(ProgressStyle::with_template("{bytes} / {total_bytes} ({eta})").unwrap());
+
+    while let Some(entity) = parser.parse_next()? {
+        database.push(entity);
         count += 1;
+        bar.set_position(*bytes_read.borrow());
     }
 
+    bar.finish();
+
     println!("count: {count}");
+
+    let full_database = database.build();
+    // println!("full_database: {full_database:?}");
+
+    let messages_stats = MessagesStats::compute(full_database);
+    println!("messages_stats: {messages_stats:?}");
 
     Ok(())
 }

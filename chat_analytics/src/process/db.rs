@@ -3,10 +3,11 @@ use std::collections::HashMap;
 use crate::message::Message;
 use crate::parse::{PAuthor, PChannel, PMessage, ParsedEntity, RawID};
 use crate::process::channel_messages::ChannelMessages;
+use crate::process::database::{Author, Channel, FullDatabase, Guild};
 use crate::process::nlp::text::{self, normalize_text};
 use crate::process::nlp::tokenizer::{self, tokenize};
 
-pub struct Database {
+pub struct DatabaseBuilder {
     authors: HashMap<RawID, PAuthor>,
     channels: HashMap<RawID, PChannel>,
     messages_in_channel: HashMap<RawID, ChannelMessages>,
@@ -14,7 +15,7 @@ pub struct Database {
     messages: Vec<Message>,
 }
 
-impl Database {
+impl DatabaseBuilder {
     pub fn new() -> Self {
         Self {
             authors: HashMap::new(),
@@ -29,9 +30,10 @@ impl Database {
             &message.text_content.clone().unwrap_or_default(),
         ));
 
-        println!("TEXT: {:?}", message.text_content.unwrap_or_default());
-        println!("TOKENS: {normalized_text:?}");
-        println!("");
+        // println!("TEXT: {:?}", message.text_content.unwrap_or_default());
+        // println!("TOKENS: {normalized_text:?}");
+        // println!("");
+
         //
         Message {
             day_index: 0,
@@ -71,5 +73,34 @@ impl Database {
             _ => {}
         }
         // -
+    }
+
+    pub fn build(self) -> FullDatabase {
+        FullDatabase {
+            guilds: vec![Guild {
+                name: "Default".to_string(),
+                avatar: None,
+            }],
+            authors: self
+                .authors
+                .into_values()
+                .map(|a| Author {
+                    name: a.name,
+                    bot: a.bot,
+                    avatar: a.avatar,
+                })
+                .collect(),
+            channels: self
+                .channels
+                .into_values()
+                .map(|c| Channel {
+                    name: c.name,
+                    avatar: c.avatar,
+                    msg_offset: 0,
+                    msg_count: 0,
+                })
+                .collect(),
+            messages: self.messages,
+        }
     }
 }

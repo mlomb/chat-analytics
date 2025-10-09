@@ -6,6 +6,7 @@ edition = "2024"
 [dependencies]
 chrono = "0.4.42"
 clap = { version = "4.5.48", features = ["derive"] }
+indicatif = "0.18.0"
 regex = "1.11.3"
 serde = { version = "1.0.226", features = ["serde_derive"] }
 struson = { version = "0.6.0", features = ["serde"] }

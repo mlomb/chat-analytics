@@ -1,3 +1,4 @@
+#[derive(Debug, Clone)]
 pub struct Message {
     // time
     pub day_index: u32,
