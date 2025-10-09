@@ -42,20 +42,15 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut parser = DiscordChatExporterParser::new(file_wrapper)?;
     let mut database = DatabaseBuilder::new();
 
-    let mut count = 0;
-
     let bar = ProgressBar::new(file_size);
     bar.set_style(ProgressStyle::with_template("{bytes} / {total_bytes} ({eta})").unwrap());
 
     while let Some(entity) = parser.parse_next()? {
         database.push(entity);
-        count += 1;
         bar.set_position(*bytes_read.borrow());
     }
 
     bar.finish();
-
-    println!("count: {count}");
 
     let full_database = database.build();
     // println!("full_database: {full_database:?}");

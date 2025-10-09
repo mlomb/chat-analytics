@@ -1,7 +1,7 @@
 use std::io::{Read, Seek};
 
 /// Platform's own ID (e.g: a Discord Snowflake)
-pub type RawID = String;
+pub type PlatformId = String;
 
 pub type UnixTimestamp = i64;
 
@@ -38,7 +38,7 @@ pub enum AttachmentType {
 /// Channel interface produced by parsers
 #[derive(Debug, Clone)]
 pub struct PChannel {
-    pub id: RawID,
+    pub id: PlatformId,
     pub guild: PGuild,
     pub r#type: ChannelType,
     pub name: String,
@@ -48,7 +48,7 @@ pub struct PChannel {
 /// Author interface produced by parsers
 #[derive(Debug, Clone)]
 pub struct PAuthor {
-    pub id: RawID,
+    pub id: PlatformId,
     pub name: String,
     pub bot: bool,
     pub avatar: Option<String>,
@@ -57,12 +57,12 @@ pub struct PAuthor {
 /// Message interface produced by parsers
 #[derive(Debug, Clone)]
 pub struct PMessage {
-    pub id: RawID,
+    pub id: PlatformId,
     pub channel: PChannel,
     pub author: PAuthor,
     pub timestamp: UnixTimestamp,
     pub timestamp_edit: Option<UnixTimestamp>,
-    pub reply_to: Option<RawID>,
+    pub reply_to: Option<PlatformId>,
 
     pub text_content: Option<String>,
     pub attachments: Vec<AttachmentType>,
@@ -71,10 +71,10 @@ pub struct PMessage {
 
 #[derive(Debug)]
 pub struct PCall {
-    pub id: RawID,
+    pub id: PlatformId,
     /// The user who started the call
-    pub author_id: RawID,
-    pub channel_id: RawID,
+    pub author_id: PlatformId,
+    pub channel_id: PlatformId,
     pub timestamp_start: UnixTimestamp,
     pub timestamp_end: UnixTimestamp,
 }
@@ -82,7 +82,7 @@ pub struct PCall {
 /// Emoji interface produced by parsers
 #[derive(Debug, Clone)]
 pub struct PEmoji {
-    pub id: Option<RawID>,
+    pub id: Option<PlatformId>,
     /// e.g. "🔥", "pepe", "pepe_sad"
     pub text: String,
 }
@@ -104,5 +104,4 @@ where
 }
 
 pub mod discord;
-pub mod json;
 pub mod util;

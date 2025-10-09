@@ -1,16 +1,16 @@
 use std::collections::HashMap;
 
 use crate::message::Message;
-use crate::parse::{PAuthor, PChannel, PMessage, ParsedEntity, RawID};
+use crate::parse::{PAuthor, PChannel, PMessage, ParsedEntity, PlatformId};
 use crate::process::channel_messages::ChannelMessages;
 use crate::process::database::{Author, Channel, FullDatabase, Guild};
 use crate::process::nlp::text::{self, normalize_text};
 use crate::process::nlp::tokenizer::{self, tokenize};
 
 pub struct DatabaseBuilder {
-    authors: HashMap<RawID, PAuthor>,
-    channels: HashMap<RawID, PChannel>,
-    messages_in_channel: HashMap<RawID, ChannelMessages>,
+    authors: HashMap<PlatformId, PAuthor>,
+    channels: HashMap<PlatformId, PChannel>,
+    messages_in_channel: HashMap<PlatformId, ChannelMessages>,
     // for now, store directly here
     messages: Vec<Message>,
 }
