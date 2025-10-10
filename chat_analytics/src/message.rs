@@ -1,25 +1,27 @@
 #[derive(Debug, Clone)]
 pub struct Message {
-    // time
-    pub day_index: u32,
-    pub second_of_day: u32,
-    pub edited_after: Option<u32>,
-
     // author
-    pub author_index: u32,
+    pub author_index: usize,
+    // TODO: to be removed
+    pub channel_index: usize,
+
+    // time
+    pub day_index: usize,
+    pub second_of_day: usize,
+    pub edited_after: Option<usize>, // seconds
 
     // reply
-    pub reply_offset: Option<u32>,
+    pub reply_offset: Option<usize>,
 
     // analysis
-    pub lang_index: Option<u32>,
-    pub sentiment: Option<u32>,
+    pub lang_index: Option<usize>,
+    pub sentiment: Option<usize>,
 
     // content
-    pub words: Option<Vec<u32>>,
-    pub emojis: Option<Vec<u32>>,
-    pub mentions: Option<Vec<u32>>,
-    pub reactions: Option<Vec<u32>>,
-    pub domains: Option<Vec<u32>>,
-    pub attachments: Option<Vec<u32>>,
+    pub words: Option<Vec<usize>>,
+    pub emojis: Option<Vec<usize>>,
+    pub mentions: Option<Vec<usize>>,
+    pub reactions: Option<Vec<usize>>,
+    pub domains: Option<Vec<usize>>,
+    pub attachments: Option<Vec<usize>>,
 }

@@ -58,5 +58,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let messages_stats = MessagesStats::compute(full_database);
     println!("messages_stats: {messages_stats:?}");
 
+    // print as JSON
+    let messages_stats_json =
+        serde_json::to_string(&messages_stats).expect("Failed to convert to JSON");
+    println!("messages_stats_json: {messages_stats_json}");
+
     Ok(())
 }

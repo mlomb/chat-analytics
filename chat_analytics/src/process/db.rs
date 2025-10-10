@@ -1,15 +1,20 @@
 use std::collections::HashMap;
 
+use indexmap::IndexMap;
+
 use crate::message::Message;
 use crate::parse::{PAuthor, PChannel, PMessage, ParsedEntity, PlatformId};
 use crate::process::channel_messages::ChannelMessages;
 use crate::process::database::{Author, Channel, FullDatabase, Guild};
-use crate::process::nlp::text::{self, normalize_text};
-use crate::process::nlp::tokenizer::{self, tokenize};
+use crate::process::nlp::text::normalize_text;
+use crate::process::nlp::tokenizer::{Tag, tokenize};
 
 pub struct DatabaseBuilder {
-    authors: HashMap<PlatformId, PAuthor>,
-    channels: HashMap<PlatformId, PChannel>,
+    // data stores
+    authors: IndexMap<PlatformId, PAuthor>,
+    channels: IndexMap<PlatformId, PChannel>,
+    words: IndexMap<String, String>,
+
     messages_in_channel: HashMap<PlatformId, ChannelMessages>,
     // for now, store directly here
     messages: Vec<Message>,
@@ -18,8 +23,9 @@ pub struct DatabaseBuilder {
 impl DatabaseBuilder {
     pub fn new() -> Self {
         Self {
-            authors: HashMap::new(),
-            channels: HashMap::new(),
+            authors: IndexMap::new(),
+            channels: IndexMap::new(),
+            words: IndexMap::new(),
             messages_in_channel: HashMap::new(),
             messages: Vec::new(),
         }
@@ -30,20 +36,47 @@ impl DatabaseBuilder {
             &message.text_content.clone().unwrap_or_default(),
         ));
 
+        let author_index = self
+            .authors
+            .insert_full(message.author.id.clone(), message.author.clone())
+            .0;
+        let channel_index = self
+            .channels
+            .insert_full(message.channel.id.clone(), message.channel.clone())
+            .0;
+
+        let mut words = vec![];
+
+        for token in normalized_text {
+            match token.tag {
+                Tag::Word => words.push(
+                    self.words
+                        .insert_full(token.text.clone(), token.text.clone())
+                        .0,
+                ),
+                _ => continue,
+            }
+        }
+
         // println!("TEXT: {:?}", message.text_content.unwrap_or_default());
         // println!("TOKENS: {normalized_text:?}");
         // println!("");
 
-        //
+        let edited_after = message
+            .timestamp_edit
+            .map(|timestamp_edit| (timestamp_edit - message.timestamp) as usize / 1000);
+
         Message {
+            author_index,
+            channel_index,
+            edited_after,
+            words: if words.is_empty() { None } else { Some(words) },
+
             day_index: 0,
             second_of_day: 0,
-            edited_after: Some(0),
-            author_index: 0,
             reply_offset: Some(0),
             lang_index: Some(0),
             sentiment: Some(0),
-            words: Some(vec![0]),
             emojis: Some(vec![0]),
             mentions: Some(vec![0]),
             reactions: Some(vec![0]),
@@ -55,22 +88,9 @@ impl DatabaseBuilder {
     pub fn push(&mut self, entity: ParsedEntity) {
         // println!("entity: {entity:?}");
 
-        match entity {
-            ParsedEntity::Message(message) => {
-                self.authors
-                    .insert(message.author.id.clone(), message.author.clone());
-                self.channels
-                    .insert(message.channel.id.clone(), message.channel.clone());
-
-                let processed = self.process_message(message.clone());
-                self.messages.push(processed);
-
-                self.messages_in_channel
-                    .entry(message.channel.id.clone())
-                    .or_insert_with(ChannelMessages::default)
-                    .add_message(message);
-            }
-            _ => {}
+        if let ParsedEntity::Message(message) = entity {
+            let processed = self.process_message(message.clone());
+            self.messages.push(processed);
         }
         // -
     }
