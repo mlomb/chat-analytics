@@ -4,6 +4,7 @@ use clap::ValueEnum;
 use indicatif::{ProgressBar, ProgressStyle};
 use std::fs::File;
 
+use chat_analytics::aggregate::per_period::MessagesPerPeriod;
 use chat_analytics::aggregate::stats::MessagesStats;
 use chat_analytics::parse::ChatParser;
 use chat_analytics::parse::discord::DiscordChatExporterParser;
@@ -55,13 +56,16 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let full_database = database.build();
     // println!("full_database: {full_database:?}");
 
-    let messages_stats = MessagesStats::compute(full_database);
-    println!("messages_stats: {messages_stats:?}");
+    let messages_stats = MessagesStats::compute(&full_database);
+    let messages_per_period = MessagesPerPeriod::compute(&full_database);
 
     // print as JSON
     let messages_stats_json =
         serde_json::to_string(&messages_stats).expect("Failed to convert to JSON");
-    println!("messages_stats_json: {messages_stats_json}");
+    let messages_per_period_json =
+        serde_json::to_string(&messages_per_period).expect("Failed to convert to JSON");
+    println!("messages_stats: {messages_stats_json}");
+    println!("messages_per_period: {messages_per_period_json}");
 
     Ok(())
 }
