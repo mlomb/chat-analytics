@@ -1,6 +1,8 @@
 use std::collections::HashMap;
 
+use chrono::{TimeZone, Utc};
 use indexmap::IndexMap;
+use url::Url;
 
 use crate::message::Message;
 use crate::parse::{PAuthor, PChannel, PMessage, ParsedEntity, PlatformId};
@@ -9,13 +11,21 @@ use crate::process::database::{Author, Channel, FullDatabase, Guild};
 use crate::process::nlp::text::normalize_text;
 use crate::process::nlp::tokenizer::{Tag, tokenize};
 
+struct Emoji {
+    id: String,
+    name: String,
+}
+
 pub struct DatabaseBuilder {
     // data stores
     authors: IndexMap<PlatformId, PAuthor>,
     channels: IndexMap<PlatformId, PChannel>,
     words: IndexMap<String, String>,
+    emoji: IndexMap<String, Emoji>,
+    domains: IndexMap<String, String>,
 
     messages_in_channel: HashMap<PlatformId, ChannelMessages>,
+
     // for now, store directly here
     messages: Vec<Message>,
 }
@@ -26,6 +36,8 @@ impl DatabaseBuilder {
             authors: IndexMap::new(),
             channels: IndexMap::new(),
             words: IndexMap::new(),
+            emoji: IndexMap::new(),
+            domains: IndexMap::new(),
             messages_in_channel: HashMap::new(),
             messages: Vec::new(),
         }
@@ -46,6 +58,7 @@ impl DatabaseBuilder {
             .0;
 
         let mut words = vec![];
+        let mut domains = vec![];
 
         for token in normalized_text {
             match token.tag {
@@ -54,6 +67,18 @@ impl DatabaseBuilder {
                         .insert_full(token.text.clone(), token.text.clone())
                         .0,
                 ),
+                Tag::Url => {
+                    if let Ok(url) = Url::parse(&token.text)
+                        && let Some(host) = url.host_str()
+                    {
+                        let host = host.to_lowercase();
+                        domains.push(
+                            self.domains
+                                .insert_full(host.to_string(), host.to_string())
+                                .0,
+                        );
+                    }
+                }
                 _ => continue,
             }
         }
@@ -70,18 +95,20 @@ impl DatabaseBuilder {
             author_index,
             channel_index,
             edited_after,
-            words: if words.is_empty() { None } else { Some(words) },
+
+            timestamp: Utc.timestamp_opt(message.timestamp, 0).unwrap(),
+            words,
+            domains,
 
             day_index: 0,
             second_of_day: 0,
             reply_offset: Some(0),
             lang_index: Some(0),
             sentiment: Some(0),
-            emojis: Some(vec![0]),
-            mentions: Some(vec![0]),
-            reactions: Some(vec![0]),
-            domains: Some(vec![0]),
-            attachments: Some(vec![0]),
+            emojis: vec![],
+            mentions: vec![],
+            reactions: vec![],
+            attachments: vec![],
         }
     }
 

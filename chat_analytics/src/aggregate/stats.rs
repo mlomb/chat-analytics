@@ -1,21 +1,9 @@
+use chrono::{Datelike, Timelike};
 use serde::{Deserialize, Serialize};
 use serde_with::serde_as;
 use std::collections::HashMap;
 
-use crate::{aggregate::Block, process::database::FullDatabase};
-
-/** Types of attachments */
-#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Hash)]
-#[serde(rename_all = "snake_case")]
-pub enum AttachmentType {
-    Image,
-    ImageAnimated, // (GIFs)
-    Video,
-    Sticker,
-    Audio,
-    Document,
-    Other,
-}
+use crate::{aggregate::Block, parse::AttachmentType, process::database::FullDatabase};
 
 #[serde_as]
 #[derive(Debug, Serialize, Deserialize)]
@@ -69,30 +57,49 @@ impl Block for MessagesStats {
         let mut counts_by_author = vec![0; database.authors.len()];
         let mut counts_in_channel = vec![0; database.channels.len()];
 
+        let mut weekday_hour_activity = [0; 7 * 24];
+
         for message in database.messages {
             total += 1;
-            if message.words.is_some() {
+            if !message.words.is_empty() {
                 with_text += 1
+            }
+            if !message.domains.is_empty() {
+                with_links += 1;
             }
             if message.edited_after.is_some() {
                 edited += 1;
             }
+            for attachment in message.attachments {
+                with_attachments_count
+                    .entry(attachment)
+                    .and_modify(|count| *count += 1)
+                    .or_insert(1);
+            }
             counts_by_author[message.author_index] += 1;
             counts_in_channel[message.channel_index] += 1;
+
+            // extract day from timestamp
+            let weekday = message.timestamp.weekday();
+            let hour_of_day = message.timestamp.time().hour();
+
+            weekday_hour_activity[(weekday.num_days_from_monday() * 24 + hour_of_day) as usize] +=
+                1;
         }
 
         Self {
             total,
             edited,
-            with_attachments_count,
             with_text,
             with_links,
+            with_attachments_count,
+
             counts_by_author,
             counts_in_channel,
 
             // TODO:
             num_active_days: 0,
-            weekday_hour_activity: [0; 7 * 24],
+            weekday_hour_activity,
             most_active_hour: MostActiveEntry {
                 messages: 0,
                 at: None,

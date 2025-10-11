@@ -1,3 +1,4 @@
+use serde::{Deserialize, Serialize};
 use std::io::{Read, Seek};
 
 /// Platform's own ID (e.g: a Discord Snowflake)
@@ -24,7 +25,8 @@ pub enum ChannelType {
 }
 
 /// Types of attachments
-#[derive(Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Hash, Clone)]
+#[serde(rename_all = "snake_case")]
 pub enum AttachmentType {
     Image,
     ImageAnimated, // (GIFs)

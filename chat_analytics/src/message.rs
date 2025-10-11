@@ -1,3 +1,7 @@
+use chrono::{DateTime, Utc};
+
+use crate::parse::AttachmentType;
+
 #[derive(Debug, Clone)]
 pub struct Message {
     // author
@@ -6,6 +10,7 @@ pub struct Message {
     pub channel_index: usize,
 
     // time
+    pub timestamp: DateTime<Utc>,
     pub day_index: usize,
     pub second_of_day: usize,
     pub edited_after: Option<usize>, // seconds
@@ -18,10 +23,10 @@ pub struct Message {
     pub sentiment: Option<usize>,
 
     // content
-    pub words: Option<Vec<usize>>,
-    pub emojis: Option<Vec<usize>>,
-    pub mentions: Option<Vec<usize>>,
-    pub reactions: Option<Vec<usize>>,
-    pub domains: Option<Vec<usize>>,
-    pub attachments: Option<Vec<usize>>,
+    pub words: Vec<usize>,
+    pub emojis: Vec<usize>,
+    pub mentions: Vec<usize>,
+    pub reactions: Vec<usize>,
+    pub domains: Vec<usize>,
+    pub attachments: Vec<AttachmentType>,
 }
