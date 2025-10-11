@@ -1,9 +1,12 @@
-use chrono::{Datelike, Timelike};
+use chrono::{Datelike, TimeZone, Timelike};
+use chrono_tz::Tz;
 use serde::{Deserialize, Serialize};
 use serde_with::serde_as;
 use std::collections::HashMap;
 
-use crate::{aggregate::Block, parse::AttachmentType, process::database::FullDatabase};
+use crate::{
+    aggregate::Block, parse::AttachmentType, process::database::FullDatabase, time_index::TimeIndex,
+};
 
 #[serde_as]
 #[derive(Debug, Serialize, Deserialize)]
@@ -48,6 +51,10 @@ pub struct MostActiveEntry {
 
 impl Block for MessagesStats {
     fn compute(database: FullDatabase) -> Self {
+        let ti = TimeIndex::new(database.min_timestamp, Tz::America__Argentina__Buenos_Aires);
+
+        println!("ti: {:?}", ti.index(database.min_timestamp));
+
         let mut total = 0;
         let mut edited = 0;
         let mut with_text = 0;
@@ -57,6 +64,10 @@ impl Block for MessagesStats {
         let mut counts_by_author = vec![0; database.authors.len()];
         let mut counts_in_channel = vec![0; database.channels.len()];
 
+        let max_idxs = ti.index(database.max_timestamp);
+        let mut day_counts = vec![0; max_idxs.day_index + 1];
+        let mut month_counts = vec![0; max_idxs.month_index + 1];
+        let mut year_counts = vec![0; max_idxs.year_index + 1];
         let mut weekday_hour_activity = [0; 7 * 24];
 
         for message in database.messages {
@@ -79,12 +90,12 @@ impl Block for MessagesStats {
             counts_by_author[message.author_index] += 1;
             counts_in_channel[message.channel_index] += 1;
 
-            // extract day from timestamp
-            let weekday = message.timestamp.weekday();
-            let hour_of_day = message.timestamp.time().hour();
+            let message_idxs = ti.index(message.timestamp);
 
-            weekday_hour_activity[(weekday.num_days_from_monday() * 24 + hour_of_day) as usize] +=
-                1;
+            day_counts[message_idxs.day_index] += 1;
+            month_counts[message_idxs.month_index] += 1;
+            year_counts[message_idxs.year_index] += 1;
+            weekday_hour_activity[message_idxs.weekday_index * 24 + message_idxs.hour_index] += 1;
         }
 
         Self {
@@ -97,7 +108,6 @@ impl Block for MessagesStats {
             counts_by_author,
             counts_in_channel,
 
-            // TODO:
             num_active_days: 0,
             weekday_hour_activity,
             most_active_hour: MostActiveEntry {

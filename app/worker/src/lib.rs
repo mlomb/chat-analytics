@@ -31,12 +31,12 @@ pub fn process_files(files: Vec<web_sys::File>) -> String {
         const BUFFER_SIZE: usize = 1024 * 1024 * 4; // 4MB
         let wf = BufReader::with_capacity(BUFFER_SIZE, wf);
 
-        let parser = DiscordChatExporterParser::new(wf).expect("Failed to parse file");
+        let mut parser = DiscordChatExporterParser::new(wf).expect("Failed to parse file");
 
         let mut count = 0;
 
-        for result in parser {
-            database.push(result.expect("Failed to parse message"));
+        while let Some(entity) = parser.parse_next().unwrap() {
+            database.push(entity);
             count += 1;
         }
     }

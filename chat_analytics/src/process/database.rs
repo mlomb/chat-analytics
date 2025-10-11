@@ -1,3 +1,5 @@
+use chrono::{DateTime, Utc};
+
 use crate::message::Message;
 
 #[derive(Debug)]
@@ -28,4 +30,7 @@ pub struct FullDatabase {
     pub channels: Vec<Channel>,
     pub authors: Vec<Author>,
     pub messages: Vec<Message>,
+
+    pub min_timestamp: DateTime<Utc>,
+    pub max_timestamp: DateTime<Utc>,
 }

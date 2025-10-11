@@ -1,9 +1,8 @@
 use std::{cell::RefCell, rc::Rc};
 
-use crate::{
-    message::Message,
-    parse::{PMessage, UnixTimestamp},
-};
+use chrono::{DateTime, Utc};
+
+use crate::{message::Message, parse::PMessage};
 
 /// This class handles all the messages in a channel, either processed or not.
 /// Responsible for receiving PMessage objects (parser messages) and generate groups of messages (PMessageGroup)
@@ -87,8 +86,8 @@ impl ChannelMessages {
 /// It also keeps track of the index of each message by its ID.
 pub struct MessagesInterval {
     /// [start, end]
-    start: UnixTimestamp,
-    end: UnixTimestamp,
+    start: DateTime<Utc>,
+    end: DateTime<Utc>,
 
     /// Messages pending to be grouped and processed. It should be very few elements here at a time
     message_queue: Vec<PMessage>,
@@ -117,7 +116,7 @@ impl MessagesInterval {
         self.message_queue.push(message);
     }
 
-    pub fn is_contained(&self, ts: UnixTimestamp) -> bool {
+    pub fn is_contained(&self, ts: DateTime<Utc>) -> bool {
         ts >= self.start && ts <= self.end
     }
 }

@@ -5,6 +5,7 @@ edition = "2024"
 
 [dependencies]
 chrono = "0.4.42"
+chrono-tz = "0.10.4"
 clap = { version = "4.5.48", features = ["derive"] }
 indexmap = { version = "2.11.4", features = ["serde"] }
 indicatif = "0.18.0"

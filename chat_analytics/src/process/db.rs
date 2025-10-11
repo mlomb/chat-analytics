@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use chrono::{TimeZone, Utc};
+use chrono::{DateTime, Utc};
 use indexmap::IndexMap;
 use url::Url;
 
@@ -28,6 +28,9 @@ pub struct DatabaseBuilder {
 
     // for now, store directly here
     messages: Vec<Message>,
+
+    min_timestamp: DateTime<Utc>,
+    max_timestamp: DateTime<Utc>,
 }
 
 impl DatabaseBuilder {
@@ -40,6 +43,8 @@ impl DatabaseBuilder {
             domains: IndexMap::new(),
             messages_in_channel: HashMap::new(),
             messages: Vec::new(),
+            min_timestamp: DateTime::<Utc>::MAX_UTC,
+            max_timestamp: DateTime::<Utc>::MIN_UTC,
         }
     }
 
@@ -89,14 +94,16 @@ impl DatabaseBuilder {
 
         let edited_after = message
             .timestamp_edit
-            .map(|timestamp_edit| (timestamp_edit - message.timestamp) as usize / 1000);
+            .map(|timestamp_edit| (timestamp_edit - message.timestamp).num_seconds() as usize);
 
+        self.min_timestamp = self.min_timestamp.min(message.timestamp);
+        self.max_timestamp = self.max_timestamp.max(message.timestamp);
         Message {
             author_index,
             channel_index,
             edited_after,
 
-            timestamp: Utc.timestamp_opt(message.timestamp, 0).unwrap(),
+            timestamp: message.timestamp,
             words,
             domains,
 
@@ -148,6 +155,8 @@ impl DatabaseBuilder {
                 })
                 .collect(),
             messages: self.messages,
+            min_timestamp: self.min_timestamp,
+            max_timestamp: self.max_timestamp,
         }
     }
 }

@@ -1,3 +1,4 @@
+use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use std::io::{Read, Seek};
 
@@ -62,8 +63,8 @@ pub struct PMessage {
     pub id: PlatformId,
     pub channel: PChannel,
     pub author: PAuthor,
-    pub timestamp: UnixTimestamp,
-    pub timestamp_edit: Option<UnixTimestamp>,
+    pub timestamp: DateTime<Utc>,
+    pub timestamp_edit: Option<DateTime<Utc>>,
     pub reply_to: Option<PlatformId>,
 
     pub text_content: Option<String>,
