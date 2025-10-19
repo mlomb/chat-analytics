@@ -33,6 +33,10 @@ impl DateTimeIndex {
             hour_index: end_time.hour() as usize,
         }
     }
+
+    pub fn generate_timestamps() {
+        // ^
+    }
 }
 
 #[cfg(test)]

@@ -1,6 +1,8 @@
+import * as ReportWorkerType from "report_worker";
+
 import { DateKey } from "@pipeline/Time";
 import { Index } from "@pipeline/Types";
-import { BlockArgs, BlockData, BlockKey, Blocks, Filter } from "@pipeline/aggregate/Blocks";
+import { BlockArgs, BlockData, BlockKey, Filter } from "@pipeline/aggregate/Blocks";
 import { CommonBlockData, computeCommonBlockData } from "@pipeline/aggregate/Common";
 import { Filters } from "@pipeline/aggregate/Filters";
 import { decompressDatabase } from "@pipeline/compression/Compression";
@@ -25,7 +27,7 @@ export type BlockResult<K extends BlockKey> = {
 /** Message sent from the UI to the worker to initialize the database (providing it encoded) */
 export interface InitMessage {
     type: "init";
-    dataStr: string;
+    dataStr: Uint8Array;
 }
 
 /** Message sent from the worker to the UI with the Database decoded and other information */
@@ -63,7 +65,54 @@ let database: Database | null = null;
 let filters: Filters | null = null;
 let common: CommonBlockData | null = null;
 
+let module: typeof ReportWorkerType | null = null;
+
 const init = (msg: InitMessage) => {
+    console.log("Init message", msg);
+
+    import("report_worker").then((m) => {
+        module = m;
+        module.init_panic_hook();
+        console.log(msg.dataStr.byteLength);
+        console.log(module.read_database(new Uint8Array(msg.dataStr)));
+
+        const message: ReadyMessage = {
+            type: "ready",
+            database: {
+                // since we don't need serialized messages in the UI
+                // and since they are huge, let's remove them
+                messages: undefined,
+
+                time: {
+                    minDate: "2025-01-25",
+                    maxDate: "2025-01-30",
+                },
+                config: {
+                    platform: "discord",
+                },
+                guilds: [
+                    {
+                        name: "asd",
+                    },
+                ],
+                channels: [],
+                authors: [],
+                calls: [],
+                words: [],
+                emojis: [],
+                domains: [],
+                mentions: [],
+            },
+            formatCache: undefined,
+        };
+
+        self.postMessage(message);
+    });
+
+    return;
+
+    ///
+
     console.time("Decompress time");
     database = decompressDatabase(msg.dataStr);
     console.timeEnd("Decompress time");
@@ -105,6 +154,44 @@ const init = (msg: InitMessage) => {
 };
 
 const request = async (msg: BlockRequestMessage) => {
+    console.log("BLOCK REQUEST:", msg);
+
+    if (!module) throw new Error("Module not initialized");
+
+    const request = msg.request;
+    const resultMsg: BlockResultMessage<any> = {
+        type: "result",
+        request,
+        result: {
+            success: false,
+            triggers: [],
+            errorMessage: "Unknown error",
+        },
+    };
+
+    try {
+        const id = request.blockKey + (request.args ? "--" + JSON.stringify(request.args) : "");
+
+        console.time(id);
+        const data = module.compute_block(
+            msg.request.blockKey,
+            msg.request.args ? JSON.stringify(msg.request.args) : ""
+        );
+        console.timeEnd(id);
+
+        resultMsg.result.success = true;
+        resultMsg.result.data = JSON.parse(data);
+        resultMsg.result.errorMessage = undefined;
+    } catch (ex) {
+        // handle exceptions
+        resultMsg.result.errorMessage = ex instanceof Error ? ex.message : ex + "";
+        console.log("Error ahead ↓");
+        console.error(ex);
+    }
+
+    self.postMessage(resultMsg);
+
+    /*
     if (!database || !filters || !common) throw new Error("No data provided");
 
     // update active filters if provided
@@ -147,6 +234,7 @@ const request = async (msg: BlockRequestMessage) => {
     }
 
     self.postMessage(resultMsg);
+    */
 };
 
 self.onmessage = (ev: MessageEvent<InitMessage | BlockRequestMessage>) => {

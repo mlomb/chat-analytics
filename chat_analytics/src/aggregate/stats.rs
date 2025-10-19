@@ -2,6 +2,7 @@ use chrono_tz::Tz;
 use serde::{Deserialize, Serialize};
 use serde_with::serde_as;
 use std::collections::HashMap;
+use ts_rs::TS;
 
 use crate::{
     aggregate::Block, datetime_index::DateTimeIndex, parse::AttachmentType,
@@ -9,8 +10,9 @@ use crate::{
 };
 
 #[serde_as]
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, TS, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
+#[ts(export)]
 pub struct MessagesStats {
     /// Total number of messages sent
     pub total: usize,
@@ -33,6 +35,7 @@ pub struct MessagesStats {
     pub num_active_days: usize,
     /// Each entry contains the number of messages sent for that hour of the week
     #[serde_as(as = "[_; 7 * 24]")]
+    #[ts(type = "[number, number][]")]
     pub weekday_hour_activity: [usize; 7 * 24],
 
     pub most_active_hour: Option<MostActiveEntry>,
@@ -42,7 +45,7 @@ pub struct MessagesStats {
 }
 
 /// Most active entry (hour, day, month, year) with count
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, TS, Serialize, Deserialize)]
 pub struct MostActiveEntry {
     pub index: usize,
     pub messages: usize,

@@ -1,10 +1,12 @@
 use chrono_tz::Tz;
 use serde::{Deserialize, Serialize};
+use ts_rs::TS;
 
 use crate::{aggregate::Block, datetime_index::DateTimeIndex, process::database::FullDatabase};
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, TS, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
+#[ts(export)]
 pub struct MessagesPerPeriod {
     /// Number of messages sent per day
     per_day: Vec<usize>,

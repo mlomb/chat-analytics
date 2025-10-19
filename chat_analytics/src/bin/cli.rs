@@ -1,8 +1,11 @@
 use chat_analytics::aggregate::Block;
+use chat_analytics::process::database::FullDatabase;
 use clap::Parser;
 use clap::ValueEnum;
 use indicatif::{ProgressBar, ProgressStyle};
 use std::fs::File;
+use std::io::Read;
+use std::io::Write;
 
 use chat_analytics::aggregate::per_period::MessagesPerPeriod;
 use chat_analytics::aggregate::stats::MessagesStats;
@@ -56,8 +59,26 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let full_database = database.build();
     // println!("full_database: {full_database:?}");
 
-    let messages_stats = MessagesStats::compute(&full_database);
-    let messages_per_period = MessagesPerPeriod::compute(&full_database);
+    // serialize full_database to "C:\Users\mlomb\Desktop\chat-analytics\report\public\report_sample.data"
+    // using bincode
+    let buffer = bincode::serde::encode_to_vec(&full_database, bincode::config::standard())?;
+    let mut output_file =
+        File::create(r"C:\Users\mlomb\Desktop\chat-analytics\report\public\report_sample.data")?;
+    output_file.write_all(&buffer)?;
+
+    // read file
+    let mut input_file =
+        File::open(r"C:\Users\mlomb\Desktop\chat-analytics\report\public\report_sample.data")?;
+    let mut buffer = Vec::new();
+    input_file.read_to_end(&mut buffer)?;
+
+    // Decode the bincode-encoded database using bincode trait
+    let (asd, _): (FullDatabase, usize) =
+        bincode::serde::decode_from_slice(&buffer, bincode::config::standard())
+            .expect("Failed to decode database");
+
+    let messages_stats = MessagesStats::compute(&asd);
+    let messages_per_period = MessagesPerPeriod::compute(&asd);
 
     // print as JSON
     let messages_stats_json =

@@ -1,6 +1,7 @@
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use std::io::{Read, Seek};
+use ts_rs::TS;
 
 /// Platform's own ID (e.g: a Discord Snowflake)
 pub type PlatformId = String;
@@ -26,7 +27,7 @@ pub enum ChannelType {
 }
 
 /// Types of attachments
-#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Hash, Clone)]
+#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Hash, Clone, TS)]
 #[serde(rename_all = "snake_case")]
 pub enum AttachmentType {
     Image,

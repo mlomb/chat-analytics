@@ -4,13 +4,15 @@ import { Tooltip } from "@report/components/core/Tooltip";
 import GitHub from "@assets/images/logos/github.svg";
 import "@assets/styles/Footer.less";
 
+// TODO: import.meta
+
 const extraInfo = () => (
     <>
         Report generated at: <b>{getDatabase().generatedAt}</b>
         <br />
-        Build date: <b>{env.build.date}</b>
+        Build date: <b>{123}</b>
         <br />
-        Build version: <b>v{env.build.version}</b>
+        Build version: <b>v{123}</b>
     </>
 );
 
@@ -28,7 +30,7 @@ export default () => (
                 <img src={GitHub} alt="GitHub" />
             </a>
             <Tooltip content={extraInfo()}>
-                <span className="Footer__build">build {env.build.commitHash}</span>
+                <span className="Footer__build">build {123}</span>
             </Tooltip>
         </span>
     </div>

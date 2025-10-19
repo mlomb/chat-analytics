@@ -11,10 +11,11 @@ import {
     XYChart,
     XYCursor,
 } from "@amcharts/amcharts5/xy";
-import { MessagesPerPeriod } from "@pipeline/aggregate/blocks/messages/MessagesPerPeriod";
 import { useBlockData } from "@report/BlockHook";
 import { createYAxisLabel, syncAxisWithTimeFilter } from "@report/components/viz/amcharts/AmCharts5";
 import { AmCharts5Chart, CreateFn } from "@report/components/viz/amcharts/AmCharts5Chart";
+
+import { MessagesPerPeriod } from "../../../../chat_analytics/bindings/MessagesPerPeriod";
 
 export const MessagesOverTime = ({ options }: { options: number[] }) => {
     const data = useBlockData("messages/per-period");
@@ -84,6 +85,7 @@ export const MessagesOverTime = ({ options }: { options: number[] }) => {
             } else {
                 // for weeks and months
                 series = ColumnSeries.new(c.root, {
+                    // TODO: transform this!
                     valueXField: "ts",
                     valueYField: "v",
                     xAxis: xAxis,

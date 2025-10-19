@@ -5,8 +5,10 @@ import { useBlockData } from "@report/BlockHook";
 import { getDatabase } from "@report/WorkerWrapper";
 import DottedTable, { Line } from "@report/components/viz/DottedTable";
 
+import { MessagesStats } from "../../../../chat_analytics/bindings/MessagesStats";
+
 const MessagesStatsTable = () => {
-    const stats = useBlockData("messages/stats");
+    const stats: MessagesStats | undefined = useBlockData("messages/stats");
     const duration = useBlockData("interaction/conversation-duration");
 
     const db = getDatabase();
@@ -162,29 +164,29 @@ const MessagesStatsTable = () => {
             type: "text",
             label: "year ever",
             depth: 1,
-            value: formatDatetime("y", stats?.mostActive.year.at),
-            tooltip: <>with {stats?.mostActive.year.messages.toLocaleString()} messages</>,
+            value: formatDatetime("y", stats?.mostActiveYear?.index),
+            tooltip: <>with {stats?.mostActiveYear?.messages.toLocaleString()} messages</>,
         },
         {
             type: "text",
             label: "month ever",
             depth: 1,
-            value: formatDatetime("ym", stats?.mostActive.month.at),
-            tooltip: <>with {stats?.mostActive.month.messages.toLocaleString()} messages</>,
+            value: formatDatetime("ym", stats?.mostActiveMonth?.index),
+            tooltip: <>with {stats?.mostActiveMonth?.messages.toLocaleString()} messages</>,
         },
         {
             type: "text",
             label: "day ever",
             depth: 1,
-            value: formatDatetime("ymd", stats?.mostActive.day.at),
-            tooltip: <>with {stats?.mostActive.day.messages.toLocaleString()} messages</>,
+            value: formatDatetime("ymd", stats?.mostActiveDay?.index),
+            tooltip: <>with {stats?.mostActiveDay?.messages.toLocaleString()} messages</>,
         },
         {
             type: "text",
             label: "hour ever",
             depth: 1,
-            value: formatDatetime("ymdh", stats?.mostActive.hour.at),
-            tooltip: <>with {stats?.mostActive.hour.messages.toLocaleString()} messages</>,
+            value: formatDatetime("ymdh", stats?.mostActiveHour?.index),
+            tooltip: <>with {stats?.mostActiveHour?.messages.toLocaleString()} messages</>,
         },
     ];
 

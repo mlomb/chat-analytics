@@ -64,7 +64,7 @@ export class WorkerWrapper extends EventEmitter {
     /** Whether the worker is currently processing a request */
     private workerBusy: boolean = false;
 
-    constructor(dataStr: string) {
+    constructor(dataStr: Uint8Array) {
         super();
 
         if (env.isDev) {
@@ -77,7 +77,8 @@ export class WorkerWrapper extends EventEmitter {
             } else {
                 // normal webpack v5 worker loading
                 // @ts-expect-error
-                this.worker = new Worker(new URL("@report/WorkerReport.ts", import.meta.url));
+                //this.worker = new Worker(new URL("@report/WorkerReport.ts", import.meta.url));
+                this.worker = new Worker(new URL("@report/WorkerReport.ts", import.meta.url), { type: "module" });
             }
         } else {
             // Why we use base64 instead of Blob+URL.createObjectURL?
@@ -92,7 +93,7 @@ export class WorkerWrapper extends EventEmitter {
         }
         this.worker.onerror = this.onError.bind(this);
         this.worker.onmessage = this.onMessage.bind(this);
-        this.worker.postMessage({ type: "init", dataStr } as InitMessage);
+        this.worker.postMessage({ type: "init", dataStr } as InitMessage, [dataStr]);
     }
 
     private onError(e: ErrorEvent) {

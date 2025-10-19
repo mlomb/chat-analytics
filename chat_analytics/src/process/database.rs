@@ -1,14 +1,15 @@
 use chrono::{DateTime, Utc};
+use serde::{Deserialize, Serialize};
 
 use crate::message::Message;
 
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Guild {
     pub name: String,
     pub avatar: Option<String>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Channel {
     pub name: String,
     pub avatar: Option<String>,
@@ -17,14 +18,14 @@ pub struct Channel {
     pub msg_count: u64,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Author {
     pub name: String,
     pub bot: bool,
     pub avatar: Option<String>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct FullDatabase {
     pub guilds: Vec<Guild>,
     pub channels: Vec<Channel>,

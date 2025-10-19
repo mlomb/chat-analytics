@@ -11,17 +11,19 @@ import { plausible } from "@assets/Plausible";
 document.addEventListener("DOMContentLoaded", async () => {
     try {
         const dataElem = document.getElementById("data")!;
-        let dataStr: string = dataElem.textContent || "";
+        let dataStr: Uint8Array = dataElem.textContent || "";
         dataElem.remove();
 
         if (dataStr === "[[[DATA]]]") {
+            console.log("Loading sample report from report_sample.data");
+
             // load from public/ folder
             const res = await fetch("report_sample.data");
             if (res.status !== 200) {
                 alert("Could not load `report_sample.data` from `/public` for development, make sure to generate one.");
                 return;
             }
-            dataStr = await res.text();
+            dataStr = await res.arrayBuffer();
         }
 
         if (dataStr.length === 0 || dataStr === "[[[DATA]]]") {

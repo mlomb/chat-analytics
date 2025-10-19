@@ -288,8 +288,10 @@ impl<R: Read + Seek> ChatParser<R> for DiscordChatExporterParser<R> {
 
     fn parse_next(&mut self) -> Result<Option<ParsedEntity>, Box<dyn std::error::Error>> {
         if !self.messages_stream.has_next()? {
+            // no more messages to read
             return Ok(None);
         }
+
         let message: DiscordMessage = self.messages_stream.deserialize_next()?;
 
         // Timestamps in the export are in UTC

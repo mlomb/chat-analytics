@@ -1,0 +1,15 @@
+{
+    "compilerOptions": {
+        "target": "ESNext",
+        "module": "ESNext",
+        "allowSyntheticDefaultImports": true,
+        "jsx": "react-jsx",
+        "moduleResolution": "node",
+        "paths": {
+            "@app/*": ["../app/*"],
+            "@assets/*": ["../../assets/*"],
+            "@pipeline/*": ["../../pipeline/*"],
+            "@report/*": ["../report/*"]
+        }
+    }
+}
