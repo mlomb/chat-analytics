@@ -1,0 +1,112 @@
+{
+    "about": "Test multi-chat export",
+    "personal_information": {
+        "user_id": 100000001,
+        "first_name": "Test",
+        "last_name": "User"
+    },
+    "chats": {
+        "about": "This page lists all chats from this export.",
+        "list": [
+            {
+                "name": "Chat One",
+                "type": "personal_chat",
+                "id": 700000001,
+                "messages": [
+                    {
+                        "id": 1001,
+                        "type": "message",
+                        "date": "2023-01-01T10:00:00",
+                        "date_unixtime": "1672574400",
+                        "from": "Alice",
+                        "from_id": "user300000000",
+                        "text": "Hello from chat one!",
+                        "text_entities": [
+                            {
+                                "type": "plain",
+                                "text": "Hello from chat one!"
+                            }
+                        ]
+                    },
+                    {
+                        "id": 1002,
+                        "type": "message",
+                        "date": "2023-01-01T10:01:00",
+                        "date_unixtime": "1672574460",
+                        "from": "Bob",
+                        "from_id": "user700000000",
+                        "text": "Hi there!",
+                        "text_entities": [
+                            {
+                                "type": "plain",
+                                "text": "Hi there!"
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "name": "Chat Two",
+                "type": "private_group",
+                "id": 700000002,
+                "messages": [
+                    {
+                        "id": 2001,
+                        "type": "message",
+                        "date": "2023-01-02T10:00:00",
+                        "date_unixtime": "1672660800",
+                        "from": "Charlie",
+                        "from_id": "user800000000",
+                        "text": "Welcome to chat two!",
+                        "text_entities": [
+                            {
+                                "type": "plain",
+                                "text": "Welcome to chat two!"
+                            }
+                        ]
+                    },
+                    {
+                        "id": 2002,
+                        "type": "message",
+                        "date": "2023-01-02T10:02:00",
+                        "date_unixtime": "1672660920",
+                        "from": "David",
+                        "from_id": "user900000000",
+                        "text": "Group chat is fun!",
+                        "text_entities": [
+                            {
+                                "type": "plain",
+                                "text": "Group chat is fun!"
+                            }
+                        ]
+                    },
+                    {
+                        "id": 2003,
+                        "type": "service",
+                        "date": "2023-01-02T10:03:00",
+                        "date_unixtime": "1672660980",
+                        "actor": "Charlie",
+                        "actor_id": "user800000000",
+                        "action": "phone_call",
+                        "duration_seconds": 120,
+                        "text": "",
+                        "text_entities": []
+                    },
+                    {
+                        "id": 2004,
+                        "type": "message",
+                        "date": "2023-01-03T10:00:00",
+                        "date_unixtime": "1672747200",
+                        "from": "Eve",
+                        "from_id": "user101000000",
+                        "photo": "(File not included. Change data exporting settings to download.)",
+                        "width": 800,
+                        "height": 600,
+                        "text": "",
+                        "text_entities": []
+                    }
+                ]
+            }
+        ]
+    }
+}
