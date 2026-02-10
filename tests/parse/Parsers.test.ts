@@ -14,6 +14,7 @@ import { loadSample } from "@tests/samples";
 describe("should parse correctly", () => {
     // prettier-ignore
     const cases: { parser: new () => Parser; inputs: string[] }[] = [
+        { parser: DiscordParser, inputs: ["discord/DM_0A_0M.json"] },
         { parser: DiscordParser, inputs: ["discord/DM_2A_2M.json"] },
         { parser: DiscordParser, inputs: ["discord/GC_3A_5M.json"] },
         { parser: DiscordParser, inputs: ["discord/SV_5A_5M.json"] },

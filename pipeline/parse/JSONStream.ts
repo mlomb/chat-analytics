@@ -222,8 +222,11 @@ export class JSONStream {
                     break;
 
                 case State.END_VALUE_ARRAY:
-                    // console.log("EMITTING ARRAY", this.key, this.value);
-                    this.arrayCallbacks[this.key!](this.parseValue());
+                    // Check if the captured value is actually empty/whitespace
+                    if (this.buffer.slice(this.valueStart, i).trim().length > 0) {
+                        // console.log("EMITTING ARRAY", this.key, this.value);
+                        this.arrayCallbacks[this.key!](this.parseValue());
+                    }
 
                     // read next item
                     this.state = State.NEXT_ARRAY_ITEM;
