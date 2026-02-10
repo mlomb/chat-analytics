@@ -1,0 +1,21 @@
+{
+    "guild": {
+        "id": "0",
+        "name": "Direct Messages",
+        "iconUrl": "https://cdn.discordapp.com/embed/avatars/0.png"
+    },
+    "channel": {
+        "id": "530805775262679064",
+        "type": "DirectTextChat",
+        "categoryId": "0",
+        "category": "Private",
+        "name": "Someones name",
+        "topic": null
+    },
+    "dateRange": {
+        "after": null,
+        "before": null
+    },
+    "messages": [],
+    "messageCount": 0
+}
