@@ -8,7 +8,7 @@ import { MessengerParser } from "@pipeline/parse/parsers/MessengerParser";
 import { TelegramParser } from "@pipeline/parse/parsers/TelegramParser";
 import { WhatsAppParser } from "@pipeline/parse/parsers/WhatsAppParser";
 
-import { checkSamplesAreParsedCorrectly } from "@tests/parse/Parse";
+import { checkSamplesAreParsedCorrectly, runParserFromString } from "@tests/parse/Parse";
 import { loadSample } from "@tests/samples";
 
 describe("should parse correctly", () => {
@@ -42,6 +42,120 @@ describe("createParser should return the correct parser", () => {
         ["messenger", MessengerParser],
     ])("%s", async (platform, expectedClass) => {
         expect(createParser(platform)).toBeInstanceOf(expectedClass);
+    });
+});
+
+describe("TelegramParser", () => {
+    test("should parse Telegram formatted text entity objects as message text", async () => {
+        const input = JSON.stringify({
+            name: "Telegram sample",
+            type: "public_channel",
+            id: 1,
+            messages: [
+                {
+                    id: 1,
+                    type: "message",
+                    date: "2026-04-18T00:00:00",
+                    date_unixtime: "1776463200",
+                    from: "Alice",
+                    from_id: "user1",
+                    text: [{ type: "plain", text: "Hello from entity" }],
+                    text_entities: [{ type: "plain", text: "Hello from entity" }],
+                },
+            ],
+        });
+
+        const parsed = await runParserFromString(TelegramParser, [input]);
+
+        expect(parsed.messages).toIncludeAllPartialMembers([{ id: "1", textContent: "Hello from entity" }]);
+    });
+
+    test("should flatten nested Telegram formatted text entity objects", async () => {
+        const input = JSON.stringify({
+            name: "Telegram sample",
+            type: "public_channel",
+            id: 1,
+            messages: [
+                {
+                    id: 1,
+                    type: "message",
+                    date: "2026-04-18T00:00:00",
+                    date_unixtime: "1776463200",
+                    from: "Alice",
+                    from_id: "user1",
+                    text: {
+                        type: "plain",
+                        text: [{ type: "plain", text: "Nested entity" }],
+                    },
+                    text_entities: [{ type: "plain", text: "Nested entity" }],
+                },
+            ],
+        });
+
+        const parsed = await runParserFromString(TelegramParser, [input]);
+
+        expect(parsed.messages).toIncludeAllPartialMembers([{ id: "1", textContent: "Nested entity" }]);
+    });
+
+    test("should flatten Telegram poll questions formatted as text entities", async () => {
+        const input = JSON.stringify({
+            name: "Telegram sample",
+            type: "public_channel",
+            id: 1,
+            messages: [
+                {
+                    id: 1,
+                    type: "message",
+                    date: "2026-04-18T00:00:00",
+                    date_unixtime: "1776463200",
+                    from: "Alice",
+                    from_id: "user1",
+                    text: "",
+                    poll: {
+                        question: [{ type: "plain", text: "Poll question" }],
+                    },
+                },
+            ],
+        });
+
+        const parsed = await runParserFromString(TelegramParser, [input]);
+
+        expect(parsed.messages).toIncludeAllPartialMembers([{ id: "1", textContent: "Poll question" }]);
+    });
+
+    test("should parse Telegram reactions into message reactions", async () => {
+        const input = JSON.stringify({
+            name: "Telegram sample",
+            type: "public_channel",
+            id: 1,
+            messages: [
+                {
+                    id: 1,
+                    type: "message",
+                    date: "2026-04-18T00:00:00",
+                    date_unixtime: "1776463200",
+                    from: "Alice",
+                    from_id: "user1",
+                    text: "Message with reactions",
+                    reactions: [
+                        { emoji: "👍", count: 3 },
+                        { text: "🔥", count: 2 },
+                    ],
+                },
+            ],
+        });
+
+        const parsed = await runParserFromString(TelegramParser, [input]);
+
+        expect(parsed.messages).toIncludeAllPartialMembers([
+            {
+                id: "1",
+                reactions: [
+                    [{ text: "👍" }, 3],
+                    [{ text: "🔥" }, 2],
+                ],
+            },
+        ]);
     });
 });
 

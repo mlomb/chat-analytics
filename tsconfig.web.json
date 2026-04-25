@@ -2,7 +2,8 @@
   "extends": "./tsconfig.json",
 
   "compilerOptions": {
-    "sourceMap": true
+    "sourceMap": true,
+    "skipLibCheck": true
   },
 
   "include": [

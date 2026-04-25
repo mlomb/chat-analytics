@@ -2,7 +2,7 @@
 
 Hi there!
 
-Don't forget to run `npm install` before starting to develop.
+Use Node 20 for development. Run `npm ci` before starting to develop so installs stay reproducible with `package-lock.json`.
 
 ## Developing UI
 
@@ -22,6 +22,8 @@ You have to link the package locally to be able to use it, after that you have t
 npm link
 npm run build:node && chat-analytics -p whatsapp -i "export/*"
 ```
+
+Run `npm run typecheck` to validate both Node and web TypeScript projects without writing build output.
 
 ## Testing
 
