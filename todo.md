@@ -28,9 +28,11 @@
   - Status: completed. `typecheck`, parser tests, node/web builds, and Telegram report generation passed; web build keeps existing asset-size warnings.
 - [x] Create compact repository AGENTS.md.
   - Status: completed. Added root `AGENTS.md` with verified commands, architecture map, data/privacy rules, and repository workflow guardrails.
-- [ ] Run final integrated verification for prepared work.
+- [x] Run final integrated verification for prepared work.
   - Status: completed. Typecheck, parser tests, format-check, node/web builds, and Telegram report generation passed; web build has existing asset-size warnings.
-- [ ] Review prepared change set for privacy and scope.
+- [x] Review prepared change set for privacy and scope.
   - Status: completed. Scope/privacy reviews found no secrets; private `IN` export and generated `OUT/report.html` must remain uncommitted.
 - [x] Create local Git checkpoint commit for prepared work.
   - Status: completed. Created task branch and prepared a local checkpoint commit with only safe source/docs/readme files staged; private/generated data stayed uncommitted.
+- [ ] Push checkpoint branch and create pull request.
+  - Status: in_progress. Preparing remote branch and PR from verified local checkpoint.
