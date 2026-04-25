@@ -35,4 +35,4 @@
 - [x] Create local Git checkpoint commit for prepared work.
   - Status: completed. Created task branch and prepared a local checkpoint commit with only safe source/docs/readme files staged; private/generated data stayed uncommitted.
 - [ ] Push checkpoint branch and create pull request.
-  - Status: in_progress. Preparing remote branch and PR from verified local checkpoint.
+  - Status: completed. Created fork `ozand/chat-analytics`, pushed `chore/chat-analytics-p0-setup`, and opened PR https://github.com/mlomb/chat-analytics/pull/141.
