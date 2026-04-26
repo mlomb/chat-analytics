@@ -6,5 +6,11 @@ report_sample*.data
 stats.json
 report.html
 
+# local private chat exports and generated reports
+IN/*
+!IN/README.md
+OUT/*
+!OUT/README.md
+
 # pack build
 chat-analytics-*.tgz

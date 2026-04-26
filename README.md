@@ -37,7 +37,7 @@ You can generate reports from the following platforms:
 |-----------|----------------------------------------------------------------------------------|--------------|------------------|-------------------------------------------------------------------------------------|------------------|------------------------|-------------|-------|
 | Discord   | `json` from [DiscordChatExporter](https://github.com/Tyrrrz/DiscordChatExporter) | ✅            | ✅                | ✅                                                                                   | ✅                | ✅ (until link expires) | ✅ (as text) | ✅ |
 | Messenger | `json` from [Facebook DYI export](https://www.facebook.com/dyi)                  | ✅            | ❌                | ✅                                                                                   | ❌                | ❌                      | ✅ (as text) | ❌ |
-| Telegram  | `json` from [Telegram Desktop](https://desktop.telegram.org/)                    | ✅            | ✅                | ✅                                                                                   | ❌ (not provided) | ❌                      | ✅ (as text) | ✅ |
+| Telegram  | `json` from [Telegram Desktop](https://desktop.telegram.org/)                    | ✅            | ✅                | ✅                                                                                   | ✅                | ❌                      | ✅ (as text) | ✅ |
 | WhatsApp  | `txt` or `zip` exported from a phone                                             | ✅            | ❌ (not provided) | ✅<strong>*</strong> (if exported from iOS)<br>🟦 (generic if exported from Android) | ❌ (not provided) | ❌                      | ✅ (as text) | ❌ |
 
 <strong>*</strong> not all languages are supported, check [WhatsApp.ts](/pipeline/parse/parsers/WhatsApp.ts).
@@ -74,6 +74,30 @@ For example:
 npx chat-analytics -p discord -i "exported/*.json" -o report.html
 ```
 
+### Local Telegram analysis workspace
+
+For local analysis, keep private chat exports in `IN/` and generated reports in `OUT/`. Both folders are ignored by git so chat data and reports stay local.
+
+Recommended Telegram Desktop export layout:
+
+```text
+IN/
+  telegram_export_2026-04-18/
+    result.json
+    stickers/
+    video_files/
+OUT/
+```
+
+Build and generate a local Telegram report:
+
+```sh
+npm run build:node
+node dist/lib/CLI.js -p telegram -i "IN/telegram_export_2026-04-18/result.json" -o OUT/report.html
+```
+
+`result.json` is the required Telegram input. Keep media folders beside it only if you want to preserve the original export structure.
+
 ## Docker Compose
 
 You can self-host the app using the official docker image provided at https://hub.docker.com/r/mlomb/chat-analytics. Check out the [Dockerfile](/Dockerfile).
@@ -93,7 +117,8 @@ You can map the web interface port as required by changing the port mapping, int
 
 ## Docs & Development
 
-You can read [docs/README.md](/docs/README.md) for technical details, and [docs/DEV.md](/docs/DEV.md) for development instructions.  
+You can read [docs/README.md](/docs/README.md) for technical details, and [docs/DEV.md](/docs/DEV.md) for development instructions.
+Use Node 20 and `npm ci` for reproducible local installs. `npm run typecheck` validates both Node and web TypeScript builds without emitting files.
 In [docs/TODO.md](/docs/TODO.md) you can find ideas and pending stuff to be implemented.
 
 ## Acknowledgements

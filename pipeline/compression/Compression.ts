@@ -41,7 +41,7 @@ export const compressDatabase = (database: Database): string => {
     // release buffer
     (jsonBuffer as any) = undefined;
 
-    let zippedBuffer = gzipSync(rawBuffer);
+    let zippedBuffer = gzipSync(rawBuffer, { mtime: 0 });
     (rawBuffer as any) = undefined;
 
     let encoded = base91encode(zippedBuffer);

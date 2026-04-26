@@ -47,7 +47,7 @@ export const PlatformsInfo: {
         defaultFilename: "result.json",
         support: {
             stickers: false,
-            reactions: false,
+            reactions: true,
             replies: true,
             edits: true,
             calls: true,

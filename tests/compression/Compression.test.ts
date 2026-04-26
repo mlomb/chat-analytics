@@ -16,3 +16,18 @@ test("should compress and decompress correctly", async () => {
 
     expect(final).toEqual(db);
 });
+
+test("should compress identical databases deterministically", async () => {
+    const samples = await loadSamples(["discord/GC_3A_5M.json"]);
+    const db = await generateDatabase(
+        samples.map((s) => s.input),
+        { platform: "discord" },
+        TestEnv
+    );
+
+    const first = compressDatabase(db);
+    await new Promise((resolve) => setTimeout(resolve, 1100));
+    const second = compressDatabase(db);
+
+    expect(second).toEqual(first);
+});

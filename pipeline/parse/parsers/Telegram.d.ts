@@ -27,9 +27,10 @@ interface TelegramMessage {
     media_type: "sticker" | unknown;
     mime_type?: string;
     photo?: string;
-    poll?: { question: string };
+    poll?: { question: string | TextArray | TextArray[] };
+    reactions?: TelegramReaction[];
     reply_to_message_id?: number;
-    text: string | TextArray[];
+    text: string | TextArray | TextArray[];
     type: "message" | "service" | unknown;
 }
 
@@ -48,5 +49,12 @@ interface TextArray {
         | "text_link"
         | "underline"
         | unknown;
-    text: string;
+    text: string | TextArray | TextArray[];
+}
+
+interface TelegramReaction {
+    count?: number;
+    emoji?: string;
+    id?: string | number;
+    text?: string;
 }

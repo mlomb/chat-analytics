@@ -4,7 +4,7 @@ import { Timestamp } from "@pipeline/Types";
 import { FileInput, streamJSONFromFile, tryToFindTimestampAtEnd } from "@pipeline/parse/File";
 import { JSONStream } from "@pipeline/parse/JSONStream";
 import { Parser } from "@pipeline/parse/Parser";
-import { PAuthor, PCall, PChannel, PGuild, PMessage, RawID } from "@pipeline/parse/Types";
+import { PAuthor, PCall, PChannel, PEmoji, PGuild, PMessage, RawID } from "@pipeline/parse/Types";
 
 export class TelegramParser extends Parser {
     private lastChannelName?: string;
@@ -103,7 +103,7 @@ export class TelegramParser extends Parser {
                 // polls
                 if (message.poll) {
                     // put the question as the message content
-                    textContent = message.poll.question;
+                    textContent = this.parseTextArray(message.poll.question);
                 }
                 // NOTE: also :dart: emoji appears as empty content
             }
@@ -117,8 +117,7 @@ export class TelegramParser extends Parser {
                 timestampEdit,
                 textContent,
                 attachments: attachment === undefined ? [] : [attachment],
-                // NOTE: as of now, Telegram doesn't export reactions :(
-                // reactions: [],
+                reactions: this.parseReactions(message.reactions),
             };
 
             // before emitting, check if it's out of order
@@ -142,7 +141,27 @@ export class TelegramParser extends Parser {
         }
     }
 
-    private parseTextArray(input: string | TextArray | TextArray[]): string {
+    private parseReactions(reactions: TelegramReaction[] | undefined): [PEmoji, number][] | undefined {
+        const parsed = reactions
+            ?.map<[PEmoji, number] | undefined>((reaction) => {
+                const text = reaction.emoji || reaction.text;
+                if (!text) return undefined;
+
+                return [
+                    {
+                        id: reaction.id,
+                        text,
+                    },
+                    reaction.count ?? 1,
+                ];
+            })
+            .filter((reaction): reaction is [PEmoji, number] => reaction !== undefined);
+
+        return parsed && parsed.length > 0 ? parsed : undefined;
+    }
+
+    private parseTextArray(input: string | TextArray | TextArray[] | undefined): string {
+        if (input === undefined) return "";
         if (typeof input === "string") return input;
         if (Array.isArray(input)) return input.map(this.parseTextArray.bind(this)).join("");
         switch (input.type) {
@@ -151,17 +170,17 @@ export class TelegramParser extends Parser {
             // /command → command
             // /command@bot → command @bot
             case "bot_command":
-                return input.text.replace("/", "").replace("@", " @");
+                return this.parseTextArray(input.text).replace("/", "").replace("@", " @");
 
             // remove #
             case "hashtag":
-                return input.text.replace("#", "");
+                return this.parseTextArray(input.text).replace("#", "");
 
             // add redundant spaces to the sides to make sure it will be tokenized correctly
             case "link":
             case "mention":
             case "text_link":
-                return ` ${input.text} `;
+                return ` ${this.parseTextArray(input.text)} `;
 
             // emails are removed
             case "email":
@@ -169,7 +188,7 @@ export class TelegramParser extends Parser {
 
             // by default just return the text
             default:
-                return input.text;
+                return this.parseTextArray(input.text);
         }
     }
 }
