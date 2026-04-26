@@ -152,7 +152,7 @@ export class TelegramParser extends Parser {
                         id: reaction.id,
                         text,
                     },
-                    reaction.count || 1,
+                    reaction.count ?? 1,
                 ];
             })
             .filter((reaction): reaction is [PEmoji, number] => reaction !== undefined);

@@ -2,7 +2,7 @@
 
 Дата анализа: 2026-04-24
 Проект: `mlomb/chat-analytics`
-Локальная рабочая копия: `T:\Code\chat-analytics`
+Локальная рабочая копия: repository workspace
 
 ## Executive summary
 
@@ -38,21 +38,16 @@
 
 ### Локальная проверка на Telegram export
 
-Источник: `IN/telegram_export_2026-04-18/result.json`
-Сгенерированный отчет: `OUT/report.html`
+Источник: приватный Telegram Desktop JSON export в `IN/`
+Сгенерированный отчет: локальный HTML report в `OUT/`
 
 Проверенные результаты CLI:
 
-- отчет создан в `OUT/report.html`;
-- report data size: около `707 kB`;
-- report HTML size: около `1.89 MB`;
-- отчет содержит:
-  - `23,057` сообщений;
-  - `2` автора;
-  - `1` канал;
-  - `1` guild.
+- локальный HTML report создан успешно;
+- report data и HTML size находятся в ожидаемом диапазоне для небольшого Telegram export;
+- отчет содержит ожидаемые агрегаты по сообщениям, авторам, каналу и guild.
 
-Исходный Telegram export содержал `23,333` записей/сообщений верхнего уровня. Разница объясняется тем, что не все Telegram entries являются пользовательскими сообщениями, пригодными для текущей модели отчета: часть service events и специфичных Telegram-сущностей сейчас не попадает в полноценные аналитические измерения.
+Не все Telegram entries являются пользовательскими сообщениями, пригодными для текущей модели отчета: часть service events и специфичных Telegram-сущностей сейчас не попадает в полноценные аналитические измерения.
 
 ### Локальные исправления в рабочей копии
 
@@ -67,7 +62,7 @@
   - `npm ci` проходит;
   - `npm run build:node` проходит;
   - `npm run build:web` проходит;
-  - `npx jest tests/parse/Parsers.test.ts --runInBand --verbose` дает `21/21` passing tests;
+  - `npx jest tests/parse/Parsers.test.ts --runInBand --verbose` проходит;
   - CLI report generation проходит на локальном Telegram export.
 
 ---
@@ -305,7 +300,7 @@ Custom serialization в `pipeline/serialization/*` и compression в `pipeline/c
 
 ## Анализ текущего Telegram/RU отчета
 
-Судя по сгенерированному `OUT/report.html`, базовый отчет уже полезен как обзорный дашборд, но для Telegram/RU-кейса он пока остается скорее универсальным, чем действительно продуктовым.
+Судя по локально сгенерированному HTML report, базовый отчет уже полезен как обзорный дашборд, но для Telegram/RU-кейса он пока остается скорее универсальным, чем действительно продуктовым.
 
 ### Что уже есть в текущем отчете
 
@@ -563,7 +558,7 @@ Custom serialization в `pipeline/serialization/*` и compression в `pipeline/c
 ## Privacy/security notes
 
 - Репозиторий и локальные артефакты следует считать чувствительными, если внутри есть реальные chat exports.
-- `OUT/report.html` содержит embedded report data и потенциально может раскрывать содержимое переписки.
+- Локальный HTML report содержит embedded report data и потенциально может раскрывать содержимое переписки.
 - Нельзя коммитить реальные экспорты из `IN/` и реальные отчеты из `OUT/`.
 - В публичных демо следует использовать синтетические или обезличенные данные.
 - Даже агрегаты могут деанонимизировать участников маленького чата.
@@ -670,8 +665,8 @@ Custom serialization в `pipeline/serialization/*` и compression в `pipeline/c
 
 ### Local generated artifacts
 
-- `IN/telegram_export_2026-04-18/result.json`
-- `OUT/report.html`
+- private chat exports under `IN/`
+- generated reports under `OUT/`
 - `IN/README.md`
 - `OUT/README.md`
 

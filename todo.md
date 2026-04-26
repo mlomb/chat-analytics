@@ -36,3 +36,9 @@
   - Status: completed. Created task branch and prepared a local checkpoint commit with only safe source/docs/readme files staged; private/generated data stayed uncommitted.
 - [x] Push checkpoint branch and create pull request.
   - Status: completed. Created fork `ozand/chat-analytics`, pushed `chore/chat-analytics-p0-setup`, and opened PR https://github.com/mlomb/chat-analytics/pull/141.
+- [x] Run post-PR full verification.
+  - Status: completed. `typecheck`, `format-check`, full tests, node/web builds, and Telegram report generation passed; web build keeps existing size warnings.
+- [x] Perform post-PR code review pass.
+  - Status: completed. Review found no critical issues; identified deterministic gzip and documentation privacy hardening.
+- [ ] Apply any necessary post-PR fixes and update branch.
+  - Status: in_progress. Verification passed; committing and pushing deterministic gzip, safer Telegram reaction count handling, and redacted dataset-specific docs.
