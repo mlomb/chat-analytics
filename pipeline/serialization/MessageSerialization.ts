@@ -1,6 +1,7 @@
 import { Message } from "@pipeline/process/Types";
 import { BitStream } from "@pipeline/serialization/BitStream";
 import { readIndexCounts, writeIndexCounts } from "@pipeline/serialization/IndexCountsSerialization";
+import { decodeSentiment, encodeSentiment } from "@pipeline/serialization/SentimentSerialization";
 
 /** These flags are used to encode the presence of optional fields in a Message */
 // prettier-ignore
@@ -65,7 +66,7 @@ export const writeMessage = (message: Message, stream: BitStream, bitConfig: Mes
     if (flags & MessageFlags.Edited) stream.writeVarInt(message.editedAfter!);
     if (flags & MessageFlags.Text) {
         stream.setBits(8, message.langIndex!); // 0-255
-        stream.setBits(8, Math.max(-128, Math.min(127, message.sentiment!)) + 128); // 0-255
+        stream.setBits(8, encodeSentiment(message.sentiment)); // 0-255; zero means unavailable
     }
     if (flags & MessageFlags.Words) writeIndexCounts(message.words!, stream, bitConfig.wordIdxBits);
     if (flags & MessageFlags.Emojis) writeIndexCounts(message.emojis!, stream, bitConfig.emojiIdxBits);
@@ -95,7 +96,7 @@ export const readMessage = (stream: BitStream, bitConfig: MessageBitConfig): Mes
     if (flags & MessageFlags.Edited) message.editedAfter = stream.readVarInt();
     if (flags & MessageFlags.Text) {
         message.langIndex = stream.getBits(8);
-        message.sentiment = stream.getBits(8) - 128;
+        message.sentiment = decodeSentiment(stream.getBits(8));
     }
     if (flags & MessageFlags.Words) message.words = readIndexCounts(stream, bitConfig.wordIdxBits);
     if (flags & MessageFlags.Emojis) message.emojis = readIndexCounts(stream, bitConfig.emojiIdxBits);

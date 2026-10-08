@@ -5,6 +5,7 @@ import { Message, MessageComplete } from "@pipeline/process/Types";
 import { BitAddress, BitStream } from "@pipeline/serialization/BitStream";
 import { readIndexCounts, skipIndexCounts } from "@pipeline/serialization/IndexCountsSerialization";
 import { MessageBitConfig, MessageFlags } from "@pipeline/serialization/MessageSerialization";
+import { decodeSentiment } from "@pipeline/serialization/SentimentSerialization";
 
 /**
  * This is an alternative to the `readMessage` function. It deserializes parts of a Message on demand,
@@ -55,7 +56,7 @@ export class MessageView implements Message {
         if ((this.flags & MessageFlags.Edited) > 0) this.editedAfter = stream.readVarInt();
         if ((this.flags & MessageFlags.Text) > 0) {
             this.langIndex = stream.getBits(8);
-            this.sentiment = stream.getBits(8) - 128;
+            this.sentiment = decodeSentiment(stream.getBits(8));
         }
         if ((this.flags & MessageFlags.Words) > 0) {
             this.wordsOffset = stream.offset;

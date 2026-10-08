@@ -276,7 +276,7 @@ const ReportDashboard = () => {
                         title={[
                             "Sentiment over time",
                             ["by week", "by month"],
-                            ["(% of total)", "(# messages)", "(# messages diff)"],
+                            ["(% of all messages)", "(# messages)", "(# messages diff)"],
                         ]}
                         children={SentimentOverTime}
                     />,

@@ -93,6 +93,8 @@ You can map the web interface port as required by changing the port mapping, int
 
 ## Docs & Development
 
+See [the sentiment guide](docs/SENTIMENT.md) for score coverage, percentages, and interpretation limits.
+
 You can read [docs/README.md](/docs/README.md) for technical details, and [docs/DEV.md](/docs/DEV.md) for development instructions.  
 In [docs/TODO.md](/docs/TODO.md) you can find ideas and pending stuff to be implemented.
 

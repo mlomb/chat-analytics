@@ -8,6 +8,7 @@ export type SentimentInDate = {
     p: number; // messages with positive sentiment
     n: number; // messages with negative sentiment
     z: number; // messages with neutral sentiment
+    u: number; // messages without a sentiment score
 
     // raw diff, one of the following is always 0
     diffP: number;
@@ -19,6 +20,7 @@ export type SentimentInDate = {
 };
 
 export interface SentimentPerPeriod {
+    unscoredMessages: number;
     positiveMessages: number;
     negativeMessages: number;
     neutralMessages: number;
@@ -29,6 +31,7 @@ export interface SentimentPerPeriod {
 
 const fn: BlockFn<SentimentPerPeriod> = (database, filters, common, args) => {
     const res: SentimentPerPeriod = {
+        unscoredMessages: 0,
         positiveMessages: 0,
         negativeMessages: 0,
         neutralMessages: 0,
@@ -46,6 +49,7 @@ const fn: BlockFn<SentimentPerPeriod> = (database, filters, common, args) => {
             p: 0,
             n: 0,
             z: 0,
+            u: 0,
             diffP: 0,
             diffN: 0,
             percP: 0,
@@ -58,6 +62,7 @@ const fn: BlockFn<SentimentPerPeriod> = (database, filters, common, args) => {
             p: 0,
             n: 0,
             z: 0,
+            u: 0,
             diffP: 0,
             diffN: 0,
             percP: 0,
@@ -81,6 +86,10 @@ const fn: BlockFn<SentimentPerPeriod> = (database, filters, common, args) => {
                 res.perMonth[dateToMonthIndex[msg.dayIndex]].n -= 1;
                 res.perWeek[dateToWeekIndex[msg.dayIndex]].n -= 1;
             }
+        } else {
+            res.unscoredMessages++;
+            res.perMonth[dateToMonthIndex[msg.dayIndex]].u++;
+            res.perWeek[dateToWeekIndex[msg.dayIndex]].u++;
         }
     };
 
@@ -89,7 +98,7 @@ const fn: BlockFn<SentimentPerPeriod> = (database, filters, common, args) => {
     const post = (e: SentimentInDate) => {
         const p = Math.abs(e.p);
         const n = Math.abs(e.n);
-        const total = p + n + e.z;
+        const total = p + n + e.z + e.u;
         const diff = p - n;
 
         e.diffP = Math.max(0, diff);
@@ -97,7 +106,7 @@ const fn: BlockFn<SentimentPerPeriod> = (database, filters, common, args) => {
 
         if (total > 0) {
             e.percP = (p / total) * 100;
-            e.percN = (-n / total) * 100;
+            e.percN = n > 0 ? (-n / total) * 100 : 0;
         }
     };
 

@@ -1,4 +1,4 @@
-import { Color, Container, Percent, Tooltip } from "@amcharts/amcharts5";
+import { Color, Container, Legend, Percent, Tooltip } from "@amcharts/amcharts5";
 import { PieChart, PieSeries } from "@amcharts/amcharts5/percent";
 import { AmCharts5Chart } from "@report/components/viz/amcharts/AmCharts5Chart";
 
@@ -6,6 +6,7 @@ interface Props {
     n: number; // -
     p: number; // +
     z: number;
+    u: number;
 }
 
 const createPieChart = (c: Container) => {
@@ -30,17 +31,25 @@ const createPieChart = (c: Container) => {
         // disable pull-out
         toggleKey: "none",
     });
-    series.labels.template.setAll({
-        textType: "circular",
-        centerX: 0,
-        centerY: 0,
-    });
+    // A large unscored share can leave very small scored slices; use a legend to avoid overlapping labels.
+    series.labels.template.set("forceHidden", true);
+    series.ticks.template.set("forceHidden", true);
+    const legend = chart.children.push(
+        Legend.new(c.root, {
+            layout: c.root.verticalLayout,
+            clickTarget: "none",
+            paddingBottom: 24,
+        })
+    );
+    legend.labels.template.set("text", "{category}");
+    legend.valueLabels.template.set("text", "{valuePercentTotal.formatNumber('0.0')}%");
     series
         .get("colors")!
         .set("colors", [
             c.root.interfaceColors.get("positive")!,
             c.root.interfaceColors.get("negative")!,
             Color.fromHex(0x00bcd4),
+            Color.fromHex(0x9e9e9e),
         ]);
 
     return (data: Props) => {
@@ -57,7 +66,12 @@ const createPieChart = (c: Container) => {
                 tag: "Neutral",
                 count: data.z,
             },
+            {
+                tag: "Not scored",
+                count: data.u,
+            },
         ]);
+        legend.data.setAll(series.dataItems);
     };
 };
 
